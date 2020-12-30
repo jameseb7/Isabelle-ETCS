@@ -1772,19 +1772,22 @@ section  \<open>Axiom 6: Equivalence Classes\<close>
 
 definition reflexive :: "cset \<Rightarrow> bool" where
   "reflexive R = (\<exists> X m. (R,m) \<subseteq>\<^sub>c X\<times>\<^sub>cX \<and> 
- (\<forall>x. x \<in>\<^sub>c X \<longrightarrow>
- (\<langle>x,x\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m))))"
+    (\<forall>x. x \<in>\<^sub>c X \<longrightarrow>
+      (\<langle>x,x\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m))))"
 
 definition symmetric :: "cset \<Rightarrow> bool" where
   "symmetric R = (\<exists> X m. (R,m)  \<subseteq>\<^sub>c X\<times>\<^sub>cX \<and>
- (\<forall>x y. x \<in>\<^sub>c X \<and>  y \<in>\<^sub>c X \<longrightarrow> 
-(\<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m) \<longrightarrow> \<langle>y,x\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m))))" 
+    (\<forall>x y. x \<in>\<^sub>c X \<and>  y \<in>\<^sub>c X \<longrightarrow> 
+      (\<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m) \<longrightarrow> \<langle>y,x\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m))))" 
 
 definition transitive :: "cset \<Rightarrow> bool" where
   "transitive R = (\<exists> X m. (R,m)  \<subseteq>\<^sub>c X\<times>\<^sub>cX \<and>
-(\<forall>x y z. x \<in>\<^sub>c X \<and>  y \<in>\<^sub>c X \<and> z \<in>\<^sub>c X  \<longrightarrow>
-(\<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m) \<and> \<langle>y,z\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m)
- \<longrightarrow> \<langle>x,z\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m))))"
+    (\<forall>x y z. x \<in>\<^sub>c X \<and>  y \<in>\<^sub>c X \<and> z \<in>\<^sub>c X  \<longrightarrow>
+      (\<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m) \<and> \<langle>y,z\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m)
+        \<longrightarrow> \<langle>x,z\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> (R, m))))"
+
+definition equivalance_rel :: "cset \<Rightarrow> bool" where
+  "equivalance_rel R  \<longleftrightarrow> (reflexive R \<and> symmetric R \<and> transitive R)"
 
 (*definition equivalence_relation :: "cset \<Rightarrow> cset \<Rightarrow> bool" where
   "equivalence_relation R X = (R \<subseteq>\<^sub>c X \<times>\<^sub>c X)"*)
