@@ -2781,6 +2781,37 @@ axiomatization
    triangle_commutes one \<nat>\<^sub>c X zero u q \<and>
    square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X u f successor u)"
 
+lemma natural_number_object_func_unique:
+  assumes u_type: "u : \<nat>\<^sub>c \<rightarrow> X" and v_type: "v : \<nat>\<^sub>c \<rightarrow> X" and f_type: "f: X \<rightarrow> X"
+  assumes zeros_eq: "u \<circ>\<^sub>c zero = v \<circ>\<^sub>c zero"
+  assumes u_successor_eq: "u \<circ>\<^sub>c successor = f \<circ>\<^sub>c u"
+  assumes v_successor_eq: "v \<circ>\<^sub>c successor = f \<circ>\<^sub>c v"
+  shows "u = v"
+proof -
+  have u_zero_type: "u \<circ>\<^sub>c zero : one \<rightarrow> X"
+    using u_type zero_type by auto
+  have triangle_commutes_u: "triangle_commutes one \<nat>\<^sub>c X zero u (u \<circ>\<^sub>c zero)"
+    by (simp add: triangle_commutes_def u_type u_zero_type zero_type)
+  have square_commutes_u: "square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X u f successor u"
+    by (simp add: f_type square_commutes_def successor_type u_successor_eq u_type)
+  have uniqueness: "\<And> w. w: \<nat>\<^sub>c \<rightarrow> X \<and>
+   triangle_commutes one \<nat>\<^sub>c X zero w (u \<circ>\<^sub>c zero) \<and>
+   square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X w f successor w \<Longrightarrow> w = u"
+    using u_zero_type triangle_commutes_u square_commutes_u
+    using natural_number_object_property square_commutes_def by blast
+
+  have v_zero_type: "v \<circ>\<^sub>c zero : one \<rightarrow> X"
+    using v_type zero_type by auto
+  have triangle_commutes_v: "triangle_commutes one \<nat>\<^sub>c X zero v (u \<circ>\<^sub>c zero)"
+    by (simp add: triangle_commutes_def v_type v_zero_type zero_type zeros_eq)
+  have square_commutes_v: "square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X v f successor v"
+    by (simp add: f_type square_commutes_def successor_type v_successor_eq v_type)
+
+  from uniqueness show "u = v"
+    using square_commutes_v triangle_commutes_v v_type by blast
+qed
+
+
 definition is_NNO :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool"  where
    "is_NNO Y z s \<longleftrightarrow>(\<forall> X f q. ((q : one \<rightarrow> X) \<and> (f: X \<rightarrow> X))\<longrightarrow>
    (\<exists>!u. u: Y \<rightarrow> X \<and>
@@ -3224,9 +3255,155 @@ qed
 
 lemma add_curried_type: "add_curried:  \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   by (simp add: add_curried_property)
-
-
  
+lemma add_curried_0_eq: "add_curried \<circ>\<^sub>c zero = (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
+  using add_curried_property triangle_commutes_def by blast
+
+lemma add_curried_comp_succ_eq: "add_curried \<circ>\<^sub>c successor = (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) \<circ>\<^sub>c add_curried"
+  using add_curried_property square_commutes_def by auto
+
+definition add_uncurried :: "cfunc"
+  where "add_uncurried = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add_curried)"
+
+lemma add_uncurried_type: "add_uncurried:  \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c"
+  unfolding add_uncurried_def
+proof - 
+  have "id \<nat>\<^sub>c \<times>\<^sub>f add_curried : \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<times>\<^sub>c(\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)"
+    by (simp add: add_curried_property cfunc_cross_prod_type id_type)
+  then show "eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_curried : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    using comp_type eval_func_type by blast
+qed
+
+
+definition add :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixl "+\<^sub>\<nat>" 65)
+  where "m +\<^sub>\<nat> n = add_uncurried\<circ>\<^sub>c\<langle>m, n\<rangle>"
+
+lemma add_def2:
+  assumes "m\<in>\<^sub>c  \<nat>\<^sub>c" "n\<in>\<^sub>c  \<nat>\<^sub>c"
+  shows "m +\<^sub>\<nat> n = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add_curried \<circ>\<^sub>c n\<rangle>"
+  unfolding add_def add_uncurried_def
+  by (smt add_curried_type assms cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_associative id_left_unit id_type)
+
+
+
+lemma add_respects_zero_on_right:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "m +\<^sub>\<nat> zero = m"
+proof -
+  have projsharp_type: "(left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>: one \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+    by (simp add: left_cart_proj_type transpose_func_def)
+  
+  have "m +\<^sub>\<nat> zero =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add_curried \<circ>\<^sub>c zero\<rangle>"
+    by (simp add: add_def2 assms zero_type)
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> \<rangle>"
+    by (simp add: add_curried_0_eq)
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> \<circ>\<^sub>c id one \<rangle>"
+    by (metis assms cfunc_type_def id_left_unit id_right_unit projsharp_type)
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f  (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> \<circ>\<^sub>c  \<langle>m, id one \<rangle>)"
+    by (smt assms cfunc_cross_prod_comp_cfunc_prod id_type projsharp_type)
+  also have "... =  (left_cart_proj \<nat>\<^sub>c one) \<circ>\<^sub>c \<langle>m,id one\<rangle>"
+    by (metis comp_associative left_cart_proj_type transpose_func_def)
+  also have "... = m"
+    using assms id_type left_cart_proj_cfunc_prod by blast
+  then show "m +\<^sub>\<nat> zero = m"
+    by (simp add: calculation)
+qed
+
+lemma zero_betaN_type: 
+  shows "(zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>): \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+  using comp_type terminal_func_type zero_type by blast
+
+lemma add_apply1:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n\<in>\<^sub>c \<nat>\<^sub>c"
+  shows "m +\<^sub>\<nat> n = add_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<circ>\<^sub>c n"
+  unfolding add_def 
+proof - 
+  have fact1: "m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>:\<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    using assms(1) comp_type terminal_func_type by blast
+  have "add_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = add_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c id one  ,id \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>"
+    by (metis assms cfunc_type_def id_left_unit id_right_unit)
+  also have "... = add_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c (\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n)  ,id \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>"
+    by (metis assms(2) comp_type id_type one_unique_element terminal_func_type)
+  also have "... = add_uncurried \<circ>\<^sub>c \<langle>(m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c n  ,id \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>"
+    using comp_associative by auto
+  also have "... = add_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<circ>\<^sub>c n"
+    using assms(2) cfunc_prod_comp fact1 id_type by fastforce
+  then show "add_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = add_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n"  using calculation by auto
+qed
+
+
+lemma add_respects_zero_on_left:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "zero +\<^sub>\<nat> m = m"
+proof - 
+  have "add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle> = id \<nat>\<^sub>c"
+  proof (rule natural_number_object_func_unique[where f= successor,  where X= "\<nat>\<^sub>c"])
+    show "add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      by (meson add_uncurried_type cfunc_prod_type comp_type id_type terminal_func_type zero_type)
+    show "id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      by (simp add: id_type)
+    show "successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      by (simp add: successor_type)
+    show "(add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+    proof - 
+      have "(add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = 
+             add_uncurried \<circ>\<^sub>c \<langle>(zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)\<circ>\<^sub>c zero,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero\<rangle>"
+        by (smt cfunc_prod_comp comp_associative comp_type id_type terminal_func_type zero_type)
+      also have "... =add_uncurried \<circ>\<^sub>c \<langle>zero,zero \<rangle>"
+        by (metis cfunc_type_def comp_associative comp_type id_left_unit id_right_unit id_type one_unique_element terminal_func_type zero_type)
+      also have "... = zero"
+        using add_def add_respects_zero_on_right zero_type by auto
+      also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+        by (metis cfunc_type_def id_left_unit zero_type)
+      then show ?thesis  using calculation by auto
+    qed
+    show "(add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor =
+    successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>"
+    proof - 
+      have "(add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor =
+           add_uncurried \<circ>\<^sub>c (\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c successor) "
+        by (simp add: comp_associative)
+      also have "... =  add_uncurried \<circ>\<^sub>c \<langle>(zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor\<rangle>"
+        using cfunc_prod_comp id_type comp_type  successor_type zero_betaN_type by fastforce
+      also have "... =  add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> ,  successor\<rangle>"
+        by (metis cfunc_type_def comp_associative comp_type id_left_unit successor_type terminal_func_type terminal_func_unique)
+      also have "... = (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_curried) \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>"
+        unfolding add_uncurried_def
+        by auto
+      also have "... =  eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,  add_curried \<circ>\<^sub>c successor\<rangle>"
+        by (smt \<open>id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<close> add_curried_property cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_associative id_left_unit successor_type zero_betaN_type)
+      also have "... =  eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,  successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add_curried\<rangle>"
+        by (simp add: add_curried_comp_succ_eq)
+      also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id \<nat>\<^sub>c \<times>\<^sub>f successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f)\<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add_curried\<rangle>"
+        by (smt \<open>id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<close> add_curried_property cfunc_cross_prod_comp_cfunc_prod cfunc_type_def id_left_unit square_commutes_def zero_betaN_type)
+      also have "... = (successor  \<circ>\<^sub>c  eval_func \<nat>\<^sub>c \<nat>\<^sub>c ) \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add_curried\<rangle>"
+        unfolding exp_func_def
+        using \<open>successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<close> cfunc_type_def codomain_comp comp_associative compatible_comp_ETCS_func domain_comp eval_func_type transpose_func_def by auto
+      also have "... = successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_curried) \<circ>\<^sub>c \<langle>zero\<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>"
+        by (smt \<open>id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<close> add_curried_property cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_associative id_left_unit id_right_unit zero_betaN_type)
+      also have "... = successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>"
+        by (simp add: add_uncurried_def comp_associative)
+      then show ?thesis using calculation by auto
+    qed
+    show " id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
+      by (metis cfunc_type_def id_left_unit id_right_unit successor_type)
+  qed
+  then show "zero +\<^sub>\<nat> m = m"
+    by (metis add_apply1 assms cfunc_type_def comp_associative id_left_unit zero_type)
+qed
+
+
+lemma add_respects_succ1:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
+  shows "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n)  =  successor\<circ>\<^sub>c (m +\<^sub>\<nat> n)"
+proof - 
+  have "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n) =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add_curried \<circ>\<^sub>c (successor  \<circ>\<^sub>c n)\<rangle>"
+    using add_def2 assms successor_type by auto
+  also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add_curried \<circ>\<^sub>c n\<rangle>"
+    by (simp add: add_curried_comp_succ_eq comp_associative)
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m, successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add_curried \<circ>\<^sub>c n\<rangle>"
+    by (metis assms(1) cfunc_type_def id_left_unit)
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) \<circ>\<^sub>c \<langle>m,add_curried \<circ>\<^sub>c n\<rangle>)"
 
 section \<open>Axiom 11: Axiom of Choice\<close>
 
