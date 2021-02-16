@@ -3549,6 +3549,13 @@ proof -
     then show ?thesis using calculation by auto
   qed
 
+  have fact6b: "successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))
+= (( add_uncurried \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>"
+  proof - 
+    have "successor \<circ>\<^sub>c add_uncurried:  \<nat>\<^sub>c \<times>\<^sub>c  \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c"
+      using add_uncurried_type comp_type successor_type by blast
+    then have "successor \<circ>\<^sub>c add_uncurried =((successor \<circ>\<^sub>c add_uncurried)\<^sup>\<sharp>)\<^sup>\<flat>"
+      using  flat_cancels_sharp
 
 (*
 then have fact5b: "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f(successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one))\<^sup>\<sharp>) =
