@@ -1,2 +1,7 @@
 *~
 \#*\#
+
+# ignore hidden files created on Mac
+.DS_Store
+.AppleDouble
+.LSOverride
