@@ -3424,7 +3424,7 @@ qed
 
 lemma add_respects_succ2:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
-  shows "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n)  =  (successor\<circ>\<^sub>c m) +\<^sub>\<nat> (successor\<circ>\<^sub>c n)"
+  shows "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n)  =  (successor\<circ>\<^sub>c m) +\<^sub>\<nat> n"
 proof -
   have fact00: "(successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c):  \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c"
     by (simp add: cfunc_cross_prod_type id_type successor_type)
@@ -3480,7 +3480,7 @@ proof -
 (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor))\<^sup>\<sharp> \<circ>\<^sub>c zero"
     using transpose_func_unique fact2 fact21 fact23 by auto
   have fact5: "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f((add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>\<circ>\<^sub>c zero)) =
-              successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
+              successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)" (*page 13 big aligned equation*)
   proof -
     have "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f((add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>\<circ>\<^sub>c zero))
      = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f((add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>fzero)"
@@ -3524,21 +3524,143 @@ proof -
     then show ?thesis using calculation by auto
   qed
 
+  
+
   have fact6b: "successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))
     = (( add_uncurried \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>"
     by (smt add_curried_comp_succ_eq add_curried_type add_uncurried_def comp_associative comp_type flat_type inv_transpose_of_composition sharp_cancels_flat successor_type transpose_func_def transpose_of_comp)
 
 
-(*
-then have fact5b: "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f(successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one))\<^sup>\<sharp>) =
-              successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
-  using fact3 by blast
-then have fact5c: "add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>\<circ>\<^sub>c zero =
-              (successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one))\<^sup>\<sharp>"
-using transpose_func_unique fact02 fact03 fact5 fact5b
-  *)
+
+  have fact6c: "(add_uncurried \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp> \<circ>\<^sub>c successor
+= successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f  \<circ>\<^sub>c (add_uncurried  \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp>"
+  proof -
+    have "(add_uncurried \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp> \<circ>\<^sub>c successor
+= (successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp>"
+      by (smt comp_type fact1 fact6b sharp_cancels_flat successor_type)
+    also have "... = successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f  \<circ>\<^sub>c (add_uncurried  \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp>"
+      using add_uncurried_type comp_type fact0 successor_type transpose_of_comp by blast
+    then show ?thesis using calculation by auto
+  qed
+
+  have fact6d: "(successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))
+              = add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f successor)"
+  proof - 
+    have "(successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))
+              = successor  \<circ>\<^sub>c eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (add_curried)) \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)"
+      by (simp add: add_uncurried_def comp_associative)
+    also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (add_curried)) \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)"
+proof -
+    have f1: "eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried\<^sup>\<sharp> = add_uncurried"
+        using add_uncurried_type transpose_func_def by blast
+      have f2: "domain successor = \<nat>\<^sub>c"
+        using cfunc_type_def successor_type by blast
+      have f3: "codomain (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried\<^sup>\<sharp>) = domain (eval_func \<nat>\<^sub>c \<nat>\<^sub>c)"
+        using f1 by (metis (no_types) add_uncurried_type cfunc_type_def compatible_comp_ETCS_func)
+      have f4: "successor \<circ>\<^sub>c add_uncurried \<in> ETCS_func"
+        using add_uncurried_type cfunc_type_def compatible_comp_ETCS_func successor_type by fastforce
+      have f5: "\<forall>c ca. codomain (eval_func ca c) = ca"
+        by (meson cfunc_type_def eval_func_type)
+      have f6: "\<forall>c ca. eval_func ca c \<in> ETCS_func"
+        using cfunc_type_def eval_func_type by presburger
+      have f7: "successor \<circ>\<^sub>c successor \<in> ETCS_func"
+        using cfunc_type_def compatible_comp_ETCS_func successor_type by presburger
+      then have f8: "domain (successor \<circ>\<^sub>c successor) = \<nat>\<^sub>c"
+        using f6 f5 f2 by (metis comp_associative compatible_comp_ETCS_func)
+      have "eval_func (codomain (successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c)) \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> = successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c"
+        using f4 f3 f1 by (metis cfunc_type_def comp_associative compatible_comp_ETCS_func eval_func_type transpose_func_def)
+     then show ?thesis
+      using f8 f7 f6 f5 by (metis (no_types) add_uncurried_def comp_associative compatible_comp_ETCS_func exp_func_def)
+  qed
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add_curried)) \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)"
+    by (smt add_curried_property cfunc_cross_prod_comp_cfunc_cross_prod comp_associative id_domain id_right_unit id_type square_commutes_def)
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  ( add_curried \<circ>\<^sub>c successor)) \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: add_curried_comp_succ_eq)
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_curried) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)"
+    using add_curried_type comp_associative identity_distributes_across_composition successor_type by auto
+  also have "... = add_uncurried \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: add_uncurried_def comp_associative)
+  also have "... = add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f successor)"
+  proof -
+    have "successor \<times>\<^sub>f successor = (id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<times>\<^sub>f (successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c)"
+      by (metis (no_types) cfunc_type_def id_left_unit id_right_unit successor_type)
+    then show ?thesis
+      by (metis (no_types) cfunc_cross_prod_comp_cfunc_cross_prod id_type successor_type)
+  qed
+ then show ?thesis using calculation by auto
+qed
+
+  have fact6d: "(successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)) = 
+               ((add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>"
+  proof - 
+    have "(successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)) =  
+        add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f successor)"
+      by (simp add: fact6d)
+    also have "... = (add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor))"
+      by (metis (mono_tags, lifting) cfunc_cross_prod_comp_cfunc_cross_prod cfunc_type_def id_left_unit id_right_unit id_type successor_type)
+    also have "... = ((add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>"
+      by (smt add_uncurried_type comp_associative comp_type fact00 inv_transpose_func_def2 inv_transpose_of_composition successor_type transpose_func_def)
+    then show ?thesis using calculation by auto
+  qed
 
 
+  have fact6e: "(add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c successor = 
+                successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>" 
+  proof - 
+    have "(add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c successor = 
+          (successor  \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>"
+    proof -
+      have "\<forall>c ca. ca \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> c \<or> \<not> ca : \<nat>\<^sub>c \<rightarrow> c"
+        by (meson comp_type successor_type)
+      then show ?thesis
+        by (metis (no_types) fact01 fact6d sharp_cancels_flat)
+    qed
+    also have "... = successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>"
+      by (meson add_uncurried_type comp_type fact00 successor_type transpose_of_comp)
+then show ?thesis using calculation by auto
+  qed
+  
+
+  
+  have fact8: " (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  (successor)))\<^sup>\<sharp> = 
+                (add_uncurried \<circ>\<^sub>c ((successor) \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c ))\<^sup>\<sharp>" 
+   proof (rule natural_number_object_func_unique[where f= "successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f",  where X= "\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"])
+     show sg1: "(add_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+       by (simp add: fact1)
+     show sg2: "(add_uncurried \<circ>\<^sub>c successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+       by (simp add: fact01)
+     show sg3: "successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f : \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+       by (simp add: exp_func_type successor_type)
+     show sg4: " (add_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)\<^sup>\<sharp> \<circ>\<^sub>c zero =
+              (add_uncurried \<circ>\<^sub>c successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
+       using fact02 fact21 fact4 fact5 transpose_func_unique by auto
+     show sg5: "(add_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)\<^sup>\<sharp> \<circ>\<^sub>c successor =
+                successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)\<^sup>\<sharp>"
+       using fact6c by auto
+     show sg6: "(add_uncurried \<circ>\<^sub>c successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor =
+                 successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
+       by (simp add: fact6e)
+   qed
+    
+   have fact9: "(add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  (successor))) = 
+                (add_uncurried \<circ>\<^sub>c ((successor) \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c ))"
+     by (smt add_uncurried_type comp_type fact0 fact00 fact8 transpose_func_def)
+
+   show "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n)  =  (successor\<circ>\<^sub>c m) +\<^sub>\<nat> n"
+   proof - 
+     have "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n) = add_uncurried  \<circ>\<^sub>c \<langle>m, successor  \<circ>\<^sub>c n\<rangle>"
+       by (simp add: add_def)
+     also have "... = add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  (successor)) \<circ>\<^sub>c  \<langle>m,n\<rangle>"
+       by (smt assms(1) assms(2) cfunc_cross_prod_comp_cfunc_prod cfunc_type_def id_left_unit id_type successor_type)
+     also have "... = add_uncurried \<circ>\<^sub>c ((successor)\<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c  ) \<circ>\<^sub>c  \<langle>m,n\<rangle>"
+       by (simp add: comp_associative fact9)
+     also have "... = add_uncurried  \<circ>\<^sub>c \<langle>successor  \<circ>\<^sub>c m, n\<rangle>"
+       by (smt assms(1) assms(2) cfunc_cross_prod_comp_cfunc_prod cfunc_type_def id_left_unit id_type successor_type)
+     also have "... = (successor\<circ>\<^sub>c m) +\<^sub>\<nat> n"
+       by (simp add: add_def)
+   then show ?thesis using calculation by auto
+ qed
+qed
 
 
 section \<open>Axiom 11: Axiom of Choice\<close>
