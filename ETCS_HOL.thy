@@ -2185,6 +2185,7 @@ axiomatization
   eval_func  :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" and
   transpose_func :: "cfunc \<Rightarrow> cfunc" ("_\<^sup>\<sharp>" [100]100)
 where
+  exp_set_inj: "X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B" and
   eval_func_type:  "eval_func X A : A\<times>\<^sub>c X\<^bsup>A\<^esup> \<rightarrow> X" and
   transpose_func_def: "f : A \<times>\<^sub>c Z \<rightarrow> X \<longrightarrow> (f\<^sup>\<sharp> : Z \<rightarrow> X\<^bsup>A\<^esup> \<and> (eval_func X A) \<circ>\<^sub>c (id A)\<times>\<^sub>f(f\<^sup>\<sharp>) = f)" and
   transpose_func_unique: "(g: Z \<rightarrow> X\<^bsup>A\<^esup> \<and> ((eval_func X A) \<circ>\<^sub>c (id A)\<times>\<^sub>fg = f) \<and> f : A\<times>\<^sub>cZ \<rightarrow> X) \<longrightarrow> g = f\<^sup>\<sharp>"
@@ -2249,7 +2250,7 @@ definition inv_transpose_func :: "cfunc \<Rightarrow> cfunc" ("_\<^sup>\<flat>" 
   "f\<^sup>\<flat> = (SOME g. \<exists> Z X A. domain f = Z \<and> codomain f = X\<^bsup>A\<^esup> \<and> g = (eval_func X A) \<circ>\<^sub>c (id A \<times>\<^sub>f f))"
 
 lemma inv_transpose_func_def2:
-  assumes "f : Z \<rightarrow> X\<^bsup>A\<^esup>" "\<And>X A Y B. X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
+  assumes "f : Z \<rightarrow> X\<^bsup>A\<^esup>"
   shows "f\<^sup>\<flat> = (eval_func X A) \<circ>\<^sub>c (id A \<times>\<^sub>f f)"
   unfolding inv_transpose_func_def
 proof (rule someI2)
@@ -2259,13 +2260,13 @@ next
   fix g
   assume "\<exists>Z X A. domain f = Z \<and> codomain f = X\<^bsup>A\<^esup> \<and> g = eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f"
   then show "g = eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f"
-    by (metis assms cfunc_type_def)
+    by (metis assms cfunc_type_def exp_set_inj)
 qed
 
 lemma flat_type:
-  assumes f_type: "f : Z \<rightarrow> X\<^bsup>A\<^esup>" and "\<And>X A Y B. X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
+  assumes f_type: "f : Z \<rightarrow> X\<^bsup>A\<^esup>"
   shows "f\<^sup>\<flat> : A \<times>\<^sub>c Z \<rightarrow> X"
-proof (subst inv_transpose_func_def2, auto, insert assms, blast, blast, blast)
+proof (subst inv_transpose_func_def2[where Z=Z, where X=X, where A=A], simp add: assms)
   have cross_type: "id\<^sub>c A \<times>\<^sub>f f : A \<times>\<^sub>c Z \<rightarrow> A \<times>\<^sub>c X\<^bsup>A\<^esup>"
     by (simp add: cfunc_cross_prod_type f_type id_type)
   have "eval_func X A : A \<times>\<^sub>c X\<^bsup>A\<^esup> \<rightarrow> X"
@@ -2274,54 +2275,28 @@ proof (subst inv_transpose_func_def2, auto, insert assms, blast, blast, blast)
     using cross_type by auto
 qed
 
-lemma "X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
-proof (rule ccontr, auto)
-  assume XA_eq_YB: "X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup>"
-  assume X_neq_Y: "X \<noteq> Y"
-
-  have eval_func_XA_type: "eval_func X A : A \<times>\<^sub>c X\<^bsup>A\<^esup> \<rightarrow> X"
-    by (simp add: eval_func_type)
-  have eval_func_YB_type: "eval_func Y B : B \<times>\<^sub>c Y\<^bsup>B\<^esup> \<rightarrow> Y"
-    by (simp add: eval_func_type)
-  obtain f Z where f_type: "f : A \<times>\<^sub>c Z \<rightarrow> X"
-    using eval_func_XA_type by auto
-  obtain g where g_type: "g : B \<times>\<^sub>c Z \<rightarrow> Y"
-    by (metis XA_eq_YB \<open>f : A \<times>\<^sub>c Z \<rightarrow> X\<close> cfunc_cross_prod_type comp_type eval_func_type is_isomorphic_def isomorphic_is_reflexive transpose_func_def)
-
-  have f_neq_g: "f \<noteq> g"
-    using X_neq_Y cfunc_type_def f_type g_type by auto
-
-  have f_sharp_type: "f\<^sup>\<sharp> : Z \<rightarrow> X\<^bsup>A\<^esup>"
-    by (simp add: f_type transpose_func_def)
-  have g_sharp_type: "g\<^sup>\<sharp> : Z \<rightarrow> Y\<^bsup>B\<^esup>"
-    by (simp add: g_type transpose_func_def)
-  oops
-
 (* Proposition 2.5.4 *)
-lemma inv_transpose_of_composition: 
-  assumes "\<And>X A Y B. X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
+lemma inv_transpose_of_composition:
   shows "f: X \<rightarrow> Y \<and> g: Y \<rightarrow> Z\<^bsup>A\<^esup> \<Longrightarrow> (g \<circ>\<^sub>c f)\<^sup>\<flat> = g\<^sup>\<flat> \<circ>\<^sub>c (id(A) \<times>\<^sub>f f)"
-  by (smt assms comp_associative comp_type identity_distributes_across_composition inv_transpose_func_def2)
+  by (smt comp_associative comp_type identity_distributes_across_composition inv_transpose_func_def2)
 
 (* Proposition 2.5.5 *)
 lemma flat_cancels_sharp:
-  assumes "\<And>X A Y B. X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
-  shows "f : A \<times>\<^sub>c Z \<rightarrow> X  \<Longrightarrow> (f\<^sup>\<sharp>)\<^sup>\<flat> = f"
-  by (metis assms inv_transpose_func_def2 transpose_func_def)
+  "f : A \<times>\<^sub>c Z \<rightarrow> X  \<Longrightarrow> (f\<^sup>\<sharp>)\<^sup>\<flat> = f"
+  by (metis inv_transpose_func_def2 transpose_func_def)
 
 (* Proposition 2.5.6 *)
 lemma sharp_cancels_flat:
-  assumes "\<And>X A Y B. X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
   shows "f: Z \<rightarrow> X\<^bsup>A\<^esup>  \<Longrightarrow> (f\<^sup>\<flat>)\<^sup>\<sharp> = f"
 proof -
   assume f_type: "f : Z \<rightarrow> X\<^bsup>A\<^esup>"
   then have "f\<^sup>\<flat> : A \<times>\<^sub>c Z \<rightarrow> X"
-    using assms flat_type by blast
+    using flat_type by blast
   then have uniqueness: "\<forall> g. g : Z \<rightarrow> X\<^bsup>A\<^esup> \<longrightarrow> eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f g) = f\<^sup>\<flat> \<longrightarrow> g = (f\<^sup>\<flat>)\<^sup>\<sharp>"
     using transpose_func_unique by blast
 
   have "eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f f) = f\<^sup>\<flat>"
-    by (metis assms f_type inv_transpose_func_def2)
+    by (metis f_type inv_transpose_func_def2)
   then show "f\<^sup>\<flat>\<^sup>\<sharp> = f"
     using f_type uniqueness by auto
 qed
@@ -3550,12 +3525,9 @@ proof -
   qed
 
   have fact6b: "successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))
-= (( add_uncurried \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>"
-  proof - 
-    have "successor \<circ>\<^sub>c add_uncurried:  \<nat>\<^sub>c \<times>\<^sub>c  \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c"
-      using add_uncurried_type comp_type successor_type by blast
-    then have "successor \<circ>\<^sub>c add_uncurried =((successor \<circ>\<^sub>c add_uncurried)\<^sup>\<sharp>)\<^sup>\<flat>"
-      using  flat_cancels_sharp
+    = (( add_uncurried \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>"
+    by (smt add_curried_comp_succ_eq add_curried_type add_uncurried_def comp_associative comp_type flat_type inv_transpose_of_composition sharp_cancels_flat successor_type transpose_func_def transpose_of_comp)
+
 
 (*
 then have fact5b: "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f(successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one))\<^sup>\<sharp>) =
