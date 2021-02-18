@@ -617,6 +617,9 @@ proof -
     by auto
 qed
 
+lemma swap_type: "\<langle>right_cart_proj X Y, left_cart_proj X Y\<rangle> : X \<times>\<^sub>c Y \<rightarrow> Y \<times>\<^sub>c X"
+  by (simp add: cfunc_prod_type left_cart_proj_type right_cart_proj_type)
+
 section \<open>Axiom 3: Terminal Objects\<close>
 
 axiomatization
@@ -3705,6 +3708,26 @@ add_uncurried \<circ>\<^sub>c \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^
   also have "... = successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c  \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle>\<circ>\<^sub>c \<langle>m,n\<rangle>"
     using cfunc_prod_comp  left_cart_proj_type right_cart_proj_type type2 by fastforce 
   then show ?thesis using calculation by auto
+qed
+
+lemma pointfree_add_pi1_pi0_1xsEqs_s_add_pi1_pi_0:
+  shows "add_uncurried \<circ>\<^sub>c \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle> \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)
+    = successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c  \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle>"
+proof (rule one_separator[where X="\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c", where Y="\<nat>\<^sub>c"])
+  have cross_type: "id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: cfunc_cross_prod_type id_type successor_type)
+  show "add_uncurried \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor
+          : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    using add_uncurried_type comp_type cross_type swap_type by blast
+  show "successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>
+          : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    using add_uncurried_type comp_type successor_type swap_type by blast
+next
+  fix x
+  assume x_type: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+  show "(add_uncurried \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c x
+    = (successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c x"
+    using add_pi1_pi0_1xsEqs_s_add_pi1_pi_0 cart_prod_decomp comp_associative x_type by fastforce
 qed
 
 lemma add_commutes:
