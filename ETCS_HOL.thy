@@ -625,8 +625,7 @@ axiomatization
 where
   terminal_func_type: "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> one" and
   terminal_func_unique: "\<forall> h. (h :  X \<rightarrow> one)  \<longrightarrow> (h =\<beta>\<^bsub>X\<^esub>)" and
-  one_separator: "\<forall> f g. (f : X \<rightarrow> Y) \<and> (g : X \<rightarrow> Y) \<longrightarrow> 
-    ((\<forall> x. x : one \<rightarrow> X \<longrightarrow> f \<circ>\<^sub>c x = g \<circ>\<^sub>c x) \<longrightarrow> f = g)"
+  one_separator: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> (\<And> x. x : one \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c x = g \<circ>\<^sub>c x) \<Longrightarrow> f = g"
 
 abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
   "x \<in>\<^sub>c X \<equiv> (x : one \<rightarrow> X)"
@@ -1545,15 +1544,18 @@ next
   have eq1: "fibered_product_right_proj X f f X \<circ>\<^sub>c xx = id X"
     by (metis xx_assms comp_associative diagonal_def fibered_product_right_proj_def id_type right_cart_proj_cfunc_prod)
 
-  have ext: "\<forall>x. x \<in>\<^sub>c X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<longrightarrow> (xx \<circ>\<^sub>c fibered_product_right_proj X f f X) \<circ>\<^sub>c x = id (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) \<circ>\<^sub>c x"
-  proof auto
+  have eq2: "xx \<circ>\<^sub>c fibered_product_right_proj X f f X = id (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X)"
+  proof (rule one_separator[where X="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X", where Y="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"])
+    show "xx \<circ>\<^sub>c fibered_product_right_proj X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"
+      using assms(1) comp_type fibered_product_right_proj_type xx_assms by blast
+    show "id\<^sub>c (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"
+      by (simp add: id_type)
+  next
     fix x
     assume x_type: "x \<in>\<^sub>c X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"
     then obtain a where a_assms: "\<langle>a,a\<rangle> = fibered_product_morphism X f f X \<circ>\<^sub>c x \<and> a \<in>\<^sub>c X"
       by (smt assms cfunc_prod_comp cfunc_prod_unique comp_type fibered_product_left_proj_def
           fibered_product_morphism_type fibered_product_right_proj_def fibered_product_right_proj_type)
-
-    thm fibered_product_right_proj_def
 
     have "(xx \<circ>\<^sub>c fibered_product_right_proj X f f X) \<circ>\<^sub>c x = xx \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c \<langle>a,a\<rangle>"
       by (simp add: a_assms comp_associative fibered_product_right_proj_def)
@@ -1595,10 +1597,6 @@ next
     then show "(xx \<circ>\<^sub>c fibered_product_right_proj X f f X) \<circ>\<^sub>c x = id\<^sub>c (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) \<circ>\<^sub>c x"
       using calculation by auto
   qed
-  have eq2: "xx \<circ>\<^sub>c fibered_product_right_proj X f f X = id (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X)"
-    using one_separator[where X="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X", where Y="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"]
-    apply (erule_tac x="xx \<circ>\<^sub>c fibered_product_right_proj X f f X" in allE, erule_tac x="id (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X)" in allE)
-    using assms(1) comp_type fibered_product_right_proj_type xx_assms id_type ext by blast
  
   show "isomorphism (fibered_product_right_proj X f f X)"
     unfolding isomorphism_def
