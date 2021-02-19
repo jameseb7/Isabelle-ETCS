@@ -3798,12 +3798,33 @@ proof -
     by (metis cfunc_type_def id_left_unit left_cart_proj_type)
 then show ?thesis using calculation by auto
  qed
-  then have "((add_uncurried  \<circ>\<^sub>c
+  then have fact0: "((add_uncurried  \<circ>\<^sub>c
     \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero)
    = (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
     using inv_transpose_func_def2 sharp_cancels_flat type4 by fastforce 
 
-  
+  have fact1: "(add_uncurried \<circ>\<^sub>c 
+        \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>\<^sup>\<sharp> \<circ>\<^sub>c
+        successor)\<^sup>\<flat> = 
+        successor \<circ>\<^sub>c 
+        add_uncurried \<circ>\<^sub>c 
+        \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>"
+  proof - 
+     have "((add_uncurried \<circ>\<^sub>c 
+        \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
+        successor)\<^sup>\<flat> = 
+    (add_uncurried \<circ>\<^sub>c \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle>)\<^sup>\<sharp>\<^sup>\<flat>
+     \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)"
+      by (meson inv_transpose_of_composition successor_type type3)
+    also have "... =  (add_uncurried \<circ>\<^sub>c \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle>)
+     \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)"
+      using flat_cancels_sharp type2 by auto
+    also have "... =  successor \<circ>\<^sub>c 
+        add_uncurried \<circ>\<^sub>c 
+        \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>"
+      using comp_associative pointfree_add_pi1_pi0_1xsEqs_s_add_pi1_pi_0 by auto
+    oops
+    
 
 
 section \<open>Axiom 11: Axiom of Choice\<close>
