@@ -3862,7 +3862,7 @@ qed
 
 lemma add_associates:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" 
-  shows "(a +\<^sub>\<nat> b ) +\<^sub>\<nat> c   = a +\<^sub>\<nat> (b +\<^sub>\<nat> c)"
+  shows   "a +\<^sub>\<nat> (b +\<^sub>\<nat> c) =  (a +\<^sub>\<nat> b ) +\<^sub>\<nat> c"
 proof - 
   have typePair: "\<langle>a,b\<rangle> \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c"
     using assms(1) assms(2) cfunc_prod_type by blast
@@ -4010,6 +4010,194 @@ right_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<
           (add_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) one)\<^sup>\<sharp>) \<circ>\<^sub>c
          x"
      oops
+
+
+(*Likewise.... bottom of page 8*)
+
+     have "(eval_func  \<nat>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)) \<circ>\<^sub>c 
+(id\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>f (add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f  id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c
+zero)  \<circ>\<^sub>c
+\<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>) = 
+"(eval_func  \<nat>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)) \<circ>\<^sub>c 
+(id\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>f (add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f  id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c
+(id\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>f zero)  \<circ>\<^sub>c
+\<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>)"
+also have "... = (add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f  id\<^sub>c \<nat>\<^sub>c))  \<circ>\<^sub>c
+\<langle>\<langle>a,b\<rangle>,zero\<rangle>"
+also have "... = add_uncurried \<circ>\<^sub>c \<langle> add_uncurried \<circ>\<^sub>c \<langle>a,b\<rangle>,zero\<rangle>"
+also have "... = add_uncurried \<circ>\<^sub>c \<langle>a,b\<rangle>"
+
+(*Top of page 9*)
+have "add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried)  \<circ>\<^sub>c
+ \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c  left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+  \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c (id\<^sub>c(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor)
+\<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle> = 
+"add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried)  \<circ>\<^sub>c
+ \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c  left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+  \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c
+\<langle>\<langle>a,b\<rangle>,successor \<circ>\<^sub>c c\<rangle>"
+  also have "... = add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+ \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c  left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c
+\<circ>\<^sub>c
+\<langle>\<langle>a,b\<rangle>,successor \<circ>\<^sub>c c\<rangle> , 
+ \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,successor \<circ>\<^sub>c c\<rangle>"
+  also have "... = add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+ \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c\<langle>a,b\<rangle>, 
+ \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c 
+\<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,successor \<circ>\<^sub>c c\<rangle>,
+right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,successor \<circ>\<^sub>c c\<rangle> \<rangle>\<rangle>"
+  also have "... = add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+ \<circ>\<^sub>c \<langle> a, \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>a,b\<rangle>, successor \<circ>\<^sub>c c\<rangle> \<rangle>"
+  also have "... = add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+ \<circ>\<^sub>c \<langle>a,\<langle>b,successor \<circ>\<^sub>c c\<rangle> \<rangle>"
+  also have "... = a +\<^sub>\<nat> (b +\<^sub>\<nat> successor \<circ>\<^sub>c c)"
+  also have "... = a +\<^sub>\<nat> (successor \<circ>\<^sub>c (b +\<^sub>\<nat> c))"
+  also have "... = successor \<circ>\<^sub>c (a +\<^sub>\<nat> (b +\<^sub>\<nat> c))"
+  also have "... = successor \<circ>\<^sub>c (add_uncurried 
+          \<circ>\<^sub>c \<langle>a,add_uncurried \<circ>\<^sub>c \<langle>b,c\<rangle>\<rangle>"
+  also have "... = successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c
+(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c
+    \<langle>a,\<langle>b,c\<rangle>\<rangle>)"
+  also have "... = successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c
+(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c
+    \<langle>a,\<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
+ \<langle>a,b\<rangle>,c\<rangle>\<rangle>)"
+  also have "... = successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c
+(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c
+\<langle> (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
+ \<langle>a,b\<rangle>, \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c 
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>,
+(right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<circ>\<^sub>c  \<langle>\<langle>a,b\<rangle>,c\<rangle>\<rangle>\<rangle>)"
+  also have "... = successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c
+(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c
+\<langle> (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<circ>\<^sub>c
+ \<langle>\<langle>a,b\<rangle>,c\<rangle>, \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c 
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c), 
+(right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>\<rangle>\<rangle>)"
+  also have "successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c
+(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c \<langle>
+(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c 
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c),
+\<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
+ (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<rangle>\<rangle>) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>"
+
+(*It follows that*)
+    have "((add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried)  \<circ>\<^sub>c
+ \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c  left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+  \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat> = 
+((add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried)  \<circ>\<^sub>c
+ \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c  left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+  \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>)\<^sup>\<flat>  \<circ>\<^sub>c (id\<^sub>c(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor)"
+      also have "... = successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c
+(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c \<langle>
+(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c 
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c),
+\<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
+ (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<rangle>\<rangle>)"
+
+(*And by taking sharps of both sides we arrive at*)
+        have "((add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried)  \<circ>\<^sub>c
+ \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c  left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+  \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor)
+ =  successor\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>\<^sub>f \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c
+(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c \<langle>
+(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c 
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c),
+\<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
+ (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<rangle>\<rangle>)\<^sup>\<sharp>"
+
+(*That is, this function causes the square to commute.
+Now we show that (add o (add x id))# does this as well.*)
+
+(*Bottom of page 9*)
+    have "add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) 
+ \<circ>\<^sub>c (id\<^sub>c(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle> = 
+add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,successor  \<circ>\<^sub>c c\<rangle>"
+    also have "... = add_uncurried \<circ>\<^sub>c \<langle>
+  add_uncurried \<circ>\<^sub>c \<langle>a,b\<rangle>, successor \<circ>\<^sub>c  c\<rangle>"
+    also have "... = (a +\<^sub>\<nat> b) +\<^sub>\<nat> (successor \<circ>\<^sub>c  c)"
+    also have "... = successor \<circ>\<^sub>c ((a +\<^sub>\<nat> b) +\<^sub>\<nat> c)"
+    also have "... = successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c
+\<langle>add_uncurried \<circ>\<^sub>c \<langle>a,b\<rangle>,c\<rangle>)"
+    also have "... = successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c 
+(add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>"
+
+(*Top of page 9... "It follows that" *)
+
+      have "((add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> 
+\<circ>\<^sub>c successor)\<^sup>\<flat> = (successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c 
+(add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)\<^sup>\<flat> \<circ>\<^sub>c (id\<^sub>c(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor)"
+        also have "... = 
+successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c 
+(add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))"
+
+(*By taking sharps we arrive at *)
+          have " successor\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>\<^sub>f \<circ>\<^sub>c
+((add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>
+ = (add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> 
+\<circ>\<^sub>c successor"
+
+(*Therefore ... causes the square to commmute as well...*)
+
+            have "add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)
+ = "add_uncurried \<circ>\<^sub>c ( id\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c
+ \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c  left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+  \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,
+right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>"
+
+(*Finally, we have that... *)
+
+have "a +\<^sub>\<nat> (b +\<^sub>\<nat> c)  = add_uncurried \<circ>\<^sub>c \<langle>a, add_uncurried \<circ>\<^sub>c \<langle>b,c\<rangle>\<rangle>"
+also have "... = add_uncurried \<circ>\<^sub>c ( id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+ \<circ>\<^sub>c \<langle>a,\<langle>b,c\<rangle>\<rangle>" 
+also have "... = add_uncurried \<circ>\<^sub>c ( id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+\<circ>\<^sub>c \<langle>a,\<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>a,b\<rangle>     ,c\<rangle>\<rangle>"
+also have "... = 
+add_uncurried \<circ>\<^sub>c ( id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+\<circ>\<^sub>c \<langle> (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>a,b\<rangle>
+,\<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)
+ \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>    ,
+(right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)
+\<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle> \<rangle>\<rangle>"
+also have "... = 
+add_uncurried \<circ>\<^sub>c ( id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+\<circ>\<^sub>c \<langle> (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<circ>\<^sub>c
+ \<langle>\<langle>a,b\<rangle>,c\<rangle>
+,\<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)
+ \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>    ,
+(right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)
+\<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle> \<rangle>\<rangle>"
+also have "... = 
+add_uncurried \<circ>\<^sub>c ( id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+\<circ>\<^sub>c \<langle> (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<circ>\<^sub>c
+ \<langle>\<langle>a,b\<rangle>,c\<rangle>
+,\<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)
+    ,
+(right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)
+ \<rangle>\<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle> \<rangle>"
+also have "... = 
+add_uncurried \<circ>\<^sub>c ( id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) 
+\<circ>\<^sub>c \<langle> (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<circ>\<^sub>c
+ 
+,\<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c
+(left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)
+    ,
+(right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)
+ \<rangle> \<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>"
+also have "... = add_uncurried \<circ>\<^sub>c 
+(add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>"
+also have "... = add_uncurried \<circ>\<^sub>c 
+\<langle>add_uncurried \<circ>\<^sub>c \<langle>a,b\<rangle>, c \<rangle>"
+also have "... = (a +\<^sub>\<nat> b) +\<^sub>\<nat> c"
 
 section \<open>Axiom 11: Axiom of Choice\<close>
 
