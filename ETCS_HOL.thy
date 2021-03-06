@@ -4405,12 +4405,6 @@ next
     using calculation comp_associative by auto
 qed
 
-
-     
-      
-
-
-
 have square2: "mult_uncurried \<circ>\<^sub>c \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c \<rangle> \<circ>\<^sub>c successor  = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c
                mult_uncurried \<circ>\<^sub>c \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c \<rangle>"
 proof - 
@@ -4438,20 +4432,15 @@ proof -
     using left_cart_proj_cfunc_prod mult_curried_property zero_beta_N_succ_type by auto
   also have "... = add_uncurried  \<circ>\<^sub>c \<langle> zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,(eval_func  \<nat>\<^sub>c \<nat>\<^sub>c)\<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult_curried) \<circ>\<^sub>c \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle> \<rangle>"
     by (smt cfunc_cross_prod_comp_cfunc_prod cfunc_type_def id_left_unit id_right_unit id_type mult_curried_property zero_beta_N_succ_type)
-  also have "... = add_uncurried  \<circ>\<^sub>c \<langle> zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor, mult_uncurried \<circ>\<^sub>c  \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle> \<rangle> "
-    by (simp add: comp_associative mult_uncurried_def)
-  also have "... = add_uncurried  \<circ>\<^sub>c \<langle> zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor , mult_uncurried \<circ>\<^sub>c  \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle>  \<rangle> "
-     using cfunc_prod_comp
-     using assms comp_associative mult_prod_0bs_id_type zero_beta_N_succ_type by auto
-   also have "... =  add_uncurried  \<circ>\<^sub>c \<langle> zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c mult_uncurried \<circ>\<^sub>c  \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle> , mult_uncurried \<circ>\<^sub>c  \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle>  \<rangle> "
-     using mult_prod_0bs_id_type successor_type terminal_func_comp by auto
-   also have "... =  add_uncurried  \<circ>\<^sub>c \<langle> zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  ,  id\<^sub>c \<nat>\<^sub>c  \<rangle> \<circ>\<^sub>c (mult_uncurried \<circ>\<^sub>c  \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle>) "
-     by (smt cfunc_prod_comp comp_associative id_left_unit2 id_type mult_prod_0bs_id_type successor_type terminal_func_comp zero_beta_N_succ_type)
-   also have "... =id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c
-               mult_uncurried \<circ>\<^sub>c \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c \<rangle>"
-     using comp_associative id_N_def2 successor_type terminal_func_comp by auto
-   then show ?thesis using calculation by auto
- qed
+  also have "... =  add_uncurried  \<circ>\<^sub>c \<langle> zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c mult_uncurried \<circ>\<^sub>c  \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle> , mult_uncurried \<circ>\<^sub>c  \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle>  \<rangle> "
+    by (metis comp_associative mult_prod_0bs_id_type mult_uncurried_def successor_type terminal_func_comp)
+  also have "... =  add_uncurried  \<circ>\<^sub>c \<langle> zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,  id\<^sub>c \<nat>\<^sub>c  \<rangle> \<circ>\<^sub>c (mult_uncurried \<circ>\<^sub>c  \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor,id\<^sub>c \<nat>\<^sub>c\<rangle>) "
+    by (smt cfunc_prod_comp comp_associative id_left_unit2 id_type mult_prod_0bs_id_type successor_type terminal_func_comp zero_beta_N_succ_type)
+  also have "... =id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c
+             mult_uncurried \<circ>\<^sub>c \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c \<rangle>"
+    using comp_associative id_N_def2 successor_type terminal_func_comp by auto
+  then show ?thesis using calculation by auto
+qed
 
 
 
