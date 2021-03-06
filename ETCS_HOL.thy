@@ -3360,6 +3360,25 @@ proof -
   then show "add_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = add_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n"  using calculation by auto
 qed
 
+lemma add_apply1_left:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n\<in>\<^sub>c \<nat>\<^sub>c"
+  shows "m +\<^sub>\<nat> n = add_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<circ>\<^sub>c m"
+  unfolding add_def 
+proof - 
+  have fact1: "n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>:\<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    using assms(2) comp_type terminal_func_type by blast
+  have "add_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = add_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, n \<circ>\<^sub>c id one\<rangle>"
+    by (metis assms cfunc_type_def id_left_unit id_right_unit)
+  also have "... = add_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, n \<circ>\<^sub>c (\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m)\<rangle>"
+    by (metis assms(1) comp_type id_type one_unique_element terminal_func_type)
+  also have "... = add_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, (n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c m\<rangle>"
+    using comp_associative by auto
+  also have "... = add_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<rangle> \<circ>\<^sub>c m"
+    using assms(1) cfunc_prod_comp fact1 id_type by fastforce
+  then show "add_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = add_uncurried \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c m" 
+    using calculation by auto
+qed
+
 (*We make this unusual result its own lemma since it will be used in the commutativity proof*)
 lemma id_N_def2:
   shows  "add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle> = id \<nat>\<^sub>c"
@@ -4216,6 +4235,45 @@ lemma mult_def2:
   unfolding mult_def mult_uncurried_def
   by (smt assms(1) assms(2) cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_associative id_left_unit id_type mult_curried_property)
 
+lemma mult_apply1right:
+  assumes "m\<in>\<^sub>c  \<nat>\<^sub>c" "n\<in>\<^sub>c  \<nat>\<^sub>c"
+  shows  "m \<cdot>\<^sub>\<nat> n = mult_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<circ>\<^sub>c n"
+  unfolding mult_def
+proof -  
+  have fact1: "m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>:\<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    using assms(1) comp_type terminal_func_type by blast
+  have "mult_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = mult_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c id one  ,id \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>"
+    by (metis assms cfunc_type_def id_left_unit id_right_unit)
+  also have "... = mult_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c (\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n)  ,id \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>"
+    by (metis assms(2) comp_type id_type one_unique_element terminal_func_type)
+  also have "... = mult_uncurried \<circ>\<^sub>c \<langle>(m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c n  ,id \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>"
+    using comp_associative by auto
+  also have "... = mult_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<circ>\<^sub>c n"
+    using assms(2) cfunc_prod_comp fact1 id_type by fastforce
+  then show "mult_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = mult_uncurried \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n" 
+    using calculation by auto
+qed
+
+lemma mult_apply1_left:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n\<in>\<^sub>c \<nat>\<^sub>c"
+  shows "m  \<cdot>\<^sub>\<nat>  n = mult_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<circ>\<^sub>c m"
+  unfolding mult_def 
+proof - 
+  have fact1: "n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>:\<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    using assms(2) comp_type terminal_func_type by blast
+  have "mult_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = mult_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, n \<circ>\<^sub>c id one\<rangle>"
+    by (metis assms cfunc_type_def id_left_unit id_right_unit)
+  also have "... = mult_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, n \<circ>\<^sub>c (\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m)\<rangle>"
+    by (metis assms(1) comp_type id_type one_unique_element terminal_func_type)
+  also have "... = mult_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, (n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c m\<rangle>"
+    using comp_associative by auto
+  also have "... = mult_uncurried \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<rangle> \<circ>\<^sub>c m"
+    using assms(1) cfunc_prod_comp fact1 id_type by fastforce
+  then show "mult_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle> = mult_uncurried \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c m" 
+    using calculation by auto
+qed
+
+
 lemma mult_respects_zero_right:
   assumes "m\<in>\<^sub>c  \<nat>\<^sub>c"
   shows "m \<cdot>\<^sub>\<nat> zero = zero"
@@ -4238,7 +4296,9 @@ qed
 lemma mult_curried_n: 
    assumes "n\<in>\<^sub>c  \<nat>\<^sub>c"
    shows "mult_curried\<circ>\<^sub>c n: one \<rightarrow> (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)"
-    using assms mult_curried_type by auto
+  using assms mult_curried_type by auto
+
+
 
 
 lemma mult_respects_succ_right:
@@ -4442,9 +4502,31 @@ proof -
   then show ?thesis using calculation by auto
 qed
 
+  have "mult_uncurried \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c, zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> = mult_uncurried \<circ>\<^sub>c \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c \<rangle>"
+  proof (rule natural_number_object_func_unique[where f="id\<^sub>c \<nat>\<^sub>c", where X="\<nat>\<^sub>c"])
+    show  f1: "mult_uncurried \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      by (metis (mono_tags, lifting) cfunc_type_def codomain_comp compatible_comp_ETCS_func domain_comp triangle1 zero_type)
+    show f2: "mult_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      using mult_prod_0bs_id_type successor_type terminal_func_comp by auto
+    show "id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      by (meson id_type)
+    show "(mult_uncurried \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero =
+    (mult_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero"
+      using comp_associative triangle1 triangle2 by presburger
+    show "(mult_uncurried \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor =
+    id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c mult_uncurried \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
+      by (metis comp_associative f1 id_left_unit2 square1)
+    show "(mult_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor =
+    id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c mult_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>"
+      using comp_associative square2 by auto
+  qed
+  then show ?thesis
+    using assms comp_associative mult_apply1_left mult_apply1right mult_respects_zero_right zero_type by auto
+qed
 
-
-
+    
+    
+    
 section \<open>Axiom 11: Axiom of Choice\<close>
 
 definition section_of :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" (infix "sectionof" 90)
