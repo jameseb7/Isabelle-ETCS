@@ -623,8 +623,151 @@ proof -
     by auto
 qed
 
-lemma swap_type: "\<langle>right_cart_proj X Y, left_cart_proj X Y\<rangle> : X \<times>\<^sub>c Y \<rightarrow> Y \<times>\<^sub>c X"
-  by (simp add: cfunc_prod_type left_cart_proj_type right_cart_proj_type)
+subsection \<open>Useful Cartesian product permuting functions\<close>
+
+definition swap :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "swap X Y = \<langle>right_cart_proj X Y, left_cart_proj X Y\<rangle>"
+
+lemma swap_type: "swap X Y : X \<times>\<^sub>c Y \<rightarrow> Y \<times>\<^sub>c X"
+  unfolding swap_def by (simp add: cfunc_prod_type left_cart_proj_type right_cart_proj_type)
+
+lemma swap_ap:
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y"
+  shows "swap X Y \<circ>\<^sub>c \<langle>x, y\<rangle> = \<langle>y, x\<rangle>"
+proof -
+  have "swap X Y \<circ>\<^sub>c \<langle>x, y\<rangle> = \<langle>right_cart_proj X Y,left_cart_proj X Y\<rangle> \<circ>\<^sub>c \<langle>x,y\<rangle>"
+    unfolding swap_def by auto
+  also have "... = \<langle>right_cart_proj X Y \<circ>\<^sub>c \<langle>x,y\<rangle>, left_cart_proj X Y \<circ>\<^sub>c \<langle>x,y\<rangle>\<rangle>"
+    by (meson assms cfunc_prod_comp cfunc_prod_type left_cart_proj_type right_cart_proj_type)
+  also have "... = \<langle>y, x\<rangle>"
+    using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition associate_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "associate_right X Y Z =
+    \<langle>
+      left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z, 
+      \<langle>
+        right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z,
+        right_cart_proj (X \<times>\<^sub>c Y) Z
+      \<rangle>
+    \<rangle>"
+
+lemma associate_right_type: "associate_right X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+  unfolding associate_right_def by (meson cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type)
+
+lemma associate_right_ap:
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
+  shows "associate_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle> = \<langle>x, \<langle>y, z\<rangle>\<rangle>"
+  (is "?lhs = ?rhs")
+proof -
+  have xy_z_type: "\<langle>\<langle>x,y\<rangle>,z\<rangle> : A \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
+    by (simp add: assms cfunc_prod_type)
+  have ll_type: "left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> X"
+    using comp_type left_cart_proj_type by blast
+  have rl_r_type:
+    "\<langle>right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z,right_cart_proj (X \<times>\<^sub>c Y) Z\<rangle>
+      : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> Y \<times>\<^sub>c Z"
+    using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
+  
+
+  have "?lhs = \<langle>
+    left_cart_proj X Y \<circ>\<^sub>c  left_cart_proj (X \<times>\<^sub>c Y) Z,
+      \<langle>
+        right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z,
+        right_cart_proj (X \<times>\<^sub>c Y) Z
+      \<rangle>
+    \<rangle> \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>"
+    unfolding associate_right_def by auto
+  also have "... = \<langle>
+    (left_cart_proj X Y \<circ>\<^sub>c  left_cart_proj (X \<times>\<^sub>c Y) Z) \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>,
+      \<langle>
+        (right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z),
+        right_cart_proj (X \<times>\<^sub>c Y) Z
+      \<rangle> \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>
+    \<rangle>"
+    using cfunc_prod_comp ll_type rl_r_type xy_z_type by blast
+  also have "... = \<langle>
+    (left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z) \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>,
+      \<langle>
+        (right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z) \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>,
+        right_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>
+      \<rangle>
+    \<rangle>"
+    by (smt cfunc_prod_comp comp_type left_cart_proj_type right_cart_proj_type xy_z_type)
+  also have "... = \<langle>left_cart_proj X Y \<circ>\<^sub>c \<langle>x,y\<rangle>, \<langle>right_cart_proj X Y \<circ>\<^sub>c \<langle>x,y\<rangle>, z\<rangle>\<rangle>"
+    by (smt assms cfunc_prod_type comp_associative left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = ?rhs"
+    using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition associate_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "associate_left X Y Z =
+    \<langle>
+      \<langle>
+        left_cart_proj X (Y \<times>\<^sub>c Z),
+        left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)
+      \<rangle>,
+      right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)
+    \<rangle>"
+
+lemma associate_left_type: "associate_left X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
+  unfolding associate_left_def
+  by (meson cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type)
+
+lemma associate_left_ap:
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
+  shows "associate_left X Y Z \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle> = \<langle>\<langle>x, y\<rangle>, z\<rangle>"
+  (is "?lhs = ?rhs")
+proof -
+  have x_yz_type: "\<langle>x, \<langle>y, z\<rangle>\<rangle> : A \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+    by (simp add: assms cfunc_prod_type)
+  have yz_type: "\<langle>y, z\<rangle> : A \<rightarrow> Y \<times>\<^sub>c Z"
+    by (simp add: assms cfunc_prod_type)
+  have rr_type: "right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> Z"
+    using comp_type right_cart_proj_type by blast
+  have lr_type: "left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> Y"
+    using comp_type left_cart_proj_type right_cart_proj_type by blast
+  have l_ll_type:
+    "\<langle>left_cart_proj X (Y \<times>\<^sub>c Z), left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle>
+      : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> X \<times>\<^sub>c Y"
+    using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
+
+  have "?lhs = \<langle>
+      \<langle>
+        left_cart_proj X (Y \<times>\<^sub>c Z),
+        left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)
+      \<rangle>,
+      right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)
+    \<rangle> \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>"
+    unfolding associate_left_def by auto
+  also have "... = \<langle>
+      \<langle>
+        left_cart_proj X (Y \<times>\<^sub>c Z),
+        left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)
+      \<rangle> \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>,
+      right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)  \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>
+    \<rangle>"
+    using cfunc_prod_comp comp_associative l_ll_type rr_type x_yz_type by auto
+  also have "... = \<langle>
+      \<langle>
+        left_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>,
+        left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>
+      \<rangle> ,
+      right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)  \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>
+    \<rangle>"
+    using cfunc_prod_comp comp_associative left_cart_proj_type lr_type x_yz_type by fastforce
+  also have "... = \<langle>\<langle>x, left_cart_proj Y Z \<circ>\<^sub>c \<langle>y, z\<rangle>\<rangle>, right_cart_proj Y Z \<circ>\<^sub>c \<langle>y, z\<rangle>\<rangle>"
+    using assms(1) left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod yz_type by auto
+  also have "... = ?rhs"
+    using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
+  then show ?thesis
+    using calculation by auto
+qed
 
 section \<open>Axiom 3: Terminal Objects\<close>
 
@@ -3303,6 +3446,11 @@ proof -
     using comp_type eval_func_type by blast
 qed
 
+lemma add_uncurried_apply:
+  assumes "m : X \<rightarrow> \<nat>\<^sub>c" "n : X \<rightarrow> \<nat>\<^sub>c"
+  shows "add_uncurried \<circ>\<^sub>c \<langle>m, n\<rangle> = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add_curried \<circ>\<^sub>c n\<rangle>"
+  by (smt add_curried_property add_uncurried_def assms cfunc_cross_prod_comp_cfunc_prod comp_associative id_left_unit2 id_type)
+
 
 definition add :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixl "+\<^sub>\<nat>" 65)
   where "m +\<^sub>\<nat> n = add_uncurried\<circ>\<^sub>c\<langle>m, n\<rangle>"
@@ -3441,16 +3589,19 @@ lemma add_respects_zero_on_left:
   shows "zero +\<^sub>\<nat> m = m"
     by (metis add_apply1 assms cfunc_type_def comp_associative id_left_unit zero_type id_N_def2)
 
+lemma add_uncurried_respects_zero_on_left:
+  assumes "f : X \<rightarrow> \<nat>\<^sub>c"
+  shows "add_uncurried \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>, f\<rangle> = f"
+  by (smt assms cfunc_prod_comp comp_associative id_N_def2 id_left_unit2 id_type terminal_func_comp zero_betaN_type)
 
-
-lemma add_respects_succ1:
-  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
-  shows "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n)  =  successor\<circ>\<^sub>c (m +\<^sub>\<nat> n)"
-proof - 
-  have fact1: "add_curried \<circ>\<^sub>c n: one \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+lemma add_uncurried_respects_succ_right:
+  assumes "m : X \<rightarrow> \<nat>\<^sub>c" "n : X \<rightarrow> \<nat>\<^sub>c" 
+  shows "add_uncurried \<circ>\<^sub>c \<langle>m, successor  \<circ>\<^sub>c n\<rangle>  = successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c \<langle>m, n\<rangle>"
+proof -
+  have fact1: "add_curried \<circ>\<^sub>c n : X \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
     using add_curried_type assms(2) comp_type by blast
-  have "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n) =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add_curried \<circ>\<^sub>c (successor  \<circ>\<^sub>c n)\<rangle>"
-    using add_def2 assms successor_type by auto
+  have "add_uncurried \<circ>\<^sub>c \<langle>m, successor  \<circ>\<^sub>c n\<rangle> =  eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add_curried \<circ>\<^sub>c (successor \<circ>\<^sub>c n)\<rangle>"
+    using add_uncurried_apply assms successor_type by auto
   also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add_curried \<circ>\<^sub>c n\<rangle>"
     by (simp add: add_curried_comp_succ_eq comp_associative)
   also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m, successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add_curried \<circ>\<^sub>c n\<rangle>"
@@ -3461,14 +3612,16 @@ proof -
   also have "... = successor \<circ>\<^sub>c (eval_func  \<nat>\<^sub>c \<nat>\<^sub>c  \<circ>\<^sub>c \<langle>m,add_curried \<circ>\<^sub>c n\<rangle>)"
     using cfunc_type_def codomain_comp comp_associative compatible_comp_ETCS_func domain_comp eval_func_type exp_func_def successor_type transpose_func_def by auto
   also have "... = successor \<circ>\<^sub>c (add_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle>)"
-    using add_def add_def2 assms by presburger
-  also have "... = successor\<circ>\<^sub>c (m +\<^sub>\<nat> n)"
-    by (simp add: add_def)
+    using add_uncurried_apply assms by auto
   then show ?thesis 
     using calculation by auto
 qed
 
- 
+lemma add_respects_succ1:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
+  shows "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n)  =  successor\<circ>\<^sub>c (m +\<^sub>\<nat> n)"
+  using add_def add_uncurried_respects_succ_right assms by auto
+
 
 lemma add_respects_succ2:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
