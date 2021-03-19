@@ -360,7 +360,7 @@ axiomatization
 where
   left_cart_proj_type: "left_cart_proj X Y : X \<times>\<^sub>c Y \<rightarrow> X" and
   right_cart_proj_type: "right_cart_proj X Y : X \<times>\<^sub>c Y \<rightarrow> Y" and
-  cfunc_prod_type: "f : Z \<rightarrow> X \<and> g : Z \<rightarrow> Y \<longrightarrow> \<langle>f,g\<rangle> : Z \<rightarrow> X \<times>\<^sub>c Y" and
+  cfunc_prod_type: "f : Z \<rightarrow> X \<Longrightarrow> g : Z \<rightarrow> Y \<Longrightarrow> \<langle>f,g\<rangle> : Z \<rightarrow> X \<times>\<^sub>c Y" and
   left_cart_proj_cfunc_prod: "f : Z \<rightarrow> X \<and> g : Z \<rightarrow> Y \<longrightarrow> left_cart_proj X Y \<circ>\<^sub>c \<langle>f,g\<rangle> = f" and
   right_cart_proj_cfunc_prod: "f : Z \<rightarrow> X \<and> g : Z \<rightarrow> Y \<longrightarrow> right_cart_proj X Y \<circ>\<^sub>c \<langle>f,g\<rangle> = g" and
   cfunc_prod_unique: "f : Z \<rightarrow> X \<and> g : Z \<rightarrow> Y \<longrightarrow>
@@ -766,6 +766,184 @@ proof -
     using assms(1) left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod yz_type by auto
   also have "... = ?rhs"
     using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition distribute_right_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "distribute_right_left X Y Z = 
+    \<langle>left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z, right_cart_proj (X \<times>\<^sub>c Y) Z\<rangle>"
+
+lemma distribute_right_left_type:
+  "distribute_right_left X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> X \<times>\<^sub>c Z"
+  unfolding distribute_right_left_def
+  using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
+
+lemma distribute_right_left_ap: 
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
+  shows "distribute_right_left X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle> = \<langle>x, z\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have xyz_type: "\<langle>\<langle>x, y\<rangle>, z\<rangle> : A \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
+    by (simp add: assms cfunc_prod_type)
+  have ll_type: "left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> X"
+    using comp_type left_cart_proj_type by blast
+  have "?lhs = 
+    \<langle>left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z, right_cart_proj (X \<times>\<^sub>c Y) Z\<rangle> \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>"
+    unfolding distribute_right_left_def by simp
+  also have "... = \<langle>left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>, 
+      right_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>\<rangle>"
+    using cfunc_prod_comp comp_associative ll_type right_cart_proj_type xyz_type by fastforce
+  also have "... = \<langle>left_cart_proj X Y \<circ>\<^sub>c \<langle>x, y\<rangle>, z\<rangle>"
+    by (metis assms cfunc_prod_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = ?rhs"
+    using assms(1) assms(2) left_cart_proj_cfunc_prod by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition distribute_right_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "distribute_right_right X Y Z = 
+    \<langle>right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z, right_cart_proj (X \<times>\<^sub>c Y) Z\<rangle>"
+
+lemma distribute_right_right_type:
+  "distribute_right_right X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> Y \<times>\<^sub>c Z"
+  unfolding distribute_right_right_def
+  using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
+
+lemma distribute_right_right_ap: 
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
+  shows "distribute_right_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle> = \<langle>y, z\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have xyz_type: "\<langle>\<langle>x, y\<rangle>, z\<rangle> : A \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
+    by (simp add: assms cfunc_prod_type)
+  have rl_type: "right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> Y"
+    using comp_type right_cart_proj_type left_cart_proj_type by blast
+  have "?lhs = 
+    \<langle>right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z, right_cart_proj (X \<times>\<^sub>c Y) Z\<rangle> \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>"
+    unfolding distribute_right_right_def by simp
+  also have "... = \<langle>right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>, 
+      right_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>\<rangle>"
+    using cfunc_prod_comp comp_associative rl_type right_cart_proj_type xyz_type by fastforce
+  also have "... = \<langle>right_cart_proj X Y \<circ>\<^sub>c \<langle>x, y\<rangle>, z\<rangle>"
+    by (metis assms cfunc_prod_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = ?rhs"
+    using assms(1) assms(2) right_cart_proj_cfunc_prod by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition distribute_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "distribute_right X Y Z = \<langle>distribute_right_left X Y Z, distribute_right_right X Y Z\<rangle>"
+
+lemma distribute_right_type:
+  "distribute_right X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+  unfolding distribute_right_def
+  by (simp add: cfunc_prod_type distribute_right_left_type distribute_right_right_type)
+
+lemma distribute_right_ap: 
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
+  shows "distribute_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle> = \<langle>\<langle>x, z\<rangle>, \<langle>y, z\<rangle>\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have xyz_type: "\<langle>\<langle>x, y\<rangle>, z\<rangle> : A \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
+    by (simp add: assms cfunc_prod_type)
+  have "?lhs = \<langle>distribute_right_left X Y Z, distribute_right_right X Y Z\<rangle> \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>"
+    unfolding distribute_right_def by simp
+  also have "... = \<langle>distribute_right_left X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>, distribute_right_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>\<rangle>"
+    using cfunc_prod_comp distribute_right_left_type distribute_right_right_type xyz_type by blast
+  also have "... = ?rhs"
+    using assms distribute_right_left_ap distribute_right_right_ap by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition distribute_left_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "distribute_left_left X Y Z = 
+    \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle>"
+
+lemma distribute_left_left_type:
+  "distribute_left_left X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> X \<times>\<^sub>c Y"
+  unfolding distribute_left_left_def
+  using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
+
+lemma distribute_left_left_ap: 
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
+  shows "distribute_left_left X Y Z \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle> = \<langle>x, y\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have xyz_type: "\<langle>x, \<langle>y, z\<rangle>\<rangle> : A \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+    by (simp add: assms cfunc_prod_type)
+  have ll_type: "left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> Y"
+    using comp_type left_cart_proj_type right_cart_proj_type by blast
+  have "?lhs = 
+    \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle> \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>"
+    unfolding distribute_left_left_def by simp
+  also have "... = \<langle>left_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>,
+    left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>\<rangle>"
+    using cfunc_prod_comp comp_associative left_cart_proj_type ll_type xyz_type by fastforce
+  also have "... = \<langle>x, left_cart_proj Y Z \<circ>\<^sub>c \<langle>y, z\<rangle>\<rangle>"
+    by (metis assms cfunc_prod_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = ?rhs"
+    using assms(2) assms(3) left_cart_proj_cfunc_prod by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition distribute_left_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "distribute_left_right X Y Z = 
+    \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle>"
+
+lemma distribute_left_right_type:
+  "distribute_left_right X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> X \<times>\<^sub>c Z"
+  unfolding distribute_left_right_def
+  using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
+
+lemma distribute_left_right_ap: 
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
+  shows "distribute_left_right X Y Z \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle> = \<langle>x, z\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have xyz_type: "\<langle>x, \<langle>y, z\<rangle>\<rangle> : A \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+    by (simp add: assms cfunc_prod_type)
+  have rl_type: "right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> Z"
+    using comp_type left_cart_proj_type right_cart_proj_type by blast
+  have "?lhs = 
+    \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle> \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>"
+    unfolding distribute_left_right_def by simp
+  also have "... = \<langle>left_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>,
+    right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>\<rangle>"
+    using cfunc_prod_comp comp_associative left_cart_proj_type rl_type xyz_type by fastforce
+  also have "... = \<langle>x, right_cart_proj Y Z \<circ>\<^sub>c \<langle>y, z\<rangle>\<rangle>"
+    by (metis assms cfunc_prod_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = ?rhs"
+    using assms(2) assms(3) right_cart_proj_cfunc_prod by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition distribute_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "distribute_left X Y Z = \<langle>distribute_left_left X Y Z, distribute_left_right X Y Z\<rangle>"
+
+lemma distribute_left_type:
+  "distribute_left X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c (X \<times>\<^sub>c Z)"
+  unfolding distribute_left_def
+  by (simp add: cfunc_prod_type distribute_left_left_type distribute_left_right_type)
+
+lemma distribute_left_ap: 
+  assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
+  shows "distribute_left X Y Z \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle> = \<langle>\<langle>x, y\<rangle>, \<langle>x, z\<rangle>\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have xyz_type: "\<langle>x, \<langle>y, z\<rangle>\<rangle> : A \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+    by (simp add: assms cfunc_prod_type)
+  have "?lhs = \<langle>distribute_left_left X Y Z, distribute_left_right X Y Z\<rangle> \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>"
+    unfolding distribute_left_def by simp
+  also have "... = \<langle>distribute_left_left X Y Z \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>, distribute_left_right X Y Z \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>\<rangle>"
+    using cfunc_prod_comp distribute_left_left_type distribute_left_right_type xyz_type by blast
+  also have "... = ?rhs"
+    using assms distribute_left_left_ap distribute_left_right_ap by auto
   then show ?thesis
     using calculation by auto
 qed
@@ -4136,8 +4314,8 @@ proof -
           by fastforce
         also have "... = (add_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) one) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
           by (metis a_b_type add_def add_respects_zero_on_right b_type comp_associative id_type left_cart_proj_cfunc_prod)
-        then show "?lhs \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle> = ?rhs \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
-          using calculation by auto
+        then show "?lhs \<circ>\<^sub>c \<langle>\<langle>a, b\<rangle>, id\<^sub>c one\<rangle> = ?rhs \<circ>\<^sub>c \<langle>\<langle>a, b\<rangle>, id\<^sub>c one\<rangle>"
+          using calculation by (simp add: comp_associative) 
       qed
     qed
  
