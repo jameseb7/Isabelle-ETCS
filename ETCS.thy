@@ -115,23 +115,24 @@ ML \<open>fun match_type_rule ctxt bound_typs t rule =
             | NONE => NONE
           end\<close>
 
-ML \<open>exception CFUNC_TYPE of string * term list * thm list\<close>
+(* avoid creating an exception -- tactics aren't supposed to raise exceptions *)
+(*ML \<open>exception CFUNC_TYPE of string * term list * thm list\<close>*)
 
-ML \<open>fun find_type_rule _ _ t [] = raise CFUNC_TYPE ("No typing rule for term", [t], [])
+ML \<open>fun find_type_rule _ _ _ [] = NONE (* no typing rules left *)
       | find_type_rule ctxt bound_typs t (rule::rules) =
           case match_type_rule ctxt bound_typs t rule of
-            SOME rule' => rule'
+            SOME rule' => SOME rule'
           | NONE => find_type_rule ctxt bound_typs t rules\<close>
 
 ML_val \<open>match_type_rule @{context} [] @{term "f \<circ>\<^sub>c id X"} @{thm comp_type}\<close>
 
-ML \<open>fun elim_type_rule_prem _ thm _ [] = raise CFUNC_TYPE ("Cannot instantiate type rule", [], [thm])
+ML \<open>fun elim_type_rule_prem _ _ _ [] = NONE (* no lemmas match the premise *)
       | elim_type_rule_prem ctxt thm prem (lem::lems) = 
           case match_term [] prem (Thm.prop_of lem) of
             SOME insts => 
               let val insts' = certify_instantiations ctxt [] insts
                   val inst_thm = Thm.instantiate ([], insts') thm
-              in Thm.implies_elim inst_thm lem
+              in SOME (Thm.implies_elim inst_thm lem)
               end
           | NONE => elim_type_rule_prem ctxt thm prem lems\<close>
 
@@ -141,9 +142,14 @@ ML_val \<open>let val type_rule = the (match_type_rule @{context} [] @{term "f \
         end\<close>
 
 ML \<open>fun elim_type_rule_prems ctxt thm lems =
-          case Thm.prems_of thm of
-            [] => thm
-          | prem::_ => elim_type_rule_prems ctxt (elim_type_rule_prem ctxt thm prem lems) lems\<close>
+          let fun elim_type_rule_prems' thm [] = thm
+                | elim_type_rule_prems' thm (prem::prems) =
+                    case elim_type_rule_prem ctxt thm prem lems of
+                      SOME thm' => elim_type_rule_prems' thm' prems
+                    | NONE => (* can't eliminate premise, shift it to the back and continue *)
+                        elim_type_rule_prems' (Thm.permute_prems 0 1 thm) prems
+          in elim_type_rule_prems' thm (Thm.prems_of thm)
+          end\<close>
 
 ML_val \<open>let val type_rule = the (match_type_rule @{context} [] @{term "f \<circ>\<^sub>c id X"} @{thm comp_type})
         in elim_type_rule_prems @{context} type_rule
@@ -152,9 +158,9 @@ ML_val \<open>let val type_rule = the (match_type_rule @{context} [] @{term "f \
         end\<close>
 
 ML \<open>fun construct_cfunc_type_lemma ctxt rules binder_typs lems t = 
-          let val rule = find_type_rule ctxt binder_typs t rules
-          in elim_type_rule_prems ctxt rule lems
-          end\<close>
+          case find_type_rule ctxt binder_typs t rules of
+            SOME rule => [elim_type_rule_prems ctxt rule lems]
+          | NONE => []\<close>
 
 ML \<open>fun construct_cfunc_type_lemmas1 ctxt rules binder_typs (t $ u) =
           let val left_lems = construct_cfunc_type_lemmas1 ctxt rules binder_typs t
@@ -162,20 +168,21 @@ ML \<open>fun construct_cfunc_type_lemmas1 ctxt rules binder_typs (t $ u) =
               val sublems = left_lems @ right_lems
               val this_lem = 
                 if check_cfunc binder_typs (t $ u)
-                then [construct_cfunc_type_lemma ctxt rules binder_typs sublems (t $ u)]
+                then construct_cfunc_type_lemma ctxt rules binder_typs sublems (t $ u)
                 else []
           in this_lem @ sublems
           end
       | construct_cfunc_type_lemmas1 ctxt rules binder_typs (Abs (n, typ, t)) =
           let val sublems = construct_cfunc_type_lemmas1 ctxt rules (typ::binder_typs) t
               val this_lem = if check_cfunc binder_typs (Abs (n, typ, t))
-                then [construct_cfunc_type_lemma ctxt rules binder_typs sublems (Abs (n, typ, t))]
+                then construct_cfunc_type_lemma ctxt rules binder_typs sublems (Abs (n, typ, t))
                 else []
           in this_lem @ sublems
           end
       | construct_cfunc_type_lemmas1 ctxt rules binder_typs t =
-          if check_cfunc binder_typs t then [construct_cfunc_type_lemma ctxt rules binder_typs [] t] else []\<close>
+          if check_cfunc binder_typs t then construct_cfunc_type_lemma ctxt rules binder_typs [] t else []\<close>
 
+(* assume there are no binders at the toplevel *)
 ML \<open>fun construct_cfunc_type_lemmas ctxt rules t = construct_cfunc_type_lemmas1 ctxt rules [] t\<close>
 
 ML_val \<open>let val type_rules = [Thm.assume (Thm.cterm_of @{context} @{term "Trueprop (f : X \<rightarrow> Y)"}),
@@ -197,7 +204,9 @@ ML \<open>fun typecheck_cfuncs_tac ctxt type_rules = SUBGOAL (typecheck_cfuncs_s
 
 ML \<open>fun typecheck_cfuncs_method ctxt = (fn thms => CONTEXT_TACTIC (typecheck_cfuncs_tac ctxt thms 1)) : Method.method\<close>
 
-method_setup typecheck_cfuncs = \<open>Scan.succeed typecheck_cfuncs_method\<close> "Check types of cfuncs in current goal and add as assumptions"
+method_setup typecheck_cfuncs =
+  \<open>Scan.succeed typecheck_cfuncs_method\<close>
+  "Check types of cfuncs in current goal and add as assumptions of the current goal"
 
 
   print_methods
@@ -230,8 +239,9 @@ lemma cfunc_cross_prod_def2:
 
 lemma cfunc_cross_prod_domain:
   "f : X \<rightarrow> Z \<Longrightarrow> g : Y \<rightarrow> W \<Longrightarrow> f \<times>\<^sub>f g : X \<times>\<^sub>c Y \<rightarrow> Z \<times>\<^sub>c W"
-  unfolding cfunc_cross_prod_def
-  by (simp add: cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type)
+  unfolding cfunc_cross_prod_def unfolding has_type_def
+  apply (auto simp add: cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type)
+  using cfunc_prod_type comp_type has_type_def left_cart_proj_type right_cart_proj_type apply auto[1]
 
 lemma left_cfunc_cross_prod:
   assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> W"
