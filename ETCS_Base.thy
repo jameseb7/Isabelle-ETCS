@@ -16,11 +16,11 @@ axiomatization
 where
   domain_comp: "domain g = codomain f \<Longrightarrow> domain (g \<circ>\<^sub>c f) = domain f" and
   codomain_comp: "domain g = codomain f \<Longrightarrow> codomain (g \<circ>\<^sub>c f) = codomain g" and
-  comp_associative: "domain h = codomain g \<Longrightarrow> domain g = codomain f \<Longrightarrow> h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = (h \<circ>\<^sub>c g) \<circ>\<^sub>c f" and
+  comp_associative: "h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = (h \<circ>\<^sub>c g) \<circ>\<^sub>c f" and
   id_domain: "domain (id X) = X" and
   id_codomain: "codomain (id X) = X" and
-  id_right_unit: "domain f = X \<Longrightarrow> f \<circ>\<^sub>c id X = f" and
-  id_left_unit: "codomain f = Y \<Longrightarrow>  id Y \<circ>\<^sub>c f = f"
+  id_right_unit: "f \<circ>\<^sub>c id (domain f) = f" and
+  id_left_unit: "id (codomain f) \<circ>\<^sub>c f = f"
 
 definition cfunc_type :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" ("_ : _ \<rightarrow> _" [50, 50, 50]50) where
   "(f : X \<rightarrow> Y) \<longleftrightarrow> (domain(f) = X \<and> codomain(f) = Y)"
@@ -31,10 +31,6 @@ named_theorems type_rule
 lemma comp_type[type_rule]:
   "f : X \<rightarrow> Y \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> g \<circ>\<^sub>c f : X \<rightarrow> Z"
   by (simp add: cfunc_type_def codomain_comp domain_comp)
-
-lemma comp_associative2:
-  "f : X \<rightarrow> Y \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> h : Z \<rightarrow> W \<Longrightarrow> h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = (h \<circ>\<^sub>c g) \<circ>\<^sub>c f"
-  by (simp add: cfunc_type_def comp_associative)
 
 lemma id_type[type_rule]: "id X : X \<rightarrow> X"
   unfolding cfunc_type_def using id_domain id_codomain by auto
