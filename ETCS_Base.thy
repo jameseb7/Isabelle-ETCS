@@ -32,6 +32,10 @@ lemma comp_type[type_rule]:
   "f : X \<rightarrow> Y \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> g \<circ>\<^sub>c f : X \<rightarrow> Z"
   by (simp add: cfunc_type_def codomain_comp domain_comp)
 
+lemma comp_associative2:
+  "f : X \<rightarrow> Y \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> h : Z \<rightarrow> W \<Longrightarrow> h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = (h \<circ>\<^sub>c g) \<circ>\<^sub>c f"
+  by (simp add: cfunc_type_def comp_associative)
+
 lemma id_type[type_rule]: "id X : X \<rightarrow> X"
   unfolding cfunc_type_def using id_domain id_codomain by auto
 
