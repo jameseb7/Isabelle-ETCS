@@ -8,8 +8,8 @@ axiomatization
   terminal_func :: "cset \<Rightarrow> cfunc" ("\<beta>\<^bsub>_\<^esub>" 100) and
   one :: "cset"
 where
-  terminal_func_type: "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> one" and
-  terminal_func_unique: "\<forall> h. (h :  X \<rightarrow> one)  \<longrightarrow> (h =\<beta>\<^bsub>X\<^esub>)" and
+  terminal_func_type[type_rule]: "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> one" and
+  terminal_func_unique: "h :  X \<rightarrow> one \<Longrightarrow> h = \<beta>\<^bsub>X\<^esub>" and
   one_separator: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> (\<And> x. x : one \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c x = g \<circ>\<^sub>c x) \<Longrightarrow> f = g"
 
 abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
@@ -17,7 +17,7 @@ abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<i
 
 lemma terminal_func_comp:
   "x : X \<rightarrow> Y \<Longrightarrow> \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c x = \<beta>\<^bsub>X\<^esub>"
-  by (simp add: terminal_func_type terminal_func_unique)
+  by (simp add: comp_type terminal_func_type terminal_func_unique)
 
 definition nonempty :: "cset \<Rightarrow> bool" where
   "nonempty X \<equiv> (\<exists>x. x \<in>\<^sub>c X)"
@@ -90,8 +90,8 @@ qed
 lemma element_monomorphism:
   "x \<in>\<^sub>c X \<Longrightarrow> monomorphism x"
   unfolding monomorphism_def
-  by (metis comp_monic_imp_monic comp_type id_isomorphism id_type iso_imp_epi_and_monic
-      monomorphism_def terminal_func_type terminal_func_unique)
+  by (metis cfunc_type_def domain_comp terminal_func_unique)
+
 
 lemma one_unique_element:
   "\<exists>! x. x \<in>\<^sub>c one"
@@ -112,9 +112,15 @@ proof (rule_tac a="diagonal one" in ex1I)
     by (simp add: cfunc_prod_type diagonal_def id_type)
 next
   fix x
-  assume "x \<in>\<^sub>c one \<times>\<^sub>c one"
+  assume x_type: "x \<in>\<^sub>c one \<times>\<^sub>c one"
+  
+  have left_eq: "left_cart_proj one one \<circ>\<^sub>c x = id one"
+    using x_type one_unique_element by (typecheck_cfuncs, blast)
+  have right_eq: "right_cart_proj one one \<circ>\<^sub>c x = id one"
+    using x_type one_unique_element by (typecheck_cfuncs, blast)
+
   then show "x = diagonal one"
-    by (smt cfunc_prod_unique comp_type diagonal_def id_type left_cart_proj_type right_cart_proj_type terminal_func_unique)
+    unfolding diagonal_def using cfunc_prod_unique id_type left_eq x_type by blast
 qed
 
 (* Proposition 2.1.19 *)
@@ -132,7 +138,7 @@ proof
     fix x
     assume x_type: "x \<in>\<^sub>c X"
     then have \<beta>x_eq_\<beta>f: "\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c f"
-      using f_type one_unique_element terminal_func_type by auto
+      using f_type terminal_func_comp by auto
     have "isomorphism (\<beta>\<^bsub>X\<^esub>)"
       using X_iso_one is_isomorphic_def terminal_func_unique by blast
     then have "monomorphism (\<beta>\<^bsub>X\<^esub>)"
@@ -163,7 +169,7 @@ next
           using one_separator_contrapos[where f=xa, where g="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>", where X=Y, where Y=X]
           using comp_type terminal_func_type x_type xa_type by blast
         have elem1: "xa \<circ>\<^sub>c y \<in>\<^sub>c X"
-          using xa_type y_type by auto
+          using comp_type xa_type y_type by auto
         have elem2: "(x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y \<in>\<^sub>c X"
           using comp_type terminal_func_type x_type y_type by blast
         show False
@@ -198,7 +204,7 @@ proof
              using one_separator_contrapos[where f=xa, where g="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>", where X=Y, where Y=X]
              using comp_type terminal_func_type x_type xa_type by blast
            have elem1: "xa \<circ>\<^sub>c y \<in>\<^sub>c X"
-             using xa_type y_type by auto
+             using comp_type xa_type y_type by auto
            have elem2: "(x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y \<in>\<^sub>c X"
              using comp_type terminal_func_type x_type y_type by blast
            show False
@@ -293,9 +299,9 @@ proof (rule_tac x="left_cart_proj X Y \<circ>\<^sub>c a" in exI, rule_tac x="rig
   show "a = \<langle>left_cart_proj X Y \<circ>\<^sub>c a,right_cart_proj X Y \<circ>\<^sub>c a\<rangle>"
     using assms cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type by blast
   show "left_cart_proj X Y \<circ>\<^sub>c a \<in>\<^sub>c X"
-    using assms left_cart_proj_type by auto
+    using assms left_cart_proj_type comp_type by auto
   show "right_cart_proj X Y \<circ>\<^sub>c a \<in>\<^sub>c Y"
-    using assms right_cart_proj_type by auto
+    using assms right_cart_proj_type comp_type by auto
 qed
 
 (* Note 2.1.22 *)
@@ -309,14 +315,23 @@ lemma nonempty_right_imp_left_proj_epimorphism:
   "nonempty Y \<Longrightarrow> epimorphism (left_cart_proj X Y)"
 proof -
   assume "nonempty Y"
-  then obtain y where "y : one \<rightarrow> Y"
+  then obtain y where y_in_Y: "y : one \<rightarrow> Y"
     using nonempty_def by blast
-  then have "(left_cart_proj X Y) \<circ>\<^sub>c \<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> = id X"
+  then have id_eq: "(left_cart_proj X Y) \<circ>\<^sub>c \<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> = id X"
     using comp_type id_type left_cart_proj_cfunc_prod terminal_func_type by blast
-  then have "epimorphism ((left_cart_proj X Y) \<circ>\<^sub>c \<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>)"
-    by (simp add: id_isomorphism iso_imp_epi_and_monic)
   then show "epimorphism (left_cart_proj X Y)"
-    using comp_epi_imp_epi by blast
+    unfolding epimorphism_def
+  proof auto
+    fix g h
+    assume domain_g: "domain g = codomain (left_cart_proj X Y)"
+    assume domain_h: "domain h = codomain (left_cart_proj X Y)"
+
+    assume "g \<circ>\<^sub>c left_cart_proj X Y = h \<circ>\<^sub>c left_cart_proj X Y"
+    then have "g \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c \<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> = h \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c \<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>"
+      using y_in_Y by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative domain_g domain_h)
+    then show "g = h"
+      by (metis cfunc_type_def domain_g domain_h id_eq id_right_unit left_cart_proj_type)
+  qed
 qed
 
 (*Dual to Proposition 2.1.23 *)
@@ -324,14 +339,23 @@ lemma nonempty_left_imp_right_proj_epimorphism:
   "nonempty X \<Longrightarrow> epimorphism (right_cart_proj X Y)"
 proof - 
   assume "nonempty X"
-  then obtain y where "y: one \<rightarrow> X"
+  then obtain y where y_in_Y: "y: one \<rightarrow> X"
     using nonempty_def by blast
-   then have "(right_cart_proj X Y) \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> = id Y"
+  then have id_eq: "(right_cart_proj X Y) \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> = id Y"
      using comp_type id_type right_cart_proj_cfunc_prod terminal_func_type by blast
-    then have "epimorphism ((right_cart_proj X Y) \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>,id Y\<rangle>)"
-      by (simp add: id_isomorphism iso_imp_epi_and_monic)
-    then show "epimorphism (right_cart_proj X Y)"
-    using comp_epi_imp_epi by blast
+  then show "epimorphism (right_cart_proj X Y)"
+    unfolding epimorphism_def
+  proof auto
+    fix g h
+    assume domain_g: "domain g = codomain (right_cart_proj X Y)"
+    assume domain_h: "domain h = codomain (right_cart_proj X Y)"
+
+    assume "g \<circ>\<^sub>c right_cart_proj X Y = h \<circ>\<^sub>c right_cart_proj X Y"
+    then have "g \<circ>\<^sub>c right_cart_proj X Y \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> = h \<circ>\<^sub>c right_cart_proj X Y \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle>"
+      using y_in_Y by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative domain_g domain_h)
+    then show "g = h"
+      by (metis cfunc_type_def domain_g domain_h id_eq id_right_unit right_cart_proj_type)
+  qed
 qed
 
 (* Definition 2.1.24 *)
@@ -354,13 +378,11 @@ proof safe
   assume cd_g_eq_d_f: "codomain g = domain f"
   assume cd_h_eq_d_f: "codomain h = domain f"
   assume fg_eq_fh: "f \<circ>\<^sub>c g = f \<circ>\<^sub>c h"
-  assume g_ETCS: "g \<in> ETCS_func"
-  assume h_ETCS: "h \<in> ETCS_func"
 
   obtain X Y where f_type: "f : X \<rightarrow> Y"
     using assms cfunc_type_def by blast
   obtain A where g_type: "g : A \<rightarrow> X" and h_type: "h : A \<rightarrow> X"
-    by (metis cd_g_eq_d_f cd_h_eq_d_f cfunc_type_def domain_comp f_type fg_eq_fh g_ETCS h_ETCS)
+    by (metis cd_g_eq_d_f cd_h_eq_d_f cfunc_type_def domain_comp f_type fg_eq_fh)
 
   have "(\<forall>x. x \<in>\<^sub>c A \<longrightarrow> g \<circ>\<^sub>c x = h \<circ>\<^sub>c x)"
   proof auto
@@ -368,7 +390,7 @@ proof safe
     assume x_in_A: "x \<in>\<^sub>c A"
 
     have "f \<circ>\<^sub>c (g \<circ>\<^sub>c x) = f \<circ>\<^sub>c (h \<circ>\<^sub>c x)"
-      by (simp add: comp_associative fg_eq_fh)
+      using g_type h_type x_in_A f_type comp_associative2 fg_eq_fh by (typecheck_cfuncs, auto)
     then show "g \<circ>\<^sub>c x = h \<circ>\<^sub>c x"
       using cd_h_eq_d_f cfunc_type_def comp_type f_inj g_type h_type x_in_A by presburger
   qed
@@ -390,14 +412,12 @@ proof (cases "nonempty (codomain f)", auto)
   assume d_g_eq_cd_f: "domain g = codomain f"
   assume d_h_eq_cd_f: "domain h = codomain f"
   assume gf_eq_hf: "g \<circ>\<^sub>c f = h \<circ>\<^sub>c f"
-  assume g_ETCS: "g \<in> ETCS_func" 
-  assume h_ETCS: "h \<in> ETCS_func"
   assume nonempty: "nonempty (codomain f)"
 
   obtain X Y where f_type: "f : X \<rightarrow> Y"
-    using nonempty cfunc_type_def compatible_comp_ETCS_func f_surj nonempty_def by auto
+    using nonempty cfunc_type_def f_surj nonempty_def by auto
   obtain A where g_type: "g : Y \<rightarrow> A" and h_type: "h : Y \<rightarrow> A"
-    by (metis cfunc_type_def codomain_comp d_g_eq_cd_f d_h_eq_cd_f f_type g_ETCS gf_eq_hf h_ETCS)
+    by (metis cfunc_type_def codomain_comp d_g_eq_cd_f d_h_eq_cd_f f_type gf_eq_hf)
 
   show "g = h"
   proof (rule ccontr)
@@ -406,17 +426,15 @@ proof (cases "nonempty (codomain f)", auto)
       using g_type h_type one_separator by blast
     then obtain x where "x \<in>\<^sub>c X" and "f \<circ>\<^sub>c x = y"
       using cfunc_type_def f_surj f_type by auto
-    then have "g \<circ>\<^sub>c f \<circ>\<^sub>c x \<noteq> h \<circ>\<^sub>c f \<circ>\<^sub>c x"
-      by (simp add: gy_neq_hy)
     then have "g \<circ>\<^sub>c f \<noteq> h \<circ>\<^sub>c f"
-      using comp_associative by auto
+      using comp_associative2 f_type g_type gy_neq_hy h_type by auto
     then show False
       using gf_eq_hf by auto
   qed
 next
   fix g h
   assume empty: "\<not> nonempty (codomain f)"
-  assume "g \<in> ETCS_func" "h \<in> ETCS_func" "domain g = codomain f" "domain h = codomain f"
+  assume "domain g = codomain f" "domain h = codomain f"
   then show "g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<Longrightarrow> g = h"
     by (metis empty cfunc_type_def codomain_comp nonempty_def one_separator)
 qed
