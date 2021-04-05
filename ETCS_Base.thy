@@ -51,7 +51,7 @@ subsection \<open>Tactic to construct type facts\<close>
 ML \<open>
   fun check_cfunc binder_typs (t : term) = 
     case fastype_of1 (binder_typs, t) of
-      Type (name, []) => name = "ETCS.cfunc"
+      Type (name, []) => name = "ETCS_Base.cfunc"
     | _ => false
 \<close>
 
@@ -90,7 +90,7 @@ ML \<open>fun extract_type_rule_term rule =
           case Thm.concl_of rule of
             Const ("HOL.Trueprop", _) $ boolrule =>
               (case boolrule of 
-                (Const ("ETCS.cfunc_type", _) $ t) $ _ $ _ => SOME t
+                (Const ("ETCS_Base.cfunc_type", _) $ t) $ _ $ _ => SOME t
               | _ => NONE)
           | _ => NONE
                 \<close>
@@ -184,9 +184,9 @@ ML \<open>fun extract_prems ((@{term Trueprop}) $ P) = extract_prems P
 (* typecheck_cfuncs_subtac implements a tactic that generates cfunc type facts as assumptions of a goal,
   in the right format to be passed to the SUBGOAL combinator *)
 ML \<open>fun typecheck_cfuncs_subtac ctxt type_rules (subgoal, n) = 
-          let val type_rules' = type_rules @ Named_Theorems.get ctxt "ETCS.type_rule"
+          let val type_rules' = type_rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
               val lems = construct_cfunc_type_lemmas ctxt type_rules' subgoal
-          in (Method.insert_tac ctxt lems n THEN asm_full_simp_tac ctxt n)
+          in Method.insert_tac ctxt lems n THEN asm_full_simp_tac ctxt n
           end\<close>
 
 (* typecheck_cfuncs_tac lifts typecheck_cfuncs_subtac to a tactic
