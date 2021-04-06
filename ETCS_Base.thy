@@ -241,6 +241,15 @@ definition monomorphism :: "cfunc \<Rightarrow> bool" where
   "monomorphism(f) \<longleftrightarrow> (\<forall> g h. 
     (codomain(g) = domain(f) \<and> codomain(h) = domain(f)) \<longrightarrow> (f \<circ>\<^sub>c g = f \<circ>\<^sub>c h \<longrightarrow> g = h))"
 
+lemma monomorphism_def2:
+  "monomorphism f \<longleftrightarrow> (\<forall> g h A X Y. g : A \<rightarrow> X \<and> h : A \<rightarrow> X \<and> f : X \<rightarrow> Y \<longrightarrow> (f \<circ>\<^sub>c g = f \<circ>\<^sub>c h \<longrightarrow> g = h))"
+  unfolding monomorphism_def by (smt cfunc_type_def domain_comp)
+
+lemma monomorphism_def3:
+  assumes "f : X \<rightarrow> Y"
+  shows "monomorphism f \<longleftrightarrow> (\<forall> g h A. g : A \<rightarrow> X \<and> h : A \<rightarrow> X \<longrightarrow> (f \<circ>\<^sub>c g = f \<circ>\<^sub>c h \<longrightarrow> g = h))"
+  unfolding monomorphism_def2 using assms cfunc_type_def by auto 
+
 definition epimorphism :: "cfunc \<Rightarrow> bool" where
   "epimorphism(f) \<longleftrightarrow> (\<forall> g h. 
     (domain(g) = codomain(f) \<and> domain(h) = codomain(f)) \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
