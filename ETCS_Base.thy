@@ -147,7 +147,7 @@ ML \<open>fun elim_type_rule_prems ctxt thm lems =
   the lemma is returned in a list, which is empty if no lemma can be constructed *)
 ML \<open>fun construct_cfunc_type_lemma ctxt rules binder_typs lems t = 
           case find_type_rule ctxt binder_typs t rules of
-            SOME rule => [elim_type_rule_prems ctxt rule lems]
+            SOME rule => [elim_type_rule_prems ctxt rule (lems @ rules)]
           | NONE => []\<close>
 
 (* construct_cfunc_type_lemmas1 constructs all the typing lemmas for a given term,
