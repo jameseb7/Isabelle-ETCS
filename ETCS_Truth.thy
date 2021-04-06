@@ -61,14 +61,14 @@ proof -
     have comm: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>domain m\<^esub> = \<chi> \<circ>\<^sub>c m"
       using chi_pullback unfolding is_pullback_def square_commutes_def by auto
     then have "\<beta>\<^bsub>domain m\<^esub> = \<beta>\<^bsub>codomain m\<^esub> \<circ>\<^sub>c m"
-      by (metis (mono_tags, hide_lams) cfunc_type_def codomain_comp compatible_comp_ETCS_func domain_comp terminal_func_type terminal_func_unique true_func_type)
+      by (metis (mono_tags, hide_lams) cfunc_type_def codomain_comp domain_comp terminal_func_type terminal_func_unique true_func_type)
     then show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>) \<circ>\<^sub>c m = \<chi> \<circ>\<^sub>c m"
-      using comm comp_associative by auto
+      using cfunc_type_def comm comp_associative terminal_func_type true_func_type by auto
   next
     fix h F
     assume  "h : F \<rightarrow> codomain m" "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>) \<circ>\<^sub>c h = \<chi> \<circ>\<^sub>c h"
     then show "\<exists>k. k : F \<rightarrow> domain m \<and> m \<circ>\<^sub>c k = h"
-      by (metis comp_associative comp_type pullback terminal_func_type)
+      by (metis cfunc_type_def comp_associative pullback terminal_func_comp terminal_func_type true_func_type)
   next
     fix F k y
     assume "k : F \<rightarrow> domain m" "y : F \<rightarrow> domain m"
@@ -84,7 +84,7 @@ lemma epi_mon_is_iso:
   assumes "f \<in> ETCS_func"
   assumes "epimorphism(f)" "monomorphism(f)"
   shows "isomorphism(f)"
-  by (simp add: assms epi_regmon_is_iso mono_is_regmono)
+  using assms epi_regmon_is_iso mono_is_regmono by auto
 
 (* Definition 2.2.6 *)
 definition fiber :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1{_}" [100,100]100) where
