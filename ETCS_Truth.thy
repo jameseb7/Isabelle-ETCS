@@ -12,9 +12,9 @@ where
   true_func_type: "\<t> \<in>\<^sub>c \<Omega>" and
   false_func_type: "\<f> \<in>\<^sub>c \<Omega>" and
   true_false_distinct: "\<t> \<noteq> \<f>" and
-  true_false_only_truth_values: "\<forall> x. (x \<in>\<^sub>c \<Omega>) \<longrightarrow> (x = \<f> \<or> x = \<t>)" and
+  true_false_only_truth_values: "x \<in>\<^sub>c \<Omega> \<Longrightarrow> x = \<f> \<or> x = \<t>" and
   characteristic_function_exists:
-    "\<forall> X m. ((m : B \<rightarrow> X) \<and> monomorphism(m)) \<longrightarrow> (\<exists>! \<chi>. is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi> )"
+    "m : B \<rightarrow> X \<Longrightarrow> monomorphism m \<Longrightarrow> \<exists>! \<chi>. is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi>"
 
 thm subobject_of_def
 
