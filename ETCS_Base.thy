@@ -51,7 +51,7 @@ subsection \<open>Tactic to construct type facts\<close>
 ML \<open>
   fun check_cfunc binder_typs (t : term) = 
     case fastype_of1 (binder_typs, t) of
-      Type (name, []) => name = "ETCS_Base.cfunc"
+      Type (name, []) => (name = "ETCS_Base.cfunc") andalso not (loose_bvar (t, 0)) (* reject invalid terms with loose bvars *)
     | _ => false
 \<close>
 
