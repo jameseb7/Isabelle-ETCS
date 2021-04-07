@@ -10,29 +10,30 @@ axiomatization
   right_coproj :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" and
   cfunc_coprod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<amalg>" 65)
 where
-  left_proj_type: "left_coproj X Y : X \<rightarrow> X\<Coprod>Y" and
-  right_proj_type: "right_coproj X Y : Y \<rightarrow> X\<Coprod>Y" and
-  cfunc_coprod_type: "(f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z) \<longrightarrow> (f\<amalg>g :  X\<Coprod>Y \<rightarrow> Z)" and
-  left_coproj_cfunc_coprod: "(f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z) \<longrightarrow> (f\<amalg>g \<circ>\<^sub>c (left_coproj X Y)  = f)" and
-  right_coproj_cfunc_coprod: "(f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z) \<longrightarrow> (f\<amalg>g \<circ>\<^sub>c (right_coproj X Y)  = g)" and
-  cfunc_coprod_unique: "(f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z) \<longrightarrow> 
-    (\<forall> h. (h : X \<Coprod> Y \<rightarrow> Z \<and> (h \<circ>\<^sub>c left_coproj X Y = f) \<and> (h \<circ>\<^sub>c right_coproj X Y = g)) \<longrightarrow> h = f\<amalg>g)"
+  left_proj_type[type_rule]: "left_coproj X Y : X \<rightarrow> X\<Coprod>Y" and
+  right_proj_type[type_rule]: "right_coproj X Y : Y \<rightarrow> X\<Coprod>Y" and
+  cfunc_coprod_type[type_rule]: "f : X \<rightarrow> Z \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> f\<amalg>g :  X\<Coprod>Y \<rightarrow> Z" and
+  left_coproj_cfunc_coprod: "f : X \<rightarrow> Z \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> f\<amalg>g \<circ>\<^sub>c (left_coproj X Y)  = f" and
+  right_coproj_cfunc_coprod: "f : X \<rightarrow> Z \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> f\<amalg>g \<circ>\<^sub>c (right_coproj X Y)  = g" and
+  cfunc_coprod_unique: "f : X \<rightarrow> Z \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> h : X \<Coprod> Y \<rightarrow> Z \<Longrightarrow> 
+    h \<circ>\<^sub>c left_coproj X Y = f \<Longrightarrow> h \<circ>\<^sub>c right_coproj X Y = g \<Longrightarrow> h = f\<amalg>g"
 
 lemma cfunc_coprod_comp:
-  assumes a_type: "a : Y \<rightarrow> Z"
-  assumes b_type: "b : X \<rightarrow> Y"
-  assumes c_type: "c : W \<rightarrow> Y"
+  assumes "a : Y \<rightarrow> Z" "b : X \<rightarrow> Y" "c : W \<rightarrow> Y"
   shows "(a \<circ>\<^sub>c b) \<amalg> (a \<circ>\<^sub>c c) = a \<circ>\<^sub>c (b \<amalg> c)"
 proof -
-  have type1: "a \<circ>\<^sub>c (b \<amalg> c) :  X\<Coprod>W \<rightarrow> Z"
-    using a_type b_type c_type cfunc_coprod_type comp_type by blast
-  have type2: "a \<circ>\<^sub>c (b \<amalg> c) \<circ>\<^sub>c left_coproj X W : X \<rightarrow> Z"
-    using a_type b_type c_type left_coproj_cfunc_coprod by auto
-  have type3: "a \<circ>\<^sub>c (b \<amalg> c) \<circ>\<^sub>c right_coproj X W : W \<rightarrow> Z"
-    using a_type b_type c_type right_coproj_cfunc_coprod by auto
+  have "((a \<circ>\<^sub>c b) \<amalg> (a \<circ>\<^sub>c c)) \<circ>\<^sub>c (left_coproj X W) = a \<circ>\<^sub>c (b \<amalg> c) \<circ>\<^sub>c (left_coproj X W)"
+    using assms by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+  then have left_coproj_eq: "((a \<circ>\<^sub>c b) \<amalg> (a \<circ>\<^sub>c c)) \<circ>\<^sub>c (left_coproj X W) = (a \<circ>\<^sub>c (b \<amalg> c)) \<circ>\<^sub>c (left_coproj X W)"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2)
+  have "((a \<circ>\<^sub>c b) \<amalg> (a \<circ>\<^sub>c c)) \<circ>\<^sub>c (right_coproj X W) = a \<circ>\<^sub>c (b \<amalg> c) \<circ>\<^sub>c (right_coproj X W)"
+    using assms by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
+  then have right_coproj_eq: "((a \<circ>\<^sub>c b) \<amalg> (a \<circ>\<^sub>c c)) \<circ>\<^sub>c (right_coproj X W) = (a \<circ>\<^sub>c (b \<amalg> c)) \<circ>\<^sub>c (right_coproj X W)"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2)
 
   show "(a \<circ>\<^sub>c b) \<amalg> (a \<circ>\<^sub>c c) = a \<circ>\<^sub>c (b \<amalg> c)"
-    by (smt b_type c_type cfunc_coprod_unique comp_associative left_coproj_cfunc_coprod right_coproj_cfunc_coprod type1 type2 type3)
+    using assms left_coproj_eq right_coproj_eq
+    by (typecheck_cfuncs, smt cfunc_coprod_unique left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
 qed
 
 (* Coproduct commutes *)
@@ -60,17 +61,19 @@ proof (rule ccontr, auto)
   assume y_type: "y \<in>\<^sub>c Y"
   assume BWOC: "((left_coproj X Y) \<circ>\<^sub>c x = (right_coproj X Y) \<circ>\<^sub>c y)"
   obtain g where g_type: "g: X \<rightarrow> \<Omega> \<and> g factorsthru  \<t>"
-      proof -
-        assume a1: "\<And>g. g : X \<rightarrow> \<Omega> \<and> g factorsthru \<t> \<Longrightarrow> thesis"
-        have f2: "\<forall>c. domain (\<t> \<circ>\<^sub>c \<beta>\<^bsub>c\<^esub>) = c"
-          by (meson cfunc_type_def comp_type terminal_func_type true_func_type)
-        have "domain \<t> = one"
-          using cfunc_type_def true_func_type by blast
-        then show ?thesis
-          using f2 a1 by (metis (no_types) comp_type factors_through_def terminal_func_type true_func_type)
-      qed
+  proof -
+    assume a1: "\<And>g. g : X \<rightarrow> \<Omega> \<and> g factorsthru \<t> \<Longrightarrow> thesis"
+    have f2: "\<forall>c. domain (\<t> \<circ>\<^sub>c \<beta>\<^bsub>c\<^esub>) = c"
+      by (meson cfunc_type_def comp_type terminal_func_type true_func_type)
+    have "domain \<t> = one"
+      using cfunc_type_def true_func_type by blast
+    then show ?thesis
+      using f2 a1 by (metis (no_types) comp_type factors_through_def terminal_func_type true_func_type)
+  qed
   then have fact1: "\<t> = g \<circ>\<^sub>c x"
-     by (smt cfunc_type_def comp_associative comp_type factors_through_def one_separator_contrapos one_unique_element true_func_type x_type)
+    by (metis cfunc_type_def comp_associative factors_through_def id_right_unit2 id_type
+        terminal_func_comp terminal_func_unique true_func_type x_type)
+     
   obtain h where h_type: "h: Y \<rightarrow> \<Omega> \<and> h factorsthru \<f>"
       proof -
         assume a1: "\<And>h. h : Y \<rightarrow> \<Omega> \<and> h factorsthru \<f> \<Longrightarrow> thesis"
@@ -88,11 +91,12 @@ proof (rule ccontr, auto)
           by (meson cfunc_coprod_type g_type h_type left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
       qed
   then have fact2: "\<f> = h \<circ>\<^sub>c y"
-      by (metis cfunc_type_def comp_associative comp_type factors_through_def false_func_type h_type id_right_unit id_type one_unique_element y_type)
+    by (metis cfunc_type_def comp_associative factors_through_def false_func_type h_type
+        id_right_unit id_type terminal_func_comp terminal_func_unique y_type)
   also have "... = ((g \<amalg> h) \<circ>\<^sub>c (right_coproj X Y)) \<circ>\<^sub>c y"
       by (simp add: gUh_type)
   also have "... = ((g \<amalg> h) \<circ>\<^sub>c (left_coproj X Y)) \<circ>\<^sub>c x"
-      by (metis (full_types) BWOC comp_associative)
+    by (smt BWOC comp_associative2 gUh_type left_proj_type right_proj_type x_type y_type)
   also have "... =  g \<circ>\<^sub>c x"
       by (simp add: gUh_type)
   also have "... = \<t>"
@@ -110,18 +114,19 @@ proof (cases "\<exists>x. x \<in>\<^sub>c X")
   assume X_nonempty: "\<exists>x. x \<in>\<^sub>c X"
   then obtain x where "x \<in>\<^sub>c X"
     by auto
-  then have "x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> : Y \<rightarrow> X"
+  then have x_beta_type: "x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> : Y \<rightarrow> X"
     using comp_type terminal_func_type by blast
   then have "(id X \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)) \<circ>\<^sub>c left_coproj X Y = id X"
     using id_type left_coproj_cfunc_coprod by blast
   then show "monomorphism (left_coproj X Y)"
-    by (metis comp_monic_imp_monic id_isomorphism iso_imp_epi_and_monic)
+    by (metis x_beta_type cfunc_coprod_type cfunc_type_def comp_monic_imp_monic id_isomorphism
+        id_type iso_imp_epi_and_monic left_proj_type)
 next
   assume "\<nexists>x. x \<in>\<^sub>c X"
   then have "injective (left_coproj X Y)"
     using cfunc_type_def injective_def left_proj_type by auto
   then show "monomorphism (left_coproj X Y)"
-    using cfunc_type_def injective_imp_monomorphism left_proj_type by auto
+    using injective_imp_monomorphism by auto
 qed
 
 lemma right_coproj_are_monomorphisms:
@@ -130,24 +135,22 @@ proof (cases "\<exists>y. y \<in>\<^sub>c Y")
   assume Y_nonempty: "\<exists>y. y \<in>\<^sub>c Y"
   then obtain y where "y \<in>\<^sub>c Y"
     by auto
-  then have "y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> : X \<rightarrow> Y"
+  then have y_beta_type: "y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> : X \<rightarrow> Y"
     using comp_type terminal_func_type by blast
   then have "((y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> id Y) \<circ>\<^sub>c right_coproj X Y = id Y"
     using id_type right_coproj_cfunc_coprod by blast
   then show "monomorphism (right_coproj X Y)"
-    by (metis comp_monic_imp_monic id_isomorphism iso_imp_epi_and_monic)
+    by (metis cfunc_coprod_type cfunc_type_def comp_monic_imp_monic id_isomorphism id_type
+        iso_imp_epi_and_monic right_proj_type y_beta_type)
 next
   assume "\<nexists>y. y \<in>\<^sub>c Y"
   then have "injective (right_coproj X Y)"
     using cfunc_type_def injective_def right_proj_type by auto
   then show "monomorphism (right_coproj X Y)"
-    using cfunc_type_def injective_imp_monomorphism right_proj_type by auto
+    using injective_imp_monomorphism by auto
 qed
 
-
-
 (*Proposition 2.4.4*)
-
 lemma truth_value_set_iso_1u1:
   "isomorphism(\<t>\<amalg>\<f>)"
   unfolding isomorphism_def
