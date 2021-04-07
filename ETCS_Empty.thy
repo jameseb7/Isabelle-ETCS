@@ -8,8 +8,8 @@ axiomatization
   initial_func :: "cset \<Rightarrow> cfunc" ("\<alpha>\<^bsub>_\<^esub>" 100) and
   emptyset :: "cset" ("\<emptyset>")
 where
-  initial_func_type: "initial_func(X) :  \<emptyset> \<rightarrow> X" and
-  initial_func_unique: "((\<forall> h. h : \<emptyset> \<rightarrow> X) \<longrightarrow> (h = initial_func(X)))" and
+  initial_func_type[type_rule]: "initial_func X :  \<emptyset> \<rightarrow> X" and
+  initial_func_unique: "h : \<emptyset> \<rightarrow> X \<Longrightarrow> h = initial_func X" and
   emptyset_is_empty: "\<not>(x \<in>\<^sub>c \<emptyset>)"
 
 (*characteristic_function_exists:
@@ -21,44 +21,41 @@ where
 lemma coproduct_with_zero_does_nothing:
   shows "X \<Coprod> \<emptyset> \<cong> X"
 proof -
-  have i0_type: "(left_coproj X \<emptyset>) : X \<rightarrow> X\<Coprod>\<emptyset>"
-    by (simp add: left_proj_type)
-  have i1_type: "(right_coproj X \<emptyset>) : \<emptyset> \<rightarrow> X\<Coprod>\<emptyset>"
-    by (simp add: right_proj_type)  
-  have i0Ui1_type:"(left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>):  X\<Coprod>\<emptyset> \<rightarrow> X\<Coprod>\<emptyset>"
-    by (simp add: cfunc_coprod_type i0_type i1_type)
-  have idX_U_alpha_X_type: "(id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>) : X\<Coprod>\<emptyset> \<rightarrow> X"
-    by (simp add: cfunc_coprod_type id_type initial_func_type)
-  then have "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) = 
-          (left_coproj X \<emptyset>) \<circ>\<^sub>c ((id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>) \<circ>\<^sub>c (left_coproj X \<emptyset>))"
-    by (simp add: comp_associative) 
-  also have "... = (left_coproj X \<emptyset>) \<circ>\<^sub>c id(X)"
-    by (metis id_type initial_func_type left_coproj_cfunc_coprod)
-  also have "... = left_coproj X \<emptyset>"
-    by (metis cfunc_type_def i0_type id_right_unit)
-  then have comp1: "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) = left_coproj X \<emptyset>"
-    by (simp add: calculation)
-  have "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) = 
+  have comp1: "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) = left_coproj X \<emptyset>"
+  proof -
+    have "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) =
+            (left_coproj X \<emptyset>) \<circ>\<^sub>c ((id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>) \<circ>\<^sub>c (left_coproj X \<emptyset>))"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (left_coproj X \<emptyset>) \<circ>\<^sub>c id(X)"
+      by (typecheck_cfuncs, metis left_coproj_cfunc_coprod)
+    also have "... = left_coproj X \<emptyset>"
+      by (typecheck_cfuncs, metis id_right_unit2)
+    then show ?thesis using calculation by auto
+  qed
+  have comp2: "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) = right_coproj X \<emptyset>"
+  proof -
+    have "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) = 
              (left_coproj X \<emptyset>) \<circ>\<^sub>c ((id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>) \<circ>\<^sub>c (right_coproj X \<emptyset>))"
-    by (simp add: comp_associative)
-  have "... = (left_coproj X \<emptyset>) \<circ>\<^sub>c \<alpha>\<^bsub>X\<^esub>"
-    by (metis id_type initial_func_type right_coproj_cfunc_coprod)
-  have "... = right_coproj X \<emptyset>"
-    by (meson comp_type emptyset_is_empty initial_func_type left_proj_type one_separator right_proj_type)
-  then have comp2: "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) =right_coproj X \<emptyset>"
-    by (simp add: \<open>(left_coproj X \<emptyset> \<circ>\<^sub>c id\<^sub>c X \<amalg> \<alpha>\<^bsub>X\<^esub>) \<circ>\<^sub>c right_coproj X \<emptyset> = left_coproj X \<emptyset> \<circ>\<^sub>c id\<^sub>c X \<amalg> \<alpha>\<^bsub>X\<^esub> \<circ>\<^sub>c right_coproj X \<emptyset>\<close> \<open>left_coproj X \<emptyset> \<circ>\<^sub>c id\<^sub>c X \<amalg> \<alpha>\<^bsub>X\<^esub> \<circ>\<^sub>c right_coproj X \<emptyset> = left_coproj X \<emptyset> \<circ>\<^sub>c \<alpha>\<^bsub>X\<^esub>\<close>)
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (left_coproj X \<emptyset>) \<circ>\<^sub>c \<alpha>\<^bsub>X\<^esub>"
+      by (typecheck_cfuncs, metis right_coproj_cfunc_coprod)
+    also have "... = right_coproj X \<emptyset>"
+      by (typecheck_cfuncs, metis initial_func_unique)
+    then show ?thesis using calculation by auto
+  qed
   then have fact1: "((left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) = (left_coproj X \<emptyset>)"
-    using i0_type i1_type left_coproj_cfunc_coprod by blast
+    using left_coproj_cfunc_coprod by (typecheck_cfuncs, blast)
   then have fact2: "((left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) = (right_coproj X \<emptyset>)"
-    using i0_type i1_type right_coproj_cfunc_coprod by blast
+    using right_coproj_cfunc_coprod by (typecheck_cfuncs, blast)
   then have concl: "(left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>) = ((left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>))"
-    using \<open>(left_coproj X \<emptyset> \<circ>\<^sub>c id\<^sub>c X \<amalg> \<alpha>\<^bsub>X\<^esub>) \<circ>\<^sub>c right_coproj X \<emptyset> = left_coproj X \<emptyset> \<circ>\<^sub>c id\<^sub>c X \<amalg> \<alpha>\<^bsub>X\<^esub> \<circ>\<^sub>c right_coproj X \<emptyset>\<close> \<open>left_coproj X \<emptyset> \<circ>\<^sub>c \<alpha>\<^bsub>X\<^esub> = right_coproj X \<emptyset>\<close> \<open>left_coproj X \<emptyset> \<circ>\<^sub>c id\<^sub>c X = left_coproj X \<emptyset>\<close> \<open>left_coproj X \<emptyset> \<circ>\<^sub>c id\<^sub>c X \<amalg> \<alpha>\<^bsub>X\<^esub> \<circ>\<^sub>c right_coproj X \<emptyset> = left_coproj X \<emptyset> \<circ>\<^sub>c \<alpha>\<^bsub>X\<^esub>\<close> calculation cfunc_coprod_unique i0_type i1_type idX_U_alpha_X_type by auto
+    using cfunc_coprod_unique comp1 comp2 by (typecheck_cfuncs, blast)
   also have "... = id(X\<Coprod>\<emptyset>)"
-    by (metis cfunc_coprod_unique cfunc_type_def i0_type i1_type id_left_unit id_type)
+    using cfunc_coprod_unique id_left_unit2 by (typecheck_cfuncs, auto)
   then have "isomorphism(id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)"
-    using cfunc_type_def concl i0_type idX_U_alpha_X_type id_type initial_func_type isomorphism_def left_coproj_cfunc_coprod by auto
+    unfolding isomorphism_def 
+    by (rule_tac x="left_coproj X \<emptyset>" in exI, typecheck_cfuncs, simp add: cfunc_type_def concl left_coproj_cfunc_coprod)
   then show "X\<Coprod>\<emptyset> \<cong> X"
-    using idX_U_alpha_X_type is_isomorphic_def by blast
+    using cfunc_coprod_type id_type initial_func_type is_isomorphic_def by blast
 qed
 
 (* Proposition 2.4.7 *)
@@ -84,7 +81,7 @@ proof -
    have f_inj: "injective(f)"
      using dom_f_is_empty injective_def nonempty_def by blast
    have f_mono: "monomorphism(f)"
-     by (simp add: assms(2) f_inj injective_imp_monomorphism)
+     using f_inj injective_imp_monomorphism by auto
    show "isomorphism(f)"    (*Modify this proof after you've shown that mono + epi = iso*)
       proof -
           have f1: "f : domain f \<rightarrow> \<emptyset>"
@@ -137,8 +134,7 @@ next
 qed
 
 lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>c X"
-  by (metis cfunc_type_def emptyset_is_empty initial_func_type injective_def
-      injective_imp_monomorphism subobject_of_def2)
+  by (metis UNIV_I cfunc_type_def emptyset_is_empty initial_func_type injective_def injective_imp_monomorphism subobject_of_def2)
 
 (* Proposition 2.2.1 *)
 lemma "card ({(X,m). (X,m) \<subseteq>\<^sub>c one}//{((X,m1),(Y,m2)). X \<cong> Y}) = 2"
@@ -156,7 +152,7 @@ proof -
     obtain \<chi> where \<chi>_pullback: "is_pullback X one one \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> m \<chi>"
       using X_m_subobject characteristic_function_exists subobject_of_def2 by blast
     then have \<chi>_true_or_false: "\<chi> = \<t> \<or> \<chi> = \<f>"
-      using is_pullback_def square_commutes_def true_false_only_truth_values by auto
+      unfolding is_pullback_def square_commutes_def using true_false_only_truth_values by auto
 
     have true_iso_one: "\<chi> = \<t> \<Longrightarrow> X \<cong> one"
     proof -
@@ -179,7 +175,8 @@ proof -
         have "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> = \<f> \<circ>\<^sub>c m"
           using \<chi>_false \<chi>_pullback is_pullback_def square_commutes_def by auto
         then have "\<t> \<circ>\<^sub>c (\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x) = \<f> \<circ>\<^sub>c (m \<circ>\<^sub>c x)"
-          by (simp add: comp_associative)
+          by (smt X_m_subobject comp_associative2 false_func_type subobject_of_def2
+              terminal_func_type true_func_type x_in_X)
         then have "\<t> = \<f>"
           by (smt X_m_subobject cfunc_type_def comp_type false_func_type id_right_unit id_type
               subobject_of_def2 terminal_func_unique true_func_type x_in_X)
