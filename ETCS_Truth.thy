@@ -9,8 +9,8 @@ axiomatization
   false_func  :: "cfunc" ("\<f>") and
   truth_value_set :: "cset" ("\<Omega>")
 where
-  true_func_type: "\<t> \<in>\<^sub>c \<Omega>" and
-  false_func_type: "\<f> \<in>\<^sub>c \<Omega>" and
+  true_func_type[type_rule]: "\<t> \<in>\<^sub>c \<Omega>" and
+  false_func_type[type_rule]: "\<f> \<in>\<^sub>c \<Omega>" and
   true_false_distinct: "\<t> \<noteq> \<f>" and
   true_false_only_truth_values: "x \<in>\<^sub>c \<Omega> \<Longrightarrow> x = \<f> \<or> x = \<t>" and
   characteristic_function_exists:
@@ -93,7 +93,7 @@ definition fiber :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<
 definition fiber_morphism :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" where
   "fiber_morphism f y = left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
 
-lemma fiber_morphism_type:
+lemma fiber_morphism_type[type_rule]:
   assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
   shows "fiber_morphism f y : f\<^sup>-\<^sup>1{y} \<rightarrow> X"
   unfolding fiber_def fiber_morphism_def
