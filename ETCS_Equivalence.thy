@@ -43,14 +43,13 @@ axiomatization
   equiv_class :: "cset \<times> cfunc \<Rightarrow> cfunc" and
   quotient_func :: "cfunc \<Rightarrow> cset \<times> cfunc \<Rightarrow> cfunc"
 where
-  equiv_class_type: "equiv_rel_on X R \<Longrightarrow> equiv_class R : X \<rightarrow> quotient_set X R" and
+  equiv_class_type[type_rule]: "equiv_rel_on X R \<Longrightarrow> equiv_class R : X \<rightarrow> quotient_set X R" and
   equiv_class_eq: "equiv_rel_on X R \<Longrightarrow> \<langle>x, y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> R \<longleftrightarrow> q \<circ>\<^sub>c x = q \<circ>\<^sub>c y" and
-  quotient_func_type: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> \<langle>x, y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> R \<longleftrightarrow> q \<circ>\<^sub>c x = q \<circ>\<^sub>c y \<Longrightarrow>
+  quotient_func_type[type_rule]: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> (\<And>x y. \<langle>x, y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> R \<Longrightarrow> q \<circ>\<^sub>c x = q \<circ>\<^sub>c y) \<Longrightarrow>
     quotient_func f R : quotient_set X R \<rightarrow> Y" and 
-  quotient_func_eq: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> \<langle>x, y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> R \<longleftrightarrow> q \<circ>\<^sub>c x = q \<circ>\<^sub>c y \<Longrightarrow>
+  quotient_func_eq: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> (\<And>x y. \<langle>x, y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> R \<Longrightarrow> q \<circ>\<^sub>c x = q \<circ>\<^sub>c y) \<Longrightarrow>
     equiv_class R \<circ>\<^sub>c quotient_func f R = f" and  
-  quotient_func_unique: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> \<langle>x, y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> R \<longleftrightarrow> q \<circ>\<^sub>c x = q \<circ>\<^sub>c y \<Longrightarrow>
-    h : quotient_set X R \<rightarrow> Y \<Longrightarrow> equiv_class R \<circ>\<^sub>c quotient_func h R = f \<Longrightarrow> 
-      h = quotient_func f R"
+  quotient_func_unique: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> (\<And>x y. \<langle>x, y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> R \<Longrightarrow> q \<circ>\<^sub>c x = q \<circ>\<^sub>c y) \<Longrightarrow>
+    h : quotient_set X R \<rightarrow> Y \<Longrightarrow> equiv_class R \<circ>\<^sub>c quotient_func h R = f \<Longrightarrow>  h = quotient_func f R"
 
 end
