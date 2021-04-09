@@ -10,14 +10,15 @@ axiomatization
   right_cart_proj :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" and
   cfunc_prod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("\<langle>_,_\<rangle>")
 where
-  left_cart_proj_type: "left_cart_proj X Y : X \<times>\<^sub>c Y \<rightarrow> X" and
-  right_cart_proj_type: "right_cart_proj X Y : X \<times>\<^sub>c Y \<rightarrow> Y" and
-  cfunc_prod_type: "f : Z \<rightarrow> X \<Longrightarrow> g : Z \<rightarrow> Y \<Longrightarrow> \<langle>f,g\<rangle> : Z \<rightarrow> X \<times>\<^sub>c Y" and
-  left_cart_proj_cfunc_prod: "f : Z \<rightarrow> X \<and> g : Z \<rightarrow> Y \<longrightarrow> left_cart_proj X Y \<circ>\<^sub>c \<langle>f,g\<rangle> = f" and
-  right_cart_proj_cfunc_prod: "f : Z \<rightarrow> X \<and> g : Z \<rightarrow> Y \<longrightarrow> right_cart_proj X Y \<circ>\<^sub>c \<langle>f,g\<rangle> = g" and
-  cfunc_prod_unique: "f : Z \<rightarrow> X \<and> g : Z \<rightarrow> Y \<longrightarrow>
-    (\<forall> h. ((h : Z \<rightarrow> (X \<times>\<^sub>c Y)) \<and> (left_cart_proj X Y \<circ>\<^sub>c h = f) \<and> (right_cart_proj X Y \<circ>\<^sub>c h = g))
-        \<longrightarrow> h = \<langle>f,g\<rangle>)"
+  left_cart_proj_type[type_rule]: "left_cart_proj X Y : X \<times>\<^sub>c Y \<rightarrow> X" and
+  right_cart_proj_type[type_rule]: "right_cart_proj X Y : X \<times>\<^sub>c Y \<rightarrow> Y" and
+  cfunc_prod_type[type_rule]: "f : Z \<rightarrow> X \<Longrightarrow> g : Z \<rightarrow> Y \<Longrightarrow> \<langle>f,g\<rangle> : Z \<rightarrow> X \<times>\<^sub>c Y" and
+  left_cart_proj_cfunc_prod: "f : Z \<rightarrow> X \<Longrightarrow> g : Z \<rightarrow> Y \<Longrightarrow> left_cart_proj X Y \<circ>\<^sub>c \<langle>f,g\<rangle> = f" and
+  right_cart_proj_cfunc_prod: "f : Z \<rightarrow> X \<Longrightarrow> g : Z \<rightarrow> Y \<Longrightarrow> right_cart_proj X Y \<circ>\<^sub>c \<langle>f,g\<rangle> = g" and
+  cfunc_prod_unique: "f : Z \<rightarrow> X \<Longrightarrow> g : Z \<rightarrow> Y \<Longrightarrow> h : Z \<rightarrow> X \<times>\<^sub>c Y \<Longrightarrow> 
+    left_cart_proj X Y \<circ>\<^sub>c h = f \<Longrightarrow> right_cart_proj X Y \<circ>\<^sub>c h = g \<Longrightarrow> h = \<langle>f,g\<rangle>"
+
+thm type_rule
 
 definition is_cart_prod :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" where
   "is_cart_prod W \<pi>\<^sub>0 \<pi>\<^sub>1 X Y \<longleftrightarrow> 
@@ -70,9 +71,9 @@ proof -
       using W'_cart_prod W_cart_prod unfolding is_cart_prod_def by (metis fstI sndI)
 
   have fg0: "\<pi>'\<^sub>0 \<circ>\<^sub>c (f \<circ>\<^sub>c g) = \<pi>'\<^sub>0"
-    by (simp add: comp_associative f_def g_def)
+    using W'_cart_prod comp_associative2 f_def g_def is_cart_prod_def by auto
   have fg1: "\<pi>'\<^sub>1 \<circ>\<^sub>c (f \<circ>\<^sub>c g) = \<pi>'\<^sub>1"
-    by (simp add: comp_associative f_def g_def)
+    using W'_cart_prod comp_associative2 f_def g_def is_cart_prod_def by auto
 
   obtain idW' where "idW' : W' \<rightarrow> W' \<and> (\<forall> h2. (h2 : W' \<rightarrow> W' \<and> \<pi>'\<^sub>0 \<circ>\<^sub>c h2 = \<pi>'\<^sub>0 \<and> \<pi>'\<^sub>1 \<circ>\<^sub>c h2 = \<pi>'\<^sub>1) \<longrightarrow> h2 = idW')"
     using W'_cart_prod unfolding is_cart_prod_def by (metis fst_conv snd_conv)
@@ -81,18 +82,18 @@ proof -
     assume idW'_unique: "\<forall>h2. h2 : W' \<rightarrow> W' \<and> \<pi>'\<^sub>0 \<circ>\<^sub>c h2 = \<pi>'\<^sub>0 \<and> \<pi>'\<^sub>1 \<circ>\<^sub>c h2 = \<pi>'\<^sub>1 \<longrightarrow> h2 = idW'"
     have 1: "f \<circ>\<^sub>c g = idW'"
       using idW'_unique apply (erule_tac x="f \<circ>\<^sub>c g" in allE, auto)
-      using cfunc_type_def codomain_comp compatible_comp_ETCS_func domain_comp f_def fg0 fg1 g_def by auto
+      using cfunc_type_def codomain_comp domain_comp f_def fg0 fg1 g_def by auto
     have 2: "id W' = idW'"
       using idW'_unique apply (erule_tac x="f \<circ>\<^sub>c g" in allE, auto)
-      by (metis cfunc_type_def domain_comp g_def id_right_unit id_type)
+      using W'_cart_prod id_right_unit2 id_type is_cart_prod_def by auto
     from 1 2 show "f \<circ>\<^sub>c g = id W'"
       by auto
   qed
 
   have gf0: "\<pi>\<^sub>0 \<circ>\<^sub>c (g \<circ>\<^sub>c f) = \<pi>\<^sub>0"
-    by (simp add: comp_associative f_def g_def)
+    using W_cart_prod comp_associative2 f_def g_def is_cart_prod_def by auto
   have gf1: "\<pi>\<^sub>1 \<circ>\<^sub>c (g \<circ>\<^sub>c f) = \<pi>\<^sub>1"
-    by (simp add: comp_associative f_def g_def)
+    using W_cart_prod comp_associative2 f_def g_def is_cart_prod_def by auto
 
   obtain idW where "idW : W \<rightarrow> W \<and> (\<forall> h2. (h2 : W \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h2 = \<pi>\<^sub>0 \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h2 = \<pi>\<^sub>1) \<longrightarrow> h2 = idW)"
     using W_cart_prod unfolding is_cart_prod_def by (metis fst_conv snd_conv)
@@ -101,10 +102,10 @@ proof -
     assume idW_unique: "\<forall>h2. h2 : W \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h2 = \<pi>\<^sub>0 \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h2 = \<pi>\<^sub>1 \<longrightarrow> h2 = idW"
     have 1: "g \<circ>\<^sub>c f = idW"
       using idW_unique apply (erule_tac x="g \<circ>\<^sub>c f" in allE, auto)
-      using cfunc_type_def codomain_comp compatible_comp_ETCS_func domain_comp f_def gf0 gf1 g_def by auto
+      using cfunc_type_def codomain_comp domain_comp f_def gf0 gf1 g_def by auto
     have 2: "id W = idW"
       using idW_unique apply (erule_tac x="id W" in allE, auto)
-      by (metis cfunc_type_def domain_comp f_def id_right_unit id_type)
+      using W_cart_prod id_right_unit2 id_type is_cart_prod_def by auto
     from 1 2 show "g \<circ>\<^sub>c f = id W"
       by auto
   qed
@@ -133,7 +134,8 @@ proof -
   have fact1: "\<langle>right_cart_proj A B, left_cart_proj A B\<rangle> \<circ>\<^sub>c \<langle>right_cart_proj B A, left_cart_proj B A\<rangle>: B \<times>\<^sub>c A \<rightarrow>  B \<times>\<^sub>c A"
     by (meson comp_type pprod_type qprod_type)
   have id_BA: "\<langle>right_cart_proj A B, left_cart_proj A B\<rangle> \<circ>\<^sub>c \<langle>right_cart_proj B A, left_cart_proj B A\<rangle> = id(B \<times>\<^sub>c A)"
-    by (smt cfunc_prod_unique cfunc_type_def comp_associative fact1 id_right_unit id_type left_cart_proj_cfunc_prod left_cart_proj_type right_cart_proj_cfunc_prod right_cart_proj_type)
+    by (smt cfunc_prod_unique comp_associative2 comp_type id_right_unit2 id_type left_cart_proj_cfunc_prod left_cart_proj_type pprod_type qprod_type right_cart_proj_cfunc_prod right_cart_proj_type)
+    
   show "A \<times>\<^sub>c B \<cong> B \<times>\<^sub>c A"
     by (metis cfunc_type_def id_AB id_BA is_isomorphic_def isomorphism_def pprod_type qprod_type)
   qed 
@@ -145,12 +147,15 @@ proof -
 definition diagonal :: "cset \<Rightarrow> cfunc" where
   "diagonal(X) = \<langle>id(X),id(X)\<rangle>"
 
+lemma diagonal_type[type_rule]:
+  "diagonal X : X \<rightarrow> X \<times>\<^sub>c X"
+  unfolding diagonal_def by (simp add: cfunc_prod_type id_type)
 
 (*Definition 2.1.10*)
 definition cfunc_cross_prod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<times>\<^sub>f" 55) where
   "f \<times>\<^sub>f g = \<langle>f \<circ>\<^sub>c left_cart_proj (domain f) (domain g), g \<circ>\<^sub>c right_cart_proj (domain f) (domain g)\<rangle>"
 
-lemma cfunc_cross_prod_type:
+lemma cfunc_cross_prod_type[type_rule]:
   "f : W \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Z \<Longrightarrow> f \<times>\<^sub>f g : W \<times>\<^sub>c X \<rightarrow> Y \<times>\<^sub>c Z"
   unfolding cfunc_cross_prod_def
   using cfunc_prod_type cfunc_type_def comp_type left_cart_proj_type right_cart_proj_type by auto
@@ -165,11 +170,9 @@ lemma right_cart_proj_cfunc_cross_prod:
   unfolding cfunc_cross_prod_def
   using cfunc_type_def comp_type right_cart_proj_cfunc_prod left_cart_proj_type right_cart_proj_type by auto
 
-lemma cfunc_cross_prod_unique: "f : W \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Z \<Longrightarrow>
-    \<forall> h. ((h : W \<times>\<^sub>c X \<rightarrow> Y \<times>\<^sub>c Z)
-      \<and> (left_cart_proj Y Z \<circ>\<^sub>c h = f \<circ>\<^sub>c left_cart_proj W X)
-      \<and> (right_cart_proj Y Z \<circ>\<^sub>c h = g \<circ>\<^sub>c right_cart_proj W X)) 
-        \<longrightarrow> h = f \<times>\<^sub>f g"
+lemma cfunc_cross_prod_unique: "f : W \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Z \<Longrightarrow> h : W \<times>\<^sub>c X \<rightarrow> Y \<times>\<^sub>c Z \<Longrightarrow>
+    left_cart_proj Y Z \<circ>\<^sub>c h = f \<circ>\<^sub>c left_cart_proj W X \<Longrightarrow>
+    right_cart_proj Y Z \<circ>\<^sub>c h = g \<circ>\<^sub>c right_cart_proj W X \<Longrightarrow> h = f \<times>\<^sub>f g"
   unfolding cfunc_cross_prod_def
   using cfunc_prod_unique cfunc_type_def comp_type left_cart_proj_type right_cart_proj_type by auto
 
@@ -185,15 +188,16 @@ proof -
     h = id\<^sub>c X \<times>\<^sub>f (g \<circ>\<^sub>c f)"
     by (meson comp_type f_type g_type id_type)
 
-  have step1: "(id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f) : X \<times>\<^sub>c A \<rightarrow> X \<times>\<^sub>c C"
-    by (meson cfunc_cross_prod_type comp_type f_type g_type id_type)
-  have step2: "left_cart_proj X C \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f) = id\<^sub>c X \<circ>\<^sub>c left_cart_proj X A"
-    by (smt comp_associative f_type g_type id_domain id_right_unit id_type left_cart_proj_cfunc_cross_prod)
-  have step3: "right_cart_proj X C \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f) = (g \<circ>\<^sub>c f) \<circ>\<^sub>c right_cart_proj X A"
-    by (smt comp_associative f_type g_type id_type right_cart_proj_cfunc_cross_prod)
+  have left_eq: "left_cart_proj X C \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f) = id\<^sub>c X \<circ>\<^sub>c left_cart_proj X A"
+    using assms apply (typecheck_cfuncs)
+    thm type_rule
+    by (smt comp_associative2 id_left_unit2 left_cart_proj_cfunc_cross_prod left_cart_proj_type)
+  have right_eq: "right_cart_proj X C \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f) = (g \<circ>\<^sub>c f) \<circ>\<^sub>c right_cart_proj X A"
+    using assms apply (typecheck_cfuncs)
+    by (smt comp_associative2 right_cart_proj_cfunc_cross_prod right_cart_proj_type)
 
   show "id\<^sub>c X \<times>\<^sub>f g \<circ>\<^sub>c f = (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f"
-    using uniqueness step1 step2 step3 by force
+    using assms left_eq right_eq uniqueness by (typecheck_cfuncs, auto)
 qed
 
 lemma cfunc_cross_prod_comp_cfunc_prod:
@@ -207,20 +211,18 @@ proof -
     using assms comp_type by blast
 
   have "left_cart_proj Y Z \<circ>\<^sub>c (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>a, b\<rangle> = f \<circ>\<^sub>c left_cart_proj W X \<circ>\<^sub>c \<langle>a, b\<rangle>"
-    using cfunc_cross_prod_def cfunc_type_def comp_associative comp_type f_type g_type
-      left_cart_proj_cfunc_prod left_cart_proj_type right_cart_proj_type by auto
+    using assms by (typecheck_cfuncs, simp add: comp_associative2 left_cart_proj_cfunc_cross_prod)
   then have left_eq: "left_cart_proj Y Z \<circ>\<^sub>c (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>a, b\<rangle> = f \<circ>\<^sub>c a"
     using a_type b_type left_cart_proj_cfunc_prod by auto
   
   have "right_cart_proj Y Z \<circ>\<^sub>c (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>a, b\<rangle> = g \<circ>\<^sub>c right_cart_proj W X \<circ>\<^sub>c \<langle>a, b\<rangle>"
-    using cfunc_cross_prod_def cfunc_type_def comp_associative comp_type f_type g_type
-      left_cart_proj_type right_cart_proj_cfunc_prod right_cart_proj_type by auto
+    using assms by (typecheck_cfuncs, simp add: comp_associative2 right_cart_proj_cfunc_cross_prod)
   then have right_eq: "right_cart_proj Y Z \<circ>\<^sub>c (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>a, b\<rangle> = g \<circ>\<^sub>c b"
     using a_type b_type right_cart_proj_cfunc_prod by auto
 
   show "(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>a,b\<rangle> = \<langle>f \<circ>\<^sub>c a,g \<circ>\<^sub>c b\<rangle>"
-    using uniqueness left_eq right_eq assms apply (erule_tac x="f \<times>\<^sub>f g \<circ>\<^sub>c \<langle>a,b\<rangle>" in allE, auto)
-    by (metis cfunc_type_def compatible_comp_ETCS_func domain_comp right_cart_proj_type)
+    using uniqueness left_eq right_eq assms apply (erule_tac x="f \<times>\<^sub>f g \<circ>\<^sub>c \<langle>a,b\<rangle>" in allE)
+    by (meson cfunc_cross_prod_type cfunc_prod_type comp_type uniqueness)
 qed
 
 lemma cfunc_prod_comp:
@@ -230,11 +232,11 @@ lemma cfunc_prod_comp:
 proof -
   
   have same_type: "\<langle>a, b\<rangle> \<circ>\<^sub>c f : X \<rightarrow> A \<times>\<^sub>c B"
-    using a_type b_type cfunc_prod_type f_type by auto
+    using a_type b_type cfunc_prod_type comp_type f_type by auto
   have same_left_proj: "left_cart_proj A B \<circ>\<^sub>c \<langle>a, b\<rangle> \<circ>\<^sub>c f = a \<circ>\<^sub>c f"
-    using a_type b_type comp_associative left_cart_proj_cfunc_prod by auto
+    using assms by (typecheck_cfuncs, simp add: comp_associative2 left_cart_proj_cfunc_prod)
   have same_right_proj: "right_cart_proj A B \<circ>\<^sub>c \<langle>a, b\<rangle> \<circ>\<^sub>c f = b \<circ>\<^sub>c f"
-    using a_type b_type comp_associative right_cart_proj_cfunc_prod by auto
+    using assms comp_associative2 right_cart_proj_cfunc_prod by (typecheck_cfuncs, auto)
 
   show "\<langle>a,b\<rangle> \<circ>\<^sub>c f = \<langle>a \<circ>\<^sub>c f, b \<circ>\<^sub>c f\<rangle>"
     using a_type b_type cfunc_prod_unique comp_type f_type same_left_proj same_right_proj same_type by blast
@@ -271,9 +273,8 @@ proof -
       = \<langle>x \<circ>\<^sub>c a \<circ>\<^sub>c left_cart_proj A B, y \<circ>\<^sub>c b \<circ>\<^sub>c right_cart_proj A B\<rangle>"
     by (meson assms cfunc_cross_prod_comp_cfunc_prod comp_type left_cart_proj_type right_cart_proj_type)
   then show "(x \<times>\<^sub>f y) \<circ>\<^sub>c a \<times>\<^sub>f b = (x \<circ>\<^sub>c a) \<times>\<^sub>f y \<circ>\<^sub>c b"
-    unfolding cfunc_cross_prod_def
-    using assms cfunc_type_def comp_associative domain_comp 
-    by auto
+    using assms cfunc_type_def cfunc_cross_prod_def comp_associative2 left_cart_proj_type right_cart_proj_type
+    by (typecheck_cfuncs, auto)
 qed
 
 subsection \<open>Useful Cartesian product permuting functions\<close>
@@ -281,7 +282,7 @@ subsection \<open>Useful Cartesian product permuting functions\<close>
 definition swap :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "swap X Y = \<langle>right_cart_proj X Y, left_cart_proj X Y\<rangle>"
 
-lemma swap_type: "swap X Y : X \<times>\<^sub>c Y \<rightarrow> Y \<times>\<^sub>c X"
+lemma swap_type[type_rule]: "swap X Y : X \<times>\<^sub>c Y \<rightarrow> Y \<times>\<^sub>c X"
   unfolding swap_def by (simp add: cfunc_prod_type left_cart_proj_type right_cart_proj_type)
 
 lemma swap_ap:
@@ -308,7 +309,7 @@ definition associate_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Righ
       \<rangle>
     \<rangle>"
 
-lemma associate_right_type: "associate_right X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+lemma associate_right_type[type_rule]: "associate_right X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
   unfolding associate_right_def by (meson cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type)
 
 lemma associate_right_ap:
@@ -351,7 +352,7 @@ proof -
     \<rangle>"
     by (smt cfunc_prod_comp comp_type left_cart_proj_type right_cart_proj_type xy_z_type)
   also have "... = \<langle>left_cart_proj X Y \<circ>\<^sub>c \<langle>x,y\<rangle>, \<langle>right_cart_proj X Y \<circ>\<^sub>c \<langle>x,y\<rangle>, z\<rangle>\<rangle>"
-    by (smt assms cfunc_prod_type comp_associative left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+    using assms by (typecheck_cfuncs, smt comp_associative2 left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = ?rhs"
     using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
   then show ?thesis
@@ -368,7 +369,7 @@ definition associate_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Right
       right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)
     \<rangle>"
 
-lemma associate_left_type: "associate_left X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
+lemma associate_left_type[type_rule]: "associate_left X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
   unfolding associate_left_def
   by (meson cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type)
 
@@ -405,7 +406,7 @@ proof -
       \<rangle> \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>,
       right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)  \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>
     \<rangle>"
-    using cfunc_prod_comp comp_associative l_ll_type rr_type x_yz_type by auto
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
   also have "... = \<langle>
       \<langle>
         left_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>,
@@ -413,7 +414,7 @@ proof -
       \<rangle> ,
       right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)  \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>
     \<rangle>"
-    using cfunc_prod_comp comp_associative left_cart_proj_type lr_type x_yz_type by fastforce
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
   also have "... = \<langle>\<langle>x, left_cart_proj Y Z \<circ>\<^sub>c \<langle>y, z\<rangle>\<rangle>, right_cart_proj Y Z \<circ>\<^sub>c \<langle>y, z\<rangle>\<rangle>"
     using assms(1) left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod yz_type by auto
   also have "... = ?rhs"
@@ -426,7 +427,7 @@ definition distribute_right_left :: "cset \<Rightarrow> cset \<Rightarrow> cset 
   "distribute_right_left X Y Z = 
     \<langle>left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z, right_cart_proj (X \<times>\<^sub>c Y) Z\<rangle>"
 
-lemma distribute_right_left_type:
+lemma distribute_right_left_type[type_rule]:
   "distribute_right_left X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> X \<times>\<^sub>c Z"
   unfolding distribute_right_left_def
   using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
@@ -445,7 +446,7 @@ proof -
     unfolding distribute_right_left_def by simp
   also have "... = \<langle>left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>, 
       right_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>\<rangle>"
-    using cfunc_prod_comp comp_associative ll_type right_cart_proj_type xyz_type by fastforce
+    using assms cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, auto)
   also have "... = \<langle>left_cart_proj X Y \<circ>\<^sub>c \<langle>x, y\<rangle>, z\<rangle>"
     by (metis assms cfunc_prod_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = ?rhs"
@@ -458,7 +459,7 @@ definition distribute_right_right :: "cset \<Rightarrow> cset \<Rightarrow> cset
   "distribute_right_right X Y Z = 
     \<langle>right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z, right_cart_proj (X \<times>\<^sub>c Y) Z\<rangle>"
 
-lemma distribute_right_right_type:
+lemma distribute_right_right_type[type_rule]:
   "distribute_right_right X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> Y \<times>\<^sub>c Z"
   unfolding distribute_right_right_def
   using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
@@ -477,7 +478,7 @@ proof -
     unfolding distribute_right_right_def by simp
   also have "... = \<langle>right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>, 
       right_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle>\<rangle>"
-    using cfunc_prod_comp comp_associative rl_type right_cart_proj_type xyz_type by fastforce
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
   also have "... = \<langle>right_cart_proj X Y \<circ>\<^sub>c \<langle>x, y\<rangle>, z\<rangle>"
     by (metis assms cfunc_prod_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = ?rhs"
@@ -489,7 +490,7 @@ qed
 definition distribute_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_right X Y Z = \<langle>distribute_right_left X Y Z, distribute_right_right X Y Z\<rangle>"
 
-lemma distribute_right_type:
+lemma distribute_right_type[type_rule]:
   "distribute_right X Y Z : (X \<times>\<^sub>c Y) \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
   unfolding distribute_right_def
   by (simp add: cfunc_prod_type distribute_right_left_type distribute_right_right_type)
@@ -515,7 +516,7 @@ definition distribute_left_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \
   "distribute_left_left X Y Z = 
     \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle>"
 
-lemma distribute_left_left_type:
+lemma distribute_left_left_type[type_rule]:
   "distribute_left_left X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> X \<times>\<^sub>c Y"
   unfolding distribute_left_left_def
   using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
@@ -534,7 +535,7 @@ proof -
     unfolding distribute_left_left_def by simp
   also have "... = \<langle>left_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>,
     left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>\<rangle>"
-    using cfunc_prod_comp comp_associative left_cart_proj_type ll_type xyz_type by fastforce
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
   also have "... = \<langle>x, left_cart_proj Y Z \<circ>\<^sub>c \<langle>y, z\<rangle>\<rangle>"
     by (metis assms cfunc_prod_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = ?rhs"
@@ -547,7 +548,7 @@ definition distribute_left_right :: "cset \<Rightarrow> cset \<Rightarrow> cset 
   "distribute_left_right X Y Z = 
     \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle>"
 
-lemma distribute_left_right_type:
+lemma distribute_left_right_type[type_rule]:
   "distribute_left_right X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> X \<times>\<^sub>c Z"
   unfolding distribute_left_right_def
   using cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type by blast
@@ -566,7 +567,7 @@ proof -
     unfolding distribute_left_right_def by simp
   also have "... = \<langle>left_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>,
     right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z) \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle>\<rangle>"
-    using cfunc_prod_comp comp_associative left_cart_proj_type rl_type xyz_type by fastforce
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
   also have "... = \<langle>x, right_cart_proj Y Z \<circ>\<^sub>c \<langle>y, z\<rangle>\<rangle>"
     by (metis assms cfunc_prod_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = ?rhs"
@@ -578,7 +579,7 @@ qed
 definition distribute_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_left X Y Z = \<langle>distribute_left_left X Y Z, distribute_left_right X Y Z\<rangle>"
 
-lemma distribute_left_type:
+lemma distribute_left_type[type_rule]:
   "distribute_left X Y Z : X \<times>\<^sub>c (Y \<times>\<^sub>c Z) \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c (X \<times>\<^sub>c Z)"
   unfolding distribute_left_def
   by (simp add: cfunc_prod_type distribute_left_left_type distribute_left_right_type)
