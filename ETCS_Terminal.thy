@@ -439,4 +439,28 @@ next
     by (metis empty cfunc_type_def codomain_comp nonempty_def one_separator)
 qed
 
+lemma cart_prod_extract_left:
+  assumes "f : one \<rightarrow> X" "g : one \<rightarrow> Y"
+  shows "\<langle>f, g\<rangle> = \<langle>id X, g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c f"
+proof -
+  have "\<langle>f, g\<rangle> = \<langle>id X \<circ>\<^sub>c f, g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c f\<rangle>"
+    using assms by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 id_type one_unique_element)
+  also have "... = \<langle>id X, g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c f"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  then show ?thesis
+    using calculation by auto
+qed
+
+lemma cart_prod_extract_right:
+  assumes "f : one \<rightarrow> X" "g : one \<rightarrow> Y"
+  shows "\<langle>f, g\<rangle> = \<langle>f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> \<circ>\<^sub>c g"
+proof -
+  have "\<langle>f, g\<rangle> = \<langle>f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c g, id Y \<circ>\<^sub>c g\<rangle>"
+    using assms by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 id_type one_unique_element)
+  also have "... = \<langle>f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> \<circ>\<^sub>c g"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  then show ?thesis
+    using calculation by auto
+qed
+
 end
