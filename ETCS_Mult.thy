@@ -108,6 +108,10 @@ proof -
     using calculation by auto
 qed
 
+lemma mult_closure:
+  assumes "m \<in>\<^sub>c  \<nat>\<^sub>c" "n\<in>\<^sub>c  \<nat>\<^sub>c"
+  shows "m \<cdot>\<^sub>\<nat> n \<in>\<^sub>c  \<nat>\<^sub>c"
+  using assms  cfunc_prod_type mult_def mult_uncurried_type by fastforce
 
 lemma mult_respects_zero_right:
   assumes "m\<in>\<^sub>c  \<nat>\<^sub>c"
@@ -1625,5 +1629,11 @@ lemma mult_right_distributivity:
   assumes "a \<in>\<^sub>c  \<nat>\<^sub>c"  "b\<in>\<^sub>c  \<nat>\<^sub>c"  "c\<in>\<^sub>c  \<nat>\<^sub>c"
   shows "a \<cdot>\<^sub>\<nat> ( b +\<^sub>\<nat> c)   = (a \<cdot>\<^sub>\<nat> b) +\<^sub>\<nat>  (a \<cdot>\<^sub>\<nat> c)"
   oops
+
+lemma mult_pie_type: "mult_uncurried \<circ>\<^sub>c\<langle>left_cart_proj \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>),eval_func \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>: \<nat>\<^sub>c \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<rightarrow>  \<nat>\<^sub>c"
+  using add_uncurried_type cfunc_type_def codomain_comp compatible_comp_ETCS_func domain_comp f_mult_flat_type mult_uncurried_type by auto
+
+lemma mult_pie_sharp_type: "(mult_uncurried \<circ>\<^sub>c\<langle>left_cart_proj \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>),eval_func \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>: \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  using mult_pie_type transpose_func_def by blast
 
 end
