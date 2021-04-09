@@ -413,13 +413,13 @@ proof -
      \<circ>\<^sub>c \<langle>m,successor \<circ>\<^sub>c n\<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
   also have "... = add_uncurried \<circ>\<^sub>c \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,successor \<circ>\<^sub>c n\<rangle> ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,successor \<circ>\<^sub>c n\<rangle> \<rangle>"
-    
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp)
   also have "... = add_uncurried \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c n , m\<rangle>"
-    by (metis assms(1) assms(2) comp_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod successor_type)
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = (successor \<circ>\<^sub>c n)  +\<^sub>\<nat> m"
     by (simp add: add_def)
   also have "... = successor  \<circ>\<^sub>c (n  +\<^sub>\<nat> m)"
-    using add_respects_succ1 add_respects_succ2 assms(1) assms(2) by auto
+    using add_respects_succ1 add_respects_succ2 assms by auto
   also have "... = successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c \<langle>n , m\<rangle>"
     by (simp add: add_def)
   also have "... = successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c
@@ -427,7 +427,7 @@ proof -
                   left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m , n\<rangle>\<rangle>"
     using assms(1) assms(2) left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
   also have "... = successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c  \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle>\<circ>\<^sub>c \<langle>m,n\<rangle>"
-    using cfunc_prod_comp  left_cart_proj_type right_cart_proj_type type2 by fastforce 
+    using swap_def assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod swap_ap by auto
   then show ?thesis using calculation by auto
 qed
 
@@ -446,36 +446,15 @@ proof (rule one_separator[where X="\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>
 next
   fix x
   assume x_type: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
-  show "(add_uncurried \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c x
+  then show "(add_uncurried \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c x
     = (successor \<circ>\<^sub>c add_uncurried \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c x"
-    using add_pi1_pi0_1xsEqs_s_add_pi1_pi_0 cart_prod_decomp comp_associative x_type by fastforce
+    by (typecheck_cfuncs, smt add_pi1_pi0_1xsEqs_s_add_pi1_pi_0 cart_prod_decomp comp_associative2)
 qed
 
 lemma add_commutes:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
   shows "m +\<^sub>\<nat> n  = n +\<^sub>\<nat> m"
 proof - 
-  have type1: " \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>: 
-        (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
-      by (simp add: cfunc_prod_type left_cart_proj_type right_cart_proj_type)
-    have type2: "(add_uncurried  \<circ>\<^sub>c 
-    \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>): (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow>  \<nat>\<^sub>c"
-      by (meson add_uncurried_type comp_type type1)
-    have type3: "(add_uncurried  \<circ>\<^sub>c 
-    \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
-      by (simp add: transpose_func_def type2)
-    have type4: "(add_uncurried  \<circ>\<^sub>c 
-    \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp>\<circ>\<^sub>c zero : one \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
-      using type3 zero_type by auto
-    have type5: " \<langle>(left_cart_proj \<nat>\<^sub>c one),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one)\<rangle>:
-         (\<nat>\<^sub>c \<times>\<^sub>c one)   \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
-      by (meson cfunc_prod_type comp_type left_cart_proj_type right_cart_proj_type zero_type)
-    have type6: "\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c(left_cart_proj \<nat>\<^sub>c one):  \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> one"
-      by (meson comp_type left_cart_proj_type terminal_func_type)
-    then have type7: "zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c(left_cart_proj \<nat>\<^sub>c one):  \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
-      using comp_type zero_type by blast
-    then have type8: "\<langle>m,n\<rangle>: one \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c\<nat>\<^sub>c"
-      by (simp add: assms(1) assms(2) cfunc_prod_type)
   have "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ((add_uncurried  \<circ>\<^sub>c 
     \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero)) = 
     left_cart_proj \<nat>\<^sub>c one"
@@ -484,10 +463,10 @@ proof -
     \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero)) = 
     eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (add_uncurried \<circ>\<^sub>c
     \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp>)  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)"
-      using identity_distributes_across_composition type3 zero_type by auto 
+      by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
     also have "... = add_uncurried \<circ>\<^sub>c
    \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle> \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)"
-        using comp_associative transpose_func_def type2 by presburger
+      by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative transpose_func_def)
     also have "... = add_uncurried \<circ>\<^sub>c
    \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle> \<circ>\<^sub>c
    \<langle>(left_cart_proj \<nat>\<^sub>c one),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one)\<rangle>"
@@ -496,23 +475,21 @@ proof -
    \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c one),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one)\<rangle>,
     (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c one),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one)\<rangle>
    \<rangle>"
-      using cfunc_prod_comp left_cart_proj_type right_cart_proj_type type5 by fastforce
+      by (typecheck_cfuncs, simp add: cfunc_prod_comp)
     also have "... = add_uncurried \<circ>\<^sub>c
 \<langle>zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one), (left_cart_proj \<nat>\<^sub>c one)\<rangle>"
-      using cfunc_prod_comp
-      by (smt comp_type left_cart_proj_cfunc_prod left_cart_proj_type right_cart_proj_cfunc_prod right_cart_proj_type zero_type)
+      by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
     also have "... =  add_uncurried \<circ>\<^sub>c
 \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c(left_cart_proj \<nat>\<^sub>c one), (left_cart_proj \<nat>\<^sub>c one)\<rangle>"
-      by (metis right_cart_proj_type terminal_func_unique type6)
+      by (typecheck_cfuncs, metis terminal_func_unique)
     also have "... =  add_uncurried \<circ>\<^sub>c
 \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c(left_cart_proj \<nat>\<^sub>c one), id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)\<rangle>"
-      by (metis cfunc_type_def compatible_comp_ETCS_func domain_comp id_left_unit type6 zero_betaN_type)
+      by (typecheck_cfuncs, simp add: id_left_unit2)
     also have "... =  add_uncurried \<circ>\<^sub>c
 \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one) "
-      using cfunc_prod_comp
-      by (smt comp_associative id_type left_cart_proj_type zero_betaN_type)
-    also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one) "
-    by (simp add: comp_associative id_N_def2)
+      by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+    also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
+      by (typecheck_cfuncs, simp add: comp_associative2 id_N_def2)
     also have "... = left_cart_proj \<nat>\<^sub>c one"
     by (metis cfunc_type_def id_left_unit left_cart_proj_type)
    then show ?thesis using calculation by auto
@@ -521,7 +498,7 @@ proof -
     then have fact0: "((add_uncurried  \<circ>\<^sub>c
     \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero)
    = (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
-    using inv_transpose_func_def2 sharp_cancels_flat type4 by fastforce 
+      by (typecheck_cfuncs, simp add: transpose_func_unique)
 
   have fact1: "((add_uncurried \<circ>\<^sub>c 
         \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
@@ -535,15 +512,16 @@ proof -
         successor)\<^sup>\<flat> = 
     (add_uncurried \<circ>\<^sub>c \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle>)\<^sup>\<sharp>\<^sup>\<flat>
      \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)"
-      by (meson inv_transpose_of_composition successor_type type3)
+       using inv_transpose_of_composition by (typecheck_cfuncs, blast)
     also have "... =  (add_uncurried \<circ>\<^sub>c \<langle> right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,  left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle>)
      \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)"
-      using flat_cancels_sharp type2 by auto
+      by (typecheck_cfuncs, simp add: flat_cancels_sharp)
     also have "... =  successor \<circ>\<^sub>c 
         add_uncurried \<circ>\<^sub>c 
         \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>"
-      using comp_associative pointfree_add_pi1_pi0_1xsEqs_s_add_pi1_pi_0 by auto
-    then show ?thesis using calculation by auto
+      using comp_associative2 pointfree_add_pi1_pi0_1xsEqs_s_add_pi1_pi_0 by (typecheck_cfuncs, auto)
+    then show ?thesis
+      using calculation by auto
  qed
 
   have fact2: "((add_uncurried \<circ>\<^sub>c 
@@ -552,27 +530,28 @@ proof -
         successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c 
         (add_uncurried \<circ>\<^sub>c 
         \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp>"
-    by (metis comp_type fact1 sharp_cancels_flat successor_type transpose_of_comp type2 type3)
+    by (typecheck_cfuncs, metis fact1 sharp_cancels_flat transpose_of_comp)
 
   have add_curried_def2: "(add_uncurried \<circ>\<^sub>c 
         \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> = add_curried"
-    using add_curried_0_eq add_curried_property fact0 fact2 natural_number_object_func_unique square_commutes_def type3 by auto
+    using add_curried_0_eq add_curried_property fact0 fact2 natural_number_object_func_unique square_commutes_def
+    by (typecheck_cfuncs, auto)
 
   show "m +\<^sub>\<nat> n  = n +\<^sub>\<nat> m"
   proof - 
     have "m +\<^sub>\<nat> n = add_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle>"
       by (simp add: add_def)
-    also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_curried)\<circ>\<^sub>c \<langle>m,n\<rangle>"
-      by (simp add: add_uncurried_def comp_associative)
+    also have step1: "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_curried)\<circ>\<^sub>c \<langle>m,n\<rangle>"
+      using assms by (typecheck_cfuncs, simp add: add_uncurried_def comp_associative2)
     also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (add_uncurried \<circ>\<^sub>c 
         \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp>)\<circ>\<^sub>c \<langle>m,n\<rangle>"
       by (simp add: add_curried_def2)
     also have "... =  (add_uncurried \<circ>\<^sub>c 
         \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>) \<circ>\<^sub>c \<langle>m,n\<rangle>"
-      using \<open>m +\<^sub>\<nat> n = add_uncurried \<circ>\<^sub>c \<langle>m,n\<rangle>\<close> add_curried_def2 add_uncurried_def calculation transpose_func_def type2 by force
+      using assms add_curried_def2 add_uncurried_def transpose_func_def step1 by (typecheck_cfuncs, fastforce)
     also have "... = (add_uncurried \<circ>\<^sub>c 
         \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<circ>\<^sub>c \<langle>m,n\<rangle>, (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<circ>\<^sub>c \<langle>m,n\<rangle> \<rangle>) "
-      by (metis cfunc_prod_comp comp_associative left_cart_proj_type right_cart_proj_type type8)
+      using assms by (typecheck_cfuncs, metis cfunc_prod_comp comp_associative2)
     also have "... = add_uncurried \<circ>\<^sub>c \<langle>n,m\<rangle>"
       using assms(1) assms(2) left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
     also have "...= n +\<^sub>\<nat> m"
@@ -585,41 +564,23 @@ lemma add_associates:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" 
   shows   "a +\<^sub>\<nat> (b +\<^sub>\<nat> c) = (a +\<^sub>\<nat> b ) +\<^sub>\<nat> c"
 proof - 
-  have typePair: "\<langle>a,b\<rangle> \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c"
-    using assms(1) assms(2) cfunc_prod_type by blast
-  have typePair1: " \<langle>\<langle>a,b\<rangle>,zero\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c \<nat>\<^sub>c"
-    by (simp add: cfunc_prod_type typePair zero_type)
-  have projPairType: "(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c): 
-    (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c"
-    using comp_type left_cart_proj_type right_cart_proj_type by blast
-  have type3: "(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
-    using add_uncurried_type associate_right_type cfunc_cross_prod_type comp_type id_type by blast
-  have type4:
-    "add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-    using add_uncurried_type comp_type type3 by blast
-  have type5:
-    "(add_uncurried \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
-    using transpose_func_def type4 by blast
-  have type6: "add_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) one : (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c one\<rightarrow>  \<nat>\<^sub>c"
-    using add_uncurried_type comp_type left_cart_proj_type by blast
-
   have triangle1: "(add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero = 
     (add_uncurried \<circ>\<^sub>c add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
     (is "?lhs = ?rhs")
   proof (rule same_evals_equal[where X="\<nat>\<^sub>c", where A="\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c", where Z="one"]) 
     show lhs_type: "?lhs : one \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
-      using type5 zero_type by auto
+      by typecheck_cfuncs
     show rhs_type: "?rhs : one \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
-      by (meson add_uncurried_type cfunc_cross_prod_type comp_type id_type transpose_func_def zero_type)
+      by typecheck_cfuncs
     
     have lhs_eval: "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ?lhs)
       = (add_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) one)"
     (is "?lhs1 = ?rhs1")
     proof (rule one_separator[where X="(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c one", where Y="\<nat>\<^sub>c"])
       show LHS_type: "?lhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
-        by (meson cfunc_cross_prod_type comp_type eval_func_type id_type type5 zero_type)
+        by typecheck_cfuncs
       show RHS_type: "?rhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
-        using transpose_func_def type6 by presburger
+        by typecheck_cfuncs
     next
       fix x
       assume "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one"
@@ -627,50 +588,47 @@ proof -
         by (metis cart_prod_decomp id_type terminal_func_unique)
       then show "?lhs1 \<circ>\<^sub>c x = ?rhs1 \<circ>\<^sub>c x"
       proof auto
-        have a_b_type: "\<langle>a,b\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
-          by (simp add: a_type b_type cfunc_prod_type)
-        have b_zero_type: "\<langle>b, zero\<rangle> \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c"
-          by (simp add: b_type cfunc_prod_type zero_type)
-
-        have "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c 
+        have "(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c 
             (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f
-              (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero) \<circ>\<^sub>c
+              (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero)) \<circ>\<^sub>c
             \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>
           = eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
             (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f
               (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c
             (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
-          using comp_associative identity_distributes_across_composition type5 zero_type by auto
+          using a_type b_type by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def2 inv_transpose_of_composition transpose_func_def)
         also have "... = (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
           ((id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>)"
-          using comp_associative flat_cancels_sharp inv_transpose_func_def2 type4 type5 by fastforce
+          using a_type b_type by (typecheck_cfuncs, smt comp_associative2 transpose_func_def)
         also have "... = (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, zero\<rangle>"
-          by (smt cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 id_type a_b_type zero_type)
-        also have "... = (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried)) \<circ>\<^sub>c \<langle>a, \<langle>b, zero\<rangle>\<rangle>"
-          by (metis a_type b_type associate_right_ap comp_associative zero_type)
+          using a_type b_type by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+        also have "... = add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c (associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, zero\<rangle>)"
+          using a_type b_type by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative)
+          also have "... = (add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried)) \<circ>\<^sub>c \<langle>a, \<langle>b, zero\<rangle>\<rangle>"
+          using a_type b_type by (typecheck_cfuncs, simp add: associate_right_ap comp_associative2)
         also have "... = add_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add_uncurried) \<circ>\<^sub>c \<langle>a, \<langle>b, zero\<rangle>\<rangle>"
-          by (simp add: comp_associative)
+          using a_type b_type by (typecheck_cfuncs, simp add: comp_associative2)
         also have "... = add_uncurried \<circ>\<^sub>c \<langle>a, add_uncurried \<circ>\<^sub>c \<langle>b, zero\<rangle>\<rangle>"
-          using a_type b_zero_type id_type add_uncurried_type id_left_unit2 cfunc_cross_prod_comp_cfunc_prod
-          by fastforce
+          using a_type b_type by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+        also have "... = add_uncurried \<circ>\<^sub>c \<langle>a, b\<rangle>"
+          using add_def add_respects_zero_on_right b_type by auto
+        also have "... = add_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) one \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
+          using a_type b_type by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
         also have "... = (add_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) one) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
-          by (metis a_b_type add_def add_respects_zero_on_right b_type comp_associative id_type left_cart_proj_cfunc_prod)
+          using a_type b_type by (typecheck_cfuncs, simp add: comp_associative2)
         then show "?lhs1 \<circ>\<^sub>c \<langle>\<langle>a, b\<rangle>, id\<^sub>c one\<rangle> = ?rhs1 \<circ>\<^sub>c \<langle>\<langle>a, b\<rangle>, id\<^sub>c one\<rangle>"
-          using calculation by (simp add: comp_associative) 
+          using calculation by auto
       qed
     qed
-
-    term ?lhs
-    term ?rhs
 
     have rhs_eval: "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ?rhs) 
       = (add_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) one)"
     (is "?lhs1 = ?rhs1")
     proof (rule one_separator[where X="(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c one", where Y="\<nat>\<^sub>c"])
       show LHS_type: "?lhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
-        using flat_type inv_transpose_func_def2 rhs_type by auto
+        by typecheck_cfuncs
       show RHS_type: "?rhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
-        using transpose_func_def type6 by presburger
+        by typecheck_cfuncs
     next
       fix x
       assume "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one"
@@ -678,14 +636,11 @@ proof -
         by (metis cart_prod_decomp id_type terminal_func_unique)
       then show "?lhs1 \<circ>\<^sub>c x = ?rhs1 \<circ>\<^sub>c x"
       proof auto
-        have add_add_sharp_type: "(add_uncurried \<circ>\<^sub>c add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
-          using cfunc_type_def codomain_comp compatible_comp_ETCS_func rhs_type zero_type by auto
-
         have "?lhs1  \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>  =  
           eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
           (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (add_uncurried \<circ>\<^sub>c add_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero) \<circ>\<^sub>c
           \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
-          by (simp add: comp_associative)
+          using a_type b_type by (typecheck_cfuncs, simp add: comp_associative2)
         also have "... =  
           eval_func  \<nat>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<circ>\<^sub>c 
             (id\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>f (add_uncurried \<circ>\<^sub>c (add_uncurried \<times>\<^sub>f  id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c
