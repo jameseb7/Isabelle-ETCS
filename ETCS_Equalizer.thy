@@ -12,7 +12,34 @@ definition equalizer :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarr
 axiomatization where
   equalizer_exists: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> \<exists> E m. equalizer E m f g"
 
+lemma equalizer_exists2:
+  assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> Y"
+  shows "\<exists> E m. m : E \<rightarrow> X \<and> f \<circ>\<^sub>c m = g \<circ>\<^sub>c m \<and> (\<forall> h F. ((h : F \<rightarrow> X) \<and> (f \<circ>\<^sub>c h = g \<circ>\<^sub>c h)) \<longrightarrow> (\<exists>! k. (k : F \<rightarrow> E) \<and> m \<circ>\<^sub>c k = h))"
+proof -
+  obtain E m where "equalizer E m f g"
+    using assms equalizer_exists by blast
+  then show ?thesis
+    unfolding equalizer_def
+  proof (rule_tac x="E" in exI, rule_tac x="m" in exI, auto)
+    fix X' Y'
+    assume f_type2: "f : X' \<rightarrow> Y'"
+    assume g_type2: "g : X' \<rightarrow> Y'"
+    assume m_type: "m : E \<rightarrow> X'"
 
+    assume fm_eq_gm: "f \<circ>\<^sub>c m = g \<circ>\<^sub>c m"
+    assume equalizer_unique: "\<forall>h F. h : F \<rightarrow> X' \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E \<and> m \<circ>\<^sub>c k = h)"
+
+    show m_type2: "m : E \<rightarrow> X"
+      using assms(2) cfunc_type_def g_type2 m_type by auto
+
+    show "\<And> h F. h : F \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<Longrightarrow> \<exists>k. k : F \<rightarrow> E \<and> m \<circ>\<^sub>c k = h"
+      by (metis m_type2 cfunc_type_def equalizer_unique m_type)
+
+    show "\<And> F k y. m \<circ>\<^sub>c k : F \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c m \<circ>\<^sub>c k = g \<circ>\<^sub>c m \<circ>\<^sub>c k \<Longrightarrow> k : F \<rightarrow> E \<Longrightarrow> y : F \<rightarrow> E
+        \<Longrightarrow> m \<circ>\<^sub>c y = m \<circ>\<^sub>c k \<Longrightarrow> k = y"
+      using comp_type equalizer_unique m_type by blast
+  qed
+qed 
 
 (*Exercise 2.1.31*)
 lemma
