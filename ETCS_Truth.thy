@@ -16,14 +16,48 @@ where
   characteristic_function_exists:
     "m : B \<rightarrow> X \<Longrightarrow> monomorphism m \<Longrightarrow> \<exists>! \<chi>. is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi>"
 
-thm subobject_of_def
 
-(*
-definition characteristic :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc" where
-  "characteristic E m f g \<longleftrightarrow> "
+definition eq_pred :: "cset \<Rightarrow> cfunc" where
+  "eq_pred X = (THE \<chi>. is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) \<chi>)"
 
-*)
+find_theorems "(THE x. ?P x)"
 
+lemma eq_pred_pullback: "is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) (eq_pred X)"
+  unfolding eq_pred_def
+  by (rule the1I2, simp_all add: characteristic_function_exists diag_mono diagonal_type)
+
+lemma eq_pred_type[type_rule]:
+  "eq_pred X : X \<times>\<^sub>c X \<rightarrow> \<Omega>"
+  using eq_pred_pullback unfolding is_pullback_def square_commutes_def by auto
+
+lemma eq_pred_square: "eq_pred X \<circ>\<^sub>c diagonal X = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>"
+  using eq_pred_pullback unfolding is_pullback_def square_commutes_def by auto
+
+lemma eq_pred_iff_eq:
+  assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
+  shows "(x = y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> = \<t>)"
+proof auto
+  assume x_eq_y: "x = y"
+
+  have "(eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,id\<^sub>c X\<rangle>) \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c y"
+    using eq_pred_square unfolding diagonal_def by auto
+  then have "eq_pred X \<circ>\<^sub>c \<langle>y, y\<rangle> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c y"
+    using assms diagonal_type id_type
+    by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 diagonal_def id_left_unit2)
+  then show "eq_pred X \<circ>\<^sub>c \<langle>y, y\<rangle> = \<t>"
+    using assms id_type
+    by (typecheck_cfuncs, smt comp_associative2 terminal_func_comp terminal_func_type terminal_func_unique id_right_unit2)
+next
+  assume "eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<t>"
+  then have "eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<t> \<circ>\<^sub>c id one"
+    using id_right_unit2 true_func_type by auto
+  then obtain j  where j_type: "j : one \<rightarrow> X" and "diagonal X \<circ>\<^sub>c j = \<langle>x,y\<rangle>"
+    using eq_pred_pullback assms unfolding is_pullback_def by (metis cfunc_prod_type id_type)
+  then have "\<langle>j,j\<rangle> = \<langle>x,y\<rangle>"
+    using diag_on_elements by auto
+  then show "x = y"
+    using assms element_pair_eq j_type by auto
+qed
 
 (* Proposition 2.2.1: see under Axiom 8 *)
 
