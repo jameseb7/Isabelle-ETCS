@@ -151,6 +151,18 @@ lemma diagonal_type[type_rule]:
   "diagonal X : X \<rightarrow> X \<times>\<^sub>c X"
   unfolding diagonal_def by (simp add: cfunc_prod_type id_type)
 
+(*Note at the end of Definition 2.1.9*)
+lemma diag_mono:
+"monomorphism(diagonal(X))"
+proof - 
+  have f1: "left_cart_proj X X \<circ>\<^sub>c diagonal X = id(X)"
+    by (metis diagonal_def id_type left_cart_proj_cfunc_prod)
+  show "monomorphism(diagonal(X))"
+    by (metis cfunc_type_def comp_monic_imp_monic diagonal_type f1 id_isomorphism iso_imp_epi_and_monic left_cart_proj_type)
+qed
+
+
+
 (*Definition 2.1.10*)
 definition cfunc_cross_prod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<times>\<^sub>f" 55) where
   "f \<times>\<^sub>f g = \<langle>f \<circ>\<^sub>c left_cart_proj (domain f) (domain g), g \<circ>\<^sub>c right_cart_proj (domain f) (domain g)\<rangle>"

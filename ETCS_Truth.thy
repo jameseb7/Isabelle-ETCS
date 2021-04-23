@@ -18,6 +18,13 @@ where
 
 thm subobject_of_def
 
+(*
+definition characteristic :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc" where
+  "characteristic E m f g \<longleftrightarrow> "
+
+*)
+
+
 (* Proposition 2.2.1: see under Axiom 8 *)
 
 (* Proposition 2.2.2 *)

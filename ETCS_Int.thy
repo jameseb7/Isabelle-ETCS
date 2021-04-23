@@ -82,4 +82,83 @@ proof (rule someI_ex)
       using add_inners_type add_outers_type equalizer_exists by auto
   qed
 qed
-    
+
+lemma elements_of_int_equiv_set1:
+  assumes  "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"  "d \<in>\<^sub>c \<nat>\<^sub>c" 
+  assumes "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
+  shows "b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
+proof - 
+  have f1: "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> factorsthru int_equiv_morphism"
+    using assms(5) relative_member_def by auto
+  have f2: "add_outers \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> = add_inners  \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle>"
+     using assms apply typecheck_cfuncs
+     by (meson f1 int_equiv_equalizer xfactorthru_equalizer_iff_fx_eq_gx)
+  show  "b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
+     using assms apply typecheck_cfuncs
+     using add_def add_inners_apply add_outers_apply f2 by auto
+ qed
+
+lemma elements_of_int_equiv_set2:
+  assumes  "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"  "d \<in>\<^sub>c \<nat>\<^sub>c" 
+  assumes "b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
+  shows "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
+proof-
+  have f1: "add_outers \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> = add_inners  \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle>"
+     using assms apply typecheck_cfuncs
+     using add_def add_inners_apply add_outers_apply assms(5) by presburger
+  have f2: "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> factorsthru int_equiv_morphism"
+     using assms apply typecheck_cfuncs
+     using add_inners_type add_outers_type f1 int_equiv_equalizer xfactorthru_equalizer_iff_fx_eq_gx by blast
+  have f3: "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
+    by (simp add: assms(1) assms(2) assms(3) assms(4) cfunc_prod_type)
+  have f4: "monomorphism(int_equiv_morphism)"
+    using equalizer_is_monomorphism int_equiv_equalizer by auto
+  have f5: "int_equiv_morphism: domain(int_equiv_morphism) \<rightarrow> (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
+    by (smt add_inners_type add_outers_type cfunc_type_def codomain_comp f1 f3 factors_through_def int_equiv_equalizer xfactorthru_equalizer_iff_fx_eq_gx)
+ show "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
+     using assms apply typecheck_cfuncs
+     using cfunc_type_def equalizer_def f2 f4 f5 int_equiv_equalizer relative_member_def2 by force
+qed
+
+
+
+
+lemma pair_is_subset:
+"(int_equiv_set,int_equiv_morphism) \<subseteq>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
+    by (metis add_inners_type cfunc_type_def equalizer_def equalizer_is_monomorphism int_equiv_equalizer subobject_of_def2)
+
+lemma "reflexive_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
+  by (metis add_commutes cart_prod_decomp elements_of_int_equiv_set2 pair_is_subset reflexive_on_def)
+
+
+lemma "symmetric_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
+  by (typecheck_cfuncs, smt add_commutes cart_prod_decomp elements_of_int_equiv_set1 elements_of_int_equiv_set2 pair_is_subset symmetric_on_def)
+
+(*
+lemma "transitive_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
+
+In order to prove this we need to establish the cancellative law on N.
+
+Proof: 
+Suppose <<a,b>,<c,d>> in Rz
+Suppose <<c,d>,<e,f>> in Rz
+
+then 
+b+c = a+d  AND d+e = c+f
+
+hence
+(b+e) + (c+d) = (a+f) +(c+d)
+
+and by applying the cancellative law on N we simplify this to
+(b+e) = (a+f)
+
+therefore
+<<a,b>,<e,f>> in Rz.
+
+*)
+ 
+
+
+
+
+end

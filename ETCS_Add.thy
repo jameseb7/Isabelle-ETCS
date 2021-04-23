@@ -782,4 +782,27 @@ proof -
     unfolding add_def by auto
 qed
 
+
+(*
+lemma char_deltaNaa_is_true:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "
+
+
+lemma add_cancellative:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" 
+  assumes   "a +\<^sub>\<nat> c = b +\<^sub>\<nat> c"
+  shows "a=b"
+proof - 
+
+  have f1: "diagonal(\<nat>\<^sub>c): \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
+    by (simp add: diagonal_type)
+
+  have f2: "monomorphism (diagonal(\<nat>\<^sub>c))"
+    by (simp add: diag_mono)
+*)
+(*
+    obtain chi where chi_def "chi:(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<rightarrow> \<Omega> \<and> is_pullback \<nat>\<^sub>c one (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<Omega> (\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<t> diagonal(\<nat>\<^sub>c) chi"
+*)
+
 end

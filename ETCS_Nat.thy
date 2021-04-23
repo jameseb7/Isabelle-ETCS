@@ -221,10 +221,31 @@ proof -
 qed
 
 lemma zero_is_not_successor:
-  "\<not>(\<exists> x. (x \<in>\<^sub>c \<nat>\<^sub>c \<and> zero = successor \<circ>\<^sub>c x))"
-  oops
-
-
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "zero \<noteq> successor \<circ>\<^sub>c n"
+proof (rule ccontr, auto)
+  assume for_contradiction: "zero = successor \<circ>\<^sub>c n"
+  have "\<exists>!u. u: \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> u \<circ>\<^sub>c zero = \<t> \<and> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
+    by (typecheck_cfuncs, rule natural_number_object_property2)
+  then obtain u where  u_type:  "u: \<nat>\<^sub>c \<rightarrow> \<Omega>" and 
+                       u_triangle: "u \<circ>\<^sub>c zero = \<t>" and  
+                       u_square: "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
+    by auto
+  have "\<t> = \<f>" 
+  proof -
+    have "\<t> = u  \<circ>\<^sub>c zero"
+      by (simp add: u_triangle)
+    also have "... = u \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+      by (simp add: for_contradiction)
+    also have "... = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<circ>\<^sub>c u \<circ>\<^sub>c n"
+      using assms u_type by (typecheck_cfuncs, simp add:  comp_associative2 u_square)
+    also have "... = \<f>"
+      using assms u_type by (typecheck_cfuncs, metis cfunc_type_def comp_associative id_right_unit2 id_type terminal_func_comp terminal_func_unique)
+    then show ?thesis using calculation by auto
+  qed
+  then show False
+    using true_false_distinct by blast
+qed
 
 
 (* Proposition 2.6.6 *)
