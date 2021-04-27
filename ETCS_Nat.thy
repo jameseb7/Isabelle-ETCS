@@ -388,27 +388,17 @@ proof -
       assume BWOC : "surjective(successor)"
       obtain n where snEqz: "successor \<circ>\<^sub>c n = zero" and n_type: "n : one \<rightarrow> \<nat>\<^sub>c"
         using BWOC cfunc_type_def successor_type surjective_def zero_type by auto
-      have map_type: "\<beta>\<^bsub>\<Omega>\<^esub>\<circ>\<^sub>c (u\<circ>\<^sub>c n): one \<rightarrow> one"
-        using u_form n_type by (auto, typecheck_cfuncs)
-      then have uniqueness: "\<beta>\<^bsub>\<Omega>\<^esub>\<circ>\<^sub>c (u\<circ>\<^sub>c n) = id(one)"
-       using id_type one_unique_element by blast
-      have "\<t> = u \<circ>\<^sub>c zero"
-       using triangle_commutes_def u_form by auto
-      also have "... = u \<circ>\<^sub>c (successor \<circ>\<^sub>c n)"
-       by (simp add: snEqz)
-      also have "... = \<f> \<circ>\<^sub>c (\<beta>\<^bsub>\<Omega>\<^esub>\<circ>\<^sub>c (u\<circ>\<^sub>c n))"
-        using u_form n_type
-        by (typecheck_cfuncs, metis cfunc_type_def comp_associative false_func_type square_commutes_def)
-      also have "... =\<f>"
-        by (metis cfunc_type_def false_func_type id_right_unit uniqueness)
-      then  have Contradiction: "\<t> = \<f>"
-        by (simp add: calculation)
       then show False
-        using true_false_distinct by auto
+        by (metis zero_is_not_successor)
     qed
   then show "injective successor \<and> \<not> surjective successor"
     using monomorphism_imp_injective succ_mono by blast
 qed
+
+lemma succ_inject:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c" "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "successor \<circ>\<^sub>c n = successor \<circ>\<^sub>c m \<Longrightarrow> n=m"
+  by (metis Peano's_Axioms assms cfunc_type_def injective_def successor_type) 
 
 (* Definition 2.6.9 *)
 definition countable :: "cset \<Rightarrow> bool" where
