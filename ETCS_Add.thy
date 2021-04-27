@@ -786,16 +786,6 @@ lemma add_cancellative:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(a +\<^sub>\<nat> c = b +\<^sub>\<nat> c) = (a = b)"
 proof - 
-  obtain select_lhs where 
-    select_lhs_type: "select_lhs : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)" and
-    select_lhs_def: "select_lhs = \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c, right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>"
-    by typecheck_cfuncs
-  obtain select_rhs where 
-    select_lhs_type: "select_rhs : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)" and
-    select_lhs_def: "select_rhs = \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c, right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>"
-    by typecheck_cfuncs
-
-
   obtain a_b_add_eq where
     a_b_add_eq_type: "a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>" and
     a_b_add_eq_def: "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>"
@@ -829,9 +819,7 @@ proof -
     qed
 
     show "a_b_add_eq \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq"
-
     proof (rule one_separator[where X ="\<nat>\<^sub>c", where Y = "\<Omega>"])
-
       show "a_b_add_eq \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
         using a_b_add_eq_type comp_type successor_type by auto
       show "id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>"
@@ -843,57 +831,71 @@ proof -
       have true_or_false: "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> add2 \<circ>\<^sub>c \<langle>a , n\<rangle>,  add2 \<circ>\<^sub>c \<langle>b ,  n\<rangle>\<rangle> \<in>\<^sub>c \<Omega>"
         by (metis add_def add_type assms(1) assms(2) cfunc_prod_type comp_type eq_pred_type n_type)
        
-      have "a_b_add_eq \<circ>\<^sub>c successor \<circ>\<^sub>c n = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c successor \<circ>\<^sub>c n"
-        using assms n_type by (typecheck_cfuncs, smt a_b_add_eq_def comp_associative2)
+      have "(a_b_add_eq \<circ>\<^sub>c successor) \<circ>\<^sub>c n = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+        using assms n_type unfolding a_b_add_eq_def by (typecheck_cfuncs, smt comp_associative2)
       also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n, successor \<circ>\<^sub>c n\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n,  successor \<circ>\<^sub>c n\<rangle>\<rangle>"
         using assms n_type by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 id_left_unit2)
       also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a , successor \<circ>\<^sub>c n\<rangle>, add2 \<circ>\<^sub>c \<langle>b,  successor \<circ>\<^sub>c n\<rangle>\<rangle>"
         using assms n_type  by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element)
-     also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> successor \<circ>\<^sub>c  add2 \<circ>\<^sub>c \<langle>a , n\<rangle>, successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>b , n\<rangle>\<rangle>"
-       using assms n_type by (typecheck_cfuncs, metis add2_respects_succ_right)
-     also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> add2 \<circ>\<^sub>c \<langle>a , n\<rangle>,  add2 \<circ>\<^sub>c \<langle>b ,  n\<rangle>\<rangle>"
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> successor \<circ>\<^sub>c  add2 \<circ>\<^sub>c \<langle>a , n\<rangle>, successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>b , n\<rangle>\<rangle>"
+        using assms n_type by (typecheck_cfuncs, metis add2_respects_succ_right)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> add2 \<circ>\<^sub>c \<langle>a , n\<rangle>,  add2 \<circ>\<^sub>c \<langle>b ,  n\<rangle>\<rangle>"
         (is "?LHS=?RHS")
-                  proof(cases "?RHS = \<t>")
-                    assume rhs_true: "?RHS = \<t>"
-                    then have "add2 \<circ>\<^sub>c \<langle>a , n\<rangle> = add2 \<circ>\<^sub>c \<langle>b , n\<rangle>"
-                      using assms n_type eq_pred_iff_eq by (typecheck_cfuncs, blast)
-                    then show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>a,n\<rangle>,successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>b,n\<rangle>\<rangle> =
-                eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a,n\<rangle>,add2 \<circ>\<^sub>c \<langle>b,n\<rangle>\<rangle>"
-                      by (metis  add_def add_type assms(1) eq_pred_iff_eq n_type succ_n_type)
-                  next
-                    assume rhs_not_true: "?RHS \<noteq> \<t>"
-                    have not_equal: "add2 \<circ>\<^sub>c \<langle>a , n\<rangle> \<noteq> add2 \<circ>\<^sub>c \<langle>b , n\<rangle>"
-                      using assms n_type rhs_not_true eq_pred_iff_eq by (typecheck_cfuncs, blast)
-                    then have "successor \<circ>\<^sub>c  add2 \<circ>\<^sub>c \<langle>a , n\<rangle> \<noteq> successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>b , n\<rangle>"
-                      using assms n_type  not_equal succ_inject  by (typecheck_cfuncs, blast)          
-                    then have "?LHS \<noteq>  \<t>"
-                      using assms n_type  eq_pred_iff_eq  by (typecheck_cfuncs, blast)
-                    then have lhs_false: "?LHS = \<f>"
-                      using a_b_add_eq_type calculation comp_type n_type succ_n_type true_false_only_truth_values by fastforce
-                    have  rhs_false: "?RHS = \<f>"
-                      using rhs_not_true true_false_only_truth_values true_or_false by auto
-            
-            
-                    show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>a,n\<rangle>,successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>b,n\<rangle>\<rangle> =
-                          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a,n\<rangle>,add2 \<circ>\<^sub>c \<langle>b,n\<rangle>\<rangle>"
-                      by (simp add: lhs_false rhs_false)
-                    
-                  qed
-
-     show  "(a_b_add_eq \<circ>\<^sub>c successor) \<circ>\<^sub>c n = (id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq) \<circ>\<^sub>c n"
+      proof(cases "?RHS = \<t>")
+        assume rhs_true: "?RHS = \<t>"
+        then have "add2 \<circ>\<^sub>c \<langle>a , n\<rangle> = add2 \<circ>\<^sub>c \<langle>b , n\<rangle>"
+          using assms n_type eq_pred_iff_eq by (typecheck_cfuncs, blast)
+        then show "?LHS = ?RHS"
+          by (metis  add_def add_type assms(1) eq_pred_iff_eq n_type succ_n_type)
+      next
+        assume rhs_not_true: "?RHS \<noteq> \<t>"
+        have not_equal: "add2 \<circ>\<^sub>c \<langle>a , n\<rangle> \<noteq> add2 \<circ>\<^sub>c \<langle>b , n\<rangle>"
+          using assms n_type rhs_not_true eq_pred_iff_eq by (typecheck_cfuncs, blast)
+        then have "successor \<circ>\<^sub>c  add2 \<circ>\<^sub>c \<langle>a , n\<rangle> \<noteq> successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>b , n\<rangle>"
+          using assms n_type  not_equal succ_inject  by (typecheck_cfuncs, blast)          
+        then have "?LHS \<noteq>  \<t>"
+          using assms n_type  eq_pred_iff_eq  by (typecheck_cfuncs, blast)
+        then have lhs_false: "?LHS = \<f>"
+          using assms n_type true_false_only_truth_values by (typecheck_cfuncs, fastforce)
+        have  rhs_false: "?RHS = \<f>"
+          using rhs_not_true true_false_only_truth_values true_or_false by auto
+        show "?LHS = ?RHS"
+          by (simp add: lhs_false rhs_false)
+      qed
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n,  add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , id \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n\<rangle>"
+        using assms n_type cart_prod_extract_right by (typecheck_cfuncs, auto)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>,  add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , id \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c n"
+        using assms n_type by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+      also have "... = a_b_add_eq \<circ>\<^sub>c n"
+        using assms n_type by (typecheck_cfuncs, simp add: a_b_add_eq_def comp_associative2)
+      also have "... = (id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq) \<circ>\<^sub>c n"
+        using a_b_add_eq_type id_left_unit2 by auto
+      then show  "(a_b_add_eq \<circ>\<^sub>c successor) \<circ>\<^sub>c n = (id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq) \<circ>\<^sub>c n"
+        using calculation by auto
+    qed
 
     show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-        using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp)
-
-
-
+      using assms
+      by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp)
   qed
+  then have "a_b_add_eq \<circ>\<^sub>c c = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c c"
+    using assms comp_associative2 by (typecheck_cfuncs, auto)
+  then have "a_b_add_eq \<circ>\<^sub>c c = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c c, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c c\<rangle>"
+    using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 terminal_func_comp)
+  then have "a_b_add_eq \<circ>\<^sub>c c = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a ,b\<rangle>"
+    by (metis assms id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+  then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c c = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>"
+    unfolding a_b_add_eq_def using assms comp_associative2 by (typecheck_cfuncs, auto)
+  then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c c, (add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c c\<rangle> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>"
+    using assms cfunc_prod_comp by (typecheck_cfuncs, auto)
+  then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c c, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c c\<rangle> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>"
+    using assms comp_associative2 by (typecheck_cfuncs, auto)
   then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a, c\<rangle>, add2 \<circ>\<^sub>c \<langle>b, c\<rangle>\<rangle> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>"
-    sorry
+    using assms cart_prod_extract_right by auto
   then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a +\<^sub>\<nat> c, b +\<^sub>\<nat> c\<rangle> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>"
     unfolding add_def by auto
   then show "(a +\<^sub>\<nat> c = b +\<^sub>\<nat> c) = (a = b)"
     by (metis add_type assms eq_pred_iff_eq)
 qed
-*)
+
 end
