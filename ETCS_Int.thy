@@ -127,36 +127,100 @@ lemma pair_is_subset:
 "(int_equiv_set,int_equiv_morphism) \<subseteq>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
     by (metis add_inners_type cfunc_type_def equalizer_def equalizer_is_monomorphism int_equiv_equalizer subobject_of_def2)
 
-lemma "reflexive_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
+lemma NN_rel_is_reflexive:
+"reflexive_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
   by (metis add_commutes cart_prod_decomp elements_of_int_equiv_set2 pair_is_subset reflexive_on_def)
 
 
-lemma "symmetric_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
+lemma NN_rel_is_symmetric:
+"symmetric_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
   by (typecheck_cfuncs, smt add_commutes cart_prod_decomp elements_of_int_equiv_set1 elements_of_int_equiv_set2 pair_is_subset symmetric_on_def)
 
-(*
-lemma "transitive_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
 
-In order to prove this we need to establish the cancellative law on N.
+lemma NN_rel_is_transitive:
+"transitive_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
+proof -
+  have f1: "(\<forall>x y z. x \<in>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<and>  y \<in>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<and> z \<in>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)  \<longrightarrow>
+      (\<langle>x,y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<and> \<langle>y,z\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<longrightarrow> \<langle>x,z\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism)))"
+  proof(auto)
+    fix x y z
+    assume x_type:  "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    assume y_type:  "y \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    assume z_type:  "z \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+   
+    assume rel1: "\<langle>x,y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
+    assume rel2: "\<langle>y,z\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
 
-Proof: 
-Suppose <<a,b>,<c,d>> in Rz
-Suppose <<c,d>,<e,f>> in Rz
 
-then 
-b+c = a+d  AND d+e = c+f
 
-hence
-(b+e) + (c+d) = (a+f) +(c+d)
+(*Now we decompose x, y, and z as x = <a,b> and y = <c,d> and z = <e,f>*)
 
-and by applying the cancellative law on N we simplify this to
-(b+e) = (a+f)
 
-therefore
-<<a,b>,<e,f>> in Rz.
+    have x_decomp: "\<exists> a b. x = \<langle>a, b\<rangle> \<and> a \<in>\<^sub>c \<nat>\<^sub>c \<and> b \<in>\<^sub>c \<nat>\<^sub>c"
+      by (simp add: cart_prod_decomp x_type)
+    obtain a where a_def: "\<exists>b. x = \<langle>a,b\<rangle> \<and> a \<in>\<^sub>c \<nat>\<^sub>c \<and> b \<in>\<^sub>c \<nat>\<^sub>c"
+      using x_decomp by blast
+    obtain b where b_def: "x = \<langle>a,b\<rangle> \<and> b \<in>\<^sub>c \<nat>\<^sub>c"
+      using a_def by blast
+    have x_def: "x = \<langle>a,b\<rangle>"
+      by (simp add: b_def)
 
-*)
+    have y_decomp: "\<exists> c d. y = \<langle>c, d\<rangle> \<and> c \<in>\<^sub>c \<nat>\<^sub>c \<and> d \<in>\<^sub>c \<nat>\<^sub>c"
+      by (simp add: cart_prod_decomp y_type)
+    obtain c where c_def: "\<exists>d. y = \<langle>c,d\<rangle> \<and> c \<in>\<^sub>c \<nat>\<^sub>c \<and> d \<in>\<^sub>c \<nat>\<^sub>c"
+      using y_decomp by blast
+    obtain d where d_def: "y = \<langle>c,d\<rangle> \<and> d \<in>\<^sub>c \<nat>\<^sub>c"
+      using c_def by blast
+    have y_def: "y = \<langle>c,d\<rangle>"
+          by (simp add: d_def)
+
+    
+
+     have z_decomp: "\<exists> e f. z = \<langle>e, f\<rangle> \<and> e \<in>\<^sub>c \<nat>\<^sub>c \<and> f \<in>\<^sub>c \<nat>\<^sub>c"
+      by (simp add: cart_prod_decomp z_type)
+    obtain e where e_def: "\<exists>f. z = \<langle>e,f\<rangle> \<and> e \<in>\<^sub>c \<nat>\<^sub>c \<and> f \<in>\<^sub>c \<nat>\<^sub>c"
+      using z_decomp by blast
+    obtain f where f_def: "z = \<langle>e,f\<rangle> \<and> f \<in>\<^sub>c \<nat>\<^sub>c"
+      using e_def by blast 
+    have z_def: "z = \<langle>e,f\<rangle>"
+        by (simp add: f_def)
+    
+
+    have rel1_decomp: "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
+      using x_type y_type x_def y_def rel1 by blast
  
+    have rel2_decomp: "\<langle>\<langle>c,d\<rangle>,\<langle>e,f\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
+      using y_type z_type y_def z_def rel2 by blast
+
+    have equation1: "b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
+      by (metis a_def b_def c_def d_def elements_of_int_equiv_set1 rel1)
+
+    have equation2: "d +\<^sub>\<nat> e = c +\<^sub>\<nat> f"
+      by (metis c_def d_def e_def elements_of_int_equiv_set1 f_def rel2)
+
+    have eq1_plus_eq2: "(b +\<^sub>\<nat> e) +\<^sub>\<nat> (c +\<^sub>\<nat> d) = (a +\<^sub>\<nat> f) +\<^sub>\<nat> (c +\<^sub>\<nat> d)"
+      by (smt a_def add_associates add_commutes add_type b_def c_def d_def e_def equation1 equation2 f_def)
+    have simplified_eq1_plus_eq2: "b +\<^sub>\<nat> e = a +\<^sub>\<nat> f"
+      by (smt  a_def add_associates add_cancellative add_commutes add_type b_def c_def d_def e_def element_pair_eq equation1 equation2 f_def x_def z_def)
+    
+
+    have desiredrelation_decomp: "\<langle>\<langle>a,b\<rangle>,\<langle>e,f\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
+      using a_def b_def e_def elements_of_int_equiv_set2 f_def simplified_eq1_plus_eq2 by auto
+
+
+    show "\<langle>x,z\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub> (int_equiv_set, int_equiv_morphism)"
+      by (simp add: desiredrelation_decomp x_def z_def)
+  qed
+
+  show ?thesis
+    using f1 pair_is_subset transitive_on_def by blast
+qed
+
+
+lemma NN_rel_is_relation:
+"equiv_rel_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
+  by (simp add: NN_rel_is_reflexive NN_rel_is_symmetric NN_rel_is_transitive equiv_rel_on_def)
+
 
 
 
