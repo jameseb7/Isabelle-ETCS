@@ -118,10 +118,7 @@ proof-
  show "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
      using assms apply typecheck_cfuncs
      using cfunc_type_def equalizer_def f2 f4 f5 int_equiv_equalizer relative_member_def2 by force
-qed
-
-
-
+ qed
 
 lemma pair_is_subset:
 "(int_equiv_set,int_equiv_morphism) \<subseteq>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
@@ -131,11 +128,9 @@ lemma NN_rel_is_reflexive:
 "reflexive_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
   by (metis add_commutes cart_prod_decomp elements_of_int_equiv_set2 pair_is_subset reflexive_on_def)
 
-
 lemma NN_rel_is_symmetric:
 "symmetric_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
   by (typecheck_cfuncs, smt add_commutes cart_prod_decomp elements_of_int_equiv_set1 elements_of_int_equiv_set2 pair_is_subset symmetric_on_def)
-
 
 lemma NN_rel_is_transitive:
 "transitive_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
@@ -151,10 +146,7 @@ proof -
     assume rel1: "\<langle>x,y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
     assume rel2: "\<langle>y,z\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
 
-
-
 (*Now we decompose x, y, and z as x = <a,b> and y = <c,d> and z = <e,f>*)
-
 
     have x_decomp: "\<exists> a b. x = \<langle>a, b\<rangle> \<and> a \<in>\<^sub>c \<nat>\<^sub>c \<and> b \<in>\<^sub>c \<nat>\<^sub>c"
       by (simp add: cart_prod_decomp x_type)
@@ -174,8 +166,6 @@ proof -
     have y_def: "y = \<langle>c,d\<rangle>"
           by (simp add: d_def)
 
-    
-
      have z_decomp: "\<exists> e f. z = \<langle>e, f\<rangle> \<and> e \<in>\<^sub>c \<nat>\<^sub>c \<and> f \<in>\<^sub>c \<nat>\<^sub>c"
       by (simp add: cart_prod_decomp z_type)
     obtain e where e_def: "\<exists>f. z = \<langle>e,f\<rangle> \<and> e \<in>\<^sub>c \<nat>\<^sub>c \<and> f \<in>\<^sub>c \<nat>\<^sub>c"
@@ -184,7 +174,6 @@ proof -
       using e_def by blast 
     have z_def: "z = \<langle>e,f\<rangle>"
         by (simp add: f_def)
-    
 
     have rel1_decomp: "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
       using x_type y_type x_def y_def rel1 by blast
@@ -201,12 +190,10 @@ proof -
     have eq1_plus_eq2: "(b +\<^sub>\<nat> e) +\<^sub>\<nat> (c +\<^sub>\<nat> d) = (a +\<^sub>\<nat> f) +\<^sub>\<nat> (c +\<^sub>\<nat> d)"
       by (smt a_def add_associates add_commutes add_type b_def c_def d_def e_def equation1 equation2 f_def)
     have simplified_eq1_plus_eq2: "b +\<^sub>\<nat> e = a +\<^sub>\<nat> f"
-      by (smt  a_def add_associates add_cancellative add_commutes add_type b_def c_def d_def e_def element_pair_eq equation1 equation2 f_def x_def z_def)
+      by (smt a_def add_associates add_cancellative add_commutes add_type b_def c_def d_def e_def element_pair_eq equation1 equation2 f_def x_def z_def)
     
-
     have desiredrelation_decomp: "\<langle>\<langle>a,b\<rangle>,\<langle>e,f\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
       using a_def b_def e_def elements_of_int_equiv_set2 f_def simplified_eq1_plus_eq2 by auto
-
 
     show "\<langle>x,z\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub> (int_equiv_set, int_equiv_morphism)"
       by (simp add: desiredrelation_decomp x_def z_def)
@@ -216,13 +203,41 @@ proof -
     using f1 pair_is_subset transitive_on_def by blast
 qed
 
-
 lemma NN_rel_is_relation:
 "equiv_rel_on (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
   by (simp add: NN_rel_is_reflexive NN_rel_is_symmetric NN_rel_is_transitive equiv_rel_on_def)
 
+definition int :: "cset" ("\<int>\<^sub>c") where
+  "\<int>\<^sub>c = quotient_set (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism)"
 
+definition natpair2int :: "cfunc" where
+  "natpair2int = equiv_class (int_equiv_set,int_equiv_morphism)"
 
+lemma nat2int_type[type_rule]:
+  "natpair2int : \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow> \<int>\<^sub>c"
+  unfolding natpair2int_def int_def
+  by (simp add: NN_rel_is_relation equiv_class_type)
 
+lemma equiv_is_natpair2int_eq:
+  "\<langle>x, y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<longleftrightarrow> natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
+  unfolding natpair2int_def int_def
+  by (simp add: ETCS_Equivalence.equiv_class_eq NN_rel_is_relation)
+
+lemma nat_pair_eq: 
+  assumes  "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"  "d \<in>\<^sub>c \<nat>\<^sub>c" 
+  shows "natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle> \<longleftrightarrow> b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
+proof auto
+  assume "natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle>"
+  then have "\<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism)"
+    by (simp add: equiv_is_natpair2int_eq)
+  then show "b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
+    by (simp add: assms elements_of_int_equiv_set1)
+next
+  assume "b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
+  then have "\<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism)"
+    by (simp add: assms elements_of_int_equiv_set2)
+  then show "natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle>"
+    by (simp add: equiv_is_natpair2int_eq)
+qed
 
 end
