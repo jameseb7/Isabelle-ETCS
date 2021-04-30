@@ -289,6 +289,60 @@ proof -
     by (typecheck_cfuncs, auto)
 qed
 
+lemma cart_prod_eq:
+  assumes "a : Z \<rightarrow> X \<times>\<^sub>c Y" "b : Z \<rightarrow>  X \<times>\<^sub>c Y"
+  shows "a = b \<longleftrightarrow> 
+    (left_cart_proj X Y \<circ>\<^sub>c a = left_cart_proj X Y \<circ>\<^sub>c b 
+      \<and> right_cart_proj X Y \<circ>\<^sub>c a = right_cart_proj X Y \<circ>\<^sub>c b)"
+  by (metis (full_types) assms cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type)
+
+lemma cart_prod_eq2:
+  assumes "a : Z \<rightarrow> X" "b : Z \<rightarrow> Y" "c : Z \<rightarrow>  X" "d : Z \<rightarrow>  Y"
+  shows "\<langle>a, b\<rangle> = \<langle>c,d\<rangle> \<longleftrightarrow> (a = c \<and> b = d)"
+  by (metis assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+
+lemma cart_prod_decomp:
+  assumes "a : A \<rightarrow> X \<times>\<^sub>c Y"
+  shows "\<exists> x y. a = \<langle>x, y\<rangle> \<and> x : A \<rightarrow> X \<and> y : A \<rightarrow> Y"
+proof (rule_tac x="left_cart_proj X Y \<circ>\<^sub>c a" in exI, rule_tac x="right_cart_proj X Y \<circ>\<^sub>c a" in exI, auto)
+  show "a = \<langle>left_cart_proj X Y \<circ>\<^sub>c a,right_cart_proj X Y \<circ>\<^sub>c a\<rangle>"
+    using assms cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type by blast
+  show "left_cart_proj X Y \<circ>\<^sub>c a : A \<rightarrow>  X"
+    using assms left_cart_proj_type comp_type by auto
+  show "right_cart_proj X Y \<circ>\<^sub>c a : A \<rightarrow> Y"
+    using assms right_cart_proj_type comp_type by auto
+qed
+
+lemma cfunc_cross_prod_mono:
+  assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
+  assumes f_mono: "monomorphism f" and g_mono: "monomorphism g"
+  shows "monomorphism (f \<times>\<^sub>f g)"
+  using type_assms
+proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+  fix x y A
+  assume x_type: "x : A \<rightarrow> X \<times>\<^sub>c Z"
+  assume y_type: "y : A \<rightarrow> X \<times>\<^sub>c Z"
+
+  obtain x1 x2 where x_expand: "x = \<langle>x1, x2\<rangle>" and x1_x2_type: "x1 : A \<rightarrow> X" "x2 : A \<rightarrow> Z"
+    using cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type x_type by blast
+  obtain y1 y2 where y_expand: "y = \<langle>y1, y2\<rangle>" and y1_y2_type: "y1 : A \<rightarrow> X" "y2 : A \<rightarrow> Z"
+    using cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type y_type by blast
+
+  assume "(f \<times>\<^sub>f g) \<circ>\<^sub>c x = (f \<times>\<^sub>f g) \<circ>\<^sub>c y"
+  then have "(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>x1, x2\<rangle> = (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>y1, y2\<rangle>"
+    using x_expand y_expand by blast
+  then have "\<langle>f \<circ>\<^sub>c x1, g \<circ>\<^sub>c x2\<rangle> = \<langle>f \<circ>\<^sub>c y1, g \<circ>\<^sub>c y2\<rangle>"
+    using cfunc_cross_prod_comp_cfunc_prod type_assms x1_x2_type y1_y2_type by auto
+  then have "f \<circ>\<^sub>c x1 = f \<circ>\<^sub>c y1 \<and> g \<circ>\<^sub>c x2 = g \<circ>\<^sub>c y2"
+    by (meson cart_prod_eq2 comp_type type_assms x1_x2_type y1_y2_type)
+  then have "x1 = y1 \<and> x2 = y2"
+    using cfunc_type_def f_mono g_mono monomorphism_def type_assms x1_x2_type y1_y2_type by auto
+  then have "\<langle>x1, x2\<rangle> = \<langle>y1, y2\<rangle>"
+    by blast
+  then show "x = y"
+    by (simp add: x_expand y_expand)
+qed
+
 subsection \<open>Useful Cartesian product permuting functions\<close>
 
 definition swap :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" where

@@ -285,25 +285,6 @@ lemma cart_prod_elem_eq:
       \<and> right_cart_proj X Y \<circ>\<^sub>c a = right_cart_proj X Y \<circ>\<^sub>c b)"
   by (metis (full_types) assms cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type)
 
-lemma cart_prod_eq:
-  assumes "a : Z \<rightarrow> X \<times>\<^sub>c Y" "b : Z \<rightarrow>  X \<times>\<^sub>c Y"
-  shows "a = b \<longleftrightarrow> 
-    (left_cart_proj X Y \<circ>\<^sub>c a = left_cart_proj X Y \<circ>\<^sub>c b 
-      \<and> right_cart_proj X Y \<circ>\<^sub>c a = right_cart_proj X Y \<circ>\<^sub>c b)"
-  by (metis (full_types) assms cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type)
-
-lemma cart_prod_decomp:
-  assumes "a \<in>\<^sub>c X \<times>\<^sub>c Y"
-  shows "\<exists> x y. a = \<langle>x, y\<rangle> \<and> x \<in>\<^sub>c X \<and> y \<in>\<^sub>c Y"
-proof (rule_tac x="left_cart_proj X Y \<circ>\<^sub>c a" in exI, rule_tac x="right_cart_proj X Y \<circ>\<^sub>c a" in exI, auto)
-  show "a = \<langle>left_cart_proj X Y \<circ>\<^sub>c a,right_cart_proj X Y \<circ>\<^sub>c a\<rangle>"
-    using assms cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type by blast
-  show "left_cart_proj X Y \<circ>\<^sub>c a \<in>\<^sub>c X"
-    using assms left_cart_proj_type comp_type by auto
-  show "right_cart_proj X Y \<circ>\<^sub>c a \<in>\<^sub>c Y"
-    using assms right_cart_proj_type comp_type by auto
-qed
-
 (* Note 2.1.22 *)
 lemma  element_pair_eq:
   assumes "x \<in>\<^sub>c X" "x' \<in>\<^sub>c X" "y \<in>\<^sub>c Y" "y' \<in>\<^sub>c Y"
