@@ -240,4 +240,27 @@ next
     by (simp add: equiv_is_natpair2int_eq)
 qed
 
+definition lift_int_func :: "cfunc \<Rightarrow> cfunc" ("lift\<^sub>\<int>") where
+  "lift\<^sub>\<int> f = quotient_func f (int_equiv_set,int_equiv_morphism)"
+
+lemma const_on_int_rel_def:
+  assumes "\<And>x y. natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c y"
+  shows "\<And>x y. \<langle>x, y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<Longrightarrow> 
+    equiv_class (int_equiv_set,int_equiv_morphism) \<circ>\<^sub>c f \<circ>\<^sub>c x = equiv_class (int_equiv_set,int_equiv_morphism) \<circ>\<^sub>c f \<circ>\<^sub>c y"
+  by (metis assms equiv_is_natpair2int_eq natpair2int_def)
+
+
+lemma lift_int_func_type[type_rule]:
+  assumes "\<And>x y. natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c y"
+  shows "f : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> Y \<Longrightarrow> lift\<^sub>\<int> f : \<int>\<^sub>c \<rightarrow> Y"
+  unfolding lift_int_func_def int_def
+  by (metis NN_rel_is_relation assms equiv_is_natpair2int_eq natpair2int_def quotient_func_type) 
+
+lemma lift_int_func_natpair2int_eq:
+  assumes "\<And>x y. natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c y"
+  assumes "f : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> Y"
+  shows "lift\<^sub>\<int> f \<circ>\<^sub>c natpair2int = f"
+  unfolding lift_int_func_def natpair2int_def
+  by (metis NN_rel_is_relation assms equiv_is_natpair2int_eq natpair2int_def quotient_func_eq)
+
 end
