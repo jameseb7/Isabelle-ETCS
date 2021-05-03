@@ -53,9 +53,8 @@ where
        quotient_func f R \<circ>\<^sub>c equiv_class R = f" and  
   quotient_func_unique: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> 
     (\<And>x y. \<langle>x, y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cX\<^esub> R \<Longrightarrow> equiv_class R \<circ>\<^sub>c f \<circ>\<^sub>c x = equiv_class R \<circ>\<^sub>c f \<circ>\<^sub>c y) \<Longrightarrow>
-      h : quotient_set X R \<rightarrow> Y \<Longrightarrow> quotient_func h R \<circ>\<^sub>c equiv_class R = f \<Longrightarrow> h = quotient_func f R"
+      h : quotient_set X R \<rightarrow> Y \<Longrightarrow> h \<circ>\<^sub>c equiv_class R = f \<Longrightarrow> h = quotient_func f R"
 (*Note that quotient_func f R is just f_bar *)
-
 
 definition coequalizer :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
   "coequalizer E m f g \<longleftrightarrow> (\<exists> X Y. (f : Y \<rightarrow> X) \<and> (g : Y \<rightarrow> X) \<and> (m : X \<rightarrow> E)
@@ -106,13 +105,10 @@ proof(rule_tac x=X in exI, rule_tac x= "X\<times>\<^sub>cX" in exI,auto)
   show equiv_Lproj_type: "equiv_class (R, m) \<circ>\<^sub>c left_cart_proj X X =
     equiv_class (R, m) \<circ>\<^sub>c right_cart_proj X X"
   proof(rule one_separator[where X="X \<times>\<^sub>c X", where Y = "quotient_set X (R,m)"])
-    show "equiv_class (R, m) \<circ>\<^sub>c
-    left_cart_proj X X : X \<times>\<^sub>c X \<rightarrow> quotient_set X (R, m)"
+    show "equiv_class (R, m) \<circ>\<^sub>c left_cart_proj X X : X \<times>\<^sub>c X \<rightarrow> quotient_set X (R, m)"
       by (meson comp_type left_proj_type local.equiv_type)
-    show "equiv_class (R, m) \<circ>\<^sub>c
-    right_cart_proj X X : X \<times>\<^sub>c X \<rightarrow> quotient_set X (R, m)"
+    show "equiv_class (R, m) \<circ>\<^sub>c right_cart_proj X X : X \<times>\<^sub>c X \<rightarrow> quotient_set X (R, m)"
       by (meson comp_type local.equiv_type right_proj_type)
-
   next
     fix x 
     assume x_type: "x \<in>\<^sub>c X \<times>\<^sub>c X"
@@ -136,9 +132,7 @@ proof(rule_tac x=X in exI, rule_tac x= "X\<times>\<^sub>cX" in exI,auto)
          (equiv_class (R, m) \<circ>\<^sub>c right_cart_proj X X) \<circ>\<^sub>c x"
       by (smt equiv_class_eq a_def ab_inR_relXX ab_in_XX assms b_def comp_associative2 left_cart_proj_cfunc_prod left_proj_type local.equiv_type right_cart_proj_cfunc_prod right_proj_type)
   qed   
-
 next
-
   fix h F 
   assume h_type: " h : X \<rightarrow> F"
   assume h_proj1_eqs_h_proj2: " h \<circ>\<^sub>c left_cart_proj X X = h \<circ>\<^sub>c right_cart_proj X X"
@@ -156,7 +150,37 @@ next
   have k_type: "quotient_func h (R,m):  quotient_set X (R, m) \<rightarrow> F"
     by (simp add: assms fact4 h_type quotient_func_type)
 
-  have "\<exists>k. k : quotient_set X (R, m) \<rightarrow> F \<and> k \<circ>\<^sub>c equiv_class (R, m) = h"
+  show "\<exists>k. k : quotient_set X (R, m) \<rightarrow> F \<and> k \<circ>\<^sub>c equiv_class (R, m) = h"
     using fact5 k_type by blast
-  oops
+next
+  fix F k y
+  assume k_type: "k : quotient_set X (R, m) \<rightarrow> F"
+  assume y_type: "y : quotient_set X (R, m) \<rightarrow> F"
+  assume k_equiv_class_type: "k \<circ>\<^sub>c equiv_class (R, m) : X \<rightarrow> F"
+
+  assume y_k_eq: "y \<circ>\<^sub>c equiv_class (R, m) = k \<circ>\<^sub>c equiv_class (R, m)"
+  have y_eq: "y = quotient_func (y \<circ>\<^sub>c equiv_class (R, m)) (R, m)"
+    using assms y_type k_equiv_class_type y_k_eq
+  proof (-, rule_tac quotient_func_unique[where X=X, where Y=F], simp_all)
+    fix a b
+    assume ab_in_R: "\<langle>a,b\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (R, m)"
+    then show "equiv_class (R, m) \<circ>\<^sub>c (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c a =
+       equiv_class (R, m) \<circ>\<^sub>c (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c b"
+      by (metis (mono_tags, hide_lams) equiv_class_eq assms cfunc_prod_type cfunc_type_def id_type relative_member_def2 terminal_func_unique)
+  qed
+  have k_eq: "k = quotient_func (y \<circ>\<^sub>c equiv_class (R, m)) (R, m)"
+    using assms k_type k_equiv_class_type y_k_eq
+  proof (-, rule_tac quotient_func_unique[where X=X, where Y=F], simp_all)
+    fix a b
+    assume ab_in_R: "\<langle>a,b\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (R, m)"
+    then show "equiv_class (R, m) \<circ>\<^sub>c (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c a =
+       equiv_class (R, m) \<circ>\<^sub>c (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c b"
+      by (metis (mono_tags, hide_lams) equiv_class_eq assms cfunc_prod_type cfunc_type_def id_type relative_member_def2 terminal_func_unique)
+  qed
+  show "k = y"
+    using y_eq k_eq by auto
+qed
+
+
+
 end
