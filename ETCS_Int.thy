@@ -263,4 +263,42 @@ lemma lift_int_func_natpair2int_eq:
   unfolding lift_int_func_def natpair2int_def
   by (metis NN_rel_is_relation assms equiv_is_natpair2int_eq natpair2int_def quotient_func_eq)
 
+lemma quot_map_swap_constant_on_equiv:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set, int_equiv_morphism)"
+  shows "natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>c,d\<rangle>"
+proof - 
+  have "natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>  = natpair2int \<circ>\<^sub>c  \<langle>b,a\<rangle>"
+    using assms(1) assms(2) swap_ap by auto
+  also have "... = natpair2int \<circ>\<^sub>c  \<langle>d,c\<rangle>"
+    using assms elements_of_int_equiv_set1 nat_pair_eq by auto
+  also have "... = natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>c,d\<rangle>"
+    using assms(3) assms(4) swap_ap by auto
+  then show ?thesis using calculation by auto
+qed
+
+
+
+
+(*
+lemma Z_representation: 
+  assumes "z \<in>\<^sub>c \<int>\<^sub>c"
+  shows "\<exists> n m. (z = natpair2int \<circ>\<^sub>c \<langle>n, m\<rangle> \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<and> m \<in>\<^sub>c \<nat>\<^sub>c)"
+*)
+
+
+
+(*The above lemma justifies the following definition.*)
+
+(*
+definition neg_int :: "cfunc" where "neg_int = lift\<^sub>\<int> (natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c)"
+*)
+
+(*
+lemma neg_cancels_neg: 
+  assumes "n \<in>\<^sub>c \<int>\<^sub>c"
+  shows "neg_int  \<circ>\<^sub>c neg_int  \<circ>\<^sub>c n = n"
+proof - 
+  have "
+*)
 end
