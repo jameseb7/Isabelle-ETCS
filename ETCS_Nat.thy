@@ -248,6 +248,7 @@ proof (rule ccontr, auto)
 qed
 
 
+
 (* Proposition 2.6.6 *)
 lemma  oneUN_iso_N_isomorphism:
  "isomorphism(zero \<amalg> successor)" 

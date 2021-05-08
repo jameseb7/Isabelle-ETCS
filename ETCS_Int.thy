@@ -254,6 +254,7 @@ qed
 
 
 
+
 lemma equiv_is_natpair2int_eq:
   "\<langle>x, y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<longleftrightarrow> natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
   unfolding natpair2int_def int_def

@@ -140,5 +140,55 @@ proof -
     using m_type n_type comp_associative2 unfolding leq_def by (typecheck_cfuncs, auto)
 qed
 
+lemma add_monotonic:
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and u_type: "u \<in>\<^sub>c \<nat>\<^sub>c" and v_type: "v \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes m_leq_n: "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>" 
+  assumes u_leq_v: "leq \<circ>\<^sub>c \<langle>u, v\<rangle> = \<t>" 
+  shows "leq \<circ>\<^sub>c \<langle>m +\<^sub>\<nat> u, n +\<^sub>\<nat> v\<rangle> = \<t>" 
+proof - 
+  have m_leq_n_Eqn: "\<exists> k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> m = n"
+    by (simp add: leq_true_implies_exists m_leq_n m_type n_type)
+  have u_leq_v_Eqn: "\<exists> j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> j +\<^sub>\<nat> u = v"
+    by (simp add: leq_true_implies_exists u_leq_v u_type v_type)
+  have combined_Eqns: "\<exists> l. l \<in>\<^sub>c \<nat>\<^sub>c \<and> l +\<^sub>\<nat> (m +\<^sub>\<nat> u) = n +\<^sub>\<nat> v"
+    by (metis add_associates add_commutes add_type m_leq_n_Eqn m_type u_leq_v_Eqn u_type)
+  show "leq \<circ>\<^sub>c \<langle>m +\<^sub>\<nat> u, n +\<^sub>\<nat> v\<rangle> = \<t>"
+    by (metis add_type combined_Eqns exists_implies_leq_true m_type u_type)
+qed
+
+lemma leq_transitivity:
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and p_type: "p \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes m_leq_n: "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>" 
+  assumes n_leq_p: "leq \<circ>\<^sub>c \<langle>n, p\<rangle> = \<t>" 
+  shows "leq \<circ>\<^sub>c \<langle>m, p\<rangle> = \<t>" 
+proof - 
+   have m_leq_n_Eqn: "\<exists> k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> m = n"
+     by (simp add: leq_true_implies_exists m_leq_n m_type n_type)
+   obtain k where k_num: "k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> m = n"
+     using m_leq_n_Eqn by blast
+   have n_leq_p_Eqn: "\<exists> j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> j +\<^sub>\<nat> n = p"
+     by (simp add: leq_true_implies_exists n_leq_p n_type p_type)
+   obtain j where j_num: "j \<in>\<^sub>c \<nat>\<^sub>c \<and> j +\<^sub>\<nat> n = p"
+     using n_leq_p_Eqn by blast
+   have combined_Eqn: "(k +\<^sub>\<nat> j) +\<^sub>\<nat> m = p"
+     using add_associates add_commutes j_num k_num m_type by auto
+   have combined_Exists: "\<exists> l. l \<in>\<^sub>c \<nat>\<^sub>c \<and> l +\<^sub>\<nat> m = p"
+     using add_type combined_Eqn j_num k_num by blast
+   then show "leq \<circ>\<^sub>c \<langle>m, p\<rangle> = \<t>"
+     by (simp add: exists_implies_leq_true m_type p_type)
+ qed
+
+  
+
+
+(*
+lemma lqe_antisymmetry:
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes m_leq_n: "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>" 
+  assumes n_leq_m: "leq \<circ>\<^sub>c \<langle>n, m\<rangle> = \<t>" 
+  shows "m = n"
+proof - 
+  have "
+*)
 
 end
