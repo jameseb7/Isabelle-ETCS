@@ -229,6 +229,28 @@ lemma representation_map_exists:
   using NNtoZ_map_is_epic axiom_of_choice by blast
 
 
+definition int2natpair :: "cfunc"  where
+  "int2natpair = (SOME g . g sectionof natpair2int)"
+
+lemma int2natpair_type[type_rule]:
+  "int2natpair : \<int>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c"
+  unfolding int2natpair_def int_def
+  by (metis int_def cfunc_type_def nat2int_type representation_map_exists section_of_def someI_ex)
+
+
+lemma int2natpair_is_sectionof_natpair2int:
+  "int2natpair sectionof natpair2int"
+  by (metis int2natpair_def representation_map_exists someI_ex)
+
+lemma representation_theorem:
+  assumes "z \<in>\<^sub>c \<int>\<^sub>c"
+  shows "\<exists> m n. (m \<in>\<^sub>c \<nat>\<^sub>c \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<and> z = natpair2int \<circ>\<^sub>c \<langle>m, n \<rangle>)"
+proof - 
+  have some_representation: "\<exists> x. (x \<in>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)  \<and> z = natpair2int \<circ>\<^sub>c x)"
+    by (smt assms cfunc_type_def comp_associative comp_type id_left_unit nat2int_type representation_map_exists section_of_def)
+  then show "\<exists> m n. (m \<in>\<^sub>c \<nat>\<^sub>c \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<and> z = natpair2int \<circ>\<^sub>c \<langle>m, n \<rangle>)"
+    using cart_prod_decomp by blast
+qed
 
 
 
