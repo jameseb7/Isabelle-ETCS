@@ -213,10 +213,24 @@ definition int :: "cset" ("\<int>\<^sub>c") where
 definition natpair2int :: "cfunc" where
   "natpair2int = equiv_class (int_equiv_set,int_equiv_morphism)"
 
+
 lemma nat2int_type[type_rule]:
   "natpair2int : \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow> \<int>\<^sub>c"
   unfolding natpair2int_def int_def
   by (simp add: NN_rel_is_relation equiv_class_type)
+
+
+lemma NNtoZ_map_is_epic:
+  "epimorphism(natpair2int)"
+  by (metis NN_rel_is_relation canonical_quot_map_is_epi natpair2int_def)
+
+lemma representation_map_exists:
+"(\<exists> g . g sectionof natpair2int)"
+  using NNtoZ_map_is_epic axiom_of_choice by blast
+
+
+
+
 
 lemma equiv_is_natpair2int_eq:
   "\<langle>x, y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<longleftrightarrow> natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
@@ -280,25 +294,6 @@ qed
 
 
 
-(*
-lemma Z_representation: 
-  assumes "z \<in>\<^sub>c \<int>\<^sub>c"
-  shows "\<exists> n m. (z = natpair2int \<circ>\<^sub>c \<langle>n, m\<rangle> \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<and> m \<in>\<^sub>c \<nat>\<^sub>c)"
-*)
 
 
-
-(*The above lemma justifies the following definition.*)
-
-(*
-definition neg_int :: "cfunc" where "neg_int = lift\<^sub>\<int> (natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c)"
-*)
-
-(*
-lemma neg_cancels_neg: 
-  assumes "n \<in>\<^sub>c \<int>\<^sub>c"
-  shows "neg_int  \<circ>\<^sub>c neg_int  \<circ>\<^sub>c n = n"
-proof - 
-  have "
-*)
 end

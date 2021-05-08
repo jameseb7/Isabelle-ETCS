@@ -181,6 +181,11 @@ next
     using y_eq k_eq by auto
 qed
 
+lemma canonical_quot_map_is_epi:
+  assumes "equiv_rel_on X (R,m)"
+  shows "epimorphism((equiv_class (R,m)))"
+  by (meson assms canonical_quotient_map_is_coequalizer coequalizer_is_epimorphism)
+
 
 
 end
