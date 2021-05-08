@@ -131,6 +131,26 @@ lemma same_evals_equal:
   shows "eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f f) = eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f g) \<Longrightarrow> f = g"
   by (metis assms inv_transpose_func_def2 sharp_cancels_flat)
 
+lemma sharp_comp:
+  assumes "f : A \<times>\<^sub>c Z \<rightarrow> X" "g : W \<rightarrow> Z"
+  shows "f\<^sup>\<sharp> \<circ>\<^sub>c g = (f \<circ>\<^sub>c (id A \<times>\<^sub>f g))\<^sup>\<sharp>"
+proof (rule same_evals_equal[where Z=W, where X=X, where A=A])
+  show "f\<^sup>\<sharp> \<circ>\<^sub>c g : W \<rightarrow> X\<^bsup>A\<^esup>"
+    using assms by typecheck_cfuncs
+  show "(f \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f g)\<^sup>\<sharp> : W \<rightarrow> X\<^bsup>A\<^esup>"
+    using assms by typecheck_cfuncs
+
+  have "eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c g)) = eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (id A \<times>\<^sub>f g)"
+    using assms by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
+  also have "... = f \<circ>\<^sub>c (id A \<times>\<^sub>f g)"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
+  also have "... = eval_func X A \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f (f \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g))\<^sup>\<sharp>)"
+    using assms by (typecheck_cfuncs, simp add: transpose_func_def)
+
+  then show "eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c g)) = eval_func X A \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f (f \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g))\<^sup>\<sharp>)"
+    using calculation by auto
+qed
+
 lemma eval_func_X_one_injective:
   "injective (eval_func X one)"
 proof (cases "\<exists> x. x \<in>\<^sub>c X")
