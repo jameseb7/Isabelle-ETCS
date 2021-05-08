@@ -121,4 +121,29 @@ proof -
     by blast
 qed
 
+lemma exists_true_implies_EXISTS_true:
+  assumes p_type: "p : X \<rightarrow> \<Omega>" and exists_p_true: "\<exists> x. x \<in>\<^sub>c X \<and> p \<circ>\<^sub>c x = \<t>"
+  shows  "EXISTS X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
+proof -
+ have "\<not> (\<forall> x. x \<in>\<^sub>c X \<longrightarrow> p \<circ>\<^sub>c x \<noteq> \<t>)"
+   using exists_p_true by blast
+ then have "\<not> (\<forall> x. x \<in>\<^sub>c X \<longrightarrow> NOT \<circ>\<^sub>c (p \<circ>\<^sub>c x) = \<t>)"
+   using NOT_true_is_false true_false_distinct by auto
+ then have "\<not> (\<forall> x. x \<in>\<^sub>c X \<longrightarrow> (NOT \<circ>\<^sub>c p) \<circ>\<^sub>c x = \<t>)"
+   using p_type by (typecheck_cfuncs, metis NOT_true_is_false cfunc_type_def comp_associative exists_p_true true_false_distinct)
+ then have "FORALL X \<circ>\<^sub>c ((NOT \<circ>\<^sub>c p) \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> \<noteq> \<t>"
+   using FORALL_true_implies_all_true NOT_type comp_type p_type by blast
+ then have "FORALL X \<circ>\<^sub>c (NOT \<circ>\<^sub>c p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> \<noteq> \<t>"
+   using NOT_type cfunc_type_def comp_associative left_cart_proj_type p_type by auto
+ then have "NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c (NOT \<circ>\<^sub>c p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
+   using assms NOT_is_false_implies_true true_false_only_truth_values by (typecheck_cfuncs, blast)
+ then have "NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c NOT\<^bsup>X\<^esup>\<^sub>f \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
+   using assms transpose_of_comp by (typecheck_cfuncs, auto)
+ then have "(NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c NOT\<^bsup>X\<^esup>\<^sub>f) \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
+    using assms cfunc_type_def comp_associative by (typecheck_cfuncs,auto)
+ then show "EXISTS X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
+  by (simp add: EXISTS_def)
+qed
+
+
 end
