@@ -90,4 +90,35 @@ proof (rule ccontr)
     using true_false_distinct by auto
 qed
 
+definition EXISTS :: "cset \<Rightarrow> cfunc" where
+  "EXISTS X = NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c NOT\<^bsup>X\<^esup>\<^sub>f"
+
+lemma EXISTS_type[type_rule]:
+  "EXISTS X : \<Omega>\<^bsup>X\<^esup> \<rightarrow> \<Omega>"
+  unfolding EXISTS_def by typecheck_cfuncs
+
+lemma EXISTS_true_implies_exists_true:
+  assumes p_type: "p : X \<rightarrow> \<Omega>" and EXISTS_p_true: "EXISTS X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
+  shows "\<exists> x. x \<in>\<^sub>c X \<and> p \<circ>\<^sub>c x = \<t>"
+proof -
+  have "NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c NOT\<^bsup>X\<^esup>\<^sub>f \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
+    using p_type EXISTS_p_true cfunc_type_def comp_associative comp_type
+    unfolding EXISTS_def
+    by (typecheck_cfuncs, auto)
+  then have "NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c (NOT \<circ>\<^sub>c p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
+    using p_type transpose_of_comp by (typecheck_cfuncs, auto)
+  then have "FORALL X \<circ>\<^sub>c (NOT \<circ>\<^sub>c p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> \<noteq> \<t>"
+    using NOT_true_is_false true_false_distinct by auto
+  then have "FORALL X \<circ>\<^sub>c ((NOT \<circ>\<^sub>c p) \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> \<noteq> \<t>"
+    using p_type comp_associative2 by (typecheck_cfuncs, auto)
+  then have "\<not> (\<forall> x. x \<in>\<^sub>c X \<longrightarrow> (NOT \<circ>\<^sub>c p) \<circ>\<^sub>c x = \<t>)"
+    using NOT_type all_true_implies_FORALL_true comp_type p_type by blast
+  then have "\<not> (\<forall> x. x \<in>\<^sub>c X \<longrightarrow> NOT \<circ>\<^sub>c (p \<circ>\<^sub>c x) = \<t>)"
+    using p_type comp_associative2 by (typecheck_cfuncs, auto)
+  then have "\<not> (\<forall> x. x \<in>\<^sub>c X \<longrightarrow> p \<circ>\<^sub>c x \<noteq> \<t>)"
+    using NOT_false_is_true comp_type p_type true_false_only_truth_values by fastforce
+  then show "\<exists>x. x \<in>\<^sub>c X \<and> p \<circ>\<^sub>c x = \<t>"
+    by blast
+qed
+
 end
