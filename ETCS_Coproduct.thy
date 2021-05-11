@@ -325,14 +325,38 @@ have fact4: "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c
 
 qed
 
-(*
+lemma maps_into_1u1:
+  assumes x_type:  "x\<in>\<^sub>c (one \<Coprod> one)"
+  shows "(x = left_coproj one one) \<or> (x = right_coproj one one)"
+  using assms by (typecheck_cfuncs, metis coprojs_jointly_surj terminal_func_unique)
+
+
 (*Proposition 2.4.4*)
 lemma truth_value_set_iso_1u1:
   "isomorphism(\<t>\<amalg>\<f>)"
-  unfolding isomorphism_def
-proof 
-  oops
-*)
+proof- 
+  have "\<forall>z. z \<in>\<^sub>c (one \<Coprod> one) \<longrightarrow>  (\<exists> x. (x \<in>\<^sub>c one \<and> z = (left_coproj one one) \<circ>\<^sub>c x))
+      \<or>  (\<exists> y. (y \<in>\<^sub>c one \<and> z = (right_coproj one one) \<circ>\<^sub>c y))"
+    by (simp add: coprojs_jointly_surj)
+  have tf_type: "(\<t>\<amalg>\<f>) : (one \<Coprod> one) \<rightarrow> \<Omega>"
+    by (simp add: cfunc_coprod_type false_func_type true_func_type)
+  have epic: "epimorphism(\<t>\<amalg>\<f>)"
+    by (metis cfunc_type_def false_func_type left_coproj_cfunc_coprod left_proj_type right_coproj_cfunc_coprod right_proj_type surjective_def surjective_is_epimorphism tf_type true_false_only_truth_values true_func_type)
+  have injective: "injective(\<t>\<amalg>\<f>)"
+    unfolding injective_def 
+  proof(auto)
+    fix x y
+    assume x_type: "x \<in>\<^sub>c domain (\<t> \<amalg> \<f>)"
+    assume y_type: "y \<in>\<^sub>c domain (\<t> \<amalg> \<f>)"
+    assume equals: "\<t> \<amalg> \<f> \<circ>\<^sub>c x = \<t> \<amalg> \<f> \<circ>\<^sub>c y"
+    show "x=y"
+      by (metis cfunc_type_def equals false_func_type left_coproj_cfunc_coprod maps_into_1u1 right_coproj_cfunc_coprod tf_type true_false_distinct true_func_type x_type y_type)
+  qed
+  have mono: "monomorphism(\<t>\<amalg>\<f>)"
+    using injective injective_imp_monomorphism by auto
+  then show ?thesis
+    using epi_mon_is_iso epic by auto
+qed
 
 
 end
