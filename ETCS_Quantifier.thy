@@ -145,9 +145,11 @@ proof -
   by (simp add: EXISTS_def)
 qed
 
+
 lemma OR_monomorphism_map_type:
 "\<langle>id \<Omega>,\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>\<rangle>\<amalg>\<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>,id \<Omega>\<rangle>: \<Omega>\<Coprod>\<Omega> \<rightarrow> \<Omega>\<times>\<^sub>c\<Omega>"
   by (meson cfunc_coprod_type cfunc_prod_type comp_type id_type terminal_func_type true_func_type)
+
 
 definition OR :: "cfunc" where
   "OR = (THE \<chi>. is_pullback  (\<Omega>\<Coprod>\<Omega>) one (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>\<Omega>\<Coprod>\<Omega>\<^esub>) \<t> (\<langle>id \<Omega>,\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>\<rangle>\<amalg>\<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>,id \<Omega>\<rangle>) \<chi>)"

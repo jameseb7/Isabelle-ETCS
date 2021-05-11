@@ -357,6 +357,8 @@ proof -
     using eq1 eq2 cfunc_type_def g_type iso_type isomorphism_def by auto
 qed
 
+
+
 (* Corollary *)
 lemma oneUN_iso_N:
   "one \<Coprod> \<nat>\<^sub>c \<cong> \<nat>\<^sub>c"
@@ -395,6 +397,12 @@ proof -
   then show "injective successor \<and> \<not> surjective successor"
     using monomorphism_imp_injective succ_mono by blast
 qed
+
+lemma nonzero_is_succ_pre:
+  assumes "x \<in>\<^sub>c (one \<Coprod> \<nat>\<^sub>c)"
+  shows "(x = (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one) \<or>
+         (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c) \<and> (x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n ))"
+
 
 lemma succ_inject:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c" "m \<in>\<^sub>c \<nat>\<^sub>c"
