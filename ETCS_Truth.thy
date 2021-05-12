@@ -156,6 +156,22 @@ lemma fiber_morphism_monomorphism:
   shows "monomorphism (fiber_morphism f y)"
   using assms cfunc_type_def element_monomorphism fiber_morphism_def inverse_image_monomorphism by auto
 
+lemma fiber_morphism_eq:
+  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
+  shows "f \<circ>\<^sub>c fiber_morphism f y  = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
+proof -
+  have "f \<circ>\<^sub>c fiber_morphism f y = f \<circ>\<^sub>c left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
+    unfolding fiber_morphism_def by auto
+  also have "... = y \<circ>\<^sub>c right_cart_proj X one \<circ>\<^sub>c inverse_image_mapping f one y"
+    using assms cfunc_type_def element_monomorphism inverse_image_mapping_eq by auto
+  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1[one]\<^bsub>y\<^esub>\<^esub>"
+    using assms by (typecheck_cfuncs, metis element_monomorphism terminal_func_unique)
+  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
+    unfolding fiber_def by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
 (* Proposition 2.2.7 *)
 lemma not_surjective_has_some_empty_preimage:
   assumes "p: X \<rightarrow> Y" "\<not>surjective(p)"
