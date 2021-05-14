@@ -181,14 +181,48 @@ proof -
   
 
 
-(*
+
 lemma lqe_antisymmetry:
   assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
   assumes m_leq_n: "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>" 
   assumes n_leq_m: "leq \<circ>\<^sub>c \<langle>n, m\<rangle> = \<t>" 
   shows "m = n"
 proof - 
-  have "
-*)
+  have k_exists: "\<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> n = m"
+    by (simp add: leq_true_implies_exists m_type n_leq_m n_type)
+  obtain k where k_def: "k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> n = m"
+    using k_exists by blast
+  have j_exists: "\<exists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> j +\<^sub>\<nat> m = n"
+    by (simp add: leq_true_implies_exists m_leq_n m_type n_type)
+  obtain j where j_def: "j \<in>\<^sub>c \<nat>\<^sub>c \<and> j +\<^sub>\<nat> m = n"
+    using j_exists by blast
+  have "zero +\<^sub>\<nat> m = k +\<^sub>\<nat> n"
+    by (simp add: add_respects_zero_on_left k_def m_type)
+  also have "... = (k +\<^sub>\<nat> j) +\<^sub>\<nat> m"
+    using add_associates j_def k_def m_type by blast
+  then have zero_is_kplsj: "zero = k +\<^sub>\<nat> j"
+    by (metis  add_cancellative add_type calculation j_def k_def n_type zero_type)
+  have "k = zero"
+  proof(rule ccontr)
+    assume bwoc: "k \<noteq> zero"
+    have k_is_succ: "\<exists>a. (a \<in>\<^sub>c \<nat>\<^sub>c \<and> k = successor \<circ>\<^sub>c a)"
+      by (simp add: bwoc k_def nonzero_is_succ)
+    obtain a where a_def: "a \<in>\<^sub>c \<nat>\<^sub>c \<and> k = successor \<circ>\<^sub>c a"
+      using k_is_succ by blast
+    have "zero = successor \<circ>\<^sub>c (a +\<^sub>\<nat> j)"
+      by (simp add: a_def add_respects_succ3 j_def zero_is_kplsj)
+    then show False
+      using a_def add_type  j_def zero_is_not_successor by auto
+  qed
+  then show ?thesis
+    using add_respects_zero_on_left k_def n_type by blast
+qed
+
+   
+
+lemma nonzero_is_succ:
+  assumes "k \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "k \<noteq> zero"
+  shows "\<exists>n. k = successor \<circ>\<^sub>c n"
 
 end

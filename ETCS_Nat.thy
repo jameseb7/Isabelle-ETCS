@@ -377,10 +377,12 @@ proof(auto)
 qed
 
 
+
+
 lemma nonzero_is_succ:
   assumes "k \<in>\<^sub>c \<nat>\<^sub>c"
   assumes "k \<noteq> zero"
-  shows "\<exists>n. k = successor \<circ>\<^sub>c n"
+  shows "\<exists>n.(n\<in>\<^sub>c \<nat>\<^sub>c \<and> k = successor \<circ>\<^sub>c n)"
 proof - 
   have x_exists: "\<exists>x. ((x \<in>\<^sub>c one \<Coprod> \<nat>\<^sub>c) \<and> (zero \<amalg> successor \<circ>\<^sub>c x = k))"
     using assms cfunc_type_def surjective_def zUs_surj by (typecheck_cfuncs, auto)
@@ -408,9 +410,9 @@ proof -
   also have "... = successor \<circ>\<^sub>c n"
     using right_coproj_cfunc_coprod successor_type zero_type by auto
   then show ?thesis
-    using calculation by blast
+    using   calculation n_def by auto
 qed
-  
+
 
 (* Corollary *)
 lemma oneUN_iso_N:
@@ -450,12 +452,6 @@ proof -
   then show "injective successor \<and> \<not> surjective successor"
     using monomorphism_imp_injective succ_mono by blast
 qed
-
-lemma nonzero_is_succ_pre:
-  assumes "x \<in>\<^sub>c (one \<Coprod> \<nat>\<^sub>c)"
-  shows "(x = (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one) \<or>
-         (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c) \<and> (x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n ))"
-
 
 lemma succ_inject:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c" "m \<in>\<^sub>c \<nat>\<^sub>c"
