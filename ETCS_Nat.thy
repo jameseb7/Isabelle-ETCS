@@ -249,6 +249,7 @@ qed
 
 
 
+
 (* Proposition 2.6.6 *)
 lemma  oneUN_iso_N_isomorphism:
  "isomorphism(zero \<amalg> successor)" 
@@ -357,7 +358,59 @@ proof -
     using eq1 eq2 cfunc_type_def g_type iso_type isomorphism_def by auto
 qed
 
+lemma zUs_epic:
+ "epimorphism(zero \<amalg> successor)"
+  by (simp add: iso_imp_epi_and_monic oneUN_iso_N_isomorphism)
 
+lemma zUs_surj:
+ "surjective(zero \<amalg> successor)"
+  by (simp add: cfunc_type_def epi_is_surj zUs_epic)
+
+lemma nonzero_is_succ_pre:
+  assumes "x \<in>\<^sub>c  (one \<Coprod> \<nat>\<^sub>c)"
+  shows "(x = (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one) \<or>
+         (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c) \<and> (x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n ))"
+proof(auto)
+  assume not_this: "\<forall> n. n \<in>\<^sub>c  \<nat>\<^sub>c  \<longrightarrow>  x \<noteq> right_coproj one \<nat>\<^sub>c \<circ>\<^sub>c n"
+  show "x = left_coproj one \<nat>\<^sub>c  \<circ>\<^sub>c  id one"
+    using assms not_this coprojs_jointly_surj one_unique_element by (typecheck_cfuncs, blast)
+qed
+
+
+lemma nonzero_is_succ:
+  assumes "k \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "k \<noteq> zero"
+  shows "\<exists>n. k = successor \<circ>\<^sub>c n"
+proof - 
+  have x_exists: "\<exists>x. ((x \<in>\<^sub>c one \<Coprod> \<nat>\<^sub>c) \<and> (zero \<amalg> successor \<circ>\<^sub>c x = k))"
+    using assms cfunc_type_def surjective_def zUs_surj by (typecheck_cfuncs, auto)
+  obtain x where x_def: "((x \<in>\<^sub>c one \<Coprod> \<nat>\<^sub>c) \<and> (zero \<amalg> successor \<circ>\<^sub>c x = k))"
+    using x_exists by blast
+  have cases:  "(x = (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one) \<or> 
+                (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c \<and> x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n))"
+    by (simp add: nonzero_is_succ_pre x_def)
+  have not_case_1: "x \<noteq> (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one"
+  proof(rule ccontr,auto)
+    assume bwoc: "x = left_coproj one \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c one"
+    have contradiction: "k = zero"
+      by (metis bwoc id_right_unit2 left_coproj_cfunc_coprod left_proj_type successor_type x_def zero_type)
+    show False
+      using contradiction assms(2) by force
+  qed
+  then obtain n where n_def: "n \<in>\<^sub>c \<nat>\<^sub>c \<and> x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n"
+    using cases by blast
+  then have "k = zero \<amalg> successor \<circ>\<^sub>c x"
+    using x_def by blast
+  also have "... = zero \<amalg> successor \<circ>\<^sub>c  right_coproj one \<nat>\<^sub>c \<circ>\<^sub>c n"
+    by (simp add: n_def)
+  also have "... =  (zero \<amalg> successor \<circ>\<^sub>c  right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n"
+    using cfunc_coprod_type cfunc_type_def comp_associative n_def right_proj_type successor_type zero_type by auto
+  also have "... = successor \<circ>\<^sub>c n"
+    using right_coproj_cfunc_coprod successor_type zero_type by auto
+  then show ?thesis
+    using calculation by blast
+qed
+  
 
 (* Corollary *)
 lemma oneUN_iso_N:

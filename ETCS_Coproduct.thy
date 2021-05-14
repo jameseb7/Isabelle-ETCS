@@ -167,17 +167,6 @@ lemma char_of_singleton4:
 *)
 
 
-lemma char_of_singleton1: 
-    assumes "x \<in>\<^sub>c X" 
-    shows  "eq_pred X \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>, id X\<rangle> \<circ>\<^sub>c x = \<t>"
-    using assms cart_prod_extract_right eq_pred_iff_eq by fastforce
-
-lemma char_of_singleton2: 
-    assumes "x \<in>\<^sub>c X"  "y \<in>\<^sub>c X" "x \<noteq> y"
-    shows  "eq_pred X \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>, id X\<rangle> \<circ>\<^sub>c y = \<f>"
-    using assms cart_prod_extract_right eq_pred_iff_eq true_false_only_truth_values  by (typecheck_cfuncs, fastforce)
-
-
 
 
 (*Proposition 2.4.3*)
