@@ -220,9 +220,4 @@ qed
 
    
 
-lemma nonzero_is_succ:
-  assumes "k \<in>\<^sub>c \<nat>\<^sub>c"
-  assumes "k \<noteq> zero"
-  shows "\<exists>n. k = successor \<circ>\<^sub>c n"
-
 end
