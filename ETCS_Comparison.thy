@@ -730,7 +730,8 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<cir
     using \<open>(OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>m,n\<rangle>,leq \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>\<close> calculation by presburger
 
   then show ?thesis
-    by (smt OR_false_false_is_false cfunc_prod_type comp_type leq_type m_type n_type true_false_only_truth_values)
+    using OR_true_implies_one_is_true cfunc_prod_type comp_type leq_type m_type n_type by blast
+    
 qed
 
 

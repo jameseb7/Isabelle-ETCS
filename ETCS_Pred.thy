@@ -207,4 +207,12 @@ lemma OR_true_right_is_true:
   using assms NOR_right_true_is_false NOT_false_is_true comp_associative2
   by (typecheck_cfuncs, force)
 
+
+lemma OR_true_implies_one_is_true:
+  assumes "p \<in>\<^sub>c \<Omega>" 
+  assumes "q \<in>\<^sub>c \<Omega>"
+  assumes "OR \<circ>\<^sub>c \<langle>p,q\<rangle> = \<t>"
+  shows "(p = \<t>) \<or> (q = \<t>)"
+  by (metis OR_false_false_is_false assms true_false_only_truth_values) 
+
 end
