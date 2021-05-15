@@ -224,20 +224,9 @@ lemma zero_is_smallest:
   using add_respects_zero_on_right assms exists_implies_leq_true zero_type by blast
 
 lemma lqe_connexity:
-"\<forall> n m. (n \<in>\<^sub>c \<nat>\<^sub>c \<and>  m \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> (leq \<circ>\<^sub>c \<langle>n, m\<rangle> = \<t>) \<or> (leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>))"
-  (*assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(leq \<circ>\<^sub>c \<langle>n, m\<rangle> = \<t>) \<or> (leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>)"*)
-proof(rule ccontr, auto)
-  assume " \<And>n m. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> m \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> leq \<circ>\<^sub>c \<langle>n,m\<rangle> \<noteq> \<t> \<Longrightarrow> leq \<circ>\<^sub>c \<langle>m,n\<rangle> \<noteq> \<t>"
-(*
-  assume a1: "leq \<circ>\<^sub>c \<langle>n,m\<rangle> \<noteq> \<t>"
-  assume a2: "leq \<circ>\<^sub>c \<langle>m,n\<rangle> \<noteq> \<t>"
-  have n_nleq_m: "leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<f>"
-    using assms  a1 true_false_only_truth_values by (typecheck_cfuncs, blast)
-  have m_nleq_n: "leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>"
-    using assms  a2 true_false_only_truth_values by (typecheck_cfuncs, blast)
-*)    
-
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(leq \<circ>\<^sub>c \<langle>n, m\<rangle> = \<t>) \<or> (leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>)"
+proof-
 
   have main_result: "(OR \<circ>\<^sub>c \<langle>
 leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
@@ -343,7 +332,7 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left
           qed
         qed
       qed
-      show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c successor =
+    show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c successor =
     id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp>"
       proof(rule same_evals_equal[where Z = "\<nat>\<^sub>c", where X = \<Omega>,where A = "\<nat>\<^sub>c"])
         show type_fact9: "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>"
@@ -363,11 +352,17 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left
           show "\<And>x. x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
          (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c  x =
          (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp>) \<circ>\<^sub>cx"
-          proof - 
+          proof -
             fix x
             assume x_def: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+
+            
+            
+            
             show "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c  x =
          (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp>) \<circ>\<^sub>cx"
+            
+
             proof - 
               have calc1: "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c  x =
                     (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp>)\<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c  x"
@@ -460,37 +455,19 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left
                 by (simp add: cfunc_prod_type m_def succ_n_type)
               have smn_type: "\<langle>successor \<circ>\<^sub>c m,n\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
                 by (simp add: cfunc_prod_type m_def succ_n_type)
+
               have "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
           (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
                   leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
-          successor) \<circ>\<^sub>c x = 
-                  (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
-                            (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
-                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c
-                           (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c x"
-                by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def2 inv_transpose_of_composition x_is)
-              also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
-                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
-                           (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c \<langle>n,m\<rangle>" 
-                by (typecheck_cfuncs, smt cfunc_type_def comp_associative m_def transpose_func_def)
-                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
-                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
-                            \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c n,successor \<circ>\<^sub>c m\<rangle>" 
-                  using cfunc_cross_prod_comp_cfunc_prod m_def by (typecheck_cfuncs, auto)
-                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
-                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
-                            \<langle>n,successor \<circ>\<^sub>c m\<rangle>"
-                  using id_left_unit2 m_def by auto 
-                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> ,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>\<rangle>  ,
-                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>   ,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>  \<rangle>  \<rangle>"
-                  using nsm_type by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
-               also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n ,successor \<circ>\<^sub>c m\<rangle>  ,  leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m  ,n  \<rangle>\<rangle>"
-                 using left_cart_proj_cfunc_prod m_def right_cart_proj_cfunc_prod succ_n_type by auto     
-               also have "... =  \<f>"
-               proof(cases "leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<f> \<and>  leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>", auto)    
-                 assume "leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<f>"
-                 assume "leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>"
-                 have "(leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> = \<f>)  \<and> (leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m,n\<rangle> = \<f>)"
+          successor) \<circ>\<^sub>c \<langle>n,m\<rangle> =
+         (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c
+          (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>n,m\<rangle>"
+              proof(cases "leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<f> \<and>  leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>", auto)  
+                assume "leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<f>"
+                assume "leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>"
+
+                have "(leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> = \<f>)  \<and> (leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m,n\<rangle> = \<f>)"
                  proof(rule ccontr,auto)
                    assume  "leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> \<noteq> \<f>"
                    then have "leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> = \<t>"
@@ -545,42 +522,218 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left
                    then show False
                      by (metis \<open>leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>\<close>  add_respects_succ2 exists_implies_leq_true leq_true_implies_exists m_def succ_n_type true_false_distinct)
                  qed
-                 show ?thesis
-                   by (simp add: OR_false_false_is_false \<open>leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> = \<f> \<and> leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m,n\<rangle> = \<f>\<close>)
-               next
-                 assume "leq \<circ>\<^sub>c \<langle>n,m\<rangle> \<noteq> \<f>"
-                 have "leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<f>"
-                   using \<open>\<And>n m. \<lbrakk>n \<in>\<^sub>c \<nat>\<^sub>c; m \<in>\<^sub>c \<nat>\<^sub>c; leq \<circ>\<^sub>c \<langle>n,m\<rangle> \<noteq> \<t>\<rbrakk> \<Longrightarrow> leq \<circ>\<^sub>c \<langle>m,n\<rangle> \<noteq> \<t>\<close> lqe_antisymmetry succ_n_type zero_is_not_successor zero_is_smallest zero_type by blast
-                 show ?thesis
-                   using \<open>leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<f>\<close> \<open>leq \<circ>\<^sub>c \<langle>n,m\<rangle> \<noteq> \<f>\<close> by blast
-               
-               next 
-                 assume "leq \<circ>\<^sub>c \<langle>m,n\<rangle> \<noteq> \<f>"
-                 then have   "leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>"
-                   using \<open>\<And>n m. \<lbrakk>n \<in>\<^sub>c \<nat>\<^sub>c; m \<in>\<^sub>c \<nat>\<^sub>c; leq \<circ>\<^sub>c \<langle>n,m\<rangle> \<noteq> \<t>\<rbrakk> \<Longrightarrow> leq \<circ>\<^sub>c \<langle>m,n\<rangle> \<noteq> \<t>\<close> lqe_antisymmetry succ_n_type zero_is_not_successor zero_is_smallest zero_type by blast
-                 show ?thesis
-                   using \<open>leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>\<close> \<open>leq \<circ>\<^sub>c \<langle>m,n\<rangle> \<noteq> \<f>\<close> by blast
-               qed
-               have "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
+                 
+
+
+
+
+              have "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
           (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
                   leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
-          successor) \<circ>\<^sub>c x = \<f>"
-                 using \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>,leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m,n\<rangle>\<rangle> = \<f>\<close> calculation by presburger
+          successor) \<circ>\<^sub>c \<langle>n,m\<rangle>= 
+                  (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
+                            (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c
+                           (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c \<langle>n,m\<rangle>"
+                by (typecheck_cfuncs, smt cfunc_type_def comp_associative inv_transpose_func_def2 inv_transpose_of_composition m_def)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                           (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c \<langle>n,m\<rangle>" 
+                by (typecheck_cfuncs, smt cfunc_type_def comp_associative m_def transpose_func_def)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                            \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c n,successor \<circ>\<^sub>c m\<rangle>" 
+                  using cfunc_cross_prod_comp_cfunc_prod m_def by (typecheck_cfuncs, auto)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                            \<langle>n,successor \<circ>\<^sub>c m\<rangle>"
+                  using id_left_unit2 m_def by auto 
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> ,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>\<rangle>  ,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>   ,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>  \<rangle>  \<rangle>"
+                  using nsm_type by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+               also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n ,successor \<circ>\<^sub>c m\<rangle>  ,  leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m  ,n  \<rangle>\<rangle>"
+                 using left_cart_proj_cfunc_prod m_def right_cart_proj_cfunc_prod succ_n_type by auto     
+               also have "... =  \<f>"
+                 by (simp add: OR_false_false_is_false \<open>leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> = \<f> \<and> leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m,n\<rangle> = \<f>\<close>)
+
                have "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c
           (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
-                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c x =
-                    
-          OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c  \<nat>\<^sub>c\<rangle>,
-                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c x"
-                 using comp_associative2 id_left_unit2 transpose_func_def x_is by (typecheck_cfuncs, auto)
-               also have "...  =  OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c x,right_cart_proj \<nat>\<^sub>c  \<nat>\<^sub>c \<circ>\<^sub>c x\<rangle>,
-                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c x,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c x\<rangle>\<rangle>"
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>n,m\<rangle> = 
+                OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle>"
+                 by (typecheck_cfuncs, smt comp_associative2 id_left_unit2 m_def transpose_func_def x_is)
+               also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>  ,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle> \<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c  \<circ>\<^sub>c \<langle>n,m\<rangle> ,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle> \<rangle>\<rangle> "
+                 by (typecheck_cfuncs , smt cfunc_prod_comp comp_associative2 m_def x_is)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n  ,m  \<rangle>, leq \<circ>\<^sub>c \<langle>m ,n \<rangle>\<rangle> "
+                  by (typecheck_cfuncs, metis left_cart_proj_cfunc_prod m_def right_cart_proj_cfunc_prod)                             
+                also have "... =  \<f>"
+                  by (simp add: OR_false_false_is_false \<open>leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<f>\<close> \<open>leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<f>\<close>)
+
+                then show ?thesis
+                  by (simp add: \<open>(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>n,m\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n,m\<rangle>,leq \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>,leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m,n\<rangle>\<rangle> = \<f>\<close> calculation)
+              
+              next
+                assume "leq \<circ>\<^sub>c \<langle>n,m\<rangle> \<noteq> \<f>"
+                then have "leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<t>"
+                  using  m_def true_false_only_truth_values by (typecheck_cfuncs, blast)
+
+                then have "leq \<circ>\<^sub>c \<langle>n ,successor \<circ>\<^sub>c m\<rangle> = \<t>"
+                  by (metis add_respects_succ3 exists_implies_leq_true leq_true_implies_exists m_def succ_n_type)
+                
+                
+                have "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
+          (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
+          successor) \<circ>\<^sub>c \<langle>n,m\<rangle>= 
+                  (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
+                            (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c
+                           (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c \<langle>n,m\<rangle>"
+                by (typecheck_cfuncs, smt cfunc_type_def comp_associative inv_transpose_func_def2 inv_transpose_of_composition m_def)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                           (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c \<langle>n,m\<rangle>" 
+                by (typecheck_cfuncs, smt cfunc_type_def comp_associative m_def transpose_func_def)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                            \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c n,successor \<circ>\<^sub>c m\<rangle>" 
+                  using cfunc_cross_prod_comp_cfunc_prod m_def by (typecheck_cfuncs, auto)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                            \<langle>n,successor \<circ>\<^sub>c m\<rangle>"
+                  using id_left_unit2 m_def by auto 
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> ,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>\<rangle>  ,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>   ,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>  \<rangle>  \<rangle>"
+                  using nsm_type by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+               also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n ,successor \<circ>\<^sub>c m\<rangle>  ,  leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m  ,n  \<rangle>\<rangle>"
+                 using left_cart_proj_cfunc_prod m_def right_cart_proj_cfunc_prod succ_n_type by auto     
+               also have "... =  \<t>"
+                 using OR_true_left_is_true \<open>leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> = \<t>\<close> comp_type leq_type smn_type by auto
+
+               have "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c
+          (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>n,m\<rangle> = 
+                OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle>"
+                 by (typecheck_cfuncs, smt comp_associative2 id_left_unit2 m_def transpose_func_def x_is)
+               also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>  ,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle> \<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c  \<circ>\<^sub>c \<langle>n,m\<rangle> ,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle> \<rangle>\<rangle> "
+                 by (typecheck_cfuncs , smt cfunc_prod_comp comp_associative2 m_def x_is)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n  ,m  \<rangle>, leq \<circ>\<^sub>c \<langle>m ,n \<rangle>\<rangle> "
+                  by (typecheck_cfuncs, metis left_cart_proj_cfunc_prod m_def right_cart_proj_cfunc_prod)                             
+                also have "... =  \<t>"
+                  by (typecheck_cfuncs, simp add: OR_true_left_is_true \<open>leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<t>\<close> m_def)
+
+                then show ?thesis
+                  by (simp add: \<open>(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>n,m\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n,m\<rangle>,leq \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>,leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m,n\<rangle>\<rangle> = \<t>\<close> calculation)
+
+              next
+                assume "leq \<circ>\<^sub>c \<langle>m,n\<rangle> \<noteq> \<f>"
+                then have "leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>"
+                  using  m_def true_false_only_truth_values by (typecheck_cfuncs, blast)
+
+   then have "leq \<circ>\<^sub>c \<langle>m ,successor \<circ>\<^sub>c n\<rangle> = \<t>"
+                  by (metis add_respects_succ3 exists_implies_leq_true leq_true_implies_exists m_def succ_n_type)
+                
+                
+                have "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
+          (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
+          successor) \<circ>\<^sub>c \<langle>n,m\<rangle>= 
+                  (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
+                            (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c
+                           (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c \<langle>n,m\<rangle>"
+                by (typecheck_cfuncs, smt cfunc_type_def comp_associative inv_transpose_func_def2 inv_transpose_of_composition m_def)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                           (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor) \<circ>\<^sub>c \<langle>n,m\<rangle>" 
+                by (typecheck_cfuncs, smt cfunc_type_def comp_associative m_def transpose_func_def)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                            \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c n,successor \<circ>\<^sub>c m\<rangle>" 
+                  using cfunc_cross_prod_comp_cfunc_prod m_def by (typecheck_cfuncs, auto)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>\<circ>\<^sub>c
+                            \<langle>n,successor \<circ>\<^sub>c m\<rangle>"
+                  using id_left_unit2 m_def by auto 
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> ,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>\<rangle>  ,
+                                    leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>   ,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>  \<rangle>  \<rangle>"
+                  using nsm_type by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+               also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n ,successor \<circ>\<^sub>c m\<rangle>  ,  leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m  ,n  \<rangle>\<rangle>"
+                 using left_cart_proj_cfunc_prod m_def right_cart_proj_cfunc_prod succ_n_type by auto     
+               also have "... =  \<t>"
+                 using OR_true_left_is_true \<open>leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle> = \<t>\<close> comp_type leq_type smn_type by auto
+
+               have "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c
+          (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>n,m\<rangle> = 
+                OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle>"
+                 by (typecheck_cfuncs, smt comp_associative2 id_left_unit2 m_def transpose_func_def x_is)
+               also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>  ,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle> \<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c  \<circ>\<^sub>c \<langle>n,m\<rangle> ,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle> \<rangle>\<rangle> "
+                 by (typecheck_cfuncs , smt cfunc_prod_comp comp_associative2 m_def x_is)
+                also have "... = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n  ,m  \<rangle>, leq \<circ>\<^sub>c \<langle>m ,n \<rangle>\<rangle> "
+                  by (typecheck_cfuncs, metis left_cart_proj_cfunc_prod m_def right_cart_proj_cfunc_prod)                             
+                also have "... =  \<t>"
+                  using OR_true_right_is_true \<open>leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>\<close> comp_type leq_type m_def x_is by auto
+
+                then show ?thesis
+                  by (simp add: \<open>(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>n,m\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n,m\<rangle>,leq \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c \<langle>n,m\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>\<rangle>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c m\<rangle>,leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m,n\<rangle>\<rangle> = \<t>\<close> calculation)
+              qed
+
+              show "(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
+          (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
+          successor) \<circ>\<^sub>c x =
+         (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c
+          (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                  leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c x"
+                using \<open>(eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c \<langle>n,m\<rangle> = (eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>n,m\<rangle>\<close> m_def by force
            
-                 
-(*
-(*The final in the main 6*)
-      show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c successor =
-    id\<^sub>c (\<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub>)\<^sup>\<sharp>"
-*)
+            qed
+
+          qed
+
+        qed
+      qed
+
+have flat_main_result: "(OR \<circ>\<^sub>c \<langle>
+leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>
+\<rangle>) = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c\<^esub>)"
+  by (typecheck_cfuncs, metis main_result transpose_func_def)
+
+
+  have "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>"  
+    using assms by (typecheck_cfuncs,  smt comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+  then  have "(OR \<circ>\<^sub>c \<langle>
+leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>
+\<rangle>) \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>"
+    by (simp add: flat_main_result)  
+  have "(OR \<circ>\<^sub>c \<langle>
+leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>
+\<rangle>) \<circ>\<^sub>c \<langle>m,n\<rangle> = 
+OR \<circ>\<^sub>c \<langle>
+leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c  \<circ>\<^sub>c \<langle>m,n\<rangle> , right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c   \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>,
+leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>
+\<rangle>"
+    using assms by (typecheck_cfuncs , smt cfunc_prod_comp comp_associative2)
+  also have "... = OR \<circ>\<^sub>c \<langle> leq \<circ>\<^sub>c \<langle>m , n\<rangle>, leq \<circ>\<^sub>c \<langle>n, m\<rangle>\<rangle>"
+    using left_cart_proj_cfunc_prod m_type n_type right_cart_proj_cfunc_prod by auto
+
+  then  have "OR \<circ>\<^sub>c \<langle> leq \<circ>\<^sub>c \<langle>m , n\<rangle>, leq \<circ>\<^sub>c \<langle>n, m\<rangle>\<rangle> = \<t>"
+    using \<open>(OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>\<close> \<open>OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>,leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,n\<rangle>\<rangle>\<rangle> = OR \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>m,n\<rangle>,leq \<circ>\<^sub>c \<langle>n,m\<rangle>\<rangle>\<close> calculation by presburger
+
+  then show ?thesis
+    by (smt OR_false_false_is_false cfunc_prod_type comp_type leq_type m_type n_type true_false_only_truth_values)
+qed
+
+
+
 
 end
