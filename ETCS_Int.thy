@@ -1,5 +1,5 @@
 theory ETCS_Int
-  imports ETCS_Add
+  imports ETCS_Add ETCS_Comparison
 begin
 
 definition add_outers :: "cfunc" where
@@ -253,6 +253,7 @@ proof -
 qed
 
 
+    
 
 
 lemma equiv_is_natpair2int_eq:
@@ -276,6 +277,51 @@ next
   then show "natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle>"
     by (simp add: equiv_is_natpair2int_eq)
 qed
+
+
+lemma canonical_representation_theorem:
+  assumes "m \<in>\<^sub>c \<int>\<^sub>c"
+  shows "\<exists> n. (n \<in>\<^sub>c \<nat>\<^sub>c \<and> ((m = natpair2int \<circ>\<^sub>c \<langle>zero, n \<rangle>) \<or> (m = natpair2int \<circ>\<^sub>c \<langle>n, zero \<rangle>)))"
+proof - 
+  have rep: "\<exists> j k. (j \<in>\<^sub>c \<nat>\<^sub>c \<and> k \<in>\<^sub>c \<nat>\<^sub>c \<and> m = natpair2int \<circ>\<^sub>c \<langle>j, k \<rangle>)"
+    using assms representation_theorem by blast
+  then obtain j where j_def: "\<exists>k. (j \<in>\<^sub>c \<nat>\<^sub>c \<and> k \<in>\<^sub>c \<nat>\<^sub>c \<and> m = natpair2int \<circ>\<^sub>c \<langle>j, k \<rangle>)"
+    by auto
+  then obtain k where k_def: "j \<in>\<^sub>c \<nat>\<^sub>c \<and> k \<in>\<^sub>c \<nat>\<^sub>c \<and> m = natpair2int \<circ>\<^sub>c \<langle>j, k \<rangle>"
+    by auto
+  have connexity: "(leq \<circ>\<^sub>c \<langle>j, k\<rangle> = \<t>) \<or> (leq \<circ>\<^sub>c \<langle>k, j\<rangle> = \<t>)"
+    by (simp add: k_def lqe_connexity)
+  show ?thesis
+  proof(cases "(leq \<circ>\<^sub>c \<langle>j, k\<rangle> = \<t>)")
+    assume case1: "(leq \<circ>\<^sub>c \<langle>j, k\<rangle> = \<t>)"
+    then have l_exists: "\<exists> l. (l \<in>\<^sub>c \<nat>\<^sub>c \<and> j +\<^sub>\<nat> l = k)"
+      using add_commutes k_def leq_true_implies_exists by blast
+    then obtain l where l_def: "l \<in>\<^sub>c \<nat>\<^sub>c \<and> j +\<^sub>\<nat> l = k"
+      by auto
+    then have eqn1: "k +\<^sub>\<nat> zero = j +\<^sub>\<nat> l"
+      by (simp add: add_respects_zero_on_right k_def)
+    then have a_positive_integer: "natpair2int \<circ>\<^sub>c \<langle>j,k\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero,l\<rangle>"
+      by (simp add: k_def l_def nat_pair_eq zero_type)
+    then show ?thesis
+      using k_def l_def by blast
+  next
+    assume case2: "leq \<circ>\<^sub>c \<langle>j,k\<rangle> \<noteq> \<t>"
+    then have case2i: "leq \<circ>\<^sub>c \<langle>k,j\<rangle> = \<t>"
+      using connexity by blast
+    then have p_exists: "\<exists> p. (p \<in>\<^sub>c \<nat>\<^sub>c \<and> p+\<^sub>\<nat> k = j)"
+      by (simp add: k_def leq_true_implies_exists)
+    then obtain p where p_def: "p \<in>\<^sub>c \<nat>\<^sub>c \<and> p+\<^sub>\<nat> k = j"
+      by auto
+    then have eqn2: "k +\<^sub>\<nat> p = zero +\<^sub>\<nat> j"
+      using add_commutes add_respects_zero_on_left k_def by auto
+    then have a_negative_integer: "natpair2int \<circ>\<^sub>c \<langle>j,k\<rangle> = natpair2int \<circ>\<^sub>c \<langle>p,zero\<rangle>"
+      using k_def nat_pair_eq p_def zero_type by auto
+    then show ?thesis
+      using k_def p_def by blast
+  qed
+qed
+
+
 
 definition lift_int_func :: "cfunc \<Rightarrow> cfunc" ("lift\<^sub>\<int>") where
   "lift\<^sub>\<int> f = quotient_func f (int_equiv_set,int_equiv_morphism)"
