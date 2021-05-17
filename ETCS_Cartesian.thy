@@ -17,8 +17,7 @@ where
   right_cart_proj_cfunc_prod: "f : Z \<rightarrow> X \<Longrightarrow> g : Z \<rightarrow> Y \<Longrightarrow> right_cart_proj X Y \<circ>\<^sub>c \<langle>f,g\<rangle> = g" and
   cfunc_prod_unique: "f : Z \<rightarrow> X \<Longrightarrow> g : Z \<rightarrow> Y \<Longrightarrow> h : Z \<rightarrow> X \<times>\<^sub>c Y \<Longrightarrow> 
     left_cart_proj X Y \<circ>\<^sub>c h = f \<Longrightarrow> right_cart_proj X Y \<circ>\<^sub>c h = g \<Longrightarrow> h = \<langle>f,g\<rangle>"
-
-thm type_rule
+  
 
 definition is_cart_prod :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" where
   "is_cart_prod W \<pi>\<^sub>0 \<pi>\<^sub>1 X Y \<longleftrightarrow> 
@@ -578,6 +577,34 @@ proof -
     using calculation by auto
 qed
 
+lemma distribute_right_mono:
+  "monomorphism (distribute_right X Y Z)"
+proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+  fix g h A
+  assume g_type: "g : A \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
+  then obtain g1 g2 g3 where g_expand: "g = \<langle>\<langle>g1, g2\<rangle>, g3\<rangle>"
+      and g1_g2_g3_types: "g1 : A \<rightarrow> X" "g2 : A \<rightarrow> Y" "g3 : A \<rightarrow> Z"
+    using cart_prod_decomp by blast 
+  assume h_type: "h : A \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
+  then obtain h1 h2 h3 where h_expand: "h = \<langle>\<langle>h1, h2\<rangle>, h3\<rangle>"
+      and h1_h2_h3_types: "h1 : A \<rightarrow> X" "h2 : A \<rightarrow> Y" "h3 : A \<rightarrow> Z"
+    using cart_prod_decomp by blast 
+
+  assume "distribute_right X Y Z \<circ>\<^sub>c g = distribute_right X Y Z \<circ>\<^sub>c h"
+  then have "distribute_right X Y Z \<circ>\<^sub>c \<langle>\<langle>g1, g2\<rangle>, g3\<rangle> = distribute_right X Y Z \<circ>\<^sub>c \<langle>\<langle>h1, h2\<rangle>, h3\<rangle>"
+    using g_expand h_expand by auto
+  then have "\<langle>\<langle>g1, g3\<rangle>, \<langle>g2, g3\<rangle>\<rangle> = \<langle>\<langle>h1, h3\<rangle>, \<langle>h2, h3\<rangle>\<rangle>"
+    using distribute_right_ap g1_g2_g3_types h1_h2_h3_types by auto
+  then have "\<langle>g1, g3\<rangle> = \<langle>h1, h3\<rangle> \<and> \<langle>g2, g3\<rangle> = \<langle>h2, h3\<rangle>"
+    using g1_g2_g3_types h1_h2_h3_types cart_prod_eq2 by (typecheck_cfuncs, auto)
+  then have "g1 = h1 \<and> g2 = h2 \<and> g3 = h3"
+    using g1_g2_g3_types h1_h2_h3_types cart_prod_eq2 by auto
+  then have "\<langle>\<langle>g1, g2\<rangle>, g3\<rangle> = \<langle>\<langle>h1, h2\<rangle>, h3\<rangle>"
+    by simp
+  then show "g = h"
+    by (simp add: g_expand h_expand)
+qed
+
 definition distribute_left_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_left_left X Y Z = 
     \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle>"
@@ -665,6 +692,34 @@ proof -
     using assms distribute_left_left_ap distribute_left_right_ap by auto
   then show ?thesis
     using calculation by auto
+qed
+
+lemma distribute_left_mono:
+  "monomorphism (distribute_left X Y Z)"
+proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+  fix g h A
+  assume g_type: "g : A \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+  then obtain g1 g2 g3 where g_expand: "g = \<langle>g1, \<langle>g2, g3\<rangle>\<rangle>"
+      and g1_g2_g3_types: "g1 : A \<rightarrow> X" "g2 : A \<rightarrow> Y" "g3 : A \<rightarrow> Z"
+    using cart_prod_decomp by blast 
+  assume h_type: "h : A \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
+  then obtain h1 h2 h3 where h_expand: "h = \<langle>h1, \<langle>h2, h3\<rangle>\<rangle>"
+      and h1_h2_h3_types: "h1 : A \<rightarrow> X" "h2 : A \<rightarrow> Y" "h3 : A \<rightarrow> Z"
+    using cart_prod_decomp by blast 
+
+  assume "distribute_left X Y Z \<circ>\<^sub>c g = distribute_left X Y Z \<circ>\<^sub>c h"
+  then have "distribute_left X Y Z \<circ>\<^sub>c \<langle>g1, \<langle>g2, g3\<rangle>\<rangle> = distribute_left X Y Z \<circ>\<^sub>c \<langle>h1, \<langle>h2, h3\<rangle>\<rangle>"
+    using g_expand h_expand by auto
+  then have "\<langle>\<langle>g1, g2\<rangle>, \<langle>g1, g3\<rangle>\<rangle> = \<langle>\<langle>h1, h2\<rangle>, \<langle>h1, h3\<rangle>\<rangle>"
+    using distribute_left_ap g1_g2_g3_types h1_h2_h3_types by auto
+  then have "\<langle>g1, g2\<rangle> = \<langle>h1, h2\<rangle> \<and> \<langle>g1, g3\<rangle> = \<langle>h1, h3\<rangle>"
+    using g1_g2_g3_types h1_h2_h3_types cart_prod_eq2 by (typecheck_cfuncs, auto)
+  then have "g1 = h1 \<and> g2 = h2 \<and> g3 = h3"
+    using g1_g2_g3_types h1_h2_h3_types cart_prod_eq2 by auto
+  then have "\<langle>g1, \<langle>g2, g3\<rangle>\<rangle> = \<langle>h1, \<langle>h2, h3\<rangle>\<rangle>"
+    by simp
+  then show "g = h"
+    by (simp add: g_expand h_expand)
 qed
 
 end
