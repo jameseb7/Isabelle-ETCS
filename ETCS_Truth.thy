@@ -284,6 +284,54 @@ qed
 qed
 
 
-  
 
+
+(* Proposition 2.2.9 *)
+lemma pullback_of_epi_is_epi:
+assumes "f: Y \<rightarrow> Z" "epimorphism f" "is_pullback A Y X Z (q1) f (q0) g "
+shows "epimorphism (q0)"
+proof - 
+  have surj_f: "surjective f"
+    using assms(1) assms(2) epi_is_surj by auto
+  have "surjective (q0)"
+    unfolding surjective_def
+  proof(auto)
+    fix y
+    assume y_type: "y \<in>\<^sub>c codomain q0"
+    then have codomain_gy: "g \<circ>\<^sub>c y \<in>\<^sub>c Z"
+      using assms(3) cfunc_type_def comp_type is_pullback_def square_commutes_def by auto
+    then have z_exists: "\<exists> z. z \<in>\<^sub>c Y \<and> f \<circ>\<^sub>c z = g \<circ>\<^sub>c y"
+      using assms(1) cfunc_type_def surj_f surjective_def by auto
+    then obtain z where z_def: "z \<in>\<^sub>c Y \<and> f \<circ>\<^sub>c z = g \<circ>\<^sub>c y"
+      by blast
+    then have "\<exists>! k. k: one \<rightarrow> A \<and> q0 \<circ>\<^sub>c k = y \<and> q1 \<circ>\<^sub>c k =z"
+      by (typecheck_cfuncs, smt assms(3) cfunc_type_def is_pullback_def square_commutes_def y_type z_def)
+    then show "\<exists>x. x \<in>\<^sub>c domain q0 \<and> q0 \<circ>\<^sub>c x = y"
+      using assms(3) cfunc_type_def is_pullback_def square_commutes_def by auto
+  qed
+  then show ?thesis
+    using surjective_is_epimorphism by blast
+qed
+
+(* Proposition 2.2.10 *)
+lemma pullback_of_epi_is_epi:
+  assumes f_type: "f: X \<rightarrow> Y" and f_epi: "epimorphism(f)"
+  assumes g_type: "g: W \<rightarrow> Z" and g_epi: "epimorphism(g)"
+  shows "epimorphism(f\<times>\<^sub>f g)"
+proof - (*there are serious errors in the diagram in the book!*)
+  have decompose_fxg: "f\<times>\<^sub>f g = (f\<times>\<^sub>f id(Z)) \<circ>\<^sub>c (id(X)\<times>\<^sub>f g)"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+   have pullback: "is_pullback (X\<times>\<^sub>cZ) X (Y\<times>\<^sub>cZ) Y (left_cart_proj X Z) f (f\<times>\<^sub>f id(Z)) (left_cart_proj Y Z)"
+     unfolding is_pullback_def
+   proof(auto)
+     show "square_commutes (X \<times>\<^sub>c Z) X (Y \<times>\<^sub>c Z) Y (left_cart_proj X Z) f
+     (f \<times>\<^sub>f id\<^sub>c Z) (left_cart_proj Y Z)"
+       using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_cross_prod square_commutes_def)
+     show "\<And>Za k h.
+       k : Za \<rightarrow> X \<Longrightarrow>
+       h : Za \<rightarrow> Y \<times>\<^sub>c Z \<Longrightarrow>
+       f \<circ>\<^sub>c k = left_cart_proj Y Z \<circ>\<^sub>c h \<Longrightarrow>
+       \<exists>j. j : Za \<rightarrow> X \<times>\<^sub>c Z \<and>
+           left_cart_proj X Z \<circ>\<^sub>c j = k \<and> (f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j = h"
+       using assms apply typecheck_cfuncs
 end
