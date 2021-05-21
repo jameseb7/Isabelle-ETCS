@@ -314,24 +314,118 @@ proof -
 qed
 
 (* Proposition 2.2.10 *)
-lemma pullback_of_epi_is_epi:
+lemma product_of_epis_is_epi:
   assumes f_type: "f: X \<rightarrow> Y" and f_epi: "epimorphism(f)"
   assumes g_type: "g: W \<rightarrow> Z" and g_epi: "epimorphism(g)"
   shows "epimorphism(f\<times>\<^sub>f g)"
 proof - (*there are serious errors in the diagram in the book!*)
-  have decompose_fxg: "f\<times>\<^sub>f g = (f\<times>\<^sub>f id(Z)) \<circ>\<^sub>c (id(X)\<times>\<^sub>f g)"
-    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+   have decompose_fxg: "f\<times>\<^sub>f g = (f\<times>\<^sub>f id(Z)) \<circ>\<^sub>c (id(X)\<times>\<^sub>f g)"
+     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+  
+ (*First half proving (f\<times>\<^sub>f id(Z)) is an epimorphism.*)
+
    have pullback: "is_pullback (X\<times>\<^sub>cZ) X (Y\<times>\<^sub>cZ) Y (left_cart_proj X Z) f (f\<times>\<^sub>f id(Z)) (left_cart_proj Y Z)"
      unfolding is_pullback_def
    proof(auto)
      show "square_commutes (X \<times>\<^sub>c Z) X (Y \<times>\<^sub>c Z) Y (left_cart_proj X Z) f
      (f \<times>\<^sub>f id\<^sub>c Z) (left_cart_proj Y Z)"
        using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_cross_prod square_commutes_def)
-     show "\<And>Za k h.
-       k : Za \<rightarrow> X \<Longrightarrow>
-       h : Za \<rightarrow> Y \<times>\<^sub>c Z \<Longrightarrow>
-       f \<circ>\<^sub>c k = left_cart_proj Y Z \<circ>\<^sub>c h \<Longrightarrow>
-       \<exists>j. j : Za \<rightarrow> X \<times>\<^sub>c Z \<and>
-           left_cart_proj X Z \<circ>\<^sub>c j = k \<and> (f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j = h"
-       using assms apply typecheck_cfuncs
+     show "\<And>Za k h. k : Za \<rightarrow> X \<Longrightarrow> h : Za \<rightarrow> Y \<times>\<^sub>c Z \<Longrightarrow> f \<circ>\<^sub>c k = left_cart_proj Y Z \<circ>\<^sub>c h \<Longrightarrow>
+       \<exists>j. j : Za \<rightarrow> X \<times>\<^sub>c Z \<and> left_cart_proj X Z \<circ>\<^sub>c j = k \<and> (f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j = h"
+     proof-
+       fix Za k h
+       assume k_type:  "k : Za \<rightarrow> X"
+       assume h_type: "h : Za \<rightarrow> Y \<times>\<^sub>c Z"
+       assume outer_square: "f \<circ>\<^sub>c k = left_cart_proj Y Z \<circ>\<^sub>c h"
+       obtain j where j_def: "j = \<langle>k,right_cart_proj Y Z \<circ>\<^sub>c h\<rangle>"
+         by simp
+       then have j_type: "j: Za \<rightarrow> X \<times>\<^sub>c Z"
+         using cfunc_prod_type comp_type h_type k_type right_cart_proj_type by auto
+       have top_triangle: "left_cart_proj X Z \<circ>\<^sub>c j = k"
+         using comp_type h_type j_def k_type left_cart_proj_cfunc_prod right_cart_proj_type by auto
+       have bottom_triangle: "(f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j = h"
+       proof - 
+         have "(f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j = \<langle>f \<circ>\<^sub>c k,id\<^sub>c Z \<circ>\<^sub>c right_cart_proj Y Z \<circ>\<^sub>c h\<rangle>"
+           by (smt cfunc_cross_prod_comp_cfunc_prod comp_type f_type h_type id_type j_def k_type right_cart_proj_type)
+         also have "... = \<langle>left_cart_proj Y Z \<circ>\<^sub>c h,right_cart_proj Y Z \<circ>\<^sub>c h\<rangle>"
+           by (metis cart_prod_decomp h_type id_left_unit2 outer_square right_cart_proj_cfunc_prod)
+         also have "... = h"
+           by (metis cfunc_prod_unique comp_type f_type h_type k_type outer_square right_cart_proj_type)
+       then show ?thesis
+         by (simp add: calculation) 
+     qed
+     then show "\<exists>j. j : Za \<rightarrow> X \<times>\<^sub>c Z \<and> left_cart_proj X Z \<circ>\<^sub>c j = k \<and> (f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j = h"
+       using j_type top_triangle by blast
+   qed
+     show "\<And>Za j y.
+       left_cart_proj X Z \<circ>\<^sub>c j : Za \<rightarrow> X \<Longrightarrow>
+       (f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j : Za \<rightarrow> Y \<times>\<^sub>c Z \<Longrightarrow>
+       f \<circ>\<^sub>c left_cart_proj X Z \<circ>\<^sub>c j =
+       left_cart_proj Y Z \<circ>\<^sub>c (f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j \<Longrightarrow>
+       j : Za \<rightarrow> X \<times>\<^sub>c Z \<Longrightarrow>
+       y : Za \<rightarrow> X \<times>\<^sub>c Z \<Longrightarrow>
+       left_cart_proj X Z \<circ>\<^sub>c y = left_cart_proj X Z \<circ>\<^sub>c j \<Longrightarrow>
+       (f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c y = (f \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c j \<Longrightarrow> j = y"
+         by (smt cart_prod_decomp cart_prod_eq2 cfunc_cross_prod_comp_cfunc_prod f_type id_left_unit2 id_type left_cart_proj_cfunc_prod)
+     qed
+     then have fid_epi: "epimorphism(f\<times>\<^sub>f id(Z))"
+       using f_epi f_type pullback_of_epi_is_epi by blast
+
+(*Second half proving (id(X)\<times>\<^sub>f g) is an epimorphism.*)
+
+    have pullback2: "is_pullback (X\<times>\<^sub>cW) W (X\<times>\<^sub>cZ) Z (right_cart_proj X W) g (id(X)\<times>\<^sub>f g) (right_cart_proj X Z)"
+         unfolding is_pullback_def
+    proof(auto)
+      show "square_commutes (X \<times>\<^sub>c W) W (X \<times>\<^sub>c Z) Z (right_cart_proj X W) g
+     (id\<^sub>c X \<times>\<^sub>f g) (right_cart_proj X Z)"
+        using assms by (typecheck_cfuncs, simp add: right_cart_proj_cfunc_cross_prod square_commutes_def)
+      show "\<And>Za k h. 
+       k : Za \<rightarrow> W \<Longrightarrow>
+       h : Za \<rightarrow> X \<times>\<^sub>c Z \<Longrightarrow>
+       g \<circ>\<^sub>c k = right_cart_proj X Z \<circ>\<^sub>c h \<Longrightarrow>
+       \<exists>j. j : Za \<rightarrow> X \<times>\<^sub>c W \<and>
+           right_cart_proj X W \<circ>\<^sub>c j = k \<and> (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c j = h"
+ proof-
+       fix Za k h
+       assume k_type:  "k : Za \<rightarrow> W"
+       assume h_type: "h : Za \<rightarrow> X \<times>\<^sub>c Z"
+       assume outer_square: "g \<circ>\<^sub>c k = right_cart_proj X Z \<circ>\<^sub>c h"
+       obtain j where j_def: "j = \<langle>left_cart_proj X Z \<circ>\<^sub>c h,k\<rangle>"
+         by simp
+       then have j_type: "j : Za \<rightarrow> X \<times>\<^sub>c W"
+         using cfunc_prod_type comp_type h_type k_type left_cart_proj_type by auto
+       have top_triangle: "right_cart_proj X W \<circ>\<^sub>c j = k"
+         using comp_type h_type j_def k_type left_cart_proj_type right_cart_proj_cfunc_prod by blast
+       have bottom_triangle: "(id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c j = h"
+       proof - 
+         have "(id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c j = \<langle>id\<^sub>c X \<circ>\<^sub>c left_cart_proj X Z \<circ>\<^sub>c h,g \<circ>\<^sub>c k\<rangle>"
+           by (smt cfunc_cross_prod_comp_cfunc_prod comp_type g_type h_type id_type j_def k_type left_cart_proj_type)
+         also have "... = \<langle>left_cart_proj X Z \<circ>\<^sub>c h,right_cart_proj X Z \<circ>\<^sub>c h\<rangle>"
+           by (metis cart_prod_decomp h_type id_left_unit2 left_cart_proj_cfunc_prod outer_square)
+         also have "... = h"
+           by (metis cfunc_prod_unique comp_type g_type h_type k_type left_cart_proj_type outer_square)
+         then show ?thesis
+           by (simp add: calculation)
+       qed
+       then show "\<exists>j. j : Za \<rightarrow> X \<times>\<^sub>c W \<and>
+           right_cart_proj X W \<circ>\<^sub>c j = k \<and> (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c j = h"
+         using j_type top_triangle by blast
+     qed
+     show "\<And>Za j y.
+       right_cart_proj X W \<circ>\<^sub>c j : Za \<rightarrow> W \<Longrightarrow>
+       (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c j : Za \<rightarrow> X \<times>\<^sub>c Z \<Longrightarrow>
+       g \<circ>\<^sub>c right_cart_proj X W \<circ>\<^sub>c j =
+       right_cart_proj X Z \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c j \<Longrightarrow>
+       j : Za \<rightarrow> X \<times>\<^sub>c W \<Longrightarrow>
+       y : Za \<rightarrow> X \<times>\<^sub>c W \<Longrightarrow>
+       right_cart_proj X W \<circ>\<^sub>c y = right_cart_proj X W \<circ>\<^sub>c j \<Longrightarrow>
+       (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c y = (id\<^sub>c X \<times>\<^sub>f g) \<circ>\<^sub>c j \<Longrightarrow> j = y"
+       by (smt cart_prod_decomp cart_prod_eq2 cfunc_cross_prod_comp_cfunc_prod g_type id_left_unit2 id_type right_cart_proj_cfunc_prod)
+   qed
+   then have "epimorphism(id(X)\<times>\<^sub>f g)"
+     using g_epi g_type pullback_of_epi_is_epi by blast
+   then show ?thesis
+     using fid_epi cfunc_type_def composition_of_epi_pair_is_epi decompose_fxg is_pullback_def pullback pullback2 square_commutes_def by auto
+qed
+
 end
