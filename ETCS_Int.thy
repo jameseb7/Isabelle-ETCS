@@ -237,10 +237,13 @@ lemma int2natpair_type[type_rule]:
   unfolding int2natpair_def int_def
   by (metis int_def cfunc_type_def nat2int_type representation_map_exists section_of_def someI_ex)
 
-
 lemma int2natpair_is_sectionof_natpair2int:
   "int2natpair sectionof natpair2int"
   by (metis int2natpair_def representation_map_exists someI_ex)
+
+lemma natpair2int_int2natpair:
+  "natpair2int \<circ>\<^sub>c int2natpair  = id \<int>\<^sub>c"
+  using cfunc_type_def int2natpair_is_sectionof_natpair2int nat2int_type section_of_def by auto
 
 lemma representation_theorem:
   assumes "z \<in>\<^sub>c \<int>\<^sub>c"
@@ -255,11 +258,10 @@ qed
 
     
 
-
 lemma equiv_is_natpair2int_eq:
-  "\<langle>x, y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<longleftrightarrow> natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
-  unfolding natpair2int_def int_def
-  by (simp add: ETCS_Equivalence.equiv_class_eq NN_rel_is_relation)
+  assumes "\<langle>x,y\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
+  shows "\<langle>x, y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<longleftrightarrow> natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
+  unfolding natpair2int_def int_def by (simp add: assms equiv_class_eq NN_rel_is_relation)
 
 lemma nat_pair_eq: 
   assumes  "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"  "d \<in>\<^sub>c \<nat>\<^sub>c" 
@@ -267,7 +269,7 @@ lemma nat_pair_eq:
 proof auto
   assume "natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle>"
   then have "\<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism)"
-    by (simp add: equiv_is_natpair2int_eq)
+    by (simp add: assms cfunc_prod_type equiv_is_natpair2int_eq)
   then show "b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
     by (simp add: assms elements_of_int_equiv_set1)
 next
@@ -275,7 +277,7 @@ next
   then have "\<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism)"
     by (simp add: assms elements_of_int_equiv_set2)
   then show "natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle>"
-    by (simp add: equiv_is_natpair2int_eq)
+    using equiv_is_natpair2int_eq relative_member_def by blast
 qed
 
 
@@ -327,24 +329,22 @@ definition lift_int_func :: "cfunc \<Rightarrow> cfunc" ("lift\<^sub>\<int>") wh
   "lift\<^sub>\<int> f = quotient_func f (int_equiv_set,int_equiv_morphism)"
 
 lemma const_on_int_rel_def:
-  assumes "\<And>x y. natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c y"
-  shows "\<And>x y. \<langle>x, y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> (int_equiv_set,int_equiv_morphism) \<Longrightarrow> 
-    equiv_class (int_equiv_set,int_equiv_morphism) \<circ>\<^sub>c f \<circ>\<^sub>c x = equiv_class (int_equiv_set,int_equiv_morphism) \<circ>\<^sub>c f \<circ>\<^sub>c y"
-  by (metis assms equiv_is_natpair2int_eq natpair2int_def)
-
+  assumes "\<And>x y. x \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> y \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+  shows "const_on_rel (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism) f"
+  unfolding const_on_rel_def using assms equiv_is_natpair2int_eq relative_member_def by blast
 
 lemma lift_int_func_type[type_rule]:
-  assumes "\<And>x y. natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c y"
+  assumes "\<And>x y. x \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> y \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
   shows "f : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> Y \<Longrightarrow> lift\<^sub>\<int> f : \<int>\<^sub>c \<rightarrow> Y"
   unfolding lift_int_func_def int_def
-  by (metis NN_rel_is_relation assms equiv_is_natpair2int_eq natpair2int_def quotient_func_type) 
+  using NN_rel_is_relation assms const_on_int_rel_def quotient_func_type by blast
 
 lemma lift_int_func_natpair2int_eq:
-  assumes "\<And>x y. natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c f \<circ>\<^sub>c y"
+  assumes "\<And>x y. x \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> y \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
   assumes "f : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> Y"
   shows "lift\<^sub>\<int> f \<circ>\<^sub>c natpair2int = f"
   unfolding lift_int_func_def natpair2int_def
-  by (metis NN_rel_is_relation assms equiv_is_natpair2int_eq natpair2int_def quotient_func_eq)
+  using NN_rel_is_relation assms const_on_int_rel_def quotient_func_eq by blast
 
 lemma quot_map_swap_constant_on_equiv:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
@@ -360,9 +360,85 @@ proof -
   then show ?thesis using calculation by auto
 qed
 
+(*The above lemma justifies the following definition.*)
 
+(*
+definition neg_int :: "cfunc" where "neg_int = lift\<^sub>\<int> (natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c)"
+*)
 
+(*
+lemma neg_cancels_neg: 
+  assumes "n \<in>\<^sub>c \<int>\<^sub>c"
+  shows "neg_int  \<circ>\<^sub>c neg_int  \<circ>\<^sub>c n = n"
+proof - 
+  have "
+*)
 
+definition liftr_int_func :: "cfunc \<Rightarrow> cfunc" ("liftr\<^sub>\<int>") where
+  "liftr\<^sub>\<int> f = (lift\<^sub>\<int> (f\<^sup>\<sharp>))\<^sup>\<flat>"
+
+lemma transpose_const_on_int_rel:
+  assumes f_const_on_equiv_class:
+    "\<And>x y k. k \<in>\<^sub>c X \<Longrightarrow> x \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> y \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow>
+      natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> f \<circ>\<^sub>c \<langle>k, x\<rangle> = f \<circ>\<^sub>c \<langle>k, y\<rangle>"
+  assumes f_type: "f : X \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> Y"
+  shows "const_on_rel (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism) (f\<^sup>\<sharp>)"
+proof (rule const_on_int_rel_def)
+  fix x y
+  assume x_type: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+  assume y_type: "y \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+
+  assume x_y_in_same_equiv_class: "natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
+
+  show "f\<^sup>\<sharp> \<circ>\<^sub>c x = f\<^sup>\<sharp> \<circ>\<^sub>c y"
+  proof (rule same_evals_equal[where X=Y, where A=X, where Z="one"])
+    show "f\<^sup>\<sharp> \<circ>\<^sub>c x \<in>\<^sub>c Y\<^bsup>X\<^esup>"
+      using x_type f_type by typecheck_cfuncs
+    show "f\<^sup>\<sharp> \<circ>\<^sub>c y \<in>\<^sub>c Y\<^bsup>X\<^esup>"
+      using y_type f_type by typecheck_cfuncs
+
+    show "eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x)) = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y))"
+    proof (rule one_separator[where X="X \<times>\<^sub>c one", where Y=Y])
+      show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c x : X \<times>\<^sub>c one \<rightarrow> Y"
+        using x_type f_type by typecheck_cfuncs
+      show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c y : X \<times>\<^sub>c one \<rightarrow> Y"
+        using y_type f_type by typecheck_cfuncs
+    next
+      fix k_one
+      assume "k_one \<in>\<^sub>c X \<times>\<^sub>c one"
+      then obtain k where k_type: "k \<in>\<^sub>c X" and k_one_def: "k_one = \<langle>k, id one\<rangle>"
+        using cart_prod_decomp id_type one_unique_element by blast
+
+      have "f \<circ>\<^sub>c \<langle>k, x\<rangle> = f \<circ>\<^sub>c \<langle>k, y\<rangle>"
+        using f_const_on_equiv_class k_type x_type x_y_in_same_equiv_class y_type by blast
+      then have "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp>))) \<circ>\<^sub>c \<langle>k, x\<rangle> = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp>))) \<circ>\<^sub>c \<langle>k, y\<rangle>"
+        using f_type transpose_func_def by auto
+      then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>k, x\<rangle> = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>k, y\<rangle>"
+        using x_type y_type k_type f_type comp_associative2 by (typecheck_cfuncs, auto)
+      then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x)) \<circ>\<^sub>c \<langle>k, id one\<rangle>
+          = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y)) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
+        using x_type y_type k_type f_type cfunc_cross_prod_comp_cfunc_prod id_right_unit2
+        by (typecheck_cfuncs, auto)
+      then have "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c \<langle>k, id one\<rangle>
+          = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
+        using x_type y_type k_type f_type comp_associative2 by (typecheck_cfuncs, auto)
+      then show "(eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c k_one
+          = (eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c k_one"
+        by (simp add: k_one_def)
+    qed
+  qed
+qed
+
+lemma liftr_int_func_type[type_rule]:
+  assumes f_const_on_equiv_class:
+    "\<And>x y k. k \<in>\<^sub>c X \<Longrightarrow> x \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> y \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow>
+      natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> f \<circ>\<^sub>c \<langle>k, x\<rangle> = f \<circ>\<^sub>c \<langle>k, y\<rangle>"
+  assumes f_type: "f : X \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> Y"
+  shows "liftr\<^sub>\<int> f : X \<times>\<^sub>c \<int>\<^sub>c \<rightarrow> Y"
+  unfolding liftr_int_func_def
+  by (metis int_def NN_rel_is_relation f_const_on_equiv_class f_type flat_type lift_int_func_def
+      quotient_func_type transpose_const_on_int_rel transpose_func_type)
+  
 
 
 end
