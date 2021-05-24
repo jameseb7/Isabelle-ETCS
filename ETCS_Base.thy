@@ -203,6 +203,20 @@ method_setup typecheck_cfuncs =
   \<open>Scan.succeed typecheck_cfuncs_method\<close>
   "Check types of cfuncs in current goal and add as assumptions of the current goal"
 
+(*ML \<open>fun typecheck_proof_tac_facts_subtac ctxt rules facts tac (subgoal, n) =
+          let val type_rules = rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
+              val type_lems = construct_cfunc_type_lemmas ctxt type_rules subgoal
+              val typechecked_facts = List.map 
+          in ()
+          end\<close>
+
+ML_val \<open>elim_type_rule_prems\<close>
+ML_val \<open>SUBGOAL\<close>
+ML_val \<open>Method.rule_tac\<close>
+ML_val \<open>Method.rule\<close>
+ML_val \<open>fn x => Attrib.thms >> x\<close>
+ML_val \<open>Scan.succeed\<close>*)
+
 subsection \<open>Basic Category Theory Definitions\<close>
 
 (*
@@ -251,8 +265,17 @@ lemma monomorphism_def3:
   unfolding monomorphism_def2 using assms cfunc_type_def by auto 
 
 definition epimorphism :: "cfunc \<Rightarrow> bool" where
-  "epimorphism(f) \<longleftrightarrow> (\<forall> g h. 
+  "epimorphism f \<longleftrightarrow> (\<forall> g h. 
     (domain(g) = codomain(f) \<and> domain(h) = codomain(f)) \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
+
+lemma epimorphism_def2:
+  "epimorphism f \<longleftrightarrow> (\<forall> g h A X Y. f : X \<rightarrow> Y \<and> g : Y \<rightarrow> A \<and> h : Y \<rightarrow> A \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
+  unfolding epimorphism_def by (smt cfunc_type_def codomain_comp) 
+
+lemma epimorphism_def3:
+  assumes "f : X \<rightarrow> Y"
+  shows "epimorphism f \<longleftrightarrow> (\<forall> g h A. g : Y \<rightarrow> A \<and> h : Y \<rightarrow> A \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
+  unfolding epimorphism_def2 using assms cfunc_type_def by auto
 
 definition isomorphism :: "cfunc \<Rightarrow> bool" where
   "isomorphism(f) \<longleftrightarrow> (\<exists> g. domain(g) = codomain(f) \<and> codomain(g) = domain(f) \<and> 
