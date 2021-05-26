@@ -364,6 +364,27 @@ proof -
     using calculation by auto
 qed
 
+lemma swap_cross_prod:
+  assumes "x : A \<rightarrow> X" "y : B \<rightarrow> Y"
+  shows "swap X Y \<circ>\<^sub>c (x \<times>\<^sub>f y) = (y \<times>\<^sub>f x) \<circ>\<^sub>c swap A B"
+proof -
+  have "swap X Y \<circ>\<^sub>c (x \<times>\<^sub>f y) = swap X Y \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c left_cart_proj A B, y \<circ>\<^sub>c right_cart_proj A B\<rangle>"
+    using assms unfolding cfunc_cross_prod_def cfunc_type_def by auto
+  also have "... = \<langle>y \<circ>\<^sub>c right_cart_proj A B, x \<circ>\<^sub>c left_cart_proj A B\<rangle>"
+    by (meson assms comp_type left_cart_proj_type right_cart_proj_type swap_ap)
+  also have "... = (y \<times>\<^sub>f x) \<circ>\<^sub>c \<langle>right_cart_proj A B, left_cart_proj A B\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+  also have "... = (y \<times>\<^sub>f x) \<circ>\<^sub>c swap A B"
+    unfolding swap_def by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+lemma swap_idempotent:
+  "swap Y X \<circ>\<^sub>c swap X Y = id (X \<times>\<^sub>c Y)"
+  by (metis swap_def cfunc_prod_unique id_right_unit2 id_type left_cart_proj_type
+      right_cart_proj_type swap_ap)
+  
 definition associate_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "associate_right X Y Z =
     \<langle>
