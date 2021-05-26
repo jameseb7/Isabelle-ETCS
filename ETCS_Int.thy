@@ -471,4 +471,121 @@ proof -
     by (typecheck_cfuncs, auto, blast)
 qed
 
+lemma transpose_swap_const_on_int_rel:
+  assumes f_const_on_equiv_class:
+    "\<And>x y k. k \<in>\<^sub>c X \<Longrightarrow> x \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> y \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow>
+      natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> f \<circ>\<^sub>c \<langle>x, k\<rangle> = f \<circ>\<^sub>c \<langle>y, k\<rangle>"
+  assumes f_type: "f : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c X \<rightarrow> Y"
+  shows "const_on_rel (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism) ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)"
+proof (rule const_on_int_rel_def)
+  fix x y
+  assume x_type: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+  assume y_type: "y \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+
+  assume x_y_in_same_equiv_class: "natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
+
+  show "(f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x = (f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y"
+  proof (rule same_evals_equal[where X=Y, where A=X, where Z="one"])
+    show "(f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x \<in>\<^sub>c Y\<^bsup>X\<^esup>"
+      using x_type f_type by typecheck_cfuncs
+    show "(f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y \<in>\<^sub>c Y\<^bsup>X\<^esup>"
+      using y_type f_type by typecheck_cfuncs
+
+    show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f (f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x =
+        eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f (f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y"
+    proof (rule one_separator[where X="X \<times>\<^sub>c one", where Y=Y])
+      show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f (f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x : X \<times>\<^sub>c one \<rightarrow> Y"
+        using x_type f_type by typecheck_cfuncs
+      show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f (f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y : X \<times>\<^sub>c one \<rightarrow> Y"
+        using y_type f_type by typecheck_cfuncs
+    next
+      fix k_one
+      assume "k_one \<in>\<^sub>c X \<times>\<^sub>c one"
+      then obtain k where k_type: "k \<in>\<^sub>c X" and k_one_def: "k_one = \<langle>k, id one\<rangle>"
+        using cart_prod_decomp id_type one_unique_element by blast
+
+      have "f \<circ>\<^sub>c \<langle>x, k\<rangle> = f \<circ>\<^sub>c \<langle>y, k\<rangle>"
+        using f_const_on_equiv_class k_type x_type x_y_in_same_equiv_class y_type by blast
+      then have "f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>k, x\<rangle> = f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>k, y\<rangle>"
+        using k_type swap_ap x_type y_type by auto
+      then have "(f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)) \<circ>\<^sub>c \<langle>k, x\<rangle> = (f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)) \<circ>\<^sub>c \<langle>k, y\<rangle>"
+        using f_type k_type x_type y_type comp_associative2 by (typecheck_cfuncs, auto)
+      then have "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))) \<circ>\<^sub>c \<langle>k, x\<rangle>
+          = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)))  \<circ>\<^sub>c \<langle>k, y\<rangle>"
+        using f_type transpose_func_def by (typecheck_cfuncs, auto)
+      then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>k, x\<rangle>
+          = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))  \<circ>\<^sub>c \<langle>k, y\<rangle>"
+        using x_type y_type k_type f_type comp_associative2 by (typecheck_cfuncs, auto)
+      then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x)) \<circ>\<^sub>c \<langle>k, id one\<rangle>
+          = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y)) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
+        using x_type y_type k_type f_type cfunc_cross_prod_comp_cfunc_prod id_right_unit2
+        by (typecheck_cfuncs, auto)
+      then have "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c \<langle>k, id one\<rangle>
+          = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
+        using x_type y_type k_type f_type comp_associative2 by (typecheck_cfuncs, auto)
+      then show "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c k_one
+          = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c k_one"
+        by (simp add: k_one_def)
+    qed
+  qed
+qed
+
+definition liftl_int_func :: "cfunc \<Rightarrow> cfunc" ("liftl\<^sub>\<int>") where
+  "liftl\<^sub>\<int> f = (THE g. \<exists> X. domain f = (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c X \<and> g = (lift\<^sub>\<int> ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))\<^sup>\<flat> \<circ>\<^sub>c swap \<int>\<^sub>c X)"
+
+lemma liftl_int_func_def2:
+  assumes "f : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c X \<rightarrow> Y"
+  shows "liftl\<^sub>\<int> f = (lift\<^sub>\<int> ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))\<^sup>\<flat> \<circ>\<^sub>c swap \<int>\<^sub>c X"
+  using assms unfolding liftl_int_func_def cfunc_type_def
+  by (rule_tac the1I2, auto, (metis cfunc_type_def transpose_func_type)+)
+
+lemma liftl_int_func_type[type_rule]:
+  assumes "const_on_rel (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism) ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)"
+  assumes "f : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c X \<rightarrow> Y"
+  shows "liftl\<^sub>\<int> f : \<int>\<^sub>c \<times>\<^sub>c X \<rightarrow> Y"
+  using assms NN_rel_is_relation
+  by (unfold liftl_int_func_def2 lift_int_func_def int_def, typecheck_cfuncs)
+
+lemma liftl_int_func_natpair2int_eq:
+  assumes "const_on_rel (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism) ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)"
+  assumes f_type: "f : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c X \<rightarrow> Y"
+  shows "liftl\<^sub>\<int> f \<circ>\<^sub>c (natpair2int \<times>\<^sub>f id X) = f"
+proof -
+  have "liftl\<^sub>\<int> f \<circ>\<^sub>c (natpair2int \<times>\<^sub>f id X) = ((lift\<^sub>\<int> ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))\<^sup>\<flat> \<circ>\<^sub>c swap \<int>\<^sub>c X) \<circ>\<^sub>c (natpair2int \<times>\<^sub>f id X)"
+    using assms by (unfold liftl_int_func_def2, auto)
+  also have "... = (lift\<^sub>\<int> ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))\<^sup>\<flat> \<circ>\<^sub>c swap \<int>\<^sub>c X \<circ>\<^sub>c (natpair2int \<times>\<^sub>f id X)"
+    using assms comp_associative2 by (typecheck_cfuncs, auto)
+  also have "... = (lift\<^sub>\<int> ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))\<^sup>\<flat> \<circ>\<^sub>c (id X \<times>\<^sub>f natpair2int) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) X"
+    using assms by (typecheck_cfuncs, simp add: swap_cross_prod)
+  also have "... = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f lift\<^sub>\<int> ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))) \<circ>\<^sub>c (id X \<times>\<^sub>f natpair2int) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) X"
+    by (smt assms(1) comp_type f_type inv_transpose_func_def2 lift_int_func_type swap_type transpose_func_type)
+  also have "... = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (lift\<^sub>\<int> ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>) \<circ>\<^sub>c natpair2int)) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) X"
+    using assms by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def2 inv_transpose_of_composition)
+  also have "... = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) X"
+    using assms by (typecheck_cfuncs, simp add: lift_int_func_natpair2int_eq)
+  also have "... = f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) X"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
+  also have "... = f"
+    using f_type id_right_unit2 swap_idempotent by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+lemma liftl_int_func_unique:
+  assumes f_const_on_equiv_class: 
+    "const_on_rel (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) (int_equiv_set,int_equiv_morphism) ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)"
+  assumes f_type: "f : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c X \<rightarrow> Y" and g_type: "g : \<int>\<^sub>c \<times>\<^sub>c X \<rightarrow> Y"
+  shows "g \<circ>\<^sub>c (natpair2int \<times>\<^sub>f id X) = f \<Longrightarrow> g = liftl\<^sub>\<int> f"
+proof -
+  have prod_epi: "epimorphism (natpair2int \<times>\<^sub>f id X)"
+    by (simp add: NNtoZ_map_is_epic cfunc_type_def id_isomorphism iso_imp_epi_and_monic product_of_epis_is_epi)
+
+  assume "g \<circ>\<^sub>c (natpair2int \<times>\<^sub>f id X) = f"
+  then have "g \<circ>\<^sub>c (natpair2int \<times>\<^sub>f id X) = liftl\<^sub>\<int> f \<circ>\<^sub>c (natpair2int \<times>\<^sub>f id X)"
+    using f_const_on_equiv_class f_type liftl_int_func_natpair2int_eq by auto
+  then show "g = liftl\<^sub>\<int> f"
+    using prod_epi assms cfunc_cross_prod_type epimorphism_def3 id_type nat2int_type prod_epi 
+    by (typecheck_cfuncs, auto, meson)
+qed
+
 end
