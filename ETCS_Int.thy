@@ -737,4 +737,110 @@ proof -
     using prod_epi assms by (typecheck_cfuncs, blast)
 qed
 
+definition add_lefts :: "cfunc" where
+  "add_lefts = add2 \<circ>\<^sub>c \<langle>
+      left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),
+      left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)
+    \<rangle>"
+
+lemma add_lefts_type[type_rule]: "add_lefts : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> \<nat>\<^sub>c"
+  unfolding add_lefts_def by typecheck_cfuncs
+
+lemma add_lefts_apply:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "add_lefts \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle> = add2 \<circ>\<^sub>c \<langle>a,c\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have "?lhs = add2 \<circ>\<^sub>c \<langle>
+      left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),
+      left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)
+    \<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>"
+    unfolding add_lefts_def using assms comp_associative2 by (typecheck_cfuncs, auto)
+  also have "... = add2 \<circ>\<^sub>c \<langle>
+      left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>,
+      left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>
+    \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  also have "... = add2 \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>c,d\<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = add2 \<circ>\<^sub>c \<langle>a, c\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition add_rights :: "cfunc" where
+  "add_rights = add2 \<circ>\<^sub>c \<langle>
+      right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),
+      right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)
+    \<rangle>"
+
+lemma add_rights_type[type_rule]: "add_rights : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> \<nat>\<^sub>c"
+  unfolding add_rights_def by typecheck_cfuncs
+
+lemma add_rights_apply:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "add_rights \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle> = add2 \<circ>\<^sub>c \<langle>b,d\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have "?lhs = add2 \<circ>\<^sub>c \<langle>
+      right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),
+      right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)
+    \<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>"
+    unfolding add_rights_def using assms comp_associative2 by (typecheck_cfuncs, auto)
+  also have "... = add2 \<circ>\<^sub>c \<langle>
+      right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>,
+      right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>
+    \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  also have "... = add2 \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>c,d\<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = add2 \<circ>\<^sub>c \<langle>b, d\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: right_cart_proj_cfunc_prod)
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition add2_int :: "cfunc" where
+  "add2_int = lift2\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>add_lefts, add_rights\<rangle>)"
+
+lemma add2_int_const_on_int_rel:
+  assumes type_assms: "a \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c"
+  assumes a_c_equiv: "natpair2int \<circ>\<^sub>c a = natpair2int \<circ>\<^sub>c c" and b_d_equiv: "natpair2int \<circ>\<^sub>c b = natpair2int \<circ>\<^sub>c d"
+  shows "(natpair2int \<circ>\<^sub>c \<langle>add_lefts, add_rights\<rangle>) \<circ>\<^sub>c \<langle>a, b\<rangle> = (natpair2int \<circ>\<^sub>c \<langle>add_lefts, add_rights\<rangle>) \<circ>\<^sub>c \<langle>c, d\<rangle>"
+proof -
+  obtain a1 a2 b1 b2 c1 c2 d1 d2 where
+    inner_type_assms: "a1 \<in>\<^sub>c \<nat>\<^sub>c" "a2 \<in>\<^sub>c \<nat>\<^sub>c" "b1 \<in>\<^sub>c \<nat>\<^sub>c" "b2 \<in>\<^sub>c \<nat>\<^sub>c" "c1 \<in>\<^sub>c \<nat>\<^sub>c" "c2 \<in>\<^sub>c \<nat>\<^sub>c" "d1 \<in>\<^sub>c \<nat>\<^sub>c" "d2 \<in>\<^sub>c \<nat>\<^sub>c"
+    and pair_expansions: "a = \<langle>a1,a2\<rangle>" "b = \<langle>b1,b2\<rangle>" "c = \<langle>c1,c2\<rangle>" "d = \<langle>d1,d2\<rangle>"
+    by (smt cart_prod_decomp type_assms)
+
+  have "a1 +\<^sub>\<nat> c2 = a2 +\<^sub>\<nat> c1 \<and> b1 +\<^sub>\<nat> d2 = b2 +\<^sub>\<nat> d1"
+    using a_c_equiv b_d_equiv inner_type_assms nat_pair_eq pair_expansions by auto
+  then have "a1 +\<^sub>\<nat> c2 +\<^sub>\<nat> b1 +\<^sub>\<nat> d2 = a2 +\<^sub>\<nat> c1 +\<^sub>\<nat> b2 +\<^sub>\<nat> d1"
+    by (smt add_associates add_type inner_type_assms)
+  then have "(a1 +\<^sub>\<nat> b1) +\<^sub>\<nat> (c2 +\<^sub>\<nat> d2) = (a2 +\<^sub>\<nat> b2) +\<^sub>\<nat> (c1 +\<^sub>\<nat> d1)"
+    by (smt add_associates add_commutes add_type inner_type_assms)
+  then have "natpair2int \<circ>\<^sub>c \<langle>a1 +\<^sub>\<nat> b1, a2 +\<^sub>\<nat> b2\<rangle> = natpair2int \<circ>\<^sub>c \<langle>c1 +\<^sub>\<nat> d1, c2 +\<^sub>\<nat> d2\<rangle>"
+    using inner_type_assms by (typecheck_cfuncs, simp add: add_commutes nat_pair_eq)
+  then have "natpair2int \<circ>\<^sub>c \<langle>add_lefts \<circ>\<^sub>c \<langle>a, b\<rangle> , add_rights \<circ>\<^sub>c \<langle>a, b\<rangle>\<rangle>
+      = natpair2int \<circ>\<^sub>c \<langle>add_lefts \<circ>\<^sub>c \<langle>c, d\<rangle>, add_rights \<circ>\<^sub>c \<langle>c, d\<rangle>\<rangle>"
+    using add2_apply add_def2 add_lefts_apply add_rights_apply inner_type_assms pair_expansions by auto
+  then have "natpair2int \<circ>\<^sub>c \<langle>add_lefts,add_rights\<rangle> \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c \<langle>add_lefts,add_rights\<rangle> \<circ>\<^sub>c \<langle>c,d\<rangle>"
+    using type_assms by (typecheck_cfuncs, simp add: cfunc_prod_comp)
+  then show "(natpair2int \<circ>\<^sub>c \<langle>add_lefts,add_rights\<rangle>) \<circ>\<^sub>c \<langle>a,b\<rangle> = (natpair2int \<circ>\<^sub>c \<langle>add_lefts,add_rights\<rangle>) \<circ>\<^sub>c \<langle>c,d\<rangle>"
+    using type_assms by (typecheck_cfuncs, simp add: comp_associative2)
+qed
+
+lemma add2_int_type[type_rule]:
+  "add2_int : \<int>\<^sub>c \<times>\<^sub>c \<int>\<^sub>c \<rightarrow> \<int>\<^sub>c"
+  unfolding add2_int_def using add2_int_const_on_int_rel by (typecheck_cfuncs, blast)
+
+definition add_int :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixl "+\<^sub>\<int>" 65)
+  where "m +\<^sub>\<int> n = add2_int \<circ>\<^sub>c \<langle>m, n\<rangle>"
+
+lemma add_type[type_rule]:
+  assumes "m : X \<rightarrow> \<int>\<^sub>c" "n : X \<rightarrow> \<int>\<^sub>c"
+  shows "m +\<^sub>\<int> n : X \<rightarrow> \<int>\<^sub>c"
+  unfolding add_int_def using assms by typecheck_cfuncs
+
 end
