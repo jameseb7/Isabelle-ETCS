@@ -843,4 +843,9 @@ lemma add_type[type_rule]:
   shows "m +\<^sub>\<int> n : X \<rightarrow> \<int>\<^sub>c"
   unfolding add_int_def using assms by typecheck_cfuncs
 
+lemma add2_int_natpair2int_eq:
+  "add2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int) = natpair2int \<circ>\<^sub>c \<langle>add_lefts, add_rights\<rangle>"
+  unfolding add2_int_def using add2_int_const_on_int_rel 
+  by (rule lift2_int_func_natpair2int_eq[where Y="\<int>\<^sub>c"], blast+, typecheck_cfuncs)
+
 end
