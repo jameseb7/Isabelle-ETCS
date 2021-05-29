@@ -856,23 +856,114 @@ lemma add2_int_natpair2int_eq_el_form:
   using assms add_lefts_apply add_rights_apply cfunc_prod_comp 
   by (typecheck_cfuncs, force)
 
-
-
-
-
-lemma addZ_respects_zero:
-  assumes "x \<in>\<^sub>c \<int>\<^sub>c"
-  shows "natpair2int \<circ>\<^sub>c\<langle>zero, zero\<rangle> +\<^sub>\<int> x = x"
+lemma addZtoAddN:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"  "c \<in>\<^sub>c \<nat>\<^sub>c"  "d \<in>\<^sub>c \<nat>\<^sub>c" 
+  shows "(natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle>) = 
+          natpair2int \<circ>\<^sub>c \<langle> a +\<^sub>\<nat> c , b +\<^sub>\<nat> d\<rangle>"
 proof - 
-  obtain n  where x_def:"n  \<in>\<^sub>c \<nat>\<^sub>c \<and> 
-(x = natpair2int \<circ>\<^sub>c\<langle>zero, n\<rangle> \<or>  x = natpair2int \<circ>\<^sub>c\<langle>n, zero\<rangle>)"
-    using assms canonical_representation_theorem by blast
-  then show ?thesis
-  proof(cases "x = natpair2int \<circ>\<^sub>c\<langle>zero, n\<rangle>",auto)
-    assume case1: "x = natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>"
-    assume n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
-    have "natpair2int \<circ>\<^sub>c \<langle>zero,zero\<rangle> +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>) =
-          add2_int \<circ>\<^sub>c \<langle>natpair2int \<circ>\<^sub>c \<langle>zero,zero\<rangle>,  (natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>)\<rangle>"
+  have "(natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle>) =
+        add2_int \<circ>\<^sub>c \<langle>natpair2int \<circ>\<^sub>c \<langle>a,b\<rangle>,  natpair2int \<circ>\<^sub>c \<langle>c,d\<rangle>\<rangle>"
+    by (simp add: add_int_def)
+  also have "... = add2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int) \<circ>\<^sub>c \<langle> \<langle>a,b\<rangle>, \<langle>c,d\<rangle> \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>add_lefts, add_rights\<rangle> \<circ>\<^sub>c \<langle> \<langle>a,b\<rangle>, \<langle>c,d\<rangle> \<rangle>"
+    using assms by (typecheck_cfuncs,  simp add: add2_int_natpair2int_eq comp_associative2)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a,c\<rangle>, add2 \<circ>\<^sub>c \<langle>b, d\<rangle> \<rangle>"
+    by (simp add: add2_int_natpair2int_eq_el_form assms)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle> a +\<^sub>\<nat> c , b +\<^sub>\<nat> d\<rangle>"
+    by (simp add: add_def)
+  then show ?thesis using calculation by auto
+qed
+  
+    
+
+
+
+
+
+
+
+
+
+lemma addZ_respects_zero_left:
+  assumes "x \<in>\<^sub>c \<int>\<^sub>c"
+  shows "(natpair2int \<circ>\<^sub>c\<langle>zero, zero\<rangle>) +\<^sub>\<int> x = x"
+proof - 
+  obtain n m  where x_def:"n  \<in>\<^sub>c \<nat>\<^sub>c \<and> m  \<in>\<^sub>c \<nat>\<^sub>c \<and> x = natpair2int \<circ>\<^sub>c\<langle>m, n\<rangle>"
+    using assms representation_theorem by blast
+  then have "(natpair2int \<circ>\<^sub>c\<langle>zero, zero\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c\<langle>m, n\<rangle>) = 
+              natpair2int \<circ>\<^sub>c \<langle> zero +\<^sub>\<nat> m , zero +\<^sub>\<nat> n\<rangle>"
+    by (simp add: addZtoAddN zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle> m , n\<rangle>"
+    by (simp add: add_respects_zero_on_left x_def)
+  also have "... = x"
+    by (simp add: x_def)
+  then show ?thesis using calculation by auto
+qed
+
+lemma addZ_commutative:
+  assumes "x \<in>\<^sub>c \<int>\<^sub>c" "y \<in>\<^sub>c \<int>\<^sub>c"
+  shows "x +\<^sub>\<int> y = y +\<^sub>\<int> x"
+proof - 
+  obtain a b c d where xy_defs: "a  \<in>\<^sub>c \<nat>\<^sub>c \<and> b  \<in>\<^sub>c \<nat>\<^sub>c \<and> c  \<in>\<^sub>c \<nat>\<^sub>c \<and> d  \<in>\<^sub>c \<nat>\<^sub>c \<and>
+            x = natpair2int \<circ>\<^sub>c\<langle>a, b\<rangle> \<and> y = natpair2int \<circ>\<^sub>c\<langle>c, d\<rangle>"
+    using assms representation_theorem by blast
+  then have "x +\<^sub>\<int> y = (natpair2int \<circ>\<^sub>c\<langle>a, b\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c\<langle>c, d\<rangle>)"
+    by simp
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>a +\<^sub>\<nat> c, b +\<^sub>\<nat> d\<rangle>"
+    by (simp add: addZtoAddN xy_defs)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>c +\<^sub>\<nat> a, d +\<^sub>\<nat> b\<rangle>"
+    by (simp add: add_commutes xy_defs)
+  also have "... = (natpair2int \<circ>\<^sub>c\<langle>c, d\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c\<langle>a, b\<rangle>)"
+    by (simp add: addZtoAddN xy_defs)
+  also have "... = y +\<^sub>\<int> x"
+    by (simp add: xy_defs)
+  then show ?thesis using calculation by auto
+qed
+
+lemma addZ_respects_zero_right:
+  assumes "x \<in>\<^sub>c \<int>\<^sub>c"
+  shows "x +\<^sub>\<int> (natpair2int \<circ>\<^sub>c\<langle>zero, zero\<rangle>) = x"
+  by (metis addZtoAddN add_respects_zero_on_right assms representation_theorem zero_type)
+
+(*Eventually we should prove that 0 is the unique element with this property*)
+
+lemma addZ_associative:
+  assumes "x \<in>\<^sub>c \<int>\<^sub>c" "y \<in>\<^sub>c \<int>\<^sub>c" "z \<in>\<^sub>c \<int>\<^sub>c" 
+  shows "(x +\<^sub>\<int> y) +\<^sub>\<int> z = x +\<^sub>\<int> (y +\<^sub>\<int> z)"
+proof - 
+  obtain x1 x2 y1 y2 z1 z2 where xyz_defs: 
+"x1 \<in>\<^sub>c \<nat>\<^sub>c \<and> x2 \<in>\<^sub>c \<nat>\<^sub>c \<and> y1 \<in>\<^sub>c \<nat>\<^sub>c \<and> y2 \<in>\<^sub>c \<nat>\<^sub>c \<and> z1 \<in>\<^sub>c \<nat>\<^sub>c \<and> z2 \<in>\<^sub>c \<nat>\<^sub>c \<and>
+ x = natpair2int \<circ>\<^sub>c \<langle>x1,x2\<rangle> \<and>
+ y = natpair2int \<circ>\<^sub>c \<langle>y1,y2\<rangle> \<and> 
+ z = natpair2int \<circ>\<^sub>c \<langle>z1,z2\<rangle>"
+    by (meson assms representation_theorem) 
+  then have "(x +\<^sub>\<int> y) +\<^sub>\<int> z = 
+((natpair2int \<circ>\<^sub>c \<langle>x1,x2\<rangle>)  +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>y1,y2\<rangle>))  +\<^sub>\<int>  (natpair2int \<circ>\<^sub>c \<langle>z1,z2\<rangle>)"
+    by blast
+  also have "... = 
+(natpair2int \<circ>\<^sub>c \<langle> x1 +\<^sub>\<nat> y1 , x2 +\<^sub>\<nat> y2\<rangle>)  +\<^sub>\<int>  (natpair2int \<circ>\<^sub>c \<langle>z1,z2\<rangle>)"
+    by (simp add: addZtoAddN xyz_defs)
+  also have "... = 
+natpair2int \<circ>\<^sub>c \<langle> (x1 +\<^sub>\<nat> y1) +\<^sub>\<nat> z1 , (x2 +\<^sub>\<nat> y2) +\<^sub>\<nat> z2\<rangle>"
+    by (simp add: ETCS_Add.add_type addZtoAddN xyz_defs)
+  also have "... = 
+natpair2int \<circ>\<^sub>c \<langle> x1 +\<^sub>\<nat> (y1 +\<^sub>\<nat> z1) , x2 +\<^sub>\<nat> (y2 +\<^sub>\<nat> z2)\<rangle>"
+    by (simp add: add_associates xyz_defs)
+  also have "... =
+(natpair2int \<circ>\<^sub>c \<langle> x1  , x2\<rangle>)  +\<^sub>\<int>  (natpair2int \<circ>\<^sub>c \<langle>y1 +\<^sub>\<nat> z1 ,y2 +\<^sub>\<nat> z2\<rangle>)"
+    by (simp add: ETCS_Add.add_type addZtoAddN xyz_defs)
+  also have "... = 
+(natpair2int \<circ>\<^sub>c \<langle>x1,x2\<rangle>)  +\<^sub>\<int> ((natpair2int \<circ>\<^sub>c \<langle>y1,y2\<rangle>)  +\<^sub>\<int>  (natpair2int \<circ>\<^sub>c \<langle>z1,z2\<rangle>))"
+    by (simp add: addZtoAddN xyz_defs)
+  also have "... = x +\<^sub>\<int> (y +\<^sub>\<int> z)"
+    by (simp add: xyz_defs)
+  then show ?thesis using calculation by auto
+qed
+
+
+  
+
 
 
 end
