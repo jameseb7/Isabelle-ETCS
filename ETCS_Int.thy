@@ -843,9 +843,36 @@ lemma add_type[type_rule]:
   shows "m +\<^sub>\<int> n : X \<rightarrow> \<int>\<^sub>c"
   unfolding add_int_def using assms by typecheck_cfuncs
 
+
 lemma add2_int_natpair2int_eq:
   "add2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int) = natpair2int \<circ>\<^sub>c \<langle>add_lefts, add_rights\<rangle>"
   unfolding add2_int_def using add2_int_const_on_int_rel 
   by (rule lift2_int_func_natpair2int_eq[where Y="\<int>\<^sub>c"], blast+, typecheck_cfuncs)
+
+lemma add2_int_natpair2int_eq_el_form:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"  "c \<in>\<^sub>c \<nat>\<^sub>c"  "d \<in>\<^sub>c \<nat>\<^sub>c" 
+  shows "\<langle>add_lefts, add_rights\<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> = 
+    \<langle>add2 \<circ>\<^sub>c \<langle>a,c\<rangle>, add2 \<circ>\<^sub>c \<langle>b,d\<rangle>\<rangle>"
+  using assms add_lefts_apply add_rights_apply cfunc_prod_comp 
+  by (typecheck_cfuncs, force)
+
+
+
+
+
+lemma addZ_respects_zero:
+  assumes "x \<in>\<^sub>c \<int>\<^sub>c"
+  shows "natpair2int \<circ>\<^sub>c\<langle>zero, zero\<rangle> +\<^sub>\<int> x = x"
+proof - 
+  obtain n  where x_def:"n  \<in>\<^sub>c \<nat>\<^sub>c \<and> 
+(x = natpair2int \<circ>\<^sub>c\<langle>zero, n\<rangle> \<or>  x = natpair2int \<circ>\<^sub>c\<langle>n, zero\<rangle>)"
+    using assms canonical_representation_theorem by blast
+  then show ?thesis
+  proof(cases "x = natpair2int \<circ>\<^sub>c\<langle>zero, n\<rangle>",auto)
+    assume case1: "x = natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>"
+    assume n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    have "natpair2int \<circ>\<^sub>c \<langle>zero,zero\<rangle> +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>) =
+          add2_int \<circ>\<^sub>c \<langle>natpair2int \<circ>\<^sub>c \<langle>zero,zero\<rangle>,  (natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>)\<rangle>"
+
 
 end
