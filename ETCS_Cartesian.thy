@@ -344,6 +344,8 @@ qed
 
 subsection \<open>Useful Cartesian product permuting functions\<close>
 
+subsubsection \<open>Swapping a Cartesian product\<close>
+
 definition swap :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "swap X Y = \<langle>right_cart_proj X Y, left_cart_proj X Y\<rangle>"
 
@@ -384,7 +386,9 @@ lemma swap_idempotent:
   "swap Y X \<circ>\<^sub>c swap X Y = id (X \<times>\<^sub>c Y)"
   by (metis swap_def cfunc_prod_unique id_right_unit2 id_type left_cart_proj_type
       right_cart_proj_type swap_ap)
-  
+
+subsubsection \<open>Permuting a Cartesian product to associate to the right\<close>
+
 definition associate_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "associate_right X Y Z =
     \<langle>
@@ -444,6 +448,8 @@ proof -
   then show ?thesis
     using calculation by auto
 qed
+
+subsubsection \<open>Permuting a Cartesian product to associate to the left\<close>
 
 definition associate_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "associate_left X Y Z =
@@ -508,6 +514,8 @@ proof -
   then show ?thesis
     using calculation by auto
 qed
+
+subsubsection \<open>Distributing over a Cartesian product from the right\<close>
 
 definition distribute_right_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_right_left X Y Z = 
@@ -626,6 +634,9 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by (simp add: g_expand h_expand)
 qed
 
+
+subsubsection \<open>Distributing over a Cartesian product from the left\<close>
+
 definition distribute_left_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_left_left X Y Z = 
     \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), left_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle>"
@@ -741,6 +752,136 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by simp
   then show "g = h"
     by (simp add: g_expand h_expand)
+qed
+
+subsubsection \<open>Selecting pairs from a pair of pairs\<close>
+
+definition outers :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "outers A B C D = \<langle>
+      left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
+      right_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D)
+    \<rangle>"
+
+lemma outers_type[type_rule]: "outers A B C D : (A \<times>\<^sub>c B) \<times>\<^sub>c (C \<times>\<^sub>c D) \<rightarrow> (A \<times>\<^sub>c D)"
+  unfolding outers_def by typecheck_cfuncs
+
+lemma outers_apply:
+  assumes "a : Z \<rightarrow> A" "b : Z \<rightarrow> B" "c : Z \<rightarrow> C" "d : Z \<rightarrow> D"
+  shows "outers A B C D \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> = \<langle>a,d\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have "?lhs = \<langle>
+      left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
+      right_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D)
+    \<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle>"
+    unfolding outers_def by auto
+  also have "... = \<langle>
+      left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>,
+      right_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>
+    \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  also have "... = \<langle>left_cart_proj A B \<circ>\<^sub>c \<langle>a,b\<rangle>, right_cart_proj C D \<circ>\<^sub>c \<langle>c,d\<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = \<langle>a, d\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition inners :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "inners A B C D = \<langle>
+      right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
+      left_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D)
+    \<rangle>"
+
+lemma inners_type[type_rule]: "inners A B C D : (A \<times>\<^sub>c B) \<times>\<^sub>c (C \<times>\<^sub>c D) \<rightarrow> (B \<times>\<^sub>c C)"
+  unfolding inners_def by typecheck_cfuncs
+    
+lemma inners_apply:
+  assumes "a : Z \<rightarrow> A" "b : Z \<rightarrow> B" "c : Z \<rightarrow> C" "d : Z \<rightarrow> D"
+  shows "inners A B C D \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle> = \<langle>b,c\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have "?lhs = \<langle>
+      right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
+      left_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D)
+    \<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>"
+    unfolding inners_def by auto
+  also have "... = \<langle>
+      right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>,
+      left_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>
+    \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  also have "... = \<langle>right_cart_proj A B \<circ>\<^sub>c \<langle>a,b\<rangle>, left_cart_proj C D \<circ>\<^sub>c \<langle>c,d\<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = \<langle>b, c\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition lefts :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "lefts A B C D = \<langle>
+      left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
+      left_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D)
+    \<rangle>"
+
+lemma lefts_type[type_rule]: "lefts A B C D : (A \<times>\<^sub>c B) \<times>\<^sub>c (C \<times>\<^sub>c D) \<rightarrow> (A \<times>\<^sub>c C)"
+  unfolding lefts_def by typecheck_cfuncs
+
+lemma lefts_apply:
+  assumes "a : Z \<rightarrow> A" "b : Z \<rightarrow> B" "c : Z \<rightarrow> C" "d : Z \<rightarrow> D"
+  shows "lefts A B C D \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle> = \<langle>a,c\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have "?lhs = \<langle>
+      left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
+      left_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D)
+    \<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>"
+    unfolding lefts_def by (auto)
+  also have "... = \<langle>
+      left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>,
+      left_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>
+    \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  also have "... = \<langle>left_cart_proj A B \<circ>\<^sub>c \<langle>a,b\<rangle>, left_cart_proj C D \<circ>\<^sub>c \<langle>c,d\<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = \<langle>a, c\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition rights :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "rights A B C D = \<langle>
+      right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
+      right_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D)
+    \<rangle>"
+
+lemma rights_type[type_rule]: "rights A B C D : (A \<times>\<^sub>c B) \<times>\<^sub>c (C \<times>\<^sub>c D) \<rightarrow> (B \<times>\<^sub>c D)"
+  unfolding rights_def by typecheck_cfuncs
+
+lemma rights_apply:
+  assumes "a : Z \<rightarrow> A" "b : Z \<rightarrow> B" "c : Z \<rightarrow> C" "d : Z \<rightarrow> D"
+  shows "rights A B C D \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle> = \<langle>b,d\<rangle>"
+    (is "?lhs = ?rhs")
+proof -
+  have "?lhs = \<langle>
+      right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
+      right_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D)
+    \<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>"
+    unfolding rights_def using assms comp_associative2 by auto
+  also have "... = \<langle>
+      right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>,
+      right_cart_proj C D \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c, d\<rangle>\<rangle>
+    \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  also have "... = \<langle>right_cart_proj A B \<circ>\<^sub>c \<langle>a,b\<rangle>, right_cart_proj C D \<circ>\<^sub>c \<langle>c,d\<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  also have "... = \<langle>b, d\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: right_cart_proj_cfunc_prod)
+  then show ?thesis
+    using calculation by auto
 qed
 
 end
