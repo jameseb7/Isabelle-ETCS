@@ -1,5 +1,5 @@
 theory ETCS_Int
-  imports ETCS_Add ETCS_Comparison
+  imports ETCS_Add ETCS_Mult ETCS_Comparison
 begin
 
 definition add_outers :: "cfunc" where
@@ -993,7 +993,36 @@ lemma add_inverse_unique:
   shows "x +\<^sub>\<int> y = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle> \<Longrightarrow> y = neg_int \<circ>\<^sub>c x"
   by (smt addZ_associative addZ_respects_zero_right add_neg assms comp_type neg_cancels_neg2 neg_int_type)
 
+section \<open>Integer Multiplication\<close>
+
+definition mult2_natpair :: "cfunc" where
+  "mult2_natpair = \<langle>
+      add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c outers \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c, mult2 \<circ>\<^sub>c inners \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+      add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c lefts \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c, mult2 \<circ>\<^sub>c rights \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>
+    \<rangle>"
 
 
+lemma mult2_natpair_type[type_rule]: 
+  "mult2_natpair : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+  unfolding mult2_natpair_def by typecheck_cfuncs
+
+lemma mult2_natpair_apply: 
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "mult2_natpair \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> = \<langle>(a \<cdot>\<^sub>\<nat> d) +\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> c), (a \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> d)\<rangle>"
+  oops
+
+lemma mult2_natpair_const_on_int_rel:
+  assumes type_assms: "a \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c"
+  assumes a_c_equiv: "natpair2int \<circ>\<^sub>c a = natpair2int \<circ>\<^sub>c c" and b_d_equiv: "natpair2int \<circ>\<^sub>c b = natpair2int \<circ>\<^sub>c d"
+  shows "(natpair2int \<circ>\<^sub>c mult2_natpair) \<circ>\<^sub>c \<langle>a, b\<rangle> = (natpair2int \<circ>\<^sub>c mult2_natpair) \<circ>\<^sub>c \<langle>c, d\<rangle>"
+  sorry
+
+definition mult2_int :: "cfunc" where
+  "mult2_int = lift2\<^sub>\<int> (natpair2int \<circ>\<^sub>c mult2_natpair)"
+
+lemma mult2_int_type[type_rule]: 
+  "mult2_int : \<int>\<^sub>c \<times>\<^sub>c \<int>\<^sub>c \<rightarrow> \<int>\<^sub>c"
+  unfolding mult2_int_def using mult2_natpair_const_on_int_rel by (typecheck_cfuncs, blast)
+  
 
 end
