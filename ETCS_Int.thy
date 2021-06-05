@@ -327,7 +327,7 @@ proof -
   qed
 qed
 
-
+section \<open>Lifting function domains to integers\<close>
 
 definition lift_int_func :: "cfunc \<Rightarrow> cfunc" ("lift\<^sub>\<int>") where
   "lift\<^sub>\<int> f = quotient_func f R\<^sub>\<int>"
@@ -363,20 +363,6 @@ proof -
     using assms(3) assms(4) swap_ap by auto
   then show ?thesis using calculation by auto
 qed
-
-(*The above lemma justifies the following definition.*)
-
-(*
-definition neg_int :: "cfunc" where "neg_int = lift\<^sub>\<int> (natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c)"
-*)
-
-(*
-lemma neg_cancels_neg: 
-  assumes "n \<in>\<^sub>c \<int>\<^sub>c"
-  shows "neg_int  \<circ>\<^sub>c neg_int  \<circ>\<^sub>c n = n"
-proof - 
-  have "
-*)
 
 definition liftr_int_func :: "cfunc \<Rightarrow> cfunc" ("liftr\<^sub>\<int>") where
   "liftr\<^sub>\<int> f = (lift\<^sub>\<int> (f\<^sup>\<sharp>))\<^sup>\<flat>"
@@ -737,6 +723,36 @@ proof -
     using prod_epi assms by (typecheck_cfuncs, blast)
 qed
 
+section \<open>Integer Negation\<close>
+
+definition neg_int :: "cfunc" where
+  "neg_int = lift\<^sub>\<int> (natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c)"
+
+lemma natpair2int_swap_const_on_equiv_classes:
+  "const_on_rel (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) R\<^sub>\<int> (natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c)"
+proof (rule const_on_int_rel_def)
+  fix x y
+  assume x_type: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c" and y_type: "y \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+  assume natpair2int_eq: "natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
+
+  show "(natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c x = (natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c y"
+    oops
+
+lemma neg_cancels_neg: 
+  "neg_int \<circ>\<^sub>c neg_int = id \<int>\<^sub>c"
+  oops
+
+lemma neg_cancels_neg2: 
+  assumes "n \<in>\<^sub>c \<int>\<^sub>c"
+  shows "neg_int \<circ>\<^sub>c neg_int \<circ>\<^sub>c n = n"
+  oops
+
+lemma neg_zero:
+  "neg_int \<circ>\<^sub>c natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+  oops
+
+section \<open>Integer Addition\<close>
+
 definition add_lefts :: "cfunc" where
   "add_lefts = add2 \<circ>\<^sub>c \<langle>
       left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),
@@ -923,7 +939,7 @@ qed
 
 lemma addZ_respects_zero_right:
   assumes "x \<in>\<^sub>c \<int>\<^sub>c"
-  shows "x +\<^sub>\<int> (natpair2int \<circ>\<^sub>c\<langle>zero, zero\<rangle>) = x"
+  shows "x +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>) = x"
   by (metis addZtoAddN add_respects_zero_on_right assms representation_theorem zero_type)
 
 (*Eventually we should prove that 0 is the unique element with this property*)
@@ -961,7 +977,15 @@ natpair2int \<circ>\<^sub>c \<langle> x1 +\<^sub>\<nat> (y1 +\<^sub>\<nat> z1) ,
   then show ?thesis using calculation by auto
 qed
 
+lemma add_neg:
+  assumes "x \<in>\<^sub>c \<int>\<^sub>c"
+  shows "x +\<^sub>\<int> (neg_int \<circ>\<^sub>c x) = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+  oops
 
+lemma add_inverse_unique:
+  assumes "x \<in>\<^sub>c \<int>\<^sub>c" "y \<in>\<^sub>c \<int>\<^sub>c"
+  shows "x +\<^sub>\<int> y = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle> \<Longrightarrow> y = neg_int \<circ>\<^sub>c x"
+  oops
   
 
 
