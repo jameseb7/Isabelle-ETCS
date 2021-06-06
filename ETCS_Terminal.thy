@@ -444,10 +444,11 @@ proof -
     using calculation by auto
 qed
 
+(*
 lemma elements_of_a_pair:
   assumes "\<langle>x,y\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Y)"
   shows "(x \<in>\<^sub>c X)" and "y \<in>\<^sub>c Y"
-
+*)
 
 
 end

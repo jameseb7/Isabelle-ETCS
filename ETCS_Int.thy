@@ -1009,13 +1009,48 @@ lemma mult2_natpair_type[type_rule]:
 lemma mult2_natpair_apply: 
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
   shows "mult2_natpair \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> = \<langle>(a \<cdot>\<^sub>\<nat> d) +\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> c), (a \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> d)\<rangle>"
-  oops
+proof - 
+  have "mult2_natpair \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> =
+ \<langle>
+      add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c outers \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c, mult2 \<circ>\<^sub>c inners \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+      add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c lefts \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c, mult2 \<circ>\<^sub>c rights \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>
+    \<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle>"
+    by (simp add: mult2_natpair_def)
+  also have "... = \<langle>
+      add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c outers \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle>, mult2 \<circ>\<^sub>c inners \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> \<rangle>,
+      add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c lefts \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle>, mult2 \<circ>\<^sub>c rights \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, \<langle>c,d\<rangle>\<rangle> \<rangle>\<rangle> "
+    using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+  also have "... =  \<langle>(a \<cdot>\<^sub>\<nat> d) +\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> c), (a \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> d)\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: add_def inners_apply lefts_apply mult_def outers_apply rights_apply)
+  then show ?thesis using calculation by auto
+qed
+
 
 lemma mult2_natpair_const_on_int_rel:
   assumes type_assms: "a \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c"
   assumes a_c_equiv: "natpair2int \<circ>\<^sub>c a = natpair2int \<circ>\<^sub>c c" and b_d_equiv: "natpair2int \<circ>\<^sub>c b = natpair2int \<circ>\<^sub>c d"
   shows "(natpair2int \<circ>\<^sub>c mult2_natpair) \<circ>\<^sub>c \<langle>a, b\<rangle> = (natpair2int \<circ>\<^sub>c mult2_natpair) \<circ>\<^sub>c \<langle>c, d\<rangle>"
-  sorry
+proof - 
+  obtain a1 a2 b1 b2 c1 c2 d1 d2 where pairs_def: "a1 \<in>\<^sub>c \<nat>\<^sub>c \<and> a2 \<in>\<^sub>c \<nat>\<^sub>c \<and>
+ b1 \<in>\<^sub>c \<nat>\<^sub>c \<and> b2 \<in>\<^sub>c \<nat>\<^sub>c \<and>  c1 \<in>\<^sub>c \<nat>\<^sub>c \<and> c2 \<in>\<^sub>c \<nat>\<^sub>c \<and> d1 \<in>\<^sub>c \<nat>\<^sub>c \<and> d2 \<in>\<^sub>c \<nat>\<^sub>c \<and> 
+ a =  \<langle>a1,a2\<rangle> \<and>
+ b =  \<langle>b1,b2\<rangle> \<and>
+ c =  \<langle>c1,c2\<rangle> \<and>
+ d =  \<langle>d1,d2\<rangle> "
+    by (smt cart_prod_decomp type_assms)
+  then have rel1: "natpair2int \<circ>\<^sub>c \<langle>a1,a2\<rangle> = natpair2int \<circ>\<^sub>c \<langle>c1,c2\<rangle>"
+    using a_c_equiv by blast
+  have rel2: "natpair2int \<circ>\<^sub>c \<langle>b1,b2\<rangle> = natpair2int \<circ>\<^sub>c \<langle>d1,d2\<rangle>"
+    using b_d_equiv pairs_def by blast
+  have equiv_eqn1: "a2 +\<^sub>\<nat> c1 = a1 +\<^sub>\<nat> c2"
+    using nat_pair_eq pairs_def rel1 by auto
+  have equiv_eqn2: "(b2 +\<^sub>\<nat> d1 = b1 +\<^sub>\<nat> d2)"
+    using nat_pair_eq pairs_def rel2 by auto
+  have eqn1: "(a1\<cdot>\<^sub>\<nat> c1) +\<^sub>\<nat> (b1 +\<^sub>\<nat> a2)\<cdot>\<^sub>\<nat> d2 = (a1\<cdot>\<^sub>\<nat> c1) +\<^sub>\<nat> (a2 +\<^sub>\<nat> b1)\<cdot>\<^sub>\<nat> d2"
+    by (simp add: add_commutes pairs_def)
+  also have "... = (a1\<cdot>\<^sub>\<nat> c1) +\<^sub>\<nat> ((a2\<cdot>\<^sub>\<nat>d2) +\<^sub>\<nat> (b1\<cdot>\<^sub>\<nat>d2))"
+
+
 
 definition mult2_int :: "cfunc" where
   "mult2_int = lift2\<^sub>\<int> (natpair2int \<circ>\<^sub>c mult2_natpair)"
