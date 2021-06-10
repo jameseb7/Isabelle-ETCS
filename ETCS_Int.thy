@@ -995,6 +995,9 @@ lemma add_inverse_unique:
 
 section \<open>Integer Multiplication\<close>
 
+
+
+
 definition mult2_natpair :: "cfunc" where
   "mult2_natpair = \<langle>
       add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c outers \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c, mult2 \<circ>\<^sub>c inners \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
@@ -1031,6 +1034,11 @@ lemma mult2_natpair_const_on_int_rel:
   assumes a_c_equiv: "natpair2int \<circ>\<^sub>c a = natpair2int \<circ>\<^sub>c c" and b_d_equiv: "natpair2int \<circ>\<^sub>c b = natpair2int \<circ>\<^sub>c d"
   shows "(natpair2int \<circ>\<^sub>c mult2_natpair) \<circ>\<^sub>c \<langle>a, b\<rangle> = (natpair2int \<circ>\<^sub>c mult2_natpair) \<circ>\<^sub>c \<langle>c, d\<rangle>"
 proof - 
+  have ab_type: "\<langle>a, b\<rangle>\<in>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
+    by (simp add: cfunc_prod_type type_assms(1) type_assms(2))
+  have cd_type: "\<langle>c, d\<rangle>\<in>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
+    by (simp add: cfunc_prod_type type_assms(3) type_assms(4))
+
   obtain a1 a2 b1 b2 c1 c2 d1 d2 where pairs_def: "a1 \<in>\<^sub>c \<nat>\<^sub>c \<and> a2 \<in>\<^sub>c \<nat>\<^sub>c \<and>
  b1 \<in>\<^sub>c \<nat>\<^sub>c \<and> b2 \<in>\<^sub>c \<nat>\<^sub>c \<and>  c1 \<in>\<^sub>c \<nat>\<^sub>c \<and> c2 \<in>\<^sub>c \<nat>\<^sub>c \<and> d1 \<in>\<^sub>c \<nat>\<^sub>c \<and> d2 \<in>\<^sub>c \<nat>\<^sub>c \<and> 
  a =  \<langle>a1,a2\<rangle> \<and>
@@ -1044,12 +1052,64 @@ proof -
     using b_d_equiv pairs_def by blast
   have equiv_eqn1: "a2 +\<^sub>\<nat> c1 = a1 +\<^sub>\<nat> c2"
     using nat_pair_eq pairs_def rel1 by auto
-  have equiv_eqn2: "(b2 +\<^sub>\<nat> d1 = b1 +\<^sub>\<nat> d2)"
+  have equiv_eqn2: "b2 +\<^sub>\<nat> d1 = b1 +\<^sub>\<nat> d2"
     using nat_pair_eq pairs_def rel2 by auto
-  have eqn1: "(a1\<cdot>\<^sub>\<nat> c1) +\<^sub>\<nat> (b1 +\<^sub>\<nat> a2)\<cdot>\<^sub>\<nat> d2 = (a1\<cdot>\<^sub>\<nat> c1) +\<^sub>\<nat> (a2 +\<^sub>\<nat> b1)\<cdot>\<^sub>\<nat> d2"
-    by (simp add: add_commutes pairs_def)
-  also have "... = (a1\<cdot>\<^sub>\<nat> c1) +\<^sub>\<nat> ((a2\<cdot>\<^sub>\<nat>d2) +\<^sub>\<nat> (b1\<cdot>\<^sub>\<nat>d2))"
+  have eqn1: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2) \<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a1 +\<^sub>\<nat> c2)\<cdot>\<^sub>\<nat> d2)"
+    by (simp add: add_commutes equiv_eqn1 pairs_def)
+  have eqn2: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2) \<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a1 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2))"
+    using eqn1 mult_Left_Distributivity pairs_def by auto
+  have eqn3: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2) \<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat>(b1+\<^sub>\<nat>d2)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    by (simp add: add_associates eqn2 mult_closure mult_right_distributivity pairs_def)
+  have eqn4: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2) \<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat>(b2+\<^sub>\<nat>d1)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    by (simp add: eqn3 equiv_eqn2)
+  have eqn5: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a2 +\<^sub>\<nat> c1) \<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat>(b2+\<^sub>\<nat>d1)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    using eqn1 eqn4 equiv_eqn1 by auto
+  have eqn6: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2)) = ((a1\<cdot>\<^sub>\<nat>b2)+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    using eqn5 mult_Left_Distributivity mult_right_distributivity pairs_def by auto
+  have eqn7: "(a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2))) = (a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (((a1\<cdot>\<^sub>\<nat>b2)+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2))"
+    using eqn6 by auto
+  have eqn8: "((a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> b1)) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) = ((a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat>b2))+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    by (typecheck_cfuncs, smt add_associates equiv_eqn1 equiv_eqn2 mult_Left_Distributivity mult_closure mult_right_distributivity pairs_def)
+  have eqn9: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) = ((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1))+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    using add_commutes eqn8 mult_closure pairs_def by auto
+  have eqn10: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    using eqn9 by blast
+  have eqn10: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = ((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1)"
+    by (simp add: eqn9)
+  have eqn11: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    by (typecheck_cfuncs, smt add_associates add_commutes eqn10 mult_closure pairs_def)
+  have eqn12: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2)) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> ((a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    by (typecheck_cfuncs, simp add: add_associates eqn11 mult_closure pairs_def)
+  have eqn13: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> ( b1 +\<^sub>\<nat> d2)) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> ((a1 +\<^sub>\<nat> c2)\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    by (simp add: eqn12 mult_Left_Distributivity mult_right_distributivity pairs_def)
+  have eqn14: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> ( b2 +\<^sub>\<nat> d1)) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2)\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    by (simp add: add_commutes eqn13 equiv_eqn1 equiv_eqn2 pairs_def)
+  have eqn15: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a2\<cdot>\<^sub>\<nat>  b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>d1)) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> a2\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
+    using eqn14 mult_Left_Distributivity mult_right_distributivity pairs_def by auto
+  have eqn16: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>  b2)) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>d1) +\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1)) = ((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1))+\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> ((a2\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2))"
+    using add_associates eqn15 mult_closure pairs_def by (typecheck_cfuncs, auto)
+  have eqn17: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>  b2))  +\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1)) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>d1) = ((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1))+\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> ((c2\<cdot>\<^sub>\<nat> d2)+\<^sub>\<nat>(a2\<cdot>\<^sub>\<nat> d1))"
+    by (typecheck_cfuncs, smt add_associates add_commutes eqn16 mult_closure pairs_def)
+  have eqn18: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>  b2))  +\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1)) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>d1) = ((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1))+\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2))+\<^sub>\<nat>(a2\<cdot>\<^sub>\<nat> d1)"
+    using ETCS_Add.add_type add_associates eqn17 mult_closure pairs_def by auto
+  have eqn19: "(((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>  b2))  +\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1))) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>d1) = (((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1))+\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)))+\<^sub>\<nat>(a2\<cdot>\<^sub>\<nat> d1)"
+    using eqn18 by blast
+  have eqn20: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>  b2))  +\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1))  =
+               ((a1\<cdot>\<^sub>\<nat>b2)  +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>  b1))  +\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2))"
+    by (typecheck_cfuncs, metis (no_types) add_cancellative eqn19 mult_closure pairs_def)
 
+
+    have equivalence_Relation: 
+"natpair2int \<circ>\<^sub>c\<langle>(a1\<cdot>\<^sub>\<nat> b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>  b1), (a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b2) \<rangle> = 
+ natpair2int \<circ>\<^sub>c\<langle>(c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1), (c1\<cdot>\<^sub>\<nat>d1)  +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat>  d2)\<rangle>"
+     by (typecheck_cfuncs, simp add: eqn20 mult_closure nat_pair_eq pairs_def)
+
+    have main_eqn: "natpair2int \<circ>\<^sub>c mult2_natpair \<circ>\<^sub>c \<langle>a, b\<rangle> = natpair2int \<circ>\<^sub>c mult2_natpair \<circ>\<^sub>c \<langle>c, d\<rangle>" 
+     by (typecheck_cfuncs, simp add: equivalence_Relation mult2_natpair_apply pairs_def)
+
+   show ?thesis 
+     using ab_type cd_type comp_associative2 main_eqn by (typecheck_cfuncs,auto)
+ qed
 
 
 definition mult2_int :: "cfunc" where
@@ -1058,6 +1118,333 @@ definition mult2_int :: "cfunc" where
 lemma mult2_int_type[type_rule]: 
   "mult2_int : \<int>\<^sub>c \<times>\<^sub>c \<int>\<^sub>c \<rightarrow> \<int>\<^sub>c"
   unfolding mult2_int_def using mult2_natpair_const_on_int_rel by (typecheck_cfuncs, blast)
+
+
+
+
+
+definition mult_int :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixl "\<cdot>\<^sub>\<int>" 66)
+  where "m \<cdot>\<^sub>\<int> n = mult2_int \<circ>\<^sub>c \<langle>m, n\<rangle>"
+
+lemma mult_type[type_rule]:
+  assumes "m : X \<rightarrow> \<int>\<^sub>c" "n : X \<rightarrow> \<int>\<^sub>c"
+  shows "m \<cdot>\<^sub>\<int>  n : X \<rightarrow> \<int>\<^sub>c"
+  using assms mult_int_def cfunc_prod_type comp_type mult2_int_type mult_int_def 
+  by (typecheck_cfuncs, fastforce)
   
+
+lemma mult2_int_natpair2int_eq:
+  "natpair2int \<circ>\<^sub>c mult2_natpair = mult2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int)"
+  using lift2_int_func_natpair2int_eq mult2_int_def mult2_natpair_const_on_int_rel
+  by (typecheck_cfuncs, fastforce)
+
+
+
+(*
+lemma multZ_to_multNN_1:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"  
+  shows "(natpair2int \<circ>\<^sub>c \<langle>zero, m\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle>) = 
+        natpair2int \<circ>\<^sub>c \<langle>zero, m \<cdot>\<^sub>\<nat> n\<rangle>"
+proof - 
+  have zm_type: "\<langle>zero, m\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(1) cfunc_prod_type zero_type) 
+  have zn_type: "\<langle>zero, n\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(2) cfunc_prod_type zero_type)
+  have zmzn_type: "\<langle>\<langle>zero, m\<rangle>, \<langle>zero, n\<rangle>\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: cfunc_prod_type zm_type zn_type)
+
+  have "(natpair2int \<circ>\<^sub>c \<langle>zero, m\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle>) =
+        natpair2int \<circ>\<^sub>c \<langle>(zero \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> zero), (zero \<cdot>\<^sub>\<nat> zero) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> n)\<rangle>"
+    by (simp add: assms(1) assms(2) multZ_to_multNN zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>zero +\<^sub>\<nat> zero, zero +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> n)\<rangle>"
+    by (simp add: assms mult_respects_zero_left mult_respects_zero_right zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>zero, (m \<cdot>\<^sub>\<nat> n)\<rangle>"
+    by (simp add: add_respects_zero_on_left assms mult_closure zero_type)
+  then show ?thesis using calculation by auto
+qed
+
+
+lemma multZ_to_multNN_2:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"  
+  shows "(natpair2int \<circ>\<^sub>c \<langle>m, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>n, zero\<rangle>) = 
+        natpair2int \<circ>\<^sub>c \<langle>zero, m \<cdot>\<^sub>\<nat> n\<rangle>"
+proof - 
+  have zm_type: "\<langle>m, zero\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(1) cfunc_prod_type zero_type) 
+  have zn_type: "\<langle>n, zero\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(2) cfunc_prod_type zero_type)
+  have zmzn_type: "\<langle>\<langle>m, zero\<rangle>, \<langle>n, zero\<rangle>\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: cfunc_prod_type zm_type zn_type)
+
+  have "(natpair2int \<circ>\<^sub>c \<langle>m, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>n, zero\<rangle>) =
+  natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> zero) +\<^sub>\<nat> (zero \<cdot>\<^sub>\<nat> n), (m \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (zero \<cdot>\<^sub>\<nat> zero)\<rangle>"
+    by (simp add: assms(1) assms(2) multZ_to_multNN zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>zero +\<^sub>\<nat> zero, (m \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> zero\<rangle>"
+    by (simp add: assms mult_respects_zero_left mult_respects_zero_right zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>zero, (m \<cdot>\<^sub>\<nat> n)\<rangle>"
+    by (simp add: add_respects_zero_on_right assms mult_closure zero_type)
+  then show ?thesis using calculation by auto
+qed
+
+lemma multZ_to_multNN_3:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"  
+  shows "(natpair2int \<circ>\<^sub>c \<langle>m, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle>) = 
+        natpair2int \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> n, zero\<rangle>"
+proof - 
+  have zm_type: "\<langle>m, zero\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(1) cfunc_prod_type zero_type) 
+  have zn_type: "\<langle>zero, n\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(2) cfunc_prod_type zero_type)
+  have zmzn_type: "\<langle>\<langle>m, zero\<rangle>, \<langle>zero, n\<rangle>\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: cfunc_prod_type zm_type zn_type)
+
+  have "(natpair2int \<circ>\<^sub>c \<langle>m, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle>) =
+   natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (zero \<cdot>\<^sub>\<nat> zero), (m \<cdot>\<^sub>\<nat> zero) +\<^sub>\<nat> (zero \<cdot>\<^sub>\<nat> n)\<rangle>"
+    by (simp add: assms(1) assms(2) multZ_to_multNN zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> n +\<^sub>\<nat> zero, zero +\<^sub>\<nat> zero\<rangle>"
+    by (simp add: assms mult_respects_zero_left mult_respects_zero_right zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> n), zero\<rangle>"
+    by (simp add: add_respects_zero_on_right assms mult_closure zero_type)
+  then show ?thesis using calculation by auto
+qed
+
+lemma multZ_to_multNN_4:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"  
+  shows "(natpair2int \<circ>\<^sub>c \<langle>zero, m\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>n, zero\<rangle>) = 
+        natpair2int \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> n, zero\<rangle>"
+proof - 
+  have zm_type: "\<langle>zero, m\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(1) cfunc_prod_type zero_type) 
+  have zn_type: "\<langle>n, zero\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(2) cfunc_prod_type zero_type)
+  have zmzn_type: "\<langle>\<langle>zero, m\<rangle>, \<langle>n, zero\<rangle>\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: cfunc_prod_type zm_type zn_type)
+
+  have "(natpair2int \<circ>\<^sub>c \<langle>zero, m\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>n, zero\<rangle>) =
+   natpair2int \<circ>\<^sub>c \<langle>(zero \<cdot>\<^sub>\<nat> zero) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> n), (zero \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> zero)\<rangle>"
+    by (simp add: assms(1) assms(2) multZ_to_multNN zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>zero +\<^sub>\<nat> m \<cdot>\<^sub>\<nat> n, zero +\<^sub>\<nat> zero\<rangle>"
+    by (simp add: assms mult_respects_zero_left mult_respects_zero_right zero_type)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> n), zero\<rangle>"
+    by (simp add: add_respects_zero_on_left assms mult_closure zero_type)
+  then show ?thesis using calculation by auto
+qed
+*)
+
+lemma multZ_to_multNN:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" "p \<in>\<^sub>c \<nat>\<^sub>c" "q \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) = 
+    natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
+
+proof - 
+  have mn_type: "\<langle>m, n\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms cfunc_prod_type zero_type) 
+  have pq_type: "\<langle>p, q\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms cfunc_prod_type zero_type)
+  have zmzn_type: "\<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: cfunc_prod_type mn_type pq_type)
+
+  have "(natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) =
+  mult2_int \<circ>\<^sub>c \<langle>natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>, natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>\<rangle>"
+    by (simp add: mult_int_def)
+  also have "... = mult2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int) \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
+    by (typecheck_cfuncs, smt assms cfunc_cross_prod_comp_cfunc_prod)
+  also have "... = (mult2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int)) \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
+    using comp_associative2 zmzn_type by (typecheck_cfuncs, blast)
+  also have "... = (natpair2int \<circ>\<^sub>c mult2_natpair)  \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
+    by (simp add: mult2_int_natpair2int_eq)
+  also have "... = natpair2int \<circ>\<^sub>c mult2_natpair  \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
+    using comp_associative2 zmzn_type by (typecheck_cfuncs, auto)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
+    by (simp add: assms mult2_natpair_apply zero_type)
+  then show ?thesis using calculation by auto
+qed
+
+
+lemma int_mul_respects_zero_right:
+  assumes "m \<in>\<^sub>c \<int>\<^sub>c"
+  shows "m \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>) = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+  by (smt add_respects_zero_on_left assms multZ_to_multNN mult_respects_zero_right representation_theorem zero_type)
+
+lemma int_mul_respects_zero_left:
+  assumes "m \<in>\<^sub>c \<int>\<^sub>c"
+  shows "(natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>) \<cdot>\<^sub>\<int> m = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+  by (smt add_respects_zero_on_right assms multZ_to_multNN mult_respects_zero_left representation_theorem zero_type)
+
+lemma int_mul_respects_one_right:
+  assumes "m \<in>\<^sub>c \<int>\<^sub>c"
+  shows "(natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) \<cdot>\<^sub>\<int> m = m"
+proof - 
+  obtain p q where m_def: "p \<in>\<^sub>c \<nat>\<^sub>c \<and> q \<in>\<^sub>c \<nat>\<^sub>c \<and> m = natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>"
+    using assms representation_theorem by blast
+  have "(natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) \<cdot>\<^sub>\<int> m  =
+        (natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>)"
+    using m_def by blast
+  also have "... =  natpair2int \<circ>\<^sub>c \<langle>(zero \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> ((successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p), 
+                                   (zero \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> ((successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> q)\<rangle>"
+    by (simp add: m_def multZ_to_multNN succ_n_type zero_type)
+  also have "... =  natpair2int \<circ>\<^sub>c \<langle>zero  +\<^sub>\<nat> ((successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p), 
+                                   zero +\<^sub>\<nat> ((successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> q)\<rangle>"
+    by (simp add: m_def mult_respects_zero_left)
+  also have "... =  natpair2int \<circ>\<^sub>c \<langle>((successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p), 
+                                   ((successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> q)\<rangle>"
+    by (simp add: add_respects_zero_on_left m_def s0_is_left_id)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>p,q\<rangle>"
+    by (simp add: m_def s0_is_left_id)
+  also have "... = m"
+    using m_def by blast
+  then show  "(natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) \<cdot>\<^sub>\<int> m = m"
+    by (simp add: calculation)
+qed
+
+lemma int_mul_commutative:
+  assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c"
+  shows "a \<cdot>\<^sub>\<int> b = b \<cdot>\<^sub>\<int> a"
+
+proof - 
+  obtain m n  where a_def: "m \<in>\<^sub>c \<nat>\<^sub>c \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<and> a = natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>"
+    using assms(1) representation_theorem by blast
+  obtain p q  where b_def: "p \<in>\<^sub>c \<nat>\<^sub>c \<and> q \<in>\<^sub>c \<nat>\<^sub>c \<and> b = natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>"
+    using assms(2) representation_theorem by blast
+
+  have "a \<cdot>\<^sub>\<int> b = (natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>)"
+    by (simp add: a_def b_def)
+  also have "... =  natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
+    by (simp add: a_def b_def multZ_to_multNN)
+  also have "... =  natpair2int \<circ>\<^sub>c \<langle>(n \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> q), (n \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> p)\<rangle>"
+    by (simp add: a_def add_commutes b_def mult_closure)
+  also have "... =  natpair2int \<circ>\<^sub>c \<langle>(p \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (q \<cdot>\<^sub>\<nat> m), (q \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (p \<cdot>\<^sub>\<nat> m)\<rangle>"
+    by (simp add: a_def b_def mult_commutative)
+  also have "... = (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>)"
+    by (simp add: a_def add_commutes b_def multZ_to_multNN mult_closure)
+  also have "... = b \<cdot>\<^sub>\<int> a"
+    by (simp add: a_def b_def)
+  then show ?thesis using calculation by auto
+qed
+
+lemma int_mul_respects_one_left:
+  assumes "m \<in>\<^sub>c \<int>\<^sub>c"
+  shows "m \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) = m"
+proof - 
+  have "\<langle>zero, successor \<circ>\<^sub>c zero \<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: cfunc_prod_type succ_n_type zero_type)
+  then have "(natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) \<in>\<^sub>c \<int>\<^sub>c"
+    using comp_type nat2int_type by auto
+  then have "m \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) = 
+   (natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) \<cdot>\<^sub>\<int> m"
+    by (simp add: assms int_mul_commutative)
+  also have "... = m"
+    using assms int_mul_respects_one_right by blast
+  then show ?thesis
+    by (simp add: calculation) 
+qed
+
+lemma int_mul_associative: 
+  assumes "m \<in>\<^sub>c \<int>\<^sub>c" "n \<in>\<^sub>c \<int>\<^sub>c" "t \<in>\<^sub>c \<int>\<^sub>c"
+  shows "(m \<cdot>\<^sub>\<int> n) \<cdot>\<^sub>\<int> t = m \<cdot>\<^sub>\<int> (n \<cdot>\<^sub>\<int> t)"
+proof -
+
+  obtain m1 m2 where m_def: "m1 \<in>\<^sub>c \<nat>\<^sub>c \<and> m2 \<in>\<^sub>c \<nat>\<^sub>c \<and> m = natpair2int \<circ>\<^sub>c \<langle>m1, m2\<rangle>"
+    using assms(1) representation_theorem by blast
+  obtain n1 n2 where n_def: "n1 \<in>\<^sub>c \<nat>\<^sub>c \<and> n2 \<in>\<^sub>c \<nat>\<^sub>c \<and> n = natpair2int \<circ>\<^sub>c \<langle>n1, n2\<rangle>"
+    using assms(2) representation_theorem by blast
+  obtain t1 t2 where t_def: "t1 \<in>\<^sub>c \<nat>\<^sub>c \<and> t2 \<in>\<^sub>c \<nat>\<^sub>c \<and> t = natpair2int \<circ>\<^sub>c \<langle>t1, t2\<rangle>"
+    using assms(3) representation_theorem by blast
+
+
+  have " m \<cdot>\<^sub>\<int> (n \<cdot>\<^sub>\<int> t) = m \<cdot>\<^sub>\<int> ((natpair2int \<circ>\<^sub>c \<langle>n1, n2\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>t1, t2\<rangle>))"
+    by (simp add: n_def t_def)
+  also have "... = m \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>(n1 \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t1), (n1 \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t2)\<rangle>)"
+    by (simp add: multZ_to_multNN n_def t_def)
+  also have "... = (natpair2int \<circ>\<^sub>c \<langle>m1, m2\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>(n1 \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t1), (n1 \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t2)\<rangle>)"
+    using m_def by force
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>(m2 \<cdot>\<^sub>\<nat>((n1 \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t1))  ) +\<^sub>\<nat> 
+                                  (m1 \<cdot>\<^sub>\<nat> ((n1 \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t2)) ), 
+                                  (m1 \<cdot>\<^sub>\<nat> ((n1 \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t1)) ) +\<^sub>\<nat> 
+                                  (m2 \<cdot>\<^sub>\<nat> ((n1 \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t2)) )\<rangle>"
+    by (simp add: ETCS_Add.add_type add_commutes m_def multZ_to_multNN mult_closure n_def t_def)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>(m2 \<cdot>\<^sub>\<nat> (n1 \<cdot>\<^sub>\<nat> t2)) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat>(n2 \<cdot>\<^sub>\<nat> t1))   +\<^sub>\<nat> 
+                                   (m1 \<cdot>\<^sub>\<nat>(n1 \<cdot>\<^sub>\<nat> t1)) +\<^sub>\<nat> (m1 \<cdot>\<^sub>\<nat>(n2 \<cdot>\<^sub>\<nat> t2)) , 
+                                  (m1 \<cdot>\<^sub>\<nat> (n1 \<cdot>\<^sub>\<nat> t2)) +\<^sub>\<nat> (m1 \<cdot>\<^sub>\<nat>(n2 \<cdot>\<^sub>\<nat> t1))  +\<^sub>\<nat> 
+                                  (m2 \<cdot>\<^sub>\<nat> (n1 \<cdot>\<^sub>\<nat> t1)) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat>(n2 \<cdot>\<^sub>\<nat> t2)) \<rangle>"
+    by (simp add: ETCS_Add.add_type add_associates m_def mult_closure mult_right_distributivity n_def t_def)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>((m2 \<cdot>\<^sub>\<nat> n1) \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> ((m2 \<cdot>\<^sub>\<nat> n2) \<cdot>\<^sub>\<nat> t1)   +\<^sub>\<nat> 
+                                   ((m1 \<cdot>\<^sub>\<nat>n1) \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> ((m1 \<cdot>\<^sub>\<nat> n2) \<cdot>\<^sub>\<nat> t2) , 
+                                  ((m1 \<cdot>\<^sub>\<nat> n1) \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> ((m1 \<cdot>\<^sub>\<nat> n2) \<cdot>\<^sub>\<nat> t1)  +\<^sub>\<nat> 
+                                  ((m2 \<cdot>\<^sub>\<nat> n1) \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> ((m2 \<cdot>\<^sub>\<nat> n2) \<cdot>\<^sub>\<nat> t2) \<rangle>"
+    by (simp add: m_def mult_associative n_def t_def)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>((m1 \<cdot>\<^sub>\<nat> n2)\<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> ((m2 \<cdot>\<^sub>\<nat> n1) \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> 
+                                    ((m1 \<cdot>\<^sub>\<nat> n1)\<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> ((m2 \<cdot>\<^sub>\<nat> n2) \<cdot>\<^sub>\<nat> t1), 
+                                    ((m1 \<cdot>\<^sub>\<nat> n2)\<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> ((m2 \<cdot>\<^sub>\<nat> n1) \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> 
+                                    ((m1 \<cdot>\<^sub>\<nat> n1)\<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> ((m2 \<cdot>\<^sub>\<nat> n2) \<cdot>\<^sub>\<nat> t2)\<rangle>"
+    by (typecheck_cfuncs, smt add_associates add_commutes m_def mult_closure n_def t_def)
+
+  also have "... =  natpair2int \<circ>\<^sub>c \<langle>(((m1 \<cdot>\<^sub>\<nat> n2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n1)) \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> 
+                                  (((m1 \<cdot>\<^sub>\<nat> n1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n2)) \<cdot>\<^sub>\<nat> t1), 
+                                  (((m1 \<cdot>\<^sub>\<nat> n2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n1)) \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> 
+                                  (((m1 \<cdot>\<^sub>\<nat> n1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n2)) \<cdot>\<^sub>\<nat> t2)\<rangle>"
+    by (simp add: ETCS_Add.add_type add_associates m_def mult_Left_Distributivity mult_closure n_def t_def)
+
+  also have "... = (natpair2int \<circ>\<^sub>c \<langle>(m1 \<cdot>\<^sub>\<nat> n2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n1), (m1 \<cdot>\<^sub>\<nat> n1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n2)\<rangle>) \<cdot>\<^sub>\<int>
+                   (natpair2int \<circ>\<^sub>c \<langle>t1, t2\<rangle>)"
+    using ETCS_Add.add_type m_def multZ_to_multNN mult_closure n_def t_def by auto
+
+  also have "... = (natpair2int \<circ>\<^sub>c \<langle>(m1 \<cdot>\<^sub>\<nat> n2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n1), (m1 \<cdot>\<^sub>\<nat> n1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n2)\<rangle>) \<cdot>\<^sub>\<int> t"
+    by (simp add: t_def)
+
+  also have "... = ((natpair2int \<circ>\<^sub>c \<langle>m1, m2\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>n1, n2\<rangle>)) \<cdot>\<^sub>\<int> t"
+    by (simp add: m_def multZ_to_multNN n_def)
+
+  also have "... = (m \<cdot>\<^sub>\<int> n) \<cdot>\<^sub>\<int> t"
+    using m_def n_def by blast
+
+  then show ?thesis using calculation by auto
+qed
+
+lemma int_mul_distributive: 
+  assumes "m \<in>\<^sub>c \<int>\<^sub>c" "n \<in>\<^sub>c \<int>\<^sub>c" "t \<in>\<^sub>c \<int>\<^sub>c"
+  shows "m \<cdot>\<^sub>\<int> (n +\<^sub>\<int> t) = (m \<cdot>\<^sub>\<int> n) +\<^sub>\<int> (m \<cdot>\<^sub>\<int> t)"
+proof - 
+  obtain m1 m2 where m_def: "m1 \<in>\<^sub>c \<nat>\<^sub>c \<and> m2 \<in>\<^sub>c \<nat>\<^sub>c \<and> m = natpair2int \<circ>\<^sub>c \<langle>m1, m2\<rangle>"
+    using assms(1) representation_theorem by blast
+  obtain n1 n2 where n_def: "n1 \<in>\<^sub>c \<nat>\<^sub>c \<and> n2 \<in>\<^sub>c \<nat>\<^sub>c \<and> n = natpair2int \<circ>\<^sub>c \<langle>n1, n2\<rangle>"
+    using assms(2) representation_theorem by blast
+  obtain t1 t2 where t_def: "t1 \<in>\<^sub>c \<nat>\<^sub>c \<and> t2 \<in>\<^sub>c \<nat>\<^sub>c \<and> t = natpair2int \<circ>\<^sub>c \<langle>t1, t2\<rangle>"
+    using assms(3) representation_theorem by blast
+
+
+
+  have "m \<cdot>\<^sub>\<int> (n +\<^sub>\<int> t) = m \<cdot>\<^sub>\<int> ((natpair2int \<circ>\<^sub>c \<langle>n1, n2\<rangle>) +\<^sub>\<int>  (natpair2int \<circ>\<^sub>c \<langle>t1, t2\<rangle>))"
+    using n_def t_def by blast
+  also have "... = m \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle> n1 +\<^sub>\<nat> t1 , n2 +\<^sub>\<nat> t2\<rangle>)"
+    by (simp add: addZtoAddN n_def t_def)
+  also have "... = (natpair2int \<circ>\<^sub>c \<langle>m1, m2\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle> n1 +\<^sub>\<nat> t1 , n2 +\<^sub>\<nat> t2\<rangle>)"
+    using m_def by auto
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>(m1 \<cdot>\<^sub>\<nat> (n2 +\<^sub>\<nat> t2)) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> (n1 +\<^sub>\<nat> t1)), (m1 \<cdot>\<^sub>\<nat> (n1 +\<^sub>\<nat> t1)) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> (n2 +\<^sub>\<nat> t2))\<rangle>"
+    by (meson ETCS_Add.add_type m_def multZ_to_multNN n_def t_def)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle> ((m1 \<cdot>\<^sub>\<nat> n2) +\<^sub>\<nat> (m1 \<cdot>\<^sub>\<nat> t2)) +\<^sub>\<nat> ((m2 \<cdot>\<^sub>\<nat> n1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> t1)) , ((m1 \<cdot>\<^sub>\<nat> n1) +\<^sub>\<nat> (m1 \<cdot>\<^sub>\<nat> t1)) +\<^sub>\<nat> ((m2 \<cdot>\<^sub>\<nat> n2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> t2))\<rangle>"
+    by (simp add: m_def mult_right_distributivity n_def t_def)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle> ((m1 \<cdot>\<^sub>\<nat> n2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n1)) +\<^sub>\<nat> ((m1 \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> t1)) , ((m1 \<cdot>\<^sub>\<nat> n1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n2)) +\<^sub>\<nat> ((m1 \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> t2))\<rangle>"
+    by (typecheck_cfuncs, smt add_associates add_def m_def mult_closure mult_def n_def nat_pair_eq t_def)
+  also have "... = (natpair2int \<circ>\<^sub>c \<langle>((m1 \<cdot>\<^sub>\<nat> n2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n1)), ((m1 \<cdot>\<^sub>\<nat> n1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> n2))\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>((m1 \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> t1)), ((m1 \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat> t2))\<rangle>)"
+    by (simp add: ETCS_Add.add_type addZtoAddN m_def mult_closure n_def t_def)
+  also have "... = ((natpair2int \<circ>\<^sub>c \<langle>m1, m2\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>n1, n2\<rangle>)) +\<^sub>\<int> ((natpair2int \<circ>\<^sub>c \<langle>m1, m2\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>t1, t2\<rangle>))"
+    by (simp add: m_def multZ_to_multNN n_def t_def)
+  also have "... = (m \<cdot>\<^sub>\<int> n) +\<^sub>\<int> (m \<cdot>\<^sub>\<int> t)"
+    by (simp add: m_def n_def t_def)
+  then show ?thesis
+    by (simp add: calculation)
+qed
+
+lemma add_int_cancellative:
+  assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c" "c \<in>\<^sub>c \<int>\<^sub>c"
+  shows "(a +\<^sub>\<int> c = b +\<^sub>\<int> c) = (a = b)"
+  by (smt ETCS_Int.add_type addZ_associative add_inverse_unique add_neg assms comp_type neg_cancels_neg2 neg_int_type)
+
+lemma mult_int_cancellative:
+  assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c" "c \<in>\<^sub>c \<int>\<^sub>c" "c\<noteq> zero"
+  shows "(a \<cdot>\<^sub>\<int> c = b \<cdot>\<^sub>\<int> c) = (a = b)"
+  oops
+
 
 end
