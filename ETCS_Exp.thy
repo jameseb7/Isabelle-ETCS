@@ -843,22 +843,133 @@ lemma exp_right_dist:
    assumes "a \<in>\<^sub>c  \<nat>\<^sub>c" "b \<in>\<^sub>c  \<nat>\<^sub>c" "c\<in>\<^sub>c  \<nat>\<^sub>c"
    shows "a ^\<^sub>\<nat> (b +\<^sub>\<nat>c) = (a^\<^sub>\<nat> b) \<cdot>\<^sub>\<nat> (a^\<^sub>\<nat> c) "
 proof - 
-  have main_result: "(exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c 
-\<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c),
- \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c), 
-  (right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle>\<rangle>)\<^sup>\<sharp> = 
-(mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c 
-\<langle>\<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c), 
- (right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle>,
-\<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c),
-(right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle>\<rangle>)\<^sup>\<sharp>"
+
+  have main_result: "(exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> = 
+    (mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp>"
   proof(rule natural_number_object_func_unique[where X = "\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esup>",
- where f = "(mult2 \<circ>\<^sub>c \<langle>(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp>"])
-    show "(exp_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,\<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+        where f = "(mult2 \<circ>\<^sub>c \<langle>(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>))\<rangle>)\<^sup>\<sharp>"])
+    show "(exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
       by typecheck_cfuncs
-    show "(mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c \<langle>\<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>,\<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+    show "(mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
       by typecheck_cfuncs
-    show "(mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup> \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+    show "(mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup> \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+      by typecheck_cfuncs
+
+    show "(exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero =
+      (mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
+    proof (rule same_evals_equal[where Z=one, where X="\<nat>\<^sub>c", where A="\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"])
+      show "(exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+        by typecheck_cfuncs
+      show "(mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+        by typecheck_cfuncs
+      show "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero) =
+        eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c 
+          (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero)"
+        (is "?lhs = ?rhs")
+      proof (rule one_separator[where X="(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one", where Y="\<nat>\<^sub>c"])
+        show "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero) : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+          by typecheck_cfuncs
+        show "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c 
+          (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero) 
+            : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+          by typecheck_cfuncs
+      next
+        fix x
+        assume x_type: "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one"
+        then have "\<exists>x1 x2. x = \<langle>x1, x2\<rangle> \<and> x1 : one \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<and> x2 : one \<rightarrow> one"
+          by (simp add: cart_prod_decomp)
+        then have "\<exists>x1. x = \<langle>x1, id one\<rangle> \<and> x1 : one \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+          using id_type one_unique_element by auto
+        then obtain x1 x2 where x_types: "x1 \<in>\<^sub>c \<nat>\<^sub>c" "x2 \<in>\<^sub>c \<nat>\<^sub>c" and x_def: "x = \<langle>\<langle>x1, x2\<rangle>, id one\<rangle>"
+          using cart_prod_decomp by blast
+
+        have "?lhs \<circ>\<^sub>c x = (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)
+          \<circ>\<^sub>c (id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp>)
+          \<circ>\<^sub>c (id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero)) \<circ>\<^sub>c x"
+          by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
+        also have "... = (exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c
+          \<circ>\<^sub>c (id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero)) \<circ>\<^sub>c x"
+          by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
+        also have "... = exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c
+          \<circ>\<^sub>c (id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>x1, x2\<rangle>, id one\<rangle>"
+          unfolding x_def using x_types comp_associative2 by (typecheck_cfuncs, auto)
+        also have "... = exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c \<circ>\<^sub>c \<langle>\<langle>x1, x2\<rangle>, zero\<rangle>"
+          using x_types by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+        also have "... = exp_uncurried \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c \<langle>zero, \<langle>x1, x2\<rangle>\<rangle>"
+          using x_types by (typecheck_cfuncs, simp add: swap_ap)
+        also have "... = exp_uncurried \<circ>\<^sub>c \<langle>zero, add2 \<circ>\<^sub>c \<langle>x1, x2\<rangle>\<rangle>"
+          using x_types by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+        also have "... = mult2 \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>zero, x1\<rangle>, exp_uncurried \<circ>\<^sub>c \<langle>zero, x2\<rangle>\<rangle>"
+        proof (cases "x1 = zero")
+          assume x1_zero: "x1 = zero"
+          show ?thesis
+          proof (cases "x2 = zero")
+            assume x2_zero: "x2 = zero"
+
+            have "exp_uncurried \<circ>\<^sub>c \<langle>zero,add2 \<circ>\<^sub>c \<langle>x1,x2\<rangle>\<rangle>
+                = exp_uncurried \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+              using x_types add_def add_respects_zero_on_right x1_zero x2_zero
+              by (typecheck_cfuncs, auto)
+            also have exp2_zero_zero:  "... = successor \<circ>\<^sub>c zero"
+              using exp_def exp_respects_Zero_Left zero_type by auto
+            also have "... = mult2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c zero, successor \<circ>\<^sub>c zero\<rangle>"
+              using mult_def s0_is_right_id by (typecheck_cfuncs, auto)
+            also have "... = mult2 \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>zero, x1\<rangle>, exp_uncurried \<circ>\<^sub>c \<langle>zero, x2\<rangle>\<rangle>"
+              using x_types by (typecheck_cfuncs, simp add: exp2_zero_zero x1_zero x2_zero)
+            then show ?thesis
+              using calculation by auto
+          next
+            assume "x2 \<noteq> zero"
+            then obtain x2' where x2_def: "x2 = successor \<circ>\<^sub>c x2'" and x2'_type: "x2' \<in>\<^sub>c \<nat>\<^sub>c"
+              using nonzero_is_succ x_types(2) by blast
+
+            have "exp_uncurried \<circ>\<^sub>c \<langle>zero,add2 \<circ>\<^sub>c \<langle>x1,x2\<rangle>\<rangle> = zero"
+              using x2_def x2'_type add_def add_respects_zero_on_left exp_def exp_respects_zero_left x1_zero x_types(2) by auto
+            also have "... = mult2 \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>zero, x1\<rangle>, zero\<rangle>"
+              using exp_def exp_respects_Zero_Left mult_def s0_is_left_id x1_zero zero_type by auto
+            also have "... = mult2 \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>zero, x1\<rangle> , exp_uncurried \<circ>\<^sub>c \<langle>zero, x2\<rangle>\<rangle>"
+              by (metis x2_def x2'_type exp_def exp_respects_zero_left)
+            then show ?thesis
+              using calculation by auto
+          qed
+        next
+          assume "x1 \<noteq> zero"
+          then obtain x1' where x1_def: "x1 = successor \<circ>\<^sub>c x1'" and x1'_type: "x1' \<in>\<^sub>c \<nat>\<^sub>c"
+            using nonzero_is_succ x_types(1) by blast
+
+          have "exp_uncurried \<circ>\<^sub>c \<langle>zero, add2 \<circ>\<^sub>c \<langle>x1,x2\<rangle>\<rangle> = zero"
+            using x1_def x1'_type add2_commutes_succ add2_respects_succ_right add_def add_type exp_def exp_respects_zero_left x_types(2) by auto 
+          also have "... = mult2 \<circ>\<^sub>c \<langle>zero, exp_uncurried \<circ>\<^sub>c \<langle>zero, x2\<rangle>\<rangle>"
+            using exp_closure exp_def mult_def mult_respects_zero_left x_types(2) zero_type by auto
+          also have "... = mult2 \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>zero, x1\<rangle> , exp_uncurried \<circ>\<^sub>c \<langle>zero, x2\<rangle>\<rangle>"
+            by (metis x1_def x1'_type exp_def exp_respects_zero_left)
+          then show ?thesis
+            using calculation by auto
+        qed
+        also have "... = mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c \<langle>\<langle>zero, x1\<rangle>, \<langle>zero, x2\<rangle>\<rangle>"
+          using x_types cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, auto)
+        also have "... = mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, \<langle>x1, x2\<rangle>\<rangle>"
+          using x_types by (typecheck_cfuncs, simp add: distribute_left_ap)
+        also have "... = mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c \<circ>\<^sub>c \<langle>\<langle>x1, x2\<rangle>, zero\<rangle>"
+          using x_types by (typecheck_cfuncs, simp add: swap_ap)
+        also have "... = mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c
+            \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c \<circ>\<^sub>c (id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>x1, x2\<rangle>, id one\<rangle>"
+          using x_types by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+        also have "... = (mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c
+            \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c \<circ>\<^sub>c (id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero)) \<circ>\<^sub>c x"
+          unfolding x_def using x_types comp_associative2 by (typecheck_cfuncs, auto)
+        also have "... = (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)
+            \<circ>\<^sub>c (id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c
+            \<circ>\<^sub>c swap (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<^sup>\<sharp>)) \<circ>\<^sub>c (id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, auto simp add: transpose_func_def)
+        also have "... = ?rhs \<circ>\<^sub>c x"
+          using x_type comp_associative2
+          by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
+        then show "?lhs \<circ>\<^sub>c x = ?rhs \<circ>\<^sub>c x"
+          using calculation by auto
+      qed
+    qed
+
       oops
 
 
