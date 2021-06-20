@@ -452,7 +452,7 @@ next
 qed
 
 lemma add_commutes:
-  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
+  assumes "m : A \<rightarrow> \<nat>\<^sub>c" "n : A \<rightarrow> \<nat>\<^sub>c" 
   shows "m +\<^sub>\<nat> n  = n +\<^sub>\<nat> m"
 proof - 
   have "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ((add2  \<circ>\<^sub>c 
@@ -782,13 +782,14 @@ proof -
     unfolding add_def by auto
 qed
 
-lemma add_cancellative:
-  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(a +\<^sub>\<nat> c = b +\<^sub>\<nat> c) = (a = b)"
-proof - 
+lemma add2_cancellative:  
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c :  \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+  shows "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, c\<rangle>\<rangle>
+    = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
+proof -
   obtain a_b_add_eq where
     a_b_add_eq_type: "a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>" and
-    a_b_add_eq_def: "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>"
+    a_b_add_eq_def: "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, c\<rangle>\<rangle>"
     using assms by typecheck_cfuncs
 
   have "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
@@ -799,7 +800,7 @@ proof -
       using assms by typecheck_cfuncs
     show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
       using id_type by auto
-
+  
     show "a_b_add_eq \<circ>\<^sub>c zero = (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
     proof -
       have "a_b_add_eq \<circ>\<^sub>c zero = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c zero"
@@ -817,7 +818,7 @@ proof -
       then show ?thesis
         using calculation by auto
     qed
-
+  
     show "a_b_add_eq \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq"
     proof (rule one_separator[where X ="\<nat>\<^sub>c", where Y = "\<Omega>"])
       show "a_b_add_eq \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
@@ -827,7 +828,7 @@ proof -
     next
       fix n
       assume n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
-
+  
       have true_or_false: "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> add2 \<circ>\<^sub>c \<langle>a , n\<rangle>,  add2 \<circ>\<^sub>c \<langle>b ,  n\<rangle>\<rangle> \<in>\<^sub>c \<Omega>"
         by (metis add_def add_type assms(1) assms(2) cfunc_prod_type comp_type eq_pred_type n_type)
        
@@ -873,11 +874,26 @@ proof -
       then show  "(a_b_add_eq \<circ>\<^sub>c successor) \<circ>\<^sub>c n = (id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq) \<circ>\<^sub>c n"
         using calculation by auto
     qed
-
+  
     show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
       using assms
       by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp)
   qed
+  then show ?thesis
+    unfolding a_b_add_eq_def by auto
+qed
+
+lemma add_cancellative:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(a +\<^sub>\<nat> c = b +\<^sub>\<nat> c) = (a = b)"
+proof - 
+  obtain a_b_add_eq where
+    a_b_add_eq_type: "a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>" and
+    a_b_add_eq_def: "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>"
+    using assms by typecheck_cfuncs
+
+  have "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
+    unfolding a_b_add_eq_def by (simp add: add2_cancellative assms id_type) 
   then have "a_b_add_eq \<circ>\<^sub>c c = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c c"
     using assms comp_associative2 by (typecheck_cfuncs, auto)
   then have "a_b_add_eq \<circ>\<^sub>c c = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c c, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c c\<rangle>"
