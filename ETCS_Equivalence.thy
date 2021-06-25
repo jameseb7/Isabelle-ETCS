@@ -63,7 +63,13 @@ definition coequalizer :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Righta
     \<and> (m \<circ>\<^sub>c f = m \<circ>\<^sub>c g)
     \<and> (\<forall> h F. ((h : X \<rightarrow> F) \<and> (h \<circ>\<^sub>c f = h \<circ>\<^sub>c g)) \<longrightarrow> (\<exists>! k. (k : E \<rightarrow> F) \<and> k \<circ>\<^sub>c m = h)))"
 
-(*Proposition 2.3.2*) 
+(* Exercise 2.3.1 *)
+lemma coequalizer_unique:
+  assumes "coequalizer E m f g" "coequalizer F n f g"
+  shows "E \<cong> F"
+  oops
+
+(* Exercise 2.3.2 *) 
 (*the proof is just dual in every sense to the equalizer is monomorphism proof*)
 lemma coequalizer_is_epimorphism:
 "coequalizer E m f g \<Longrightarrow>  epimorphism(m)"
@@ -230,6 +236,28 @@ lemma canonical_quot_map_is_epi:
   assumes "equiv_rel_on X (R,m)"
   shows "epimorphism((equiv_class (R,m)))"
   by (meson assms canonical_quotient_map_is_coequalizer coequalizer_is_epimorphism)
+
+(* Exercise 2.3.3 *)
+lemma kernel_pair_equiv_rel:
+  assumes "f : X \<rightarrow> Y"
+  shows "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f Y)"
+  oops
+
+(* Definition 2.3.4 *)
+definition regular_epimorphism :: "cfunc \<Rightarrow> bool" where
+  "regular_epimorphism f = (\<exists> g h. coequalizer (codomain f) f g h)"
+
+(* Exercise 2.3.5 *)
+lemma reg_epi_and_mono_is_iso:
+  "regular_epimorphism f \<and> monomorphism f \<Longrightarrow> isomorphism f"
+  oops
+
+(* Proposition 2.3.6 *)
+lemma epimorphism_coequalizer_kernel_pair:
+  assumes "f : X \<rightarrow> Y"
+  shows "epimorphism f \<Longrightarrow>
+    coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
+  oops
 
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"

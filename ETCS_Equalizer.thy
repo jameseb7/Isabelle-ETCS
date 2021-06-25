@@ -349,7 +349,11 @@ proof auto
     by (rule_tac x="k \<circ>\<^sub>c a" in exI, auto)
 qed
 
-thm equalizer_def
+(* Proposition 2.1.41 *)
+lemma in_inverse_image:
+  assumes "f : X \<rightarrow> Y" "(B,m) \<subseteq>\<^sub>c Y"
+  shows "(x \<in>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)) = (f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B,m))"
+  oops
 
 (* Definition 2.1.42 *)
 definition fibered_product :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" ("_ \<^bsub>_\<^esub>\<times>\<^sub>c\<^bsub>_\<^esub> _" [66,66,65,65]65) where

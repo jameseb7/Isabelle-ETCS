@@ -12,12 +12,13 @@ where
   terminal_func_unique: "h :  X \<rightarrow> one \<Longrightarrow> h = \<beta>\<^bsub>X\<^esub>" and
   one_separator: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> (\<And> x. x : one \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c x = g \<circ>\<^sub>c x) \<Longrightarrow> f = g"
 
-abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
-  "x \<in>\<^sub>c X \<equiv> (x : one \<rightarrow> X)"
-
 lemma terminal_func_comp:
   "x : X \<rightarrow> Y \<Longrightarrow> \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c x = \<beta>\<^bsub>X\<^esub>"
   by (simp add: comp_type terminal_func_type terminal_func_unique)
+
+(* Definition 2.1.16 *)
+abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
+  "x \<in>\<^sub>c X \<equiv> (x : one \<rightarrow> X)"
 
 definition nonempty :: "cset \<Rightarrow> bool" where
   "nonempty X \<equiv> (\<exists>x. x \<in>\<^sub>c X)"
