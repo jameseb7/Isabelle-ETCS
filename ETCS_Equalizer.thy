@@ -511,6 +511,79 @@ next
     by auto 
 qed
 
+lemma fibered_product_proj_eq:
+  assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> Z"
+  shows "f \<circ>\<^sub>c fibered_product_left_proj X f g Y = g \<circ>\<^sub>c fibered_product_right_proj X f g Y"
+    using fibered_product_is_pullback assms
+    unfolding is_pullback_def square_commutes_def by auto
+
+lemma fibered_product_pair_member:
+  assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> Z" "x \<in>\<^sub>c X" "y \<in>\<^sub>c Y"
+  shows "(\<langle>x, y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub>Y,  fibered_product_morphism X f g Y)) = (f \<circ>\<^sub>c x = g \<circ>\<^sub>c y)"
+proof
+  assume "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y)"
+  then obtain h where
+    h_type: "h \<in>\<^sub>c X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub>Y" and h_eq: "fibered_product_morphism X f g Y \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
+    unfolding relative_member_def2 factors_through_def
+    using assms(3) assms(4) cfunc_prod_type cfunc_type_def by auto
+  
+  have left_eq: "fibered_product_left_proj X f g Y \<circ>\<^sub>c h = x"
+    unfolding fibered_product_left_proj_def
+    using assms h_type
+    by (typecheck_cfuncs, smt comp_associative2 h_eq left_cart_proj_cfunc_prod)
+
+  have right_eq: "fibered_product_right_proj X f g Y \<circ>\<^sub>c h = y"
+    unfolding fibered_product_right_proj_def
+    using assms h_type
+    by (typecheck_cfuncs, smt comp_associative2 h_eq right_cart_proj_cfunc_prod)
+
+  have "f \<circ>\<^sub>c fibered_product_left_proj X f g Y \<circ>\<^sub>c h = g \<circ>\<^sub>c fibered_product_right_proj X f g Y \<circ>\<^sub>c h"
+    using assms h_type by (typecheck_cfuncs, simp add: comp_associative2 fibered_product_proj_eq)
+  then show "f \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
+    using left_eq right_eq by auto
+next
+  assume f_g_eq: "f \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
+
+  show "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y)"
+    unfolding relative_member_def factors_through_def
+  proof auto
+    show "\<langle>x,y\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Y"
+      using assms by typecheck_cfuncs
+    show "monomorphism (fibered_product_morphism X f g Y)"
+      using assms(1) assms(2) fibered_product_morphism_monomorphism by auto
+    show "fibered_product_morphism X f g Y : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<rightarrow> X \<times>\<^sub>c Y"
+      using assms by typecheck_cfuncs
+
+    have j_exists: "\<And> Z k h. k : Z \<rightarrow> Y \<Longrightarrow> h : Z \<rightarrow> X \<Longrightarrow> g \<circ>\<^sub>c k = f \<circ>\<^sub>c h \<Longrightarrow>
+      (\<exists>!j. j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
+            fibered_product_right_proj X f g Y \<circ>\<^sub>c j = k \<and>
+            fibered_product_left_proj X f g Y \<circ>\<^sub>c j = h)"
+      using fibered_product_is_pullback assms unfolding is_pullback_def by auto
+
+    obtain j where j_type: "j \<in>\<^sub>c X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y" and 
+      j_projs: "fibered_product_right_proj X f g Y \<circ>\<^sub>c j = y" "fibered_product_left_proj X f g Y \<circ>\<^sub>c j = x"
+      using j_exists[where Z=one, where k=y, where h=x] assms f_g_eq by auto
+    show "\<exists>h. h : domain \<langle>x,y\<rangle> \<rightarrow> domain (fibered_product_morphism X f g Y) \<and>
+        fibered_product_morphism X f g Y \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
+    proof (rule_tac x=j in exI, auto)
+      show "j : domain \<langle>x,y\<rangle> \<rightarrow> domain (fibered_product_morphism X f g Y)"
+        using assms j_type cfunc_type_def by (typecheck_cfuncs, auto)
+
+
+      have left_eq: "left_cart_proj X Y \<circ>\<^sub>c fibered_product_morphism X f g Y \<circ>\<^sub>c j = x"
+        using j_projs assms j_type comp_associative2
+        unfolding fibered_product_left_proj_def by (typecheck_cfuncs, auto)
+
+      have right_eq: "right_cart_proj X Y \<circ>\<^sub>c fibered_product_morphism X f g Y \<circ>\<^sub>c j = y"
+        using j_projs assms j_type comp_associative2
+        unfolding fibered_product_right_proj_def by (typecheck_cfuncs, auto)
+
+      show "fibered_product_morphism X f g Y \<circ>\<^sub>c j = \<langle>x,y\<rangle>"
+        using left_eq right_eq assms j_type by (typecheck_cfuncs, simp add: cfunc_prod_unique)
+    qed
+  qed
+qed
+
 lemma kernel_pair_subset:
   assumes "f: X \<rightarrow> Y"
   shows "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
