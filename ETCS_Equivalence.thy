@@ -283,12 +283,45 @@ proof (unfold equiv_rel_on_def, auto)
   qed
 
   show "symmetric_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-    sorry
+  proof (unfold symmetric_on_def, auto)
+    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
+      using assms kernel_pair_subset by auto
+  next 
+    fix x y
+    assume x_type: "x \<in>\<^sub>c X" and y_type: "y \<in>\<^sub>c X"
+    assume xy_in: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    then have "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+      using assms fibered_product_pair_member x_type y_type by blast
+    
+    then show "\<langle>y,x\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+      using assms fibered_product_pair_member x_type y_type by auto
+  qed
 
   show "transitive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-    sorry
+  proof (unfold transitive_on_def, auto)
+    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
+      using assms kernel_pair_subset by auto
+  next 
+    fix x y z 
+    assume x_type: "x \<in>\<^sub>c X" and y_type: "y \<in>\<^sub>c X" and z_type: "z \<in>\<^sub>c X"
+    assume xy_in: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    assume yz_in: "\<langle>y,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
 
+   have eqn1: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+     using assms fibered_product_pair_member x_type xy_in y_type by blast
+
+   have eqn2: "f \<circ>\<^sub>c y = f \<circ>\<^sub>c z"
+     using assms fibered_product_pair_member y_type yz_in z_type by blast
+
+   show "\<langle>x,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+     using assms eqn1 eqn2 fibered_product_pair_member x_type z_type by auto
+ qed
 qed
+
+
+
+
+
 
 
  
