@@ -511,6 +511,11 @@ next
     by auto 
 qed
 
+lemma kernel_pair_subset:
+  assumes "f: X \<rightarrow> Y"
+  shows "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
+  using assms fibered_product_morphism_monomorphism fibered_product_morphism_type subobject_of_def2 by auto
+
 (* Exercise 2.1.44 Part 1 *)
 lemma kern_pair_proj_iso_TFAE1:
   assumes "f: X \<rightarrow> Y" "monomorphism f"

@@ -267,14 +267,30 @@ lemma canonical_quot_map_is_epi:
 (* Exercise 2.3.3 *)
 lemma kernel_pair_equiv_rel:
   assumes "f : X \<rightarrow> Y"
-  shows "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f Y)"
-proof - 
-    oops
+  shows "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+proof (unfold equiv_rel_on_def, auto)
 
-(*
-  have reflexive: "reflexive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f Y)"
-    apply typecheck_cfuncs
-*)
+  show "reflexive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+  proof (unfold reflexive_on_def, auto)
+    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
+      using assms kernel_pair_subset by auto
+  next
+    fix x
+    assume x_type: "x \<in>\<^sub>c X"
+    then show "\<langle>x,x\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+      by (smt assms comp_type diag_on_elements diagonal_type fibered_product_morphism_monomorphism
+          fibered_product_morphism_type pair_factorsthru_fibered_product_morphism relative_member_def2)
+  qed
+
+  show "symmetric_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    sorry
+
+  show "transitive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    sorry
+
+qed
+
+
  
  (*shows "coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
 *)
@@ -329,7 +345,7 @@ proof -
 lemma epimorphism_coequalizer_kernel_pair:
   assumes "f : X \<rightarrow> Y" "epimorphism f"
   shows "coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
-  oops  
+proof (unfold coequalizer_def)
 
 (*Prove the Corollary that every epimorphism is Regular*)
 
