@@ -67,7 +67,34 @@ definition coequalizer :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Righta
 lemma coequalizer_unique:
   assumes "coequalizer E m f g" "coequalizer F n f g"
   shows "E \<cong> F"
-  oops
+proof - 
+  have k_exists: "\<exists>! k. k: E \<rightarrow> F \<and> k \<circ>\<^sub>c m =  n"
+    by (typecheck_cfuncs, smt assms cfunc_type_def coequalizer_def)
+  then obtain k where k_def: "k: E \<rightarrow> F \<and> k \<circ>\<^sub>c m =  n"
+    by blast
+  have k'_exists: "\<exists>! k'. k': F \<rightarrow> E \<and> k' \<circ>\<^sub>c n =  m"
+    by (typecheck_cfuncs, smt assms cfunc_type_def coequalizer_def)
+  then obtain k' where k'_def: "k': F \<rightarrow> E \<and> k' \<circ>\<^sub>c n =  m"
+    by blast
+
+  have k''_exists: "\<exists>! k''. k'': F \<rightarrow> F \<and> k'' \<circ>\<^sub>c n =  n"
+    by (typecheck_cfuncs, smt assms(2)  cfunc_type_def coequalizer_def)
+  then obtain k'' where k''_def: "k'': F \<rightarrow> F \<and> k'' \<circ>\<^sub>c n =  n"
+    by blast
+  then have k''_def2: "k'' = id F"
+    using assms(2) coequalizer_def id_left_unit2 k''_def by (typecheck_cfuncs, blast)
+
+  have kk'_idF: "k \<circ>\<^sub>c k' = id F"
+    by (typecheck_cfuncs, smt assms(2) cfunc_type_def coequalizer_def comp_associative k''_def k''_def2 k'_def k_def)
+
+  have k'k_idE: "k' \<circ>\<^sub>c k = id E"
+    by (typecheck_cfuncs, smt assms(1) coequalizer_def comp_associative2 id_left_unit2 k'_def k_def)
+
+  show "E \<cong> F"
+    using cfunc_type_def is_isomorphic_def isomorphism_def k'_def k'k_idE k_def kk'_idF by fastforce
+qed
+
+
 
 (* Exercise 2.3.2 *) 
 (*the proof is just dual in every sense to the equalizer is monomorphism proof*)
@@ -241,7 +268,16 @@ lemma canonical_quot_map_is_epi:
 lemma kernel_pair_equiv_rel:
   assumes "f : X \<rightarrow> Y"
   shows "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f Y)"
-  oops
+proof - 
+    oops
+
+(*
+  have reflexive: "reflexive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f Y)"
+    apply typecheck_cfuncs
+*)
+ 
+ (*shows "coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
+*)
 
 (* Definition 2.3.4 *)
 definition regular_epimorphism :: "cfunc \<Rightarrow> bool" where
@@ -249,15 +285,53 @@ definition regular_epimorphism :: "cfunc \<Rightarrow> bool" where
 
 (* Exercise 2.3.5 *)
 lemma reg_epi_and_mono_is_iso:
-  "regular_epimorphism f \<and> monomorphism f \<Longrightarrow> isomorphism f"
-  oops
+  assumes "f : X \<rightarrow> Y" "regular_epimorphism f" "monomorphism f"
+  shows "isomorphism f"
+proof -
+  have coeq1: "(\<exists> g h. coequalizer (codomain f) f g h)"
+    using assms(2) regular_epimorphism_def by auto
+  then obtain g h where gh_def: "coequalizer (codomain f) f g h"
+    by blast
+  then have coequalized_fxns: "\<exists>W. (g: W \<rightarrow> X) \<and> (h: W \<rightarrow> X) \<and> (coequalizer Y f g h)"
+    using assms(1) cfunc_type_def coequalizer_def by auto
+  then obtain W where W_def: "(g: W \<rightarrow> X) \<and> (h: W \<rightarrow> X) \<and> (coequalizer Y f g h)"
+    by blast
+  have fg_eqs_fh: "f \<circ>\<^sub>c g = f \<circ>\<^sub>c h"
+    using coequalizer_def gh_def by blast
+  then have gh_eqs: "g = h"
+    using W_def assms(1) assms(3) monomorphism_def2 by blast
+  then have "id(X)\<circ>\<^sub>c g = id(X) \<circ>\<^sub>c  h"
+    by auto
+   have j_exists: "\<exists>! j. j: Y \<rightarrow> X \<and> j \<circ>\<^sub>c f =  id(X)"
+     by (typecheck_cfuncs, smt \<open>id\<^sub>c X \<circ>\<^sub>c g = id\<^sub>c X \<circ>\<^sub>c h\<close> cfunc_type_def coequalized_fxns coequalizer_def)
+   then obtain j where j_def: "j: Y \<rightarrow> X \<and> j \<circ>\<^sub>c f =  id(X)"
+     by auto
+
+
+   have "id(Y) \<circ>\<^sub>c f = f \<circ>\<^sub>c id(X)"
+     using assms(1) id_left_unit2 id_right_unit2 by auto
+   also have "... = (f \<circ>\<^sub>c j) \<circ>\<^sub>c f"
+     using assms(1) comp_associative2 j_def by fastforce
+
+   then have "id(Y) = f \<circ>\<^sub>c j"
+     by (typecheck_cfuncs, metis \<open>f \<circ>\<^sub>c id\<^sub>c X = (f \<circ>\<^sub>c j) \<circ>\<^sub>c f\<close> assms(1) calculation coequalized_fxns coequalizer_is_epimorphism epimorphism_def3 j_def)
+
+   show "isomorphism f"
+     by (meson CollectI assms(3) coequalized_fxns coequalizer_is_epimorphism epi_mon_is_iso)
+ qed
+
+
+
+
+
 
 (* Proposition 2.3.6 *)
 lemma epimorphism_coequalizer_kernel_pair:
-  assumes "f : X \<rightarrow> Y"
-  shows "epimorphism f \<Longrightarrow>
-    coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
-  oops
+  assumes "f : X \<rightarrow> Y" "epimorphism f"
+  shows "coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
+  oops  
+
+(*Prove the Corollary that every epimorphism is Regular*)
 
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
@@ -304,7 +378,10 @@ next
     have "monomorphism m"
       using assms unfolding reflexive_on_def subobject_of_def2 by auto
     then show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
-      oops
+      using \<open>monomorphism m\<close> cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_right_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
+  next
+    oops
+
 
 (*lemma left_pair_equiv_rel:
   assumes "equiv_rel_on X (Y, m)"

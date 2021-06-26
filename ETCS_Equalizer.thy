@@ -314,7 +314,12 @@ proof auto
               \<and> (f \<circ>\<^sub>c left_cart_proj X B) \<circ>\<^sub>c h = (m \<circ>\<^sub>c right_cart_proj X B) \<circ>\<^sub>c h \<longrightarrow>
             (\<exists>!k. k : F \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and> inverse_image_mapping f B m \<circ>\<^sub>c k = h)"
       unfolding equalizer_def using assms(2) cfunc_type_def domain_comp left_cart_proj_type by auto 
-    oops
+    show "\<exists>j. j : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and>
+           (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = k \<and>
+           (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h"
+      apply typecheck_cfuncs
+      oops
+      
 
 (* Definition 2.1.39 *)
 definition relative_member :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" ("_ \<in>\<^bsub>_\<^esub> _" [51,50,51]50) where
@@ -354,6 +359,7 @@ lemma in_inverse_image:
   assumes "f : X \<rightarrow> Y" "(B,m) \<subseteq>\<^sub>c Y"
   shows "(x \<in>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)) = (f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B,m))"
   oops
+
 
 (* Definition 2.1.42 *)
 definition fibered_product :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" ("_ \<^bsub>_\<^esub>\<times>\<^sub>c\<^bsub>_\<^esub> _" [66,66,65,65]65) where

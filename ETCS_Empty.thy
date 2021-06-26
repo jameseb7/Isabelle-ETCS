@@ -158,9 +158,8 @@ proof -
     proof -
       assume \<chi>_true: "\<chi> = \<t>"
       then have "\<exists>! x. x \<in>\<^sub>c X"
-        using \<chi>_pullback unfolding is_pullback_def apply clarsimp
-        apply (erule_tac x=one in allE, erule_tac x="id one" in allE, erule_tac x="id one" in allE)
-        by (metis comp_type id_type square_commutes_def terminal_func_unique)
+        using \<chi>_pullback unfolding is_pullback_def         
+        by (clarsimp, (erule_tac x=one in allE, erule_tac x="id one" in allE, erule_tac x="id one" in allE), metis comp_type id_type square_commutes_def terminal_func_unique)
       then show "X \<cong> one"
         using single_elem_iso_one by auto
     qed

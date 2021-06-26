@@ -164,15 +164,58 @@ proof (cases "\<exists> x. x \<in>\<^sub>c X")
     unfolding injective_def
   proof auto
     fix a b
-    assume "a \<in>\<^sub>c domain (eval_func X one)"
-    assume "b \<in>\<^sub>c domain (eval_func X one)"
-    assume "eval_func X one \<circ>\<^sub>c a = eval_func X one \<circ>\<^sub>c b"
+    assume a_type: "a \<in>\<^sub>c domain (eval_func X one)"
+    assume b_type: "b \<in>\<^sub>c domain (eval_func X one)"
+    assume evals_equal: "eval_func X one \<circ>\<^sub>c a = eval_func X one \<circ>\<^sub>c b"
 
-    have "a = (eval_func X one \<circ>\<^sub>c a)\<^sup>\<sharp>"
+    have eval_dom: "domain(eval_func X one) = one \<times>\<^sub>c (X\<^bsup>one\<^esup>)"
+      using cfunc_type_def eval_func_type by auto
+
+    obtain A where a_def: "A \<in>\<^sub>c (X\<^bsup>one\<^esup>) \<and> a = \<langle>id(one), A\<rangle>"
+      by (typecheck_cfuncs, metis a_type cart_prod_decomp eval_dom terminal_func_unique)
+
+    obtain B where b_def: "B \<in>\<^sub>c (X\<^bsup>one\<^esup>) \<and> b = \<langle>id(one), B\<rangle>"
+      by (typecheck_cfuncs, metis b_type cart_prod_decomp eval_dom terminal_func_unique)
+
     
 
-  thm transpose_func_unique[where f="eval_func X one \<circ>\<^sub>c a", where A=one, where X=X, where Z=one, where g=a]
-    oops
+    have A_doppelganger: "A = (A\<^sup>\<flat>)\<^sup>\<sharp>"
+      using a_def sharp_cancels_flat by auto
+
+   have B_doppelganger: "B = (B\<^sup>\<flat>)\<^sup>\<sharp>"
+        using b_def sharp_cancels_flat by auto
+   have Aflat11eqsBflat11: "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
+   proof - 
+      have "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = (eval_func X one) \<circ>\<^sub>c (id (one) \<times>\<^sub>f (A\<^sup>\<flat>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
+            using A_doppelganger a_def comp_associative2 inv_transpose_func_def2 by (typecheck_cfuncs, fastforce)
+      also have "... = eval_func X one \<circ>\<^sub>c a"
+            using A_doppelganger a_def cfunc_cross_prod_comp_cfunc_prod id_right_unit2 by (typecheck_cfuncs, auto)
+      also have "... = eval_func X one \<circ>\<^sub>c b"
+        by (simp add: evals_equal)
+      also have "... = (eval_func X one) \<circ>\<^sub>c (id (one) \<times>\<^sub>f (B\<^sup>\<flat>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
+            using B_doppelganger b_def cfunc_cross_prod_comp_cfunc_prod id_right_unit2 by (typecheck_cfuncs, auto)
+      also have "... = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
+            using B_doppelganger b_def comp_associative2 inv_transpose_func_def2 by (typecheck_cfuncs, fastforce)
+      then show "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
+        using calculation by auto
+    qed
+    have "A\<^sup>\<flat> = B\<^sup>\<flat>"
+      by (typecheck_cfuncs, smt ETCS_Cartesian.swap_def Aflat11eqsBflat11 a_def b_def cfunc_prod_comp comp_associative2 diagonal_def diagonal_type id_right_unit2 id_type left_cart_proj_type right_cart_proj_type swap_idempotent swap_type terminal_func_comp terminal_func_unique)
+
+    then have "A = B"
+      using A_doppelganger B_doppelganger by auto
+
+    then show "a = b"
+      by (simp add: a_def b_def)
+  qed
+next
+  assume empty: "\<nexists>x. x \<in>\<^sub>c X"
+  show "injective (eval_func X one)"
+    by (typecheck_cfuncs, metis empty cfunc_type_def comp_type injective_def)
+qed
+
+
+
 
 
 
@@ -613,10 +656,10 @@ lemma smaller_than_product1:
   shows "X \<le>\<^sub>c (X \<times>\<^sub>c Y)"
   unfolding is_smaller_than_def nonempty_def monomorphism_def
 proof 
-  obtain y where y_in_Y: "y \<in>\<^sub>c Y"
+  obtain y where y_type: "y \<in>\<^sub>c Y"
   using assms nonempty_def by blast
   have map_type: "\<langle>id(X),y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> : X \<rightarrow> (X \<times>\<^sub>c Y)"
-   using \<open>y \<in>\<^sub>c Y\<close> cfunc_prod_type cfunc_type_def codomain_comp domain_comp id_type terminal_func_type by auto
+   using y_type cfunc_prod_type cfunc_type_def codomain_comp domain_comp id_type terminal_func_type by auto
   have "monomorphism(\<langle> id(X),y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>)"
     using map_type
   proof (unfold monomorphism_def3, auto)
@@ -625,11 +668,11 @@ proof
     
     assume "\<langle>id\<^sub>c X,y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c g = \<langle>id\<^sub>c X,y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c h"
     then have "\<langle>id\<^sub>c X \<circ>\<^sub>c g, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c g\<rangle>  = \<langle>id\<^sub>c X \<circ>\<^sub>c h, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h\<rangle>"
-      using y_in_Y g_h_types by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 comp_type)
+      using y_type g_h_types by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 comp_type)
     then have "\<langle>g, y \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle>  = \<langle>h, y \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle>"
-      using y_in_Y g_h_types id_left_unit2 terminal_func_comp by (typecheck_cfuncs, auto)
+      using y_type g_h_types id_left_unit2 terminal_func_comp by (typecheck_cfuncs, auto)
     then show "g = h"
-      using g_h_types y_in_Y
+      using g_h_types y_type
       by (metis (full_types) comp_type left_cart_proj_cfunc_prod terminal_func_type)
   qed
      
@@ -647,8 +690,35 @@ lemma emptyset_is_smallest_set:
 
 
 lemma smaller_than_finite_is_finite:
-  assumes "X \<le>\<^sub>c Y \<and> is_finite(Y)"
+  assumes "X \<le>\<^sub>c Y" "is_finite(Y)" "nonempty(X)"
   shows "is_finite(X)"
-  oops
+  unfolding _is_finite_def
+proof(auto)
+  fix m
+  assume m_type: "m : X \<rightarrow> X"
+  assume m_mono: "monomorphism m"
+
+  have j_exists: "\<exists>j. j: X \<rightarrow> Y \<and> monomorphism j"
+    using assms(1) is_smaller_than_def by blast
+  then obtain j where j_def: "j: X \<rightarrow> Y \<and> monomorphism j"
+    by blast
+  show "isomorphism m"
+  proof(rule ccontr)
+    assume not_iso: "\<not> isomorphism m"
+    have not_surj: "\<not> surjective m"
+      by (meson CollectI epi_mon_is_iso m_mono not_iso surjective_is_epimorphism)
+
+    then have not_surj0: "\<not>(\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (\<exists>z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z = x)))"
+      using cfunc_type_def m_type surjective_def by auto
+    then have not_surj1: "(\<exists>x. x \<in>\<^sub>c X \<longrightarrow> (\<forall> z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z \<noteq> x)))"
+      by auto
+    then have not_surj2: "(\<exists>x. x \<in>\<^sub>c X \<and> (\<forall> z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z \<noteq> x)))"
+      apply typecheck_cfuncs
+      oops
+
+    (*then obtain x where x_def: "x \<in>\<^sub>c X \<and> (\<forall> z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z \<noteq> x))"
+      apply typecheck_cfuncs
+*)
+
 
 end

@@ -157,11 +157,9 @@ proof -
   also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult1)\<circ>\<^sub>c \<langle>m, (successor \<circ>\<^sub>c n)\<rangle>"
     using assms by (typecheck_cfuncs, simp add: comp_associative2 mult2_def)
   also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, mult1 \<circ>\<^sub>c (successor \<circ>\<^sub>c n)\<rangle>"
-    using assms apply typecheck_cfuncs
-    using calculation mult_def2 by auto
+    using assms calculation mult_def2 by (typecheck_cfuncs, auto)
   also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m,((add2  \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)),(eval_func  \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp>)\<circ>\<^sub>c mult1 \<circ>\<^sub>c n  \<rangle>"
-    using assms apply typecheck_cfuncs
-    using comp_associative2 mult1_property square_commutes_def by auto
+    using assms comp_associative2 mult1_property square_commutes_def by auto
   also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m,((add2  \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)),(eval_func  \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp>)\<circ>\<^sub>c mult1 \<circ>\<^sub>c n  \<rangle>"
       using assms by (typecheck_cfuncs, simp add: id_left_unit2)
  also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
@@ -2034,7 +2032,8 @@ lemma mult_right_distributivity:
   assumes "a \<in>\<^sub>c  \<nat>\<^sub>c"  "b\<in>\<^sub>c  \<nat>\<^sub>c"  "c\<in>\<^sub>c  \<nat>\<^sub>c"
   shows "a \<cdot>\<^sub>\<nat> ( b +\<^sub>\<nat> c)   = (a \<cdot>\<^sub>\<nat> b) +\<^sub>\<nat>  (a \<cdot>\<^sub>\<nat> c)"
   using add_type assms mult_Left_Distributivity mult_commutative by auto
-  
+
+(*
 
 lemma mult_cancellative:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "c \<noteq> zero"
@@ -2126,6 +2125,6 @@ proof -
 
   show "a = b \<Longrightarrow> a \<cdot>\<^sub>\<nat> c = b \<cdot>\<^sub>\<nat> c"
     by auto
-
+*)
 
 end
