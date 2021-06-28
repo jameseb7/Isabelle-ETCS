@@ -1,5 +1,5 @@
 theory ETCS_Mult
-  imports ETCS_Add ETCS_Pred
+  imports ETCS_Add ETCS_Pred ETCS_Comparison
 begin
 
 (*Defining multiplication on N*)
@@ -2033,6 +2033,147 @@ lemma mult_right_distributivity:
   shows "a \<cdot>\<^sub>\<nat> ( b +\<^sub>\<nat> c)   = (a \<cdot>\<^sub>\<nat> b) +\<^sub>\<nat>  (a \<cdot>\<^sub>\<nat> c)"
   using add_type assms mult_Left_Distributivity mult_commutative by auto
 
+
+
+
+
+lemma mult_cancellative_contrapositve:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "(a \<noteq> b)"
+  shows "(a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c) \<noteq> b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c))"
+proof(cases "leq \<circ>\<^sub>c \<langle>a, b\<rangle> = \<t>")
+  assume ab: "leq \<circ>\<^sub>c \<langle>a,b\<rangle> = \<t>"
+  have fact1: "a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c) = (a  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  a"
+    using add_commutes assms(1) assms(3) mult_closure mult_respects_succ_right by fastforce
+  have k_exists: "\<exists> k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> a = b"
+    by (simp add: ab assms(1) assms(2) leq_true_implies_exists)
+  then obtain k where k_def: "k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> a = b"
+    by blast
+  then have k_nonzero: "k \<noteq> zero"
+    using add_respects_zero_on_left assms(1) assms(4) by auto
+  have fact2: "leq \<circ>\<^sub>c \<langle>(a  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  a , ((k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k )+\<^sub>\<nat> ((a  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  a )\<rangle> = \<t>"
+    by (meson add_type assms(1) assms(3) exists_implies_leq_true k_def mult_closure)
+  have fact3: "((k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k)+\<^sub>\<nat> ((a  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  a ) = b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c)"
+    by (metis add_commutes assms(1) assms(3) k_def mult_Left_Distributivity mult_closure mult_respects_succ_right succ_n_type)  
+  have fact4: "leq \<circ>\<^sub>c \<langle>a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c),b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c)\<rangle> = \<t>"
+    using fact1 fact2 fact3 by auto
+  have "((k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k) \<noteq> zero"
+    by (metis add_monotonic add_respects_zero_on_left assms exists_implies_leq_true k_def lqe_antisymmetry mult_closure zero_type)
+  then show "(a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c) \<noteq> b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c))"
+    by (metis add_cancellative  add_respects_zero_on_left add_type assms(2) assms(3) comp_type fact1 fact3 k_def mult_closure successor_type zero_type)
+next 
+  assume "leq \<circ>\<^sub>c \<langle>a,b\<rangle> \<noteq> \<t>"
+  then have ba: "leq \<circ>\<^sub>c \<langle>b,a\<rangle> = \<t>"
+    using assms(1) assms(2) lqe_connexity by blast
+ have fact1: "b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c) = (b  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  b"
+    using add_commutes assms(2) assms(3) mult_closure mult_respects_succ_right by fastforce
+  have k_exists: "\<exists> k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> b = a"
+    by (simp add: ba assms(1) assms(2) leq_true_implies_exists)
+  then obtain k where k_def: "k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> b = a"
+    by blast
+  then have k_nonzero: "k \<noteq> zero"
+    using add_respects_zero_on_left assms(2) assms(4) by auto
+  have fact2: "leq \<circ>\<^sub>c \<langle>(b  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  b , ((k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k )+\<^sub>\<nat> ((b  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  b )\<rangle> = \<t>"
+    by (meson add_type assms(2) assms(3) exists_implies_leq_true k_def mult_closure)
+  have fact3: "((k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k)+\<^sub>\<nat> ((b  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  b ) = a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c)"
+    by (metis add_commutes assms(2) assms(3) k_def mult_Left_Distributivity mult_closure mult_respects_succ_right succ_n_type)  
+  have fact4: "leq \<circ>\<^sub>c \<langle>b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c),a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c)\<rangle> = \<t>"
+    using fact1 fact2 fact3 by auto
+  have "((k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k) \<noteq> zero"
+    by (metis add_monotonic add_respects_zero_on_left assms exists_implies_leq_true k_def lqe_antisymmetry mult_closure zero_type)
+  then show "(a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c) \<noteq> b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c))"
+    by (metis add_cancellative  add_respects_zero_on_left add_type assms(2) assms(3)  fact1 fact3 k_def mult_closure  zero_type)
+qed
+
+lemma mult_cancellative:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "c \<noteq> zero"
+  shows  "(a \<cdot>\<^sub>\<nat> c = b \<cdot>\<^sub>\<nat> c) = (a = b)"
+  using assms mult_cancellative_contrapositve nonzero_is_succ by blast
+
+
+
+(*
+lemma mult2_cancellative:  
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" 
+  shows "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor\<rangle>\<rangle>
+    = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
+proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
+
+  show type1: "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by (meson assms cfunc_prod_type comp_type eq_pred_type mult2_type successor_type terminal_func_type)
+  show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    using assms by typecheck_cfuncs
+  show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+    by (simp add: id_type)
+  show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero = 
+        (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
+  proof- 
+    have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero = 
+           eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> \<circ>\<^sub>c zero"
+                using assms by (typecheck_cfuncs, simp add: comp_associative2)    
+    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> ,successor \<rangle> \<circ>\<^sub>c zero,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> ,successor\<rangle> \<circ>\<^sub>c zero\<rangle>"
+        using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c zero ,successor  \<circ>\<^sub>c zero  \<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero  ,successor  \<circ>\<^sub>c zero\<rangle>\<rangle>"
+      by (typecheck_cfuncs, smt assms cfunc_prod_comp cfunc_type_def comp_associative)
+    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a ,successor  \<circ>\<^sub>c zero  \<rangle>,mult2 \<circ>\<^sub>c \<langle>b,successor  \<circ>\<^sub>c zero\<rangle>\<rangle>"
+      by (typecheck_cfuncs, metis assms id_right_unit2 id_type terminal_func_unique)
+    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(a \<cdot>\<^sub>\<nat>(successor  \<circ>\<^sub>c zero)) ,(b \<cdot>\<^sub>\<nat>(successor  \<circ>\<^sub>c zero))\<rangle>"
+      by (simp add: mult_def)
+    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a, b\<rangle>"
+      by (simp add: assms s0_is_right_id)
+    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c zero, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c zero\<rangle>"
+      by (typecheck_cfuncs, metis assms id_right_unit2 id_type terminal_func_unique)
+    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, smt assms cfunc_prod_comp comp_associative2)
+    also have "... = (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
+      using assms by (typecheck_cfuncs, simp add: comp_associative2)    
+    then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero = 
+        (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
+      by (simp add: calculation)
+  qed
+  show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor =
+    id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>"
+  proof(rule one_separator[where X ="\<nat>\<^sub>c", where Y = "\<Omega>"] )
+    show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      using comp_type successor_type type1 by blast
+    show "id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      using id_left_unit2 type1 by auto
+    show "\<And>x. x \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+         ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c x = (id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c x"
+    proof - 
+      fix x 
+      assume x_type: "x \<in>\<^sub>c \<nat>\<^sub>c"
+      then have sx_type: "successor \<circ>\<^sub>c x \<in>\<^sub>c \<nat>\<^sub>c"
+        by typecheck_cfuncs
+
+      have "((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c x = 
+            (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c x"
+                using x_type assms  by (typecheck_cfuncs, simp add: comp_associative2)    
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c x)"
+                using sx_type  assms  by (typecheck_cfuncs, simp add: comp_associative2)    
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c x) ,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c x)\<rangle>"
+        by (typecheck_cfuncs, smt assms(1) assms(2) cfunc_prod_comp comp_associative2 x_type)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c (successor \<circ>\<^sub>c x),successor \<circ>\<^sub>c (successor \<circ>\<^sub>c x)\<rangle>  ,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c (successor \<circ>\<^sub>c x),successor \<circ>\<^sub>c (successor \<circ>\<^sub>c x) \<rangle>\<rangle>"
+        by (typecheck_cfuncs, smt assms(1) assms(2) cfunc_prod_comp comp_associative2 x_type)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c (successor \<circ>\<^sub>c x)\<rangle>  ,mult2 \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c (successor \<circ>\<^sub>c x) \<rangle>\<rangle>"
+        using assms beta_N_succ_mEqs_Id1 id_right_unit2 x_type by (typecheck_cfuncs, auto)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c x\<rangle>  ,mult2 \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c  x \<rangle>\<rangle>"
+      proof(cases "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c x\<rangle>  ,mult2 \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c  x \<rangle>\<rangle> = \<t>", auto)
+        assume is_true: "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c x\<rangle>,mult2 \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c x\<rangle>\<rangle> = \<t>"
+        have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c x),b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c x)\<rangle> = \<t>"
+          by (simp add: is_true mult_def)
+        then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<cdot>\<^sub>\<nat> (successor  \<circ>\<^sub>c (successor \<circ>\<^sub>c x)),b \<cdot>\<^sub>\<nat> (successor  \<circ>\<^sub>c (successor \<circ>\<^sub>c x))\<rangle> = \<t>"
+          oops
+*)
+
+(*
+lemma mult_cancellative:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c) = b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c)) = (a = b)"
+  oops 
+*)
+  
+
 (*
 
 lemma mult_cancellative:
@@ -2125,6 +2266,8 @@ proof -
 
   show "a = b \<Longrightarrow> a \<cdot>\<^sub>\<nat> c = b \<cdot>\<^sub>\<nat> c"
     by auto
-*)
+  oops
+  *)
+    
 
 end

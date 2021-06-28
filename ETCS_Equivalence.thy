@@ -379,7 +379,7 @@ lemma epimorphism_coequalizer_kernel_pair:
   assumes "f : X \<rightarrow> Y" "epimorphism f"
   shows "coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
 proof (unfold coequalizer_def)
-
+  oops
 (*Prove the Corollary that every epimorphism is Regular*)
 
 lemma left_pair_subset:

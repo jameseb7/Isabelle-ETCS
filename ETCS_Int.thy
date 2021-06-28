@@ -898,7 +898,7 @@ proof -
   also have "... = natpair2int \<circ>\<^sub>c \<langle>a +\<^sub>\<nat> c, b +\<^sub>\<nat> d\<rangle>"
     by (simp add: addZtoAddN xy_defs)
   also have "... = natpair2int \<circ>\<^sub>c \<langle>c +\<^sub>\<nat> a, d +\<^sub>\<nat> b\<rangle>"
-    by (simp add: add_commutes xy_defs)
+    using add_commutes xy_defs by auto
   also have "... = (natpair2int \<circ>\<^sub>c\<langle>c, d\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c\<langle>a, b\<rangle>)"
     by (simp add: addZtoAddN xy_defs)
   also have "... = y +\<^sub>\<int> x"
@@ -1055,7 +1055,7 @@ proof -
   have equiv_eqn2: "b2 +\<^sub>\<nat> d1 = b1 +\<^sub>\<nat> d2"
     using nat_pair_eq pairs_def rel2 by auto
   have eqn1: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2) \<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a1 +\<^sub>\<nat> c2)\<cdot>\<^sub>\<nat> d2)"
-    by (simp add: add_commutes equiv_eqn1 pairs_def)
+    using add_commutes equiv_eqn1 pairs_def by auto
   have eqn2: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2) \<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a1 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2))"
     using eqn1 mult_Left_Distributivity pairs_def by auto
   have eqn3: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2) \<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat>(b1+\<^sub>\<nat>d2)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
@@ -1071,7 +1071,7 @@ proof -
   have eqn8: "((a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> b1)) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) = ((a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat>b2))+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
     by (typecheck_cfuncs, smt add_associates equiv_eqn1 equiv_eqn2 mult_Left_Distributivity mult_closure mult_right_distributivity pairs_def)
   have eqn9: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) = ((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1))+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
-    using add_commutes eqn8 mult_closure pairs_def by auto
+    by (metis eqn8 mult_Left_Distributivity mult_closure nat_pair_eq pairs_def)
   have eqn10: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
     using eqn9 by blast
   have eqn10: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2 \<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = ((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> (a1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1)"
@@ -1083,7 +1083,7 @@ proof -
   have eqn13: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> ( b1 +\<^sub>\<nat> d2)) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> ((a1 +\<^sub>\<nat> c2)\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
     by (simp add: eqn12 mult_Left_Distributivity mult_right_distributivity pairs_def)
   have eqn14: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> ( b2 +\<^sub>\<nat> d1)) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> ((c1 +\<^sub>\<nat> a2)\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
-    by (simp add: add_commutes eqn13 equiv_eqn1 equiv_eqn2 pairs_def)
+    using add_commutes eqn13 equiv_eqn1 equiv_eqn2 pairs_def by auto
   have eqn15: "(a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> ((a2\<cdot>\<^sub>\<nat>  b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>d1)) +\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1) = (a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1)+\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> a2\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2)"
     using eqn14 mult_Left_Distributivity mult_right_distributivity pairs_def by auto
   have eqn16: "((a1\<cdot>\<^sub>\<nat> b1) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>  b2)) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat>d1) +\<^sub>\<nat> ((c1\<cdot>\<^sub>\<nat> d2) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d1)) = ((a1\<cdot>\<^sub>\<nat>b2) +\<^sub>\<nat> (a2\<cdot>\<^sub>\<nat> b1))+\<^sub>\<nat> (c1\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> ((a2\<cdot>\<^sub>\<nat> d1) +\<^sub>\<nat> (c2\<cdot>\<^sub>\<nat> d2))"
@@ -1297,6 +1297,7 @@ proof -
     by (simp add: calculation)
 qed
 
+
 lemma int_mul_commutative:
   assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c"
   shows "a \<cdot>\<^sub>\<int> b = b \<cdot>\<^sub>\<int> a"
@@ -1312,15 +1313,18 @@ proof -
   also have "... =  natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
     by (simp add: a_def b_def multZ_to_multNN)
   also have "... =  natpair2int \<circ>\<^sub>c \<langle>(n \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> q), (n \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> p)\<rangle>"
-    by (simp add: a_def add_commutes b_def mult_closure)
+    by (metis a_def b_def mult_closure nat_pair_eq)
   also have "... =  natpair2int \<circ>\<^sub>c \<langle>(p \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (q \<cdot>\<^sub>\<nat> m), (q \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (p \<cdot>\<^sub>\<nat> m)\<rangle>"
     by (simp add: a_def b_def mult_commutative)
   also have "... = (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>)"
-    by (simp add: a_def add_commutes b_def multZ_to_multNN mult_closure)
+    using a_def add_commutes b_def multZ_to_multNN mult_closure 
   also have "... = b \<cdot>\<^sub>\<int> a"
-    by (simp add: a_def b_def)
+    apply typecheck_cfuncs
+    using a_def add_commutes b_def multZ_to_multNN by auto
+oops
   then show ?thesis using calculation by auto
 qed
+
 
 lemma int_mul_respects_one_left:
   assumes "m \<in>\<^sub>c \<int>\<^sub>c"

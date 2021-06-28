@@ -209,9 +209,9 @@ proof (cases "\<exists> x. x \<in>\<^sub>c X")
       by (simp add: a_def b_def)
   qed
 next
-  assume empty: "\<nexists>x. x \<in>\<^sub>c X"
-  show "injective (eval_func X one)"
-    by (typecheck_cfuncs, metis empty cfunc_type_def comp_type injective_def)
+  assume "\<nexists>x. x \<in>\<^sub>c X"
+  then show "injective (eval_func X one)"
+    by (typecheck_cfuncs, metis  cfunc_type_def comp_type injective_def)
 qed
 
 
@@ -237,101 +237,8 @@ lemma set_to_power_one:
     by auto
         
   have inj: "injective(e)"
-  unfolding injective_def
-  proof auto
-    fix x y 
-    assume a1: "x \<in>\<^sub>c domain e"
-    then have x_type: "x \<in>\<^sub>c one \<times>\<^sub>c X\<^bsup>one\<^esup>"
-      using cfunc_type_def e_type by auto
-    assume a2: "y \<in>\<^sub>c domain e"
-    then have y_type: "y \<in>\<^sub>c one \<times>\<^sub>c X\<^bsup>one\<^esup>"
-      using cfunc_type_def e_type by auto
-    assume a3: "e \<circ>\<^sub>c x = e \<circ>\<^sub>c y"
+    by (simp add: e_defn eval_func_X_one_injective)
 
-    have "\<langle>id(one),((right_cart_proj one  (X\<^bsup>one\<^esup>)) \<circ>\<^sub>c x)\<rangle> : one \<rightarrow> domain e"
-      using a1 cfunc_prod_type cfunc_type_def comp_type e_defn eval_func_type id_type right_cart_proj_type by auto
-    then have x_eq: "x = \<langle>id(one),(right_cart_proj one  (X\<^bsup>one\<^esup>)) \<circ>\<^sub>c x\<rangle>"
-      using a1 cfunc_prod_unique[where f="id(one)", where g="(right_cart_proj one  (X\<^bsup>one\<^esup>)) \<circ>\<^sub>c x"]
-      using cfunc_type_def comp_type e_defn eval_func_type id_type left_cart_proj_type one_unique_element right_cart_proj_type by force
-
-    have "\<langle>id(one),((right_cart_proj one  (X\<^bsup>one\<^esup>)) \<circ>\<^sub>c y)\<rangle> : one \<rightarrow> domain e"
-      using a2 cfunc_prod_type cfunc_type_def comp_type e_defn eval_func_type id_type right_cart_proj_type by auto
-    then have y_eq: "y = \<langle>id(one),(right_cart_proj one  (X\<^bsup>one\<^esup>)) \<circ>\<^sub>c y\<rangle>"
-      using a2 cfunc_prod_unique[where f="id(one)", where g="(right_cart_proj one  (X\<^bsup>one\<^esup>)) \<circ>\<^sub>c y"]
-      using cfunc_type_def comp_type e_defn eval_func_type id_type left_cart_proj_type one_unique_element right_cart_proj_type by force
-
-    have "e \<circ>\<^sub>c (id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x)) = (e\<circ>\<^sub>c x) \<circ>\<^sub>c i"
-    proof -
-      have "e \<circ>\<^sub>c (id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x)) = 
-            e \<circ>\<^sub>c ((id(one) \<circ>\<^sub>c id(one)) \<times>\<^sub>f (((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x) \<circ>\<^sub>c id(one)))"
-        by (metis a1 cfunc_type_def comp_associative e_type id_codomain id_domain id_right_unit right_cart_proj_type)
-        
-      also have "... = e\<circ>\<^sub>c ((id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x)) \<circ>\<^sub>c (id(one)\<times>\<^sub>f id(one)))"
-        by (smt a1 cfunc_type_def domain_comp e_defn eval_func_type id_cross_prod id_right_unit id_type identity_distributes_across_composition right_cart_proj_type)
-      also have "... = e\<circ>\<^sub>c ((id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x)) \<circ>\<^sub>c (diagonal(one)\<circ>\<^sub>c i))"
-        by (metis cfunc_prod_unique comp_type diagonal_def i_iso i_type id_cross_prod left_cart_proj_type right_cart_proj_type terminal_func_unique)
-      also have "... = e\<circ>\<^sub>c (((id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x)) \<circ>\<^sub>c diagonal(one))\<circ>\<^sub>c i)"
-        using assms e_type x_type i_type by (typecheck_cfuncs, simp add: comp_associative2)
-      also have "... = e\<circ>\<^sub>c (((id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x)) \<circ>\<^sub>c \<langle>id(one),id(one)\<rangle>)\<circ>\<^sub>c i)"
-        by (simp add: diagonal_def)
-      also have "... = e\<circ>\<^sub>c (\<langle>id(one) \<circ>\<^sub>c id(one),((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x)\<circ>\<^sub>c id(one)\<rangle>\<circ>\<^sub>c i)"
-        using a1 cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_type e_defn eval_func_type id_type right_cart_proj_type by auto
-      also have "... = e\<circ>\<^sub>c (\<langle>id(one),((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c x)\<rangle>\<circ>\<^sub>c i)"
-        using assms e_type x_type i_type by (typecheck_cfuncs, simp add: id_right_unit2)
-      also have "... = (e\<circ>\<^sub>c x) \<circ>\<^sub>c i"
-        using assms e_type x_type i_type comp_associative2 x_eq by (typecheck_cfuncs, auto)
-      then show ?thesis
-        using calculation by auto
-    qed
-    then have x_property: "right_cart_proj one (X\<^bsup>one\<^esup>) \<circ>\<^sub>c x = ((e \<circ>\<^sub>c x) \<circ>\<^sub>c i)\<^sup>\<sharp>"
-    proof -
-      have 1: "right_cart_proj one (X\<^bsup>one\<^esup>) \<circ>\<^sub>c x \<in>\<^sub>c X\<^bsup>one\<^esup>"
-        using a1 cfunc_type_def comp_type e_defn eval_func_type right_cart_proj_type by auto
-      have 2: "(e \<circ>\<^sub>c y) \<circ>\<^sub>c i : one \<times>\<^sub>c one \<rightarrow> X"
-        by (metis (mono_tags, hide_lams) a1 a3 cfunc_type_def codomain_comp domain_comp e_defn eval_func_type i_type)
-      assume "e \<circ>\<^sub>c id\<^sub>c one \<times>\<^sub>f (right_cart_proj one (X\<^bsup>one\<^esup>) \<circ>\<^sub>c x) = (e \<circ>\<^sub>c x) \<circ>\<^sub>c i"
-      then show ?thesis
-        using "1" "2" a3 e_defn transpose_func_unique by auto
-    qed
-
-    have "e \<circ>\<^sub>c (id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y)) = (e\<circ>\<^sub>c y) \<circ>\<^sub>c i"
-    proof -
-      have "e \<circ>\<^sub>c (id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y)) = 
-            e \<circ>\<^sub>c ((id(one) \<circ>\<^sub>c id(one)) \<times>\<^sub>f (((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y) \<circ>\<^sub>c id(one)))"
-        using e_type y_type by (typecheck_cfuncs, simp add: id_right_unit2)
-      also have "... = e\<circ>\<^sub>c ((id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y)) \<circ>\<^sub>c (id(one)\<times>\<^sub>f id(one)))"
-        using e_type y_type by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod)
-      also have "... = e\<circ>\<^sub>c ((id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y)) \<circ>\<^sub>c (diagonal(one)\<circ>\<^sub>c i))"
-        by (metis cfunc_prod_unique comp_type diagonal_def i_iso i_type id_cross_prod left_cart_proj_type right_cart_proj_type terminal_func_unique)
-      also have "... = e\<circ>\<^sub>c (((id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y)) \<circ>\<^sub>c diagonal(one))\<circ>\<^sub>c i)"
-        using e_type y_type i_type by (typecheck_cfuncs, simp add: comp_associative2)
-      also have "... = e\<circ>\<^sub>c (((id(one) \<times>\<^sub>f ((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y)) \<circ>\<^sub>c \<langle>id(one),id(one)\<rangle>)\<circ>\<^sub>c i)"
-        by (simp add: diagonal_def)
-      also have "... = e\<circ>\<^sub>c (\<langle>id(one) \<circ>\<^sub>c id(one),((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y)\<circ>\<^sub>c id(one)\<rangle>\<circ>\<^sub>c i)"
-        using a2 cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_type e_defn eval_func_type id_type right_cart_proj_type by auto
-      also have "... = e\<circ>\<^sub>c (\<langle>id(one),((right_cart_proj one  (X\<^bsup>one\<^esup>))\<circ>\<^sub>c y)\<rangle>\<circ>\<^sub>c i)"
-        using e_type y_type i_type by (typecheck_cfuncs, simp add: id_right_unit2)
-      also have "... = (e\<circ>\<^sub>c y) \<circ>\<^sub>c i"
-        using e_type y_type i_type by (typecheck_cfuncs, metis comp_associative2 y_eq)
-      then show ?thesis
-        using calculation by auto
-    qed
-    then have y_property: "right_cart_proj one (X\<^bsup>one\<^esup>) \<circ>\<^sub>c y = ((e \<circ>\<^sub>c y) \<circ>\<^sub>c i)\<^sup>\<sharp>"
-    proof -
-      have 1: "right_cart_proj one (X\<^bsup>one\<^esup>) \<circ>\<^sub>c y \<in>\<^sub>c X\<^bsup>one\<^esup>"
-        using a2 cfunc_type_def comp_type e_defn eval_func_type right_cart_proj_type by auto
-      have 2: "(e \<circ>\<^sub>c y) \<circ>\<^sub>c i : one \<times>\<^sub>c one \<rightarrow> X"
-        by (metis (mono_tags, hide_lams) a2 a3 cfunc_type_def codomain_comp domain_comp e_defn eval_func_type i_type)
-      assume "e \<circ>\<^sub>c id\<^sub>c one \<times>\<^sub>f (right_cart_proj one (X\<^bsup>one\<^esup>) \<circ>\<^sub>c y) = (e \<circ>\<^sub>c y) \<circ>\<^sub>c i"
-      then show ?thesis
-        using "1" "2" a3 e_defn transpose_func_unique x_property by auto
-    qed
-
-    have "(right_cart_proj one (X\<^bsup>one\<^esup>)) \<circ>\<^sub>c x = (right_cart_proj one (X\<^bsup>one\<^esup>)) \<circ>\<^sub>c y"
-      by (simp add: a3 x_property y_property)
-    then show "x = y"
-      using x_eq y_eq by auto
-  qed
 
   have surj: "surjective(e)"
      unfolding surjective_def

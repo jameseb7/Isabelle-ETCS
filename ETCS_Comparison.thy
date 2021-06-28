@@ -484,7 +484,7 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left
                      have "n = m +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)"
                        using \<open>j = zero\<close> \<open>n +\<^sub>\<nat> j = m +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)\<close> add_respects_zero_on_right m_def by auto
                      then have "n = (successor \<circ>\<^sub>c zero) +\<^sub>\<nat> m"
-                       by (simp add: add_commutes m_def succ_n_type zero_type)
+                       using add_commutes m_def succ_n_type zero_type by blast
                      then have "\<exists>p. p \<in>\<^sub>c \<nat>\<^sub>c \<and> n = p +\<^sub>\<nat> m"
                        using succ_n_type zero_type by blast
                      then show ?thesis
@@ -506,7 +506,7 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left
                      then have "m = n +\<^sub>\<nat> p"
                        by (simp add: add_type m_def p_def succ_inject)
                      then have "... = p +\<^sub>\<nat> n"
-                       by (simp add: add_commutes m_def p_def)
+                       using add_commutes m_def p_def by blast
                      then have "\<exists>p. (p \<in>\<^sub>c \<nat>\<^sub>c \<and> m = p +\<^sub>\<nat> n)"
                        using \<open>m = n +\<^sub>\<nat> p\<close> p_def by blast
                      then show ?thesis
