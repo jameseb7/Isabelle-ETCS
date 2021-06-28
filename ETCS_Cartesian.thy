@@ -515,6 +515,23 @@ proof -
     using calculation by auto
 qed
 
+lemma product_associates:
+  "A \<times>\<^sub>c (B \<times>\<^sub>c C)  \<cong> (A \<times>\<^sub>c B) \<times>\<^sub>c C"
+proof-
+  have right_left: "(associate_right A B C) \<circ>\<^sub>c (associate_left A B C) = id (A \<times>\<^sub>c (B \<times>\<^sub>c C))"
+    by (smt associate_left_def associate_right_ap cfunc_cross_prod_def cfunc_prod_unique comp_type id_cross_prod id_domain id_left_unit2 left_cart_proj_type right_cart_proj_type)
+  have left_right: "(associate_left A B C) \<circ>\<^sub>c (associate_right A B C) = id ((A \<times>\<^sub>c B) \<times>\<^sub>c C)"
+    by (smt associate_left_ap associate_right_def cfunc_cross_prod_def cfunc_prod_unique comp_type id_cross_prod id_domain id_left_unit2 left_cart_proj_type right_cart_proj_type)
+  show ?thesis
+    by (metis associate_left_type associate_right_type cfunc_type_def is_isomorphic_def isomorphism_def left_right right_left) 
+qed
+
+
+  
+
+
+
+
 subsubsection \<open>Distributing over a Cartesian product from the right\<close>
 
 definition distribute_right_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
@@ -883,5 +900,7 @@ proof -
   then show ?thesis
     using calculation by auto
 qed
+
+
 
 end

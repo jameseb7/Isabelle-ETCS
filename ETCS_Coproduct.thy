@@ -347,5 +347,8 @@ proof-
     using epi_mon_is_iso epic by auto
 qed
 
+lemma product_distribute_over_coproduct_left:
+  "A \<times>\<^sub>c (B \<Coprod> C) \<cong> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
+
 
 end
