@@ -347,8 +347,50 @@ proof-
     using epi_mon_is_iso epic by auto
 qed
 
+
+
+
 lemma product_distribute_over_coproduct_left:
   "A \<times>\<^sub>c (B \<Coprod> C) \<cong> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
+proof-
+  have type1: "id(A) \<times>\<^sub>f (left_coproj B C) : (A \<times>\<^sub>c B) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
+    by typecheck_cfuncs
+ have type2: "id(A) \<times>\<^sub>f (right_coproj B C) : (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
+    by typecheck_cfuncs
+  have type3: "(id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C)) : (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
+    by typecheck_cfuncs
+
+  have surjective: "surjective((id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C)))"
+  proof-
+    fix z 
+    assume z_type: "z \<in>\<^sub>c A \<times>\<^sub>c (B \<Coprod> C)"
+
+    have z_def: "\<exists>a d. (a \<in>\<^sub>c A \<and> d \<in>\<^sub>c (B \<Coprod> C)\<and> z = \<langle>a,d\<rangle>)"
+      by (meson cart_prod_decomp z_type)
+    then obtain a d  where ad_def: "(a \<in>\<^sub>c A \<and> d \<in>\<^sub>c (B \<Coprod> C)\<and> z = \<langle>a,d\<rangle>)"
+      by blast
+
+    have z_def2: "(\<exists> b. (b \<in>\<^sub>c B \<and> d = (left_coproj B C) \<circ>\<^sub>c b) \<and> z = \<langle>a,d\<rangle> )
+      \<or>  (\<exists> c. (c \<in>\<^sub>c C \<and> d = (right_coproj B C) \<circ>\<^sub>c c) \<and> z = \<langle>a,d\<rangle>)"
+      by (simp add: ad_def coprojs_jointly_surj)
+
+    have z_def3: (
 
 
+    then have "surjective((id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C)))"
+      apply typecheck_cfuncs
+
+  
+
+
+(*
+(
+    
+  have mono1: "monomorphism(id(A) \<times>\<^sub>f (left_coproj B C))"
+    by (typecheck_cfuncs, simp add: cfunc_cross_prod_mono id_isomorphism iso_imp_epi_and_monic left_coproj_are_monomorphisms)
+  have mono2: "monomorphism(id(A) \<times>\<^sub>f (right_coproj B C))"
+    by (typecheck_cfuncs, simp add: cfunc_cross_prod_mono id_isomorphism iso_imp_epi_and_monic right_coproj_are_monomorphisms)
+  have mono3: "monomorphism((id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C)))"
+    apply typecheck_cfuncs
+*)
 end
