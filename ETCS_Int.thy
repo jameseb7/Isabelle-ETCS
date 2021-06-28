@@ -1303,25 +1303,23 @@ lemma int_mul_commutative:
   shows "a \<cdot>\<^sub>\<int> b = b \<cdot>\<^sub>\<int> a"
 
 proof - 
-  obtain m n  where a_def: "m \<in>\<^sub>c \<nat>\<^sub>c \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<and> a = natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>"
+  obtain m n  where m_n_types: "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" and a_def: "a = natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>"
     using assms(1) representation_theorem by blast
-  obtain p q  where b_def: "p \<in>\<^sub>c \<nat>\<^sub>c \<and> q \<in>\<^sub>c \<nat>\<^sub>c \<and> b = natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>"
+  obtain p q  where p_q_types: "p \<in>\<^sub>c \<nat>\<^sub>c" "q \<in>\<^sub>c \<nat>\<^sub>c" and b_def: "b = natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>"
     using assms(2) representation_theorem by blast
 
   have "a \<cdot>\<^sub>\<int> b = (natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>)"
     by (simp add: a_def b_def)
   also have "... =  natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
-    by (simp add: a_def b_def multZ_to_multNN)
+    by (simp add: m_n_types p_q_types multZ_to_multNN)
   also have "... =  natpair2int \<circ>\<^sub>c \<langle>(n \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> q), (n \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> p)\<rangle>"
-    by (metis a_def b_def mult_closure nat_pair_eq)
+    by (metis m_n_types p_q_types mult_closure nat_pair_eq)
   also have "... =  natpair2int \<circ>\<^sub>c \<langle>(p \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (q \<cdot>\<^sub>\<nat> m), (q \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (p \<cdot>\<^sub>\<nat> m)\<rangle>"
-    by (simp add: a_def b_def mult_commutative)
+    by (simp add: m_n_types p_q_types mult_commutative)
   also have "... = (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>)"
-    using a_def add_commutes b_def multZ_to_multNN mult_closure 
+    using m_n_types p_q_types by (typecheck_cfuncs, simp add: add_commutes multZ_to_multNN)
   also have "... = b \<cdot>\<^sub>\<int> a"
-    apply typecheck_cfuncs
-    using a_def add_commutes b_def multZ_to_multNN by auto
-oops
+    using a_def add_commutes b_def multZ_to_multNN by (typecheck_cfuncs, auto)
   then show ?thesis using calculation by auto
 qed
 

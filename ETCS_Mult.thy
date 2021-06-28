@@ -68,6 +68,11 @@ lemma f_mult_flat_type: "(add2  \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\
 definition mult :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixl "\<cdot>\<^sub>\<nat>" 70)
   where "m \<cdot>\<^sub>\<nat> n = mult2\<circ>\<^sub>c\<langle>m, n\<rangle>"
 
+lemma mult_type[type_rule]:
+  assumes "m : X \<rightarrow> \<nat>\<^sub>c" "n : X \<rightarrow> \<nat>\<^sub>c"
+  shows "m \<cdot>\<^sub>\<nat> n : X \<rightarrow> \<nat>\<^sub>c"
+  unfolding mult_def using assms by typecheck_cfuncs
+
 lemma mult_def2:
   assumes "m\<in>\<^sub>c  \<nat>\<^sub>c" "n\<in>\<^sub>c  \<nat>\<^sub>c"
   shows "m \<cdot>\<^sub>\<nat> n = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, mult1 \<circ>\<^sub>c n\<rangle>"
