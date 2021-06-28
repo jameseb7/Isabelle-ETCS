@@ -1140,7 +1140,38 @@ lemma mult2_int_natpair2int_eq:
 
 
 
-(*
+
+
+lemma multZ_to_multNN:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" "p \<in>\<^sub>c \<nat>\<^sub>c" "q \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) = 
+    natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
+
+proof - 
+  have mn_type: "\<langle>m, n\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms cfunc_prod_type zero_type) 
+  have pq_type: "\<langle>p, q\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms cfunc_prod_type zero_type)
+  have zmzn_type: "\<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: cfunc_prod_type mn_type pq_type)
+
+  have "(natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) =
+  mult2_int \<circ>\<^sub>c \<langle>natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>, natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>\<rangle>"
+    by (simp add: mult_int_def)
+  also have "... = mult2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int) \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
+    by (typecheck_cfuncs, smt assms cfunc_cross_prod_comp_cfunc_prod)
+  also have "... = (mult2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int)) \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
+    using comp_associative2 zmzn_type by (typecheck_cfuncs, blast)
+  also have "... = (natpair2int \<circ>\<^sub>c mult2_natpair)  \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
+    by (simp add: mult2_int_natpair2int_eq)
+  also have "... = natpair2int \<circ>\<^sub>c mult2_natpair  \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
+    using comp_associative2 zmzn_type by (typecheck_cfuncs, auto)
+  also have "... = natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
+    by (simp add: assms mult2_natpair_apply zero_type)
+  then show ?thesis using calculation by auto
+qed
+
+(*The following results may feel unnecessary or redundant but they turn out to be useful for working with the canonical representations*)
 lemma multZ_to_multNN_1:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"  
   shows "(natpair2int \<circ>\<^sub>c \<langle>zero, m\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle>) = 
@@ -1229,36 +1260,7 @@ proof -
     by (simp add: add_respects_zero_on_left assms mult_closure zero_type)
   then show ?thesis using calculation by auto
 qed
-*)
 
-lemma multZ_to_multNN:
-  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" "p \<in>\<^sub>c \<nat>\<^sub>c" "q \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) = 
-    natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
-
-proof - 
-  have mn_type: "\<langle>m, n\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
-    by (simp add: assms cfunc_prod_type zero_type) 
-  have pq_type: "\<langle>p, q\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
-    by (simp add: assms cfunc_prod_type zero_type)
-  have zmzn_type: "\<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
-    by (simp add: cfunc_prod_type mn_type pq_type)
-
-  have "(natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) =
-  mult2_int \<circ>\<^sub>c \<langle>natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>, natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>\<rangle>"
-    by (simp add: mult_int_def)
-  also have "... = mult2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int) \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
-    by (typecheck_cfuncs, smt assms cfunc_cross_prod_comp_cfunc_prod)
-  also have "... = (mult2_int \<circ>\<^sub>c (natpair2int \<times>\<^sub>f natpair2int)) \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
-    using comp_associative2 zmzn_type by (typecheck_cfuncs, blast)
-  also have "... = (natpair2int \<circ>\<^sub>c mult2_natpair)  \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
-    by (simp add: mult2_int_natpair2int_eq)
-  also have "... = natpair2int \<circ>\<^sub>c mult2_natpair  \<circ>\<^sub>c \<langle>\<langle>m, n\<rangle>, \<langle>p, q\<rangle>\<rangle>"
-    using comp_associative2 zmzn_type by (typecheck_cfuncs, auto)
-  also have "... = natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
-    by (simp add: assms mult2_natpair_apply zero_type)
-  then show ?thesis using calculation by auto
-qed
 
 
 lemma int_mul_respects_zero_right:
@@ -1341,6 +1343,18 @@ proof -
     by (simp add: calculation) 
 qed
 
+lemma int_mul_respects_negation_left:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(natpair2int \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c zero,  zero \<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>m,  n \<rangle>)=
+           (natpair2int \<circ>\<^sub>c \<langle>n,  m \<rangle>)"
+  using assms by (typecheck_cfuncs, simp add: add_respects_zero_on_right multZ_to_multNN mult_respects_zero_left s0_is_left_id)
+
+lemma int_mul_respects_negation_right:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "  (natpair2int \<circ>\<^sub>c \<langle>m,  n \<rangle>) \<cdot>\<^sub>\<int>   (natpair2int \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c zero,  zero \<rangle>)=
+           (natpair2int \<circ>\<^sub>c \<langle>n,  m \<rangle>)"
+  using assms int_mul_commutative int_mul_respects_negation_left by (typecheck_cfuncs, force)
+
 lemma int_mul_associative: 
   assumes "m \<in>\<^sub>c \<int>\<^sub>c" "n \<in>\<^sub>c \<int>\<^sub>c" "t \<in>\<^sub>c \<int>\<^sub>c"
   shows "(m \<cdot>\<^sub>\<int> n) \<cdot>\<^sub>\<int> t = m \<cdot>\<^sub>\<int> (n \<cdot>\<^sub>\<int> t)"
@@ -1364,7 +1378,8 @@ proof -
                                   (m1 \<cdot>\<^sub>\<nat> ((n1 \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t2)) ), 
                                   (m1 \<cdot>\<^sub>\<nat> ((n1 \<cdot>\<^sub>\<nat> t2) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t1)) ) +\<^sub>\<nat> 
                                   (m2 \<cdot>\<^sub>\<nat> ((n1 \<cdot>\<^sub>\<nat> t1) +\<^sub>\<nat> (n2 \<cdot>\<^sub>\<nat> t2)) )\<rangle>"
-    by (simp add: ETCS_Add.add_type add_commutes m_def multZ_to_multNN mult_closure n_def t_def)
+    by (smt ETCS_Add.add_type add_commutes m_def multZ_to_multNN mult_closure mult_int_def n_def t_def)
+
   also have "... = natpair2int \<circ>\<^sub>c \<langle>(m2 \<cdot>\<^sub>\<nat> (n1 \<cdot>\<^sub>\<nat> t2)) +\<^sub>\<nat> (m2 \<cdot>\<^sub>\<nat>(n2 \<cdot>\<^sub>\<nat> t1))   +\<^sub>\<nat> 
                                    (m1 \<cdot>\<^sub>\<nat>(n1 \<cdot>\<^sub>\<nat> t1)) +\<^sub>\<nat> (m1 \<cdot>\<^sub>\<nat>(n2 \<cdot>\<^sub>\<nat> t2)) , 
                                   (m1 \<cdot>\<^sub>\<nat> (n1 \<cdot>\<^sub>\<nat> t2)) +\<^sub>\<nat> (m1 \<cdot>\<^sub>\<nat>(n2 \<cdot>\<^sub>\<nat> t1))  +\<^sub>\<nat> 
@@ -1443,10 +1458,131 @@ lemma add_int_cancellative:
   shows "(a +\<^sub>\<int> c = b +\<^sub>\<int> c) = (a = b)"
   by (smt ETCS_Int.add_type addZ_associative add_inverse_unique add_neg assms comp_type neg_cancels_neg2 neg_int_type)
 
-lemma mult_int_cancellative:
-  assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c" "c \<in>\<^sub>c \<int>\<^sub>c" "c\<noteq> zero"
-  shows "(a \<cdot>\<^sub>\<int> c = b \<cdot>\<^sub>\<int> c) = (a = b)"
+
+lemma negative_is_not_positive: 
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "natpair2int \<circ>\<^sub>c \<langle>zero, a \<rangle> = natpair2int \<circ>\<^sub>c \<langle>b, zero \<rangle>"
+  shows "(a = zero)"
+proof(cases "a=b")
+  assume a_is_b: "a = b"
+  show "(a = zero)"
+
+(*
   oops
+lemma mult_int_cancellative:
+  assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c" "c \<in>\<^sub>c \<int>\<^sub>c" "c\<noteq> natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+  assumes "(a \<cdot>\<^sub>\<int> c = b \<cdot>\<^sub>\<int> c)"
+  shows   "(a = b)"
+proof- 
+  have a_form:"(\<exists> u. (u \<in>\<^sub>c \<nat>\<^sub>c \<and> ((a = natpair2int \<circ>\<^sub>c \<langle>zero, u \<rangle>) \<or> (a = natpair2int \<circ>\<^sub>c \<langle>u, zero \<rangle>))))"
+    by (simp add: assms(1) canonical_representation_theorem)
+  obtain u where u_def: "(u \<in>\<^sub>c \<nat>\<^sub>c \<and> ((a = natpair2int \<circ>\<^sub>c \<langle>zero, u \<rangle>) \<or> (a = natpair2int \<circ>\<^sub>c \<langle>u, zero \<rangle>)))"
+    using a_form by blast
+  have v_form:"(\<exists> v. (v \<in>\<^sub>c \<nat>\<^sub>c \<and> ((b = natpair2int \<circ>\<^sub>c \<langle>zero, v \<rangle>) \<or> (b = natpair2int \<circ>\<^sub>c \<langle>v, zero \<rangle>))))"
+    by (simp add: assms(2) canonical_representation_theorem)
+  obtain v where v_def: "(v \<in>\<^sub>c \<nat>\<^sub>c \<and> ((b = natpair2int \<circ>\<^sub>c \<langle>zero, v \<rangle>) \<or> (b = natpair2int \<circ>\<^sub>c \<langle>v, zero \<rangle>)))"
+    using v_form by blast
+  have w_form:"(\<exists> w. (w \<in>\<^sub>c \<nat>\<^sub>c \<and> ((c = natpair2int \<circ>\<^sub>c \<langle>zero, w \<rangle>) \<or> (c = natpair2int \<circ>\<^sub>c \<langle>w, zero \<rangle>))))"
+    by (simp add: assms(3) canonical_representation_theorem)
+  obtain w where w_def: "(w \<in>\<^sub>c \<nat>\<^sub>c \<and> ((c = natpair2int \<circ>\<^sub>c \<langle>zero, w \<rangle>) \<or> (c = natpair2int \<circ>\<^sub>c \<langle>w, zero \<rangle>)))"
+    using w_form by blast
 
 
+  show "(a = b)"
+  proof(cases "(a = natpair2int \<circ>\<^sub>c \<langle>zero, u \<rangle>)")
+    assume a_case1: "a = natpair2int \<circ>\<^sub>c \<langle>zero,u\<rangle>" 
+    show "(a = b)"
+    proof(cases "(b = natpair2int \<circ>\<^sub>c \<langle>zero, v \<rangle>)")
+      assume b_case1: "b = natpair2int \<circ>\<^sub>c \<langle>zero,v\<rangle>"
+      show "(a = b)"
+      proof(cases "(c = natpair2int \<circ>\<^sub>c \<langle>zero, w \<rangle>)")
+        assume c_case1: "c = natpair2int \<circ>\<^sub>c \<langle>zero,w\<rangle>"
+        have "natpair2int \<circ>\<^sub>c \<langle>zero, u \<cdot>\<^sub>\<nat> w\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+        proof - 
+            have "natpair2int \<circ>\<^sub>c \<langle>zero, u \<cdot>\<^sub>\<nat> w\<rangle> = 
+              (natpair2int \<circ>\<^sub>c \<langle>zero, u\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, w\<rangle>)"
+              by (simp add: multZ_to_multNN_1 u_def w_def)
+            also have "... = a \<cdot>\<^sub>\<int> c"
+              by (simp add: a_case1 c_case1)
+            also have "... = b \<cdot>\<^sub>\<int> c"
+              by (simp add: assms(5))
+            also have "... = (natpair2int \<circ>\<^sub>c \<langle>zero, v\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, w\<rangle>)"
+              by (simp add: b_case1 c_case1)
+            also have "... = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+              by (simp add: multZ_to_multNN_1 v_def w_def)
+            then show "natpair2int \<circ>\<^sub>c \<langle>zero, u \<cdot>\<^sub>\<nat> w\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+              by (simp add: calculation)
+        qed
+        then have "u \<cdot>\<^sub>\<nat> w = v \<cdot>\<^sub>\<nat> w"
+          by (metis add_respects_zero_on_left mult_closure nat_pair_eq u_def v_def w_def zero_type)
+        then have "u = v"
+          using assms(4) mult_cancellative u_def v_def w_def by auto
+        then show "a = b"
+          by (simp add: a_case1 b_case1)
+      next
+        assume "c \<noteq> natpair2int \<circ>\<^sub>c \<langle>zero,w\<rangle>"
+        then have c_case2: "c = natpair2int \<circ>\<^sub>c \<langle>w,zero\<rangle>"
+          using w_def by linarith
+        have "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero \<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+        proof - 
+            have "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero \<rangle> = 
+              (natpair2int \<circ>\<^sub>c \<langle>zero, u\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+              by (simp add: multZ_to_multNN_4 u_def w_def)
+            also have "... = a \<cdot>\<^sub>\<int> c"
+              by (simp add: a_case1 c_case2)
+            also have "... = b \<cdot>\<^sub>\<int> c"
+              by (simp add: assms(5))
+            also have "... = (natpair2int \<circ>\<^sub>c \<langle>zero, v\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+              using b_case1 c_case2 by auto
+            also have "... = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+              by (simp add: multZ_to_multNN_4 v_def w_def)
+            then show "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero \<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+              by (simp add: calculation)
+          qed
+            then have "u \<cdot>\<^sub>\<nat> w = v \<cdot>\<^sub>\<nat> w"
+              by (metis add_respects_zero_on_left mult_closure nat_pair_eq u_def v_def w_def zero_type)
+            then have "u = v"
+              using assms(4) mult_cancellative u_def v_def w_def by auto
+            then show "a = b"
+              by (simp add: a_case1 b_case1)
+          qed
+        next
+          assume "b \<noteq> natpair2int \<circ>\<^sub>c \<langle>zero,v\<rangle>"  (*The impossible case*)
+          then have b_case2: "b  =  natpair2int \<circ>\<^sub>c \<langle>v,zero\<rangle>"
+            using  v_def by linarith
+          show "(a = b)"
+          proof(cases "(c = natpair2int \<circ>\<^sub>c \<langle>zero, w \<rangle>)")
+            assume c_case1: "c = natpair2int \<circ>\<^sub>c \<langle>zero,w\<rangle>"
+            have a_is_minus_b: "natpair2int \<circ>\<^sub>c \<langle>zero, u \<cdot>\<^sub>\<nat> w\<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+            proof - 
+                have "natpair2int \<circ>\<^sub>c \<langle>zero, u \<cdot>\<^sub>\<nat> w\<rangle> = 
+                  (natpair2int \<circ>\<^sub>c \<langle>zero, u\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, w\<rangle>)"
+                  by (simp add: multZ_to_multNN_1 u_def w_def)
+                also have "... = a \<cdot>\<^sub>\<int> c"
+                  by (simp add: a_case1 c_case1)
+                also have "... = b \<cdot>\<^sub>\<int> c"
+                  by (simp add: assms(5))
+                also have "... = (natpair2int \<circ>\<^sub>c \<langle>v, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, w\<rangle>)"
+                  by (simp add: b_case2 c_case1)
+                also have "... = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+                  by (simp add: multZ_to_multNN_3 v_def w_def)
+                then show "natpair2int \<circ>\<^sub>c \<langle>zero, u \<cdot>\<^sub>\<nat> w\<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+                  by (simp add: calculation)
+              qed
+              show "(a = b)" 
+              proof(cases "u = zero")
+                assume "u = zero"
+                then have "v \<cdot>\<^sub>\<nat> w = zero"
+                  using a_is_minus_b add_respects_zero_on_left mult_closure mult_respects_zero_left nat_pair_eq u_def v_def w_def by auto
+                then show "(a = b)"
+                  by (metis \<open>u = zero\<close> assms(4) mult_cancellative mult_respects_zero_left u_def v_def w_def)
+              next
+                assume "u \<noteq> zero"
+                then have "w = zero"
+                  oops
+
+
+                  oops
+*)
+    oops
 end
