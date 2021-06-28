@@ -369,18 +369,32 @@ proof -
      by (meson CollectI assms(3) coequalized_fxns coequalizer_is_epimorphism epi_mon_is_iso)
  qed
 
-
-
-
-
-
 (* Proposition 2.3.6 *)
 lemma epimorphism_coequalizer_kernel_pair:
   assumes "f : X \<rightarrow> Y" "epimorphism f"
-  shows "coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
-proof (unfold coequalizer_def)
-  oops
-(*Prove the Corollary that every epimorphism is Regular*)
+  shows "coequalizer Y f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
+proof (unfold coequalizer_def, rule_tac x=X in exI, rule_tac x="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" in exI, auto)
+  show "fibered_product_left_proj X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X"
+    using assms by typecheck_cfuncs
+  show "fibered_product_right_proj X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X"
+    using assms by typecheck_cfuncs
+  show "f : X \<rightarrow>Y"
+    using assms by typecheck_cfuncs
+
+  show "f \<circ>\<^sub>c fibered_product_left_proj X f f X = f \<circ>\<^sub>c fibered_product_right_proj X f f X"
+    using fibered_product_is_pullback assms unfolding is_pullback_def square_commutes_def by auto
+next
+  fix h F
+  assume h_type: "h : X \<rightarrow> F"
+
+  assume h_eq: "h \<circ>\<^sub>c fibered_product_left_proj X f f X = h \<circ>\<^sub>c fibered_product_right_proj X f f X"
+
+  (* requires axiom of choice to obtain m : Y \<rightarrow> X (since f is an epimorphism), 
+     from which we get k  = h \<circ>\<^sub>c m, can't handle Y smaller than X otherwise *)
+
+  show "\<exists>k. k : Y \<rightarrow> F \<and> k \<circ>\<^sub>c f = h"
+    oops
+
 
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
