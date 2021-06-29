@@ -1459,16 +1459,19 @@ lemma add_int_cancellative:
   by (smt ETCS_Int.add_type addZ_associative add_inverse_unique add_neg assms comp_type neg_cancels_neg2 neg_int_type)
 
 
-lemma negative_is_not_positive: 
+lemma only_zero_is_neg_pos: 
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"
   assumes "natpair2int \<circ>\<^sub>c \<langle>zero, a \<rangle> = natpair2int \<circ>\<^sub>c \<langle>b, zero \<rangle>"
-  shows "(a = zero)"
-proof(cases "a=b")
-  assume a_is_b: "a = b"
-  show "(a = zero)"
+  shows "(a = zero) \<and> (b = zero)"
+proof - 
+  have "a +\<^sub>\<nat> b = zero +\<^sub>\<nat> zero"
+    using assms nat_pair_eq zero_type by auto
+  then show "(a = zero) \<and> (b = zero)"
+    by (metis add_respects_zero_on_right assms(1) assms(2) exists_implies_leq_true lqe_antisymmetry zero_type)
+qed  
 
-(*
-  oops
+
+
 lemma mult_int_cancellative:
   assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c" "c \<in>\<^sub>c \<int>\<^sub>c" "c\<noteq> natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
   assumes "(a \<cdot>\<^sub>\<int> c = b \<cdot>\<^sub>\<int> c)"
@@ -1569,20 +1572,204 @@ proof-
                 then show "natpair2int \<circ>\<^sub>c \<langle>zero, u \<cdot>\<^sub>\<nat> w\<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
                   by (simp add: calculation)
               qed
-              show "(a = b)" 
-              proof(cases "u = zero")
-                assume "u = zero"
-                then have "v \<cdot>\<^sub>\<nat> w = zero"
-                  using a_is_minus_b add_respects_zero_on_left mult_closure mult_respects_zero_left nat_pair_eq u_def v_def w_def by auto
-                then show "(a = b)"
-                  by (metis \<open>u = zero\<close> assms(4) mult_cancellative mult_respects_zero_left u_def v_def w_def)
+              then have prod_zero: "(u \<cdot>\<^sub>\<nat> w = zero) \<and> (v \<cdot>\<^sub>\<nat> w = zero)"
+                by (meson mult_closure only_zero_is_neg_pos u_def v_def w_def)
+              show "a = b"
+              proof(cases "w = zero")
+                assume impossibe: "w = zero"
+                then have "c =  natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+                  by (simp add: c_case1)
+                then show "a = b"
+                  using assms(4) by auto
               next
-                assume "u \<noteq> zero"
-                then have "w = zero"
-                  oops
+                assume else: "w \<noteq> zero"
+                then have "u = v"
+                  using prod_zero mult_cancellative u_def v_def w_def by fastforce
+                then show "a = b"
+                  using b_case2 else local.prod_zero mult_cancellative mult_respects_zero_left u_def w_def zero_type by fastforce
+              qed
+            next
+              assume "c \<noteq> natpair2int \<circ>\<^sub>c \<langle>zero,w\<rangle>"
+              then have c_case2:  "c = natpair2int \<circ>\<^sub>c \<langle>w,zero\<rangle>"
+                using w_def by linarith
+              have a_is_minus_b: "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+            proof - 
+                have "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero\<rangle> = 
+                  (natpair2int \<circ>\<^sub>c \<langle>zero, u\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+                  by (simp add: multZ_to_multNN_4 u_def w_def)
+                also have "... = a \<cdot>\<^sub>\<int> c"
+                  by (simp add: a_case1 c_case2)
+                also have "... = b \<cdot>\<^sub>\<int> c"
+                  by (simp add: assms(5))
+                also have "... = (natpair2int \<circ>\<^sub>c \<langle>v, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+                  by (simp add: b_case2 c_case2)
+                also have "... = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+                  by (simp add: multZ_to_multNN_2 v_def w_def)
+                then show "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+                  by (simp add: calculation)
+              qed
+              then have prod_zero: "(u \<cdot>\<^sub>\<nat> w = zero) \<and> (v \<cdot>\<^sub>\<nat> w = zero)"
+                by (metis mult_closure only_zero_is_neg_pos u_def v_def w_def)
+                 show "a = b"
+              proof(cases "w = zero")
+                assume impossibe: "w = zero"
+                then have "c =  natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+                  by (simp add: c_case2)
+                then show "a = b"
+                  using assms(4) by auto
+              next
+                assume else: "w \<noteq> zero"
+                then have "u = v"
+                  using prod_zero mult_cancellative u_def v_def w_def by fastforce
+                then show "a = b"
+                  using b_case2 else local.prod_zero mult_cancellative mult_respects_zero_left u_def w_def zero_type by fastforce
+              qed
+            qed
+          qed
+        next 
+          assume "a \<noteq> natpair2int \<circ>\<^sub>c \<langle>zero,u\<rangle>" 
+          then have a_case2:  "a = natpair2int \<circ>\<^sub>c \<langle>u,zero\<rangle>"
+            using u_def by linarith 
+    show "(a = b)"
+    proof(cases "(b = natpair2int \<circ>\<^sub>c \<langle>zero, v \<rangle>)")
+      assume b_case1: "b = natpair2int \<circ>\<^sub>c \<langle>zero,v\<rangle>"
+      show "(a = b)"
+      proof(cases "(c = natpair2int \<circ>\<^sub>c \<langle>zero, w \<rangle>)")
+        assume c_case1: "c = natpair2int \<circ>\<^sub>c \<langle>zero,w\<rangle>"
+        have "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+        proof - 
+            have "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w,zero \<rangle> = 
+              (natpair2int \<circ>\<^sub>c \<langle>u, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, w\<rangle>)"
+              by (simp add: multZ_to_multNN_3 u_def w_def)
+            also have "... = a \<cdot>\<^sub>\<int> c"
+              by (simp add: a_case2 c_case1)
+            also have "... = b \<cdot>\<^sub>\<int> c"
+              by (simp add: assms(5))
+            also have "... = (natpair2int \<circ>\<^sub>c \<langle>zero, v\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, w\<rangle>)"
+              by (simp add: b_case1 c_case1)
+            also have "... = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+              by (simp add: multZ_to_multNN_1 v_def w_def)
+            then show "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+              by (simp add: calculation)
+        qed
+        then have prod_zero: "(u \<cdot>\<^sub>\<nat> w = zero) \<and> (v \<cdot>\<^sub>\<nat> w = zero)"
+          by (metis mult_closure only_zero_is_neg_pos u_def v_def w_def)
+        show "a = b"
+              proof(cases "w = zero")
+                assume impossibe: "w = zero"
+                then have "c =  natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+                  by (simp add: c_case1)
+                then show "a = b"
+                  using assms(4) by auto
+              next
+                assume else: "w \<noteq> zero"
+                then have "u = v"
+                  using prod_zero mult_cancellative u_def v_def w_def by fastforce
+                then show "a = b"
+                  using b_case1 else local.prod_zero mult_cancellative mult_respects_zero_left u_def w_def zero_type by fastforce
+              qed
+            next
+              assume "c \<noteq> natpair2int \<circ>\<^sub>c \<langle>zero,w\<rangle>"
+              then have c_case2: "c = natpair2int \<circ>\<^sub>c \<langle>w,zero\<rangle>"
+                using w_def by linarith
+              have "natpair2int \<circ>\<^sub>c \<langle>zero , u \<cdot>\<^sub>\<nat> w \<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+        proof - 
+            have "natpair2int \<circ>\<^sub>c \<langle>zero, u \<cdot>\<^sub>\<nat> w \<rangle> = 
+              (natpair2int \<circ>\<^sub>c \<langle>u, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+              by (simp add: multZ_to_multNN_2 u_def w_def)
+            also have "... = a \<cdot>\<^sub>\<int> c"
+              by (simp add: a_case2 c_case2)
+            also have "... = b \<cdot>\<^sub>\<int> c"
+              by (simp add: assms(5))
+            also have "... = (natpair2int \<circ>\<^sub>c \<langle>zero, v\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+              using b_case1 c_case2 by auto
+            also have "... = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+              by (simp add: multZ_to_multNN_4 v_def w_def)
+            then show "natpair2int \<circ>\<^sub>c \<langle>zero , u \<cdot>\<^sub>\<nat> w \<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+              by (simp add: calculation)
+          qed
+          then have prod_zero: "(u \<cdot>\<^sub>\<nat> w = zero) \<and> (v \<cdot>\<^sub>\<nat> w = zero)"
+                by (metis mult_closure only_zero_is_neg_pos u_def v_def w_def)
+          show "a = b"
+              proof(cases "w = zero")
+                assume impossibe: "w = zero"
+                then have "c =  natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+                  by (simp add: c_case2)
+                then show "a = b"
+                  using assms(4) by auto
+              next
+                assume else: "w \<noteq> zero"
+                then have "u = v"
+                  using prod_zero mult_cancellative u_def v_def w_def by fastforce
+                then show "a = b"
+                  using b_case1 else local.prod_zero mult_cancellative mult_respects_zero_left u_def w_def zero_type by fastforce
+              qed
+            qed
+          next
+            assume "b \<noteq> natpair2int \<circ>\<^sub>c \<langle>zero,v\<rangle>"
+            then have b_case2: "b =  natpair2int \<circ>\<^sub>c \<langle>v,zero\<rangle>"
+              using v_def by linarith
+            show "(a = b)"
+            proof(cases "(c = natpair2int \<circ>\<^sub>c \<langle>zero, w \<rangle>)")
+              assume c_case1: "(c = natpair2int \<circ>\<^sub>c \<langle>zero, w \<rangle>)"
+                have "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero\<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+                proof - 
+                    have "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w,zero \<rangle> = 
+                      (natpair2int \<circ>\<^sub>c \<langle>u, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, w\<rangle>)"
+                      by (simp add: multZ_to_multNN_3 u_def w_def)
+                    also have "... = a \<cdot>\<^sub>\<int> c"
+                      by (simp add: a_case2 c_case1)
+                    also have "... = b \<cdot>\<^sub>\<int> c"
+                      by (simp add: assms(5))
+                    also have "... = (natpair2int \<circ>\<^sub>c \<langle>v, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, w\<rangle>)"
+                      by (simp add: b_case2 c_case1)
+                    also have "... = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+                      by (simp add: multZ_to_multNN_3 v_def w_def)
+                    then show "natpair2int \<circ>\<^sub>c \<langle>u \<cdot>\<^sub>\<nat> w, zero\<rangle> = natpair2int \<circ>\<^sub>c \<langle>v \<cdot>\<^sub>\<nat> w, zero\<rangle>"
+                      by (simp add: calculation)
+                qed
+        then have "u \<cdot>\<^sub>\<nat> w = v \<cdot>\<^sub>\<nat> w"
+          by (metis add_respects_zero_on_left mult_closure nat_pair_eq u_def v_def w_def zero_type)
+        then have  "u = v"
+          using assms(4) mult_cancellative u_def v_def w_def by auto
+        then show "a = b"
+          by (simp add: a_case2 b_case2)
+      next
+        assume "c \<noteq> natpair2int \<circ>\<^sub>c \<langle>zero,w\<rangle>" 
+        then have c_case2: "c = natpair2int \<circ>\<^sub>c \<langle>w,zero\<rangle>"
+          using w_def by linarith
+        have "natpair2int \<circ>\<^sub>c \<langle>zero , u \<cdot>\<^sub>\<nat> w \<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+        proof - 
+                    have "natpair2int \<circ>\<^sub>c \<langle>zero,u \<cdot>\<^sub>\<nat> w \<rangle> = 
+                      (natpair2int \<circ>\<^sub>c \<langle>u, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+                      by (simp add: multZ_to_multNN_2 u_def w_def)
+                    also have "... = a \<cdot>\<^sub>\<int> c"
+                      by (simp add: a_case2 c_case2)
+                    also have "... = b \<cdot>\<^sub>\<int> c"
+                      by (simp add: assms(5))
+                    also have "... = (natpair2int \<circ>\<^sub>c \<langle>v, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+                      by (simp add: b_case2 c_case2)
+                    also have "... = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+                      by (simp add: multZ_to_multNN_2 v_def w_def)
+                    then show "natpair2int \<circ>\<^sub>c \<langle>zero , u \<cdot>\<^sub>\<nat> w \<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+                      by (simp add: calculation)
+                  qed
+                  then have "u \<cdot>\<^sub>\<nat> w = v \<cdot>\<^sub>\<nat> w"
+                       by (metis add_respects_zero_on_left mult_closure nat_pair_eq u_def v_def w_def zero_type)
+                  then have "u = v"
+                    using assms(4) mult_cancellative u_def v_def w_def by auto
+                  then show "a = b"
+                    by (simp add: a_case2 b_case2)
+                qed
+              qed
+            qed
+          qed
+        
+              
 
 
-                  oops
-*)
-    oops
+
+
+
+
 end
