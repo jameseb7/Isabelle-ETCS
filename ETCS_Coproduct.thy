@@ -638,8 +638,158 @@ qed
 qed
 
 
+lemma func_product_distribute_over_coproduct_left:
+  "f \<times>\<^sub>f (g \<amalg> h) = (f \<times>\<^sub>f g) \<amalg> (f \<times>\<^sub>f h)"
+  oops
 
 
+lemma prod_pres_iso:
+  assumes "A \<cong>  C"  "B \<cong> D"
+  shows "A \<times>\<^sub>c B \<cong>  C \<times>\<^sub>c D"
+proof - 
+  obtain f where f_def: "f: A \<rightarrow> C \<and> isomorphism(f)"
+    using assms(1) is_isomorphic_def by blast
+  obtain g where g_def: "g: B \<rightarrow> D \<and> isomorphism(g)"
+    using assms(2) is_isomorphic_def by blast
+  have fg_type: "f\<times>\<^sub>fg : A \<times>\<^sub>c B \<rightarrow>  C \<times>\<^sub>c D"
+    by (typecheck_cfuncs, simp add: f_def g_def)
+  have mono: "monomorphism(f\<times>\<^sub>fg)"
+    using cfunc_cross_prod_mono f_def g_def iso_imp_epi_and_monic by blast
+  have epic: "epimorphism(f\<times>\<^sub>fg)"
+    using f_def g_def iso_imp_epi_and_monic product_of_epis_is_epi by blast
+  have "isomorphism(f\<times>\<^sub>fg)"
+    using epic mono epi_mon_is_iso by auto
+  then show "A \<times>\<^sub>c B \<cong>  C \<times>\<^sub>c D"
+    using fg_type is_isomorphic_def by blast
+qed
+
+
+
+
+
+lemma coprod_pres_iso:
+  assumes "A \<cong>  C"  "B \<cong> D"
+  shows "A \<Coprod> B \<cong>  C \<Coprod> D"
+proof- 
+  obtain f where f_def: "f: A \<rightarrow> C \<and> isomorphism(f)"
+    using assms(1) is_isomorphic_def by blast
+  obtain g where g_def: "g: B \<rightarrow> D \<and> isomorphism(g)"
+    using assms(2) is_isomorphic_def by blast
+
+  have surj_f: "surjective(f)"
+    using epi_is_surj f_def iso_imp_epi_and_monic by blast
+  have surj_g: "surjective(g)"
+    using epi_is_surj g_def iso_imp_epi_and_monic by blast
+
+
+  obtain \<phi> where \<phi>_def: "\<phi> = (left_coproj C D \<circ>\<^sub>c f)  \<amalg> (right_coproj C D \<circ>\<^sub>c g)"
+    by simp
+  then have \<phi>_type: "\<phi>: A \<Coprod> B \<rightarrow>  C \<Coprod> D"
+    using cfunc_coprod_type cfunc_type_def codomain_comp domain_comp f_def g_def left_proj_type right_proj_type by auto
+
+  have "surjective(\<phi>)"
+    unfolding surjective_def
+  proof(auto) 
+    fix y 
+    assume y_type: "y \<in>\<^sub>c codomain \<phi>"
+    then have y_type2: "y \<in>\<^sub>c C \<Coprod> D"
+      using \<phi>_type cfunc_type_def by auto
+    then have y_form: "(\<exists> c. (c \<in>\<^sub>c C \<and> y = (left_coproj C D) \<circ>\<^sub>c c))
+      \<or>  (\<exists> d. (d \<in>\<^sub>c D \<and> y = (right_coproj C D) \<circ>\<^sub>c d))"
+      using coprojs_jointly_surj by auto
+    show "\<exists>x. x \<in>\<^sub>c domain \<phi> \<and> \<phi> \<circ>\<^sub>c x = y"
+    proof(cases "(\<exists> c. (c \<in>\<^sub>c C \<and> y = (left_coproj C D) \<circ>\<^sub>c c))")
+      assume "(\<exists> c. (c \<in>\<^sub>c C \<and> y = (left_coproj C D) \<circ>\<^sub>c c))"
+      then obtain c where c_def: "(c \<in>\<^sub>c C \<and> y = (left_coproj C D) \<circ>\<^sub>c c)"
+        by blast
+      then have "\<exists> a. a \<in>\<^sub>c A \<and> f \<circ>\<^sub>c a = c"
+        using cfunc_type_def f_def surj_f surjective_def by auto
+      then obtain a where a_def: "a \<in>\<^sub>c A \<and> f \<circ>\<^sub>c a = c"
+        by blast
+      obtain x where x_def: "x = (left_coproj A B) \<circ>\<^sub>c a"
+        by blast
+      have x_type: "x \<in>\<^sub>c A \<Coprod> B"
+        using a_def comp_type left_proj_type x_def by blast
+      have "\<phi> \<circ>\<^sub>c x = y"
+        using \<phi>_def \<phi>_type a_def c_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_def by force
+      then show "\<exists>x. x \<in>\<^sub>c domain \<phi> \<and> \<phi> \<circ>\<^sub>c x = y"
+        using \<phi>_type cfunc_type_def x_type by auto
+    next
+      assume "\<nexists>c. c \<in>\<^sub>c C \<and> y = left_coproj C D \<circ>\<^sub>c c"
+      then have y_def2: "(\<exists> d. (d \<in>\<^sub>c D \<and> y = (right_coproj C D) \<circ>\<^sub>c d))"
+        using y_form by blast
+      then obtain d where d_def: "(d \<in>\<^sub>c D \<and> y = (right_coproj C D) \<circ>\<^sub>c d)"
+        by blast
+      then have "\<exists> b. b \<in>\<^sub>c B \<and> g \<circ>\<^sub>c b = d"
+        using cfunc_type_def g_def surj_g surjective_def by auto
+      then obtain b where b_def: "b \<in>\<^sub>c B \<and> g \<circ>\<^sub>c b = d"
+        by blast
+      obtain x where x_def: "x = (right_coproj A B) \<circ>\<^sub>c b"
+        by blast
+      have x_type: "x \<in>\<^sub>c A \<Coprod> B"
+        using b_def comp_type right_proj_type x_def by blast
+      have "\<phi> \<circ>\<^sub>c x = y"
+        using \<phi>_def \<phi>_type b_def cfunc_type_def comp_associative comp_type d_def f_def g_def left_proj_type right_coproj_cfunc_coprod right_proj_type x_def by force
+      then show "\<exists>x. x \<in>\<^sub>c domain \<phi> \<and> \<phi> \<circ>\<^sub>c x = y"
+        using \<phi>_type cfunc_type_def x_type by auto
+    qed
+  qed
+
+
+  have "injective(\<phi>)"
+    unfolding injective_def
+  proof(auto)
+    fix x y   
+    assume x_type: "x \<in>\<^sub>c domain \<phi>"
+    assume y_type: "y \<in>\<^sub>c domain \<phi>"
+    assume equals: "\<phi> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c y"
+    have x_type2: "x \<in>\<^sub>c A \<Coprod> B"
+      using \<phi>_type cfunc_type_def x_type by auto
+    have y_type2: "y \<in>\<^sub>c A \<Coprod> B"
+      using \<phi>_type cfunc_type_def y_type by auto
+
+    have phix_type: "\<phi> \<circ>\<^sub>c x \<in>\<^sub>c C \<Coprod> D"
+      using \<phi>_type comp_type x_type2 by blast
+    have phiy_type: "\<phi> \<circ>\<^sub>c y \<in>\<^sub>c C \<Coprod> D"
+      using equals phix_type by auto
+
+    have phix_form: "(\<exists> c. (c \<in>\<^sub>c C  \<and> \<phi> \<circ>\<^sub>c x = (left_coproj C D) \<circ>\<^sub>c c))
+      \<or>  (\<exists> d. (d \<in>\<^sub>c D \<and> \<phi> \<circ>\<^sub>c x  = (right_coproj C D) \<circ>\<^sub>c d))"
+      by (simp add: coprojs_jointly_surj phix_type)
+
+    have phiy_form: "(\<exists> c'. (c' \<in>\<^sub>c C  \<and> \<phi> \<circ>\<^sub>c y = (left_coproj C D) \<circ>\<^sub>c c'))
+      \<or>  (\<exists> d'. (d' \<in>\<^sub>c D \<and> \<phi> \<circ>\<^sub>c y  = (right_coproj C D) \<circ>\<^sub>c d'))"
+      using equals phix_form by auto
+
+    oops 
+
+
+
+
+
+(*
+    have x_form: "(\<exists> a. (a \<in>\<^sub>c A  \<and> x = (left_coproj A B) \<circ>\<^sub>c a))
+      \<or>  (\<exists> b. (b \<in>\<^sub>c B \<and> x = (right_coproj A B) \<circ>\<^sub>c b))"
+      using cfunc_type_def coprojs_jointly_surj x_type x_type2 y_type by auto
+    
+    have y_form: "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))
+      \<or>  (\<exists> b. (b \<in>\<^sub>c B \<and> y = (right_coproj A B) \<circ>\<^sub>c b))"
+      using cfunc_type_def coprojs_jointly_surj x_type x_type2 y_type by auto
+
+    show "x=y"
+    proof(cases "(\<exists> a. (a \<in>\<^sub>c A  \<and> x = (left_coproj A B) \<circ>\<^sub>c a))")
+      assume "(\<exists> a. (a \<in>\<^sub>c A  \<and> x = (left_coproj A B) \<circ>\<^sub>c a))"
+      then obtain a where a_def: "(a \<in>\<^sub>c A  \<and> x = (left_coproj A B) \<circ>\<^sub>c a)"
+        by blast
+      show "x = y"
+      proof(cases "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))")
+        assume "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))"
+        then obtain a' where "(a' \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a')"
+          by blast
+        then have "(left_coproj A B) \<circ>\<^sub>c a = (left_coproj A B) \<circ>\<^sub>c a'"
+        proof - 
+          have "(left_coproj A B) \<circ>\<^sub>c a = (\<phi> 
+  *)
 
 
 

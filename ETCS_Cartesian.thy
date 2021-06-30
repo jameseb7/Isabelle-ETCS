@@ -342,6 +342,13 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by (simp add: x_expand y_expand)
 qed
 
+
+
+
+  
+
+
+
 subsection \<open>Useful Cartesian product permuting functions\<close>
 
 subsubsection \<open>Swapping a Cartesian product\<close>
@@ -527,7 +534,6 @@ proof-
 qed
 
 
-  
 
 
 

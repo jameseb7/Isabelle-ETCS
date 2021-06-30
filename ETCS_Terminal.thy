@@ -384,6 +384,7 @@ qed
 definition surjective :: "cfunc \<Rightarrow> bool" where
  "surjective f  \<longleftrightarrow> (\<forall>y. y \<in>\<^sub>c codomain f \<longrightarrow> (\<exists>x. x \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = y))"
 
+
 (* Exercise 2.1.30 *)
 lemma surjective_is_epimorphism:
   "surjective f \<Longrightarrow> epimorphism f"
@@ -445,11 +446,39 @@ proof -
     using calculation by auto
 qed
 
-(*
-lemma elements_of_a_pair:
-  assumes "\<langle>x,y\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Y)"
-  shows "(x \<in>\<^sub>c X)" and "y \<in>\<^sub>c Y"
-*)
+subsection \<open>More Results on Cartesian Products\<close>
+
+lemma cfunc_cross_prod_surj:
+  assumes type_assms: "f : A \<rightarrow> C" "g : B \<rightarrow> D"
+  assumes f_surj: "surjective f" and g_surj: "surjective g"
+  shows "surjective (f \<times>\<^sub>f g)"
+  unfolding surjective_def
+proof(auto)
+  fix y
+  assume y_type: "y \<in>\<^sub>c codomain (f \<times>\<^sub>f g)"
+  have fg_type: "f \<times>\<^sub>f g: (A \<times>\<^sub>c  B) \<rightarrow> (C \<times>\<^sub>c D)"
+    using assms by typecheck_cfuncs
+  then have "y \<in>\<^sub>c (C \<times>\<^sub>c D)"
+    using cfunc_type_def y_type by auto
+  then have "\<exists> c d. c \<in>\<^sub>c C \<and> d \<in>\<^sub>c D \<and> y = \<langle>c,d\<rangle>"
+    using cart_prod_decomp by blast
+  then obtain c d where y_def: "c \<in>\<^sub>c C \<and> d \<in>\<^sub>c D \<and> y = \<langle>c,d\<rangle>"
+    by blast
+  then have "\<exists> a b. a \<in>\<^sub>c A \<and> b \<in>\<^sub>c B \<and> f \<circ>\<^sub>c a = c \<and> g \<circ>\<^sub>c b = d"
+    by (metis cfunc_type_def f_surj g_surj surjective_def type_assms)
+  then obtain a b where ab_def: "a \<in>\<^sub>c A \<and> b \<in>\<^sub>c B \<and> f \<circ>\<^sub>c a = c \<and> g \<circ>\<^sub>c b = d"
+    by blast
+  then obtain x where x_def: "x = \<langle>a,b\<rangle>"
+    by auto
+  have x_type: "x \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
+    using ab_def cfunc_prod_type cfunc_type_def fg_type x_def by auto
+  have "(f \<times>\<^sub>f g) \<circ>\<^sub>c x = y"
+    using ab_def cfunc_cross_prod_comp_cfunc_prod type_assms(1) type_assms(2) x_def y_def by blast
+  then show "\<exists>x. x \<in>\<^sub>c domain (f \<times>\<^sub>f g) \<and> (f \<times>\<^sub>f g) \<circ>\<^sub>c x = y"
+    using x_type by blast
+qed
+
+
 
 
 end
