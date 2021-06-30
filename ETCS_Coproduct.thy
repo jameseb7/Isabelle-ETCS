@@ -638,10 +638,6 @@ qed
 qed
 
 
-lemma func_product_distribute_over_coproduct_left:
-  "f \<times>\<^sub>f (g \<amalg> h) = (f \<times>\<^sub>f g) \<amalg> (f \<times>\<^sub>f h)"
-  oops
-
 
 lemma prod_pres_iso:
   assumes "A \<cong>  C"  "B \<cong> D"
@@ -684,7 +680,8 @@ proof-
   have coproj_f_inject: "injective(((left_coproj C D) \<circ>\<^sub>c f))"
     using cfunc_type_def composition_of_monic_pair_is_monic f_def iso_imp_epi_and_monic left_coproj_are_monomorphisms left_proj_type monomorphism_imp_injective by auto
     
-  
+  have coproj_g_inject: "injective(((right_coproj C D) \<circ>\<^sub>c g))"
+    using cfunc_type_def composition_of_monic_pair_is_monic g_def iso_imp_epi_and_monic right_coproj_are_monomorphisms right_proj_type monomorphism_imp_injective by auto
 
   obtain \<phi> where \<phi>_def: "\<phi> = (left_coproj C D \<circ>\<^sub>c f)  \<amalg> (right_coproj C D \<circ>\<^sub>c g)"
     by simp
@@ -787,11 +784,15 @@ proof-
             using \<phi>_def a_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type by auto
           also have "... = \<phi> \<circ>\<^sub>c y"
             by (meson equals)
+          also have "... = (\<phi> \<circ>\<^sub>c (left_coproj A B)) \<circ>\<^sub>c a'"
+            using \<phi>_type a'_def comp_associative2 by (typecheck_cfuncs, blast)
           also have "... = ((left_coproj C D) \<circ>\<^sub>c f) \<circ>\<^sub>c a'"
-            using \<phi>_def a'_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type x_type2 by auto
+            unfolding \<phi>_def using f_def g_def a'_def left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
           then show "a = a'"
             by (smt a'_def a_def calculation cfunc_type_def coproj_f_inject domain_comp f_def injective_def left_proj_type)
         qed
+        then show "x=y"
+          by (simp add:  a'_def(2) a_def(2))
       next
         assume "\<nexists>a. a \<in>\<^sub>c A \<and> y = left_coproj A B \<circ>\<^sub>c a"
         then have "(\<exists> b. (b \<in>\<^sub>c B \<and> y = (right_coproj A B) \<circ>\<^sub>c b))"
@@ -810,8 +811,84 @@ proof-
             using \<phi>_type b'_def comp_associative2 by (typecheck_cfuncs, blast)
           also have "... = (right_coproj C D \<circ>\<^sub>c g) \<circ>\<^sub>c b' "
             unfolding \<phi>_def using f_def g_def b'_def right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
-          also have "... = right_coproj C D \<circ>\<^sub>c g \<circ>\<^sub>c b'"
+          also have "... = (right_coproj C D) \<circ>\<^sub>c (g \<circ>\<^sub>c b')"
               using g_def b'_def by (typecheck_cfuncs, simp add: comp_associative2)
+          then show "x = y"
+             using  a_def(1) b'_def(1) calculation comp_type coproducts_disjoint f_def(1) g_def(1) by auto
+         qed
+       qed
+     next
+         assume "\<nexists>a. a \<in>\<^sub>c A \<and> x = left_coproj A B \<circ>\<^sub>c a"
+         then have "(\<exists> b. (b \<in>\<^sub>c B \<and> x = (right_coproj A B) \<circ>\<^sub>c b))"
+           using x_form by blast
+         then obtain b where b_def: "(b \<in>\<^sub>c B \<and> x = (right_coproj A B) \<circ>\<^sub>c b)"
+           by blast
+              show "x = y"
+              proof(cases "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))")
+                 assume "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))"
+                 then obtain a' where a'_def: "a' \<in>\<^sub>c A" "y = (left_coproj A B) \<circ>\<^sub>c a'"
+                   by blast
+                 show "x = y"
+                 proof - 
+                  have "(right_coproj C D) \<circ>\<^sub>c (g \<circ>\<^sub>c b) = ((right_coproj C D) \<circ>\<^sub>c g) \<circ>\<^sub>c b"
+                    using b_def cfunc_type_def comp_associative g_def right_proj_type by auto
+                  also have "...  = \<phi> \<circ>\<^sub>c x"
+                    by (smt \<phi>_def \<phi>_type b_def comp_associative2 comp_type f_def(1) g_def(1) left_proj_type right_coproj_cfunc_coprod right_proj_type)
+                  also have "... = \<phi> \<circ>\<^sub>c y"
+                    by (meson equals)
+                  also have "... = (\<phi> \<circ>\<^sub>c (left_coproj A B)) \<circ>\<^sub>c a'"
+                    using \<phi>_type a'_def comp_associative2 by (typecheck_cfuncs, blast)
+                  also have "... = (left_coproj C D \<circ>\<^sub>c f) \<circ>\<^sub>c a' "
+                    unfolding \<phi>_def using f_def g_def a'_def left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+                  also have "... = (left_coproj C D) \<circ>\<^sub>c (f \<circ>\<^sub>c a')"
+                      using f_def a'_def by (typecheck_cfuncs, simp add: comp_associative2)
+                  then show "x = y"
+                    by (metis a'_def(1) b_def calculation comp_type coproducts_disjoint f_def(1) g_def(1))
+                qed
+        next
+          assume "\<nexists>a. a \<in>\<^sub>c A \<and> y = left_coproj A B \<circ>\<^sub>c a"
+          then have "(\<exists> b. (b \<in>\<^sub>c B \<and> y = (right_coproj A B) \<circ>\<^sub>c b))"
+            using y_form by blast
+        then obtain b' where b'_def: "b' \<in>\<^sub>c B" "y = (right_coproj A B) \<circ>\<^sub>c b'"
+          by blast
+        then have "b = b'"
+        proof - 
+          have "((right_coproj C D) \<circ>\<^sub>c g) \<circ>\<^sub>c b = \<phi> \<circ>\<^sub>c x"
+            by (smt \<phi>_def \<phi>_type b_def comp_associative2 comp_type f_def(1) g_def(1) left_proj_type right_coproj_cfunc_coprod right_proj_type)
+          also have "... = \<phi> \<circ>\<^sub>c y"
+            by (meson equals)
+          also have "... = (\<phi> \<circ>\<^sub>c (right_coproj A B)) \<circ>\<^sub>c b'"
+            using \<phi>_type b'_def comp_associative2 by (typecheck_cfuncs, blast)
+          also have "... = ((right_coproj C D) \<circ>\<^sub>c g) \<circ>\<^sub>c b'"
+            unfolding \<phi>_def using f_def g_def b'_def right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+          then show "b = b'"
+            by (smt b'_def b_def calculation cfunc_type_def coproj_g_inject domain_comp g_def injective_def right_proj_type)
+        qed
+        then show "x = y"
+          by (simp add: b'_def(2) b_def)
+      qed
+    qed
+  qed
+
+  have "monomorphism(\<phi>)"
+    using \<open>injective \<phi>\<close> injective_imp_monomorphism by blast
+  have "epimorphism(\<phi>)"
+    by (simp add: \<open>surjective \<phi>\<close> surjective_is_epimorphism)
+  have "isomorphism(\<phi>)"
+    using \<open>epimorphism \<phi>\<close> \<open>monomorphism \<phi>\<close> epi_mon_is_iso by blast
+  then show ?thesis
+    using \<phi>_type is_isomorphic_def by blast
+qed
+
+
+lemma product_distribute_over_coproduct_right:
+  "(A \<Coprod> B) \<times>\<^sub>c C  \<cong> (A \<times>\<^sub>c C) \<Coprod> (B \<times>\<^sub>c C)"
+  by (meson coprod_pres_iso isomorphic_is_transitive product_commutes product_distribute_over_coproduct_left)
+
+
+lemma func_product_distribute_over_coproduct_left:
+  "f \<times>\<^sub>f (g \<amalg> h) = (f \<times>\<^sub>f g) \<amalg> (f \<times>\<^sub>f h)"
+  oops
 
 
 
