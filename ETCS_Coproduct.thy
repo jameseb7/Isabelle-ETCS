@@ -681,6 +681,10 @@ proof-
   have surj_g: "surjective(g)"
     using epi_is_surj g_def iso_imp_epi_and_monic by blast
 
+  have coproj_f_inject: "injective(((left_coproj C D) \<circ>\<^sub>c f))"
+    using cfunc_type_def composition_of_monic_pair_is_monic f_def iso_imp_epi_and_monic left_coproj_are_monomorphisms left_proj_type monomorphism_imp_injective by auto
+    
+  
 
   obtain \<phi> where \<phi>_def: "\<phi> = (left_coproj C D \<circ>\<^sub>c f)  \<amalg> (right_coproj C D \<circ>\<^sub>c g)"
     by simp
@@ -753,21 +757,12 @@ proof-
     have phiy_type: "\<phi> \<circ>\<^sub>c y \<in>\<^sub>c C \<Coprod> D"
       using equals phix_type by auto
 
-    have phix_form: "(\<exists> c. (c \<in>\<^sub>c C  \<and> \<phi> \<circ>\<^sub>c x = (left_coproj C D) \<circ>\<^sub>c c))
-      \<or>  (\<exists> d. (d \<in>\<^sub>c D \<and> \<phi> \<circ>\<^sub>c x  = (right_coproj C D) \<circ>\<^sub>c d))"
-      by (simp add: coprojs_jointly_surj phix_type)
-
-    have phiy_form: "(\<exists> c'. (c' \<in>\<^sub>c C  \<and> \<phi> \<circ>\<^sub>c y = (left_coproj C D) \<circ>\<^sub>c c'))
-      \<or>  (\<exists> d'. (d' \<in>\<^sub>c D \<and> \<phi> \<circ>\<^sub>c y  = (right_coproj C D) \<circ>\<^sub>c d'))"
-      using equals phix_form by auto
-
-    oops 
 
 
 
 
 
-(*
+
     have x_form: "(\<exists> a. (a \<in>\<^sub>c A  \<and> x = (left_coproj A B) \<circ>\<^sub>c a))
       \<or>  (\<exists> b. (b \<in>\<^sub>c B \<and> x = (right_coproj A B) \<circ>\<^sub>c b))"
       using cfunc_type_def coprojs_jointly_surj x_type x_type2 y_type by auto
@@ -784,13 +779,42 @@ proof-
       show "x = y"
       proof(cases "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))")
         assume "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))"
-        then obtain a' where "(a' \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a')"
+        then obtain a' where a'_def: "(a' \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a')"
           by blast
-        then have "(left_coproj A B) \<circ>\<^sub>c a = (left_coproj A B) \<circ>\<^sub>c a'"
+        then have "a = a'"
         proof - 
-          have "(left_coproj A B) \<circ>\<^sub>c a = (\<phi> 
-  *)
+          have "((left_coproj C D) \<circ>\<^sub>c f) \<circ>\<^sub>c a = \<phi> \<circ>\<^sub>c x"
+            using \<phi>_def a_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type by auto
+          also have "... = \<phi> \<circ>\<^sub>c y"
+            by (meson equals)
+          also have "... = ((left_coproj C D) \<circ>\<^sub>c f) \<circ>\<^sub>c a'"
+            using \<phi>_def a'_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type x_type2 by auto
+          then show "a = a'"
+            by (smt a'_def a_def calculation cfunc_type_def coproj_f_inject domain_comp f_def injective_def left_proj_type)
+        qed
+      next
+        assume "\<nexists>a. a \<in>\<^sub>c A \<and> y = left_coproj A B \<circ>\<^sub>c a"
+        then have "(\<exists> b. (b \<in>\<^sub>c B \<and> y = (right_coproj A B) \<circ>\<^sub>c b))"
+          using y_form by blast
+        then obtain b' where b'_def: "(b' \<in>\<^sub>c B \<and> y = (right_coproj A B) \<circ>\<^sub>c b')"
+          by blast
+        show "x = y"
+        proof - 
+          have "(left_coproj C D) \<circ>\<^sub>c (f \<circ>\<^sub>c a) = ((left_coproj C D) \<circ>\<^sub>c f) \<circ>\<^sub>c a"
+            using a_def cfunc_type_def comp_associative f_def left_proj_type by auto
+          also have "...  = \<phi> \<circ>\<^sub>c x"
+              using \<phi>_def a_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type by auto
+          also have "... = \<phi> \<circ>\<^sub>c y"
+            by (meson equals)
+          also have "... = (\<phi> \<circ>\<^sub>c (right_coproj A B)) \<circ>\<^sub>c b'"
+            using \<phi>_type b'_def comp_associative2 by (typecheck_cfuncs, blast)
+          also have "... = (right_coproj C D \<circ>\<^sub>c f) \<circ>\<^sub>c b' "
+            using \<phi>_def b'_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type x_type2
+          also have "... = right_coproj C D \<circ>\<^sub>c f \<circ>\<^sub>c b' "
+              apply typecheck_cfuncs
+            oops
 
 
 
+         
 end
