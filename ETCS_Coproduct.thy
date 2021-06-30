@@ -671,9 +671,9 @@ lemma coprod_pres_iso:
   assumes "A \<cong>  C"  "B \<cong> D"
   shows "A \<Coprod> B \<cong>  C \<Coprod> D"
 proof- 
-  obtain f where f_def: "f: A \<rightarrow> C \<and> isomorphism(f)"
+  obtain f where f_def: "f: A \<rightarrow> C" "isomorphism(f)"
     using assms(1) is_isomorphic_def by blast
-  obtain g where g_def: "g: B \<rightarrow> D \<and> isomorphism(g)"
+  obtain g where g_def: "g: B \<rightarrow> D" "isomorphism(g)"
     using assms(2) is_isomorphic_def by blast
 
   have surj_f: "surjective(f)"
@@ -722,11 +722,11 @@ proof-
       assume "\<nexists>c. c \<in>\<^sub>c C \<and> y = left_coproj C D \<circ>\<^sub>c c"
       then have y_def2: "(\<exists> d. (d \<in>\<^sub>c D \<and> y = (right_coproj C D) \<circ>\<^sub>c d))"
         using y_form by blast
-      then obtain d where d_def: "(d \<in>\<^sub>c D \<and> y = (right_coproj C D) \<circ>\<^sub>c d)"
+      then obtain d where d_def: "d \<in>\<^sub>c D" "y = (right_coproj C D) \<circ>\<^sub>c d"
         by blast
       then have "\<exists> b. b \<in>\<^sub>c B \<and> g \<circ>\<^sub>c b = d"
         using cfunc_type_def g_def surj_g surjective_def by auto
-      then obtain b where b_def: "b \<in>\<^sub>c B \<and> g \<circ>\<^sub>c b = d"
+      then obtain b where b_def: "b \<in>\<^sub>c B" "g \<circ>\<^sub>c b = d"
         by blast
       obtain x where x_def: "x = (right_coproj A B) \<circ>\<^sub>c b"
         by blast
@@ -774,12 +774,12 @@ proof-
     show "x=y"
     proof(cases "(\<exists> a. (a \<in>\<^sub>c A  \<and> x = (left_coproj A B) \<circ>\<^sub>c a))")
       assume "(\<exists> a. (a \<in>\<^sub>c A  \<and> x = (left_coproj A B) \<circ>\<^sub>c a))"
-      then obtain a where a_def: "(a \<in>\<^sub>c A  \<and> x = (left_coproj A B) \<circ>\<^sub>c a)"
+      then obtain a where a_def: "a \<in>\<^sub>c A" "x = (left_coproj A B) \<circ>\<^sub>c a"
         by blast
       show "x = y"
       proof(cases "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))")
         assume "(\<exists> a. (a \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a))"
-        then obtain a' where a'_def: "(a' \<in>\<^sub>c A  \<and> y = (left_coproj A B) \<circ>\<^sub>c a')"
+        then obtain a' where a'_def: "a' \<in>\<^sub>c A" "y = (left_coproj A B) \<circ>\<^sub>c a'"
           by blast
         then have "a = a'"
         proof - 
@@ -796,7 +796,7 @@ proof-
         assume "\<nexists>a. a \<in>\<^sub>c A \<and> y = left_coproj A B \<circ>\<^sub>c a"
         then have "(\<exists> b. (b \<in>\<^sub>c B \<and> y = (right_coproj A B) \<circ>\<^sub>c b))"
           using y_form by blast
-        then obtain b' where b'_def: "(b' \<in>\<^sub>c B \<and> y = (right_coproj A B) \<circ>\<^sub>c b')"
+        then obtain b' where b'_def: "b' \<in>\<^sub>c B" "y = (right_coproj A B) \<circ>\<^sub>c b'"
           by blast
         show "x = y"
         proof - 
@@ -808,11 +808,10 @@ proof-
             by (meson equals)
           also have "... = (\<phi> \<circ>\<^sub>c (right_coproj A B)) \<circ>\<^sub>c b'"
             using \<phi>_type b'_def comp_associative2 by (typecheck_cfuncs, blast)
-          also have "... = (right_coproj C D \<circ>\<^sub>c f) \<circ>\<^sub>c b' "
-            using \<phi>_def b'_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type x_type2
-          also have "... = right_coproj C D \<circ>\<^sub>c f \<circ>\<^sub>c b' "
-              apply typecheck_cfuncs
-            oops
+          also have "... = (right_coproj C D \<circ>\<^sub>c g) \<circ>\<^sub>c b' "
+            unfolding \<phi>_def using f_def g_def b'_def right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+          also have "... = right_coproj C D \<circ>\<^sub>c g \<circ>\<^sub>c b'"
+              using g_def b'_def by (typecheck_cfuncs, simp add: comp_associative2)
 
 
 
