@@ -320,6 +320,54 @@ lemma maps_into_1u1:
 
 
 
+lemma coprod_preserves_left_epi:
+  assumes "f: X \<rightarrow> Z" "g: Y \<rightarrow> Z"
+  assumes "surjective(f)"
+  shows "surjective(f \<amalg> g)"
+  unfolding surjective_def
+proof(auto)
+  fix z
+  assume y_type: "z \<in>\<^sub>c codomain (f \<amalg> g)"
+  have fug_type: "(f \<amalg> g) : (X \<Coprod> Y) \<rightarrow> Z"
+    by (typecheck_cfuncs, simp add: assms)
+  then have y_type2: "z \<in>\<^sub>c Z"
+    using cfunc_type_def y_type by auto
+  then have "\<exists> x. x \<in>\<^sub>c X \<and> f \<circ>\<^sub>c x  = z"
+    using assms(1) assms(3) cfunc_type_def surjective_def by auto
+  then obtain x where x_def: "x \<in>\<^sub>c X \<and> f \<circ>\<^sub>c x  = z"
+    by blast
+  have coproj_x_type: "(left_coproj X Y)  \<circ>\<^sub>c x  \<in>\<^sub>c (X \<Coprod> Y)"
+    using comp_type left_proj_type x_def by blast
+  have "(f \<amalg> g) \<circ>\<^sub>c  ((left_coproj X Y)  \<circ>\<^sub>c x ) = z"
+    by (typecheck_cfuncs, smt assms comp_associative2 left_coproj_cfunc_coprod x_def)
+  then show "\<exists>x. x \<in>\<^sub>c domain (f \<amalg> g) \<and> f \<amalg> g \<circ>\<^sub>c x = z"
+    using cfunc_type_def coproj_x_type fug_type by auto
+qed
+
+lemma coprod_preserves_right_epi:
+  assumes "f: X \<rightarrow> Z" "g: Y \<rightarrow> Z"
+  assumes "surjective(g)"
+  shows "surjective(f \<amalg> g)"
+  unfolding surjective_def
+proof(auto)
+  fix z
+  assume y_type: "z \<in>\<^sub>c codomain (f \<amalg> g)"
+  have fug_type: "(f \<amalg> g) : (X \<Coprod> Y) \<rightarrow> Z"
+    by (typecheck_cfuncs, simp add: assms)
+  then have y_type2: "z \<in>\<^sub>c Z"
+    using cfunc_type_def y_type by auto
+  then have "\<exists> y. y \<in>\<^sub>c Y \<and> g \<circ>\<^sub>c y  = z"
+    using assms(2) assms(3) cfunc_type_def surjective_def by auto
+  then obtain y where y_def: "y \<in>\<^sub>c Y \<and> g \<circ>\<^sub>c y  = z"
+    by blast
+  have coproj_x_type: "(right_coproj X Y)  \<circ>\<^sub>c y  \<in>\<^sub>c (X \<Coprod> Y)"
+    using comp_type right_proj_type y_def by blast
+  have "(f \<amalg> g) \<circ>\<^sub>c  ((right_coproj X Y)  \<circ>\<^sub>c y ) = z"
+    using assms(1) assms(2) cfunc_type_def comp_associative fug_type right_coproj_cfunc_coprod right_proj_type y_def by auto
+  then show "\<exists>y. y \<in>\<^sub>c domain (f \<amalg> g) \<and> f \<amalg> g \<circ>\<^sub>c y = z"
+    using cfunc_type_def coproj_x_type fug_type by auto
+qed
+
 
 
 (*Proposition 2.4.4*)

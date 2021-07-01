@@ -480,11 +480,66 @@ lemma emptyset_is_countable:
   "countable \<emptyset>"
   using countable_def empty_subset subobject_of_def2 by blast
 
+lemma natural_numbers_are_countably_infinite:
+  "(countable \<nat>\<^sub>c) \<and> (is_infinite \<nat>\<^sub>c)"
+  by (meson CollectI Peano's_Axioms countable_def injective_imp_monomorphism is_infinite_def successor_type)
+
 
 lemma smaller_than_countable_is_countable:
   assumes "X \<le>\<^sub>c Y" "countable Y"
   shows "countable X"
   by (smt assms cfunc_type_def comp_type composition_of_monic_pair_is_monic countable_def is_smaller_than_def)
+
+
+lemma product_of_finite_is_finite:
+  assumes "is_finite(X)" "is_finite(Y)"
+  shows "is_finite(X \<times>\<^sub>c Y)"
+  oops
+
+lemma coproduct_of_finite_is_finite:
+  assumes "is_finite(X)" "is_finite(Y)"
+  shows "is_finite(X \<Coprod>  Y)"
+  oops
+
+
+lemma NxN_is_countable:
+  "countable(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+  oops
+
+
+(*Once we have this result above we can generalize it to any countable sets*)
+(*Try proving it in one step if possible... otherwise use the mostly complete code below*)
+lemma product_of_countables_is_countable:
+  assumes "countable X" "countable Y"
+  shows "countable(X \<times>\<^sub>c Y)"
+proof - 
+  have "\<exists>f. f: X \<rightarrow> \<nat>\<^sub>c \<and> monomorphism(f)"
+    using assms(1) countable_def by blast
+  then obtain f where f_def: "f: X \<rightarrow> \<nat>\<^sub>c \<and> monomorphism(f)"
+    by blast
+  have "\<exists>g. g: Y \<rightarrow> \<nat>\<^sub>c \<and> monomorphism(g)"
+    using assms(2) countable_def by blast
+  then obtain g where g_def: "g: Y \<rightarrow> \<nat>\<^sub>c \<and> monomorphism(g)"
+    by blast
+  then have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Y) \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+    by (simp add: cfunc_cross_prod_type f_def)
+  have fg_mono: "monomorphism(f \<times>\<^sub>f g)"
+    using cfunc_cross_prod_mono f_def g_def by blast
+  obtain \<phi> where \<phi>_def: "(\<phi> : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> \<nat>\<^sub>c) \<and> monomorphism(\<phi>)"
+    oops  (*This follows from the fact that NxN is countable.*)
+
+
+lemma NuN_is_countable:
+  "countable(\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c)"
+  unfolding countable_def
+  oops
+
+(*Exercise 2.6.11*)
+lemma coproduct_of_countables_is_countable:
+  assumes "countable X" "countable Y"
+  shows "countable(X \<Coprod> Y)"
+
+
 
 lemma finite_is_countable: 
   assumes "is_finite X"
