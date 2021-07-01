@@ -459,9 +459,29 @@ lemma succ_inject:
   shows "successor \<circ>\<^sub>c n = successor \<circ>\<^sub>c m \<Longrightarrow> n=m"
   by (metis Peano's_Axioms assms cfunc_type_def injective_def successor_type) 
 
+
+
+
+
+(* Definition 2.6.9 *)
+definition epi_countable :: "cset \<Rightarrow> bool" where
+  "epi_countable X \<longleftrightarrow> (\<exists> f. f : \<nat>\<^sub>c \<rightarrow> X \<and> epimorphism f)"
+
+lemma emptyset_is_not_epi_countable:
+  "\<not> (epi_countable \<emptyset>)"
+  using comp_type emptyset_is_empty epi_countable_def zero_type by blast
+
+
 (* Definition 2.6.9 *)
 definition countable :: "cset \<Rightarrow> bool" where
-  "countable X \<longleftrightarrow> (\<exists> f. f : \<nat>\<^sub>c \<rightarrow> X \<and> epimorphism f)"
+  "countable X \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> \<nat>\<^sub>c \<and> monomorphism f)"
+
+lemma emptyset_is_countable:
+  "countable \<emptyset>"
+  using countable_def empty_subset subobject_of_def2 by blast
+
+
+
 
 (* Definition 2.6.12 *)
 definition fixed_point :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
@@ -558,5 +578,10 @@ proof -
   then show "(\<exists> f.((f : X \<rightarrow> \<P> X) \<and> injective(f)))"
     using \<chi>\<^sub>\<delta>sharp_type powerset_def by auto
 qed
+
+
+
+
+
 
 end

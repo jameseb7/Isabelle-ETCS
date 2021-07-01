@@ -548,6 +548,10 @@ definition is_finite :: "cset \<Rightarrow> bool"  where
 definition is_infinite :: "cset \<Rightarrow> bool"  where
    "is_infinite(X) \<longleftrightarrow> (\<exists> m. (m : X \<rightarrow> X \<and> monomorphism(m) \<and> \<not>surjective(m)))"
 
+
+
+
+
 (* Definition 2.6.2 *)
 definition is_smaller_than :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<le>\<^sub>c" 50) where
    "X \<le>\<^sub>c Y \<longleftrightarrow> (\<exists> m. m : X \<rightarrow> Y \<and> monomorphism(m))"
