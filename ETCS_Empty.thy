@@ -134,6 +134,9 @@ next
     using f_type is_isomorphic_def isomorphic_is_symmetric by blast
 qed
 
+
+
+
 lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>c X"
   by (metis UNIV_I cfunc_type_def emptyset_is_empty initial_func_type injective_def injective_imp_monomorphism subobject_of_def2)
 
@@ -203,5 +206,8 @@ proof -
   then show "card ({(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X, m1), Y, m2). X \<cong> Y}) = 2"
     by (simp add: classes_distinct)
 qed
+
+
+
 
 end

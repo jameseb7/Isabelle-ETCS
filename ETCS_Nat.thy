@@ -481,6 +481,20 @@ lemma emptyset_is_countable:
   using countable_def empty_subset subobject_of_def2 by blast
 
 
+lemma smaller_than_countable_is_countable:
+  assumes "X \<le>\<^sub>c Y" "countable Y"
+  shows "countable X"
+  by (smt assms cfunc_type_def comp_type composition_of_monic_pair_is_monic countable_def is_smaller_than_def)
+
+lemma finite_is_countable: 
+  assumes "is_finite X"
+  shows "countable X"
+  oops
+
+lemma smaller_than_finite_is_finite:
+  assumes "X \<le>\<^sub>c Y" "is_finite X"
+  shows "is_finite Y"
+  oops
 
 
 (* Definition 2.6.12 *)

@@ -340,9 +340,27 @@ proof -
   qed
 qed
 
+
+lemma prod_with_empty_is_empty1:
+  assumes "\<not>(nonempty A)"
+  shows "\<not>(nonempty (A \<times>\<^sub>c B))"
+  by (meson assms comp_type left_cart_proj_type nonempty_def)
+
+lemma prod_with_empty_is_empty2:
+  assumes "\<not>(nonempty B)"
+  shows "\<not>(nonempty (A \<times>\<^sub>c B))"
+  using assms cart_prod_decomp nonempty_def by blast
+
+
+
+
+
 (* Definition 2.1.24 *)
 definition injective :: "cfunc \<Rightarrow> bool" where
  "injective f  \<longleftrightarrow> (\<forall> x y. (x \<in>\<^sub>c domain f \<and> y \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y) \<longrightarrow> x = y)"
+
+  
+
 
 (* Exercise 2.1.26 *)
 lemma monomorphism_imp_injective:
@@ -480,5 +498,137 @@ qed
 
 
 
+lemma cfunc_cross_prod_surj_converse:
+  assumes type_assms: "f : A \<rightarrow> C" "g : B \<rightarrow> D"
+  assumes "surjective (f \<times>\<^sub>f g)"
+  shows "(surjective (f)) \<and> (surjective (g))"
+  unfolding surjective_def
+proof(auto)
+  fix y 
+  assume y_type: "y \<in>\<^sub>c codomain f"
+  then have y_type2:  "y \<in>\<^sub>c C"
+    using cfunc_type_def type_assms(1) by auto
+  oops
+
+
+lemma cfunc_cross_prod_mono_converse:
+  assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
+  assumes fg_inject: "injective (f \<times>\<^sub>f g)"
+  assumes nonempty: "nonempty(X)" "nonempty(Z)"
+  shows "injective f \<and> injective g"
+  unfolding injective_def
+proof (auto)
+  fix x y 
+  assume x_type: "x \<in>\<^sub>c domain f"
+  assume y_type: "y \<in>\<^sub>c domain f"
+  assume equals: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+  have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
+    by (simp add: cfunc_cross_prod_type type_assms)
+  have x_type2: "x \<in>\<^sub>c X"
+    using cfunc_type_def type_assms(1) x_type by auto
+  have y_type2: "y \<in>\<^sub>c X"
+    using cfunc_type_def type_assms(1) y_type by auto
+  show "x = y"
+        proof - 
+          obtain b where b_def: "b \<in>\<^sub>c Z"
+            using nonempty(2) nonempty_def by blast
+
+          have xb_type: "\<langle>x,b\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
+            by (simp add: b_def cfunc_prod_type x_type2)
+          have yb_type: "\<langle>y,b\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
+            by (simp add: b_def cfunc_prod_type y_type2)
+          have "(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>x,b\<rangle> = \<langle>f \<circ>\<^sub>c x,g \<circ>\<^sub>c b\<rangle>"
+            using b_def cfunc_cross_prod_comp_cfunc_prod type_assms(1) type_assms(2) x_type2 by blast
+          also have "... = \<langle>f \<circ>\<^sub>c y,g \<circ>\<^sub>c b\<rangle>"
+            by (simp add: equals)
+          also have "... = (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>y,b\<rangle>"
+            using b_def cfunc_cross_prod_comp_cfunc_prod type_assms(1) type_assms(2) y_type2 by auto
+          then have "\<langle>x,b\<rangle> = \<langle>y,b\<rangle>"
+            by (metis calculation cfunc_type_def fg_inject fg_type injective_def xb_type yb_type)
+          then show "x = y"
+            using b_def element_pair_eq x_type2 y_type2 by auto
+        qed
+      next
+fix x y 
+  assume x_type: "x \<in>\<^sub>c domain g"
+  assume y_type: "y \<in>\<^sub>c domain g"
+  assume equals: "g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
+  have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
+    by (simp add: cfunc_cross_prod_type type_assms)
+  have x_type2: "x \<in>\<^sub>c Z"
+    using cfunc_type_def type_assms(2) x_type by auto
+   have y_type2: "y \<in>\<^sub>c Z"
+    using cfunc_type_def type_assms(2) y_type by auto
+show "x = y"
+        proof - 
+          obtain b where b_def: "b \<in>\<^sub>c X"
+            using nonempty(1) nonempty_def by blast
+          have xb_type: "\<langle>b,x\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
+            by (simp add: b_def cfunc_prod_type x_type2)
+          have yb_type: "\<langle>b,y\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
+            by (simp add: b_def cfunc_prod_type y_type2)
+          have "(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,x\<rangle> = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>"
+            using b_def cfunc_cross_prod_comp_cfunc_prod type_assms(1) type_assms(2) x_type2 by blast
+          also have "... = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>"
+            by (simp add: equals)
+          also have "... = (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,y\<rangle>"
+            using b_def cfunc_cross_prod_comp_cfunc_prod equals type_assms(1) type_assms(2) y_type2 by auto
+          then have "\<langle>b,x\<rangle> = \<langle>b,y\<rangle>"
+            by (metis \<open>(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,x\<rangle> = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>\<close> cfunc_type_def fg_inject fg_type injective_def xb_type yb_type)
+          then show "x = y"
+            using b_def element_pair_eq x_type2 y_type2 by auto
+        qed
+      qed
+
+
+(*The next lemma shows us that unless 
+  both domains are nonempty we gain no new information.
+ That is, it will be the case that f\<times>g is injective, and we
+cannot infer from this that f or g are injective since 
+ f\<times>g will be injective no matter what.*)
+
+lemma the_nonempty_assumption_above_is_always_required:
+  assumes "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
+  assumes "\<not>(nonempty(X)) \<or> \<not>(nonempty(Z))"
+  shows "injective (f \<times>\<^sub>f g)"
+  unfolding injective_def 
+proof(cases "nonempty(X)", auto)
+  fix x y
+  assume nonempty:  "nonempty X"
+  assume x_type: "x  \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
+  assume "y \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
+  then have "\<not>(nonempty(Z))"
+    using nonempty assms(3) by blast
+  have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
+    by (typecheck_cfuncs, simp add: assms(1) assms(2))
+  then have "x  \<in>\<^sub>c (X \<times>\<^sub>c Z)"
+    using x_type cfunc_type_def by auto
+  then have "\<exists>z. z\<in>\<^sub>c Z"
+    using cart_prod_decomp by blast
+  then have False
+    using assms(3) nonempty nonempty_def by blast
+  then show "x=y"
+    by auto
+next
+  fix x y
+  assume X_is_empty: "\<not> nonempty X"
+  assume x_type: "x  \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
+  assume "y \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
+  have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
+    by (typecheck_cfuncs, simp add: assms(1) assms(2))
+  then have "x  \<in>\<^sub>c (X \<times>\<^sub>c Z)"
+    using x_type cfunc_type_def by auto
+  then have "\<exists>z. z\<in>\<^sub>c X"
+    using cart_prod_decomp by blast
+  then have False
+    using assms(3) X_is_empty nonempty_def by blast
+  then show "x=y"
+    by auto
+qed
+
+
+
+
+  
 
 end

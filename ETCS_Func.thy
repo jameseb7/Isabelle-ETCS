@@ -616,9 +616,16 @@ qed
 
 
 
-lemma emptyset_is_finite:
-  "is_finite(\<emptyset>)"
-  using emptyset_is_empty id_isomorphism id_type is_finite_def one_separator_contrapos by blast
+
+
+lemma all_emptysets_are_finite:
+  assumes "\<not>(nonempty(X))"
+  shows "is_finite(X)"
+  by (metis CollectI assms epi_mon_is_iso epimorphism_def3 is_finite_def nonempty_def one_separator)
+
+
+
+
 
 lemma emptyset_is_smallest_set:
   "\<emptyset> \<le>\<^sub>c X"

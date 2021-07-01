@@ -345,10 +345,6 @@ qed
 
 
 
-  
-
-
-
 subsection \<open>Useful Cartesian product permuting functions\<close>
 
 subsubsection \<open>Swapping a Cartesian product\<close>
@@ -906,7 +902,6 @@ proof -
   then show ?thesis
     using calculation by auto
 qed
-
 
 
 end
