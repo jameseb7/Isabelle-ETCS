@@ -414,6 +414,7 @@ proof -
 qed
 
 
+
 (* Corollary *)
 lemma oneUN_iso_N:
   "one \<Coprod> \<nat>\<^sub>c \<cong> \<nat>\<^sub>c"

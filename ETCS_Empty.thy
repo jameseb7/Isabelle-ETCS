@@ -17,7 +17,6 @@ where
 
 
 (* Exercise 2.4.6 *)
-(* This lemma is a pre-requiste to the real version of the theorem. *)
 lemma coproduct_with_zero_does_nothing:
   shows "X \<Coprod> \<emptyset> \<cong> X"
 proof -
@@ -57,6 +56,8 @@ proof -
   then show "X\<Coprod>\<emptyset> \<cong> X"
     using cfunc_coprod_type id_type initial_func_type is_isomorphic_def by blast
 qed
+
+
 
 (* Proposition 2.4.7 *)
 lemma function_to_empty_is_iso:

@@ -442,6 +442,8 @@ proof-
     using cfunc_type_def function_to_empty_is_iso is_isomorphic_def iso_type by blast
 qed
 
+
+(*Bad version... see Coproduct Theory file for good version*)
 (* Proposition 2.5.10 *)
 lemma prod_distribute_coprod:
   assumes "\<And>X A Y B. X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
@@ -532,6 +534,9 @@ proof -
     by (rule_tac x="\<psi>" in exI, auto)
 qed
 
+
+
+
 (* Definition 2.5.11 *)
 definition powerset :: "cset \<Rightarrow> cset" ("\<P>_" [101]100) where
   "\<P> X = \<Omega>\<^bsup>X\<^esup>"
@@ -561,13 +566,13 @@ lemma  smaller_than_coproduct2:
 lemma smaller_than_product1:
   assumes "nonempty(Y)"
   shows "X \<le>\<^sub>c (X \<times>\<^sub>c Y)"
-  unfolding is_smaller_than_def nonempty_def monomorphism_def
-proof 
+  unfolding is_smaller_than_def  
+proof-
   obtain y where y_type: "y \<in>\<^sub>c Y"
   using assms nonempty_def by blast
   have map_type: "\<langle>id(X),y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> : X \<rightarrow> (X \<times>\<^sub>c Y)"
    using y_type cfunc_prod_type cfunc_type_def codomain_comp domain_comp id_type terminal_func_type by auto
-  have "monomorphism(\<langle> id(X),y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>)"
+  have mono: "monomorphism(\<langle> id(X),y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>)"
     using map_type
   proof (unfold monomorphism_def3, auto)
     fix g h A
@@ -582,10 +587,30 @@ proof
       using g_h_types y_type
       by (metis (full_types) comp_type left_cart_proj_cfunc_prod terminal_func_type)
   qed
-     
+
+
+  show "\<exists>m. m : X \<rightarrow> X \<times>\<^sub>c Y \<and> monomorphism m"
+    using mono map_type by auto
+qed
+
+lemma smaller_than_product2:
+  assumes "nonempty(Y)"
+  shows "X \<le>\<^sub>c (Y \<times>\<^sub>c X)"
+  unfolding is_smaller_than_def  
+proof - 
   have "X \<le>\<^sub>c (X \<times>\<^sub>c Y)"
-    using \<open>monomorphism \<langle>id\<^sub>c X,y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>\<close> is_smaller_than_def map_type by blast
-  oops
+    by (simp add: assms smaller_than_product1)
+  then obtain m where m_def: "m : X \<rightarrow> X \<times>\<^sub>c Y \<and> monomorphism m"
+    using is_smaller_than_def by blast
+  obtain i  where "i : (X \<times>\<^sub>c Y) \<rightarrow> (Y \<times>\<^sub>c X) \<and> isomorphism i"
+    using is_isomorphic_def product_commutes by blast
+  then have "i \<circ>\<^sub>c m : X \<rightarrow>  (Y \<times>\<^sub>c X) \<and> monomorphism(i \<circ>\<^sub>c m)"
+    using cfunc_type_def comp_type composition_of_monic_pair_is_monic iso_imp_epi_and_monic m_def by auto
+  then show "\<exists>m. m : X \<rightarrow> Y \<times>\<^sub>c X \<and> monomorphism m"
+    by blast
+qed
+
+
 
 lemma emptyset_is_finite:
   "is_finite(\<emptyset>)"
@@ -622,7 +647,6 @@ proof(auto)
     then have not_surj2: "(\<exists>x. x \<in>\<^sub>c X \<and> (\<forall> z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z \<noteq> x)))"
       apply typecheck_cfuncs
       oops
-
     (*then obtain x where x_def: "x \<in>\<^sub>c X \<and> (\<forall> z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z \<noteq> x))"
       apply typecheck_cfuncs
 *)

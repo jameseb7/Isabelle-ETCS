@@ -351,7 +351,7 @@ qed
 
 
 
-
+(*Proposition 2.5.10 ... Better version*)
 lemma product_distribute_over_coproduct_left:
   "A \<times>\<^sub>c (B \<Coprod> C) \<cong> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
 proof-
@@ -886,6 +886,8 @@ lemma product_distribute_over_coproduct_right:
   by (meson coprod_pres_iso isomorphic_is_transitive product_commutes product_distribute_over_coproduct_left)
 
 
+
+(* These aren't actually equal... more like "equal up to isomorphism*)
 lemma func_product_distribute_over_coproduct_left:
   "f \<times>\<^sub>f (g \<amalg> h) = (f \<times>\<^sub>f g) \<amalg> (f \<times>\<^sub>f h)"
   oops
