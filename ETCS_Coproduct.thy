@@ -36,6 +36,12 @@ proof -
     by (typecheck_cfuncs, smt cfunc_coprod_unique left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
 qed
 
+lemma id_coprod:
+  "id(A \<Coprod> B) = (left_coproj A B) \<amalg> (right_coproj A B)"
+  using cfunc_coprod_unique id_left_unit2 id_type left_proj_type right_proj_type by blast
+
+ 
+
 (* Coproduct commutes *)
 lemma coproduct_commutes:
   "A \<Coprod> B \<cong> B \<Coprod> A"
@@ -939,6 +945,8 @@ lemma product_distribute_over_coproduct_right:
 lemma func_product_distribute_over_coproduct_left:
   "f \<times>\<^sub>f (g \<amalg> h) = (f \<times>\<^sub>f g) \<amalg> (f \<times>\<^sub>f h)"
   oops
+
+
 
 
 
