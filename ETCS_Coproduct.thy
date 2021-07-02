@@ -58,6 +58,134 @@ proof -
     by (metis cfunc_type_def i0Ui1_type id_AB id_BA is_isomorphic_def isomorphism_def j1Uj0_type)
 qed
 
+(* Coproduct associates *)
+lemma coproduct_associates:
+  "A \<Coprod> (B \<Coprod> C)  \<cong> (A \<Coprod> B) \<Coprod> C"
+proof -
+
+(*Diagram 1*)
+  obtain q where q_def: "q = (left_coproj (A \<Coprod> B) C ) \<circ>\<^sub>c (right_coproj A B)"
+    by blast
+  have q_type: "q: B \<rightarrow> (A \<Coprod> B) \<Coprod> C"
+    using comp_type left_proj_type q_def right_proj_type by blast
+  obtain f where f_def: "f = q \<amalg> (right_coproj (A \<Coprod> B) C)"
+    by simp
+  have f_prop: "(f: (B \<Coprod> C) \<rightarrow> ((A \<Coprod> B) \<Coprod> C)) \<and> (f \<circ>\<^sub>c left_coproj B C = q) \<and> (f \<circ>\<^sub>c right_coproj B C = right_coproj (A \<Coprod> B) C)"
+    using cfunc_coprod_type f_def left_coproj_cfunc_coprod q_type right_coproj_cfunc_coprod right_proj_type by auto
+  then have f_unique: "(\<exists>!f. (f: (B \<Coprod> C) \<rightarrow> ((A \<Coprod> B) \<Coprod> C)) \<and> (f \<circ>\<^sub>c left_coproj B C = q) \<and> (f \<circ>\<^sub>c right_coproj B C = right_coproj (A \<Coprod> B) C))"
+    using cfunc_coprod_unique q_type right_proj_type by blast
+  
+(*Diagram 2*)
+  obtain m where m_def: "m = (left_coproj (A \<Coprod> B) C ) \<circ>\<^sub>c (left_coproj A B)"
+    by blast
+  obtain g where g_def: "g = m \<amalg> f"
+    by simp
+  have g_type: "g: A \<Coprod> (B \<Coprod> C)  \<rightarrow> (A \<Coprod> B) \<Coprod> C"
+    using cfunc_coprod_type comp_type f_prop g_def left_proj_type m_def by blast
+  have g_prop: "(g \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = m) \<and> (g \<circ>\<^sub>c (right_coproj A (B \<Coprod> C)) = f)"
+    using comp_type f_prop g_def left_coproj_cfunc_coprod left_proj_type m_def right_coproj_cfunc_coprod by blast
+  have g_unique: "\<exists>! g. ((g: A \<Coprod> (B \<Coprod> C)  \<rightarrow> (A \<Coprod> B) \<Coprod> C) \<and> (g \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = m) \<and> (g \<circ>\<^sub>c (right_coproj A (B \<Coprod> C)) = f))"
+    by (metis (full_types) cfunc_coprod_unique comp_type f_prop g_prop g_type left_proj_type)
+  
+
+(*Diagram 3*)
+  obtain p where p_def: "p = (right_coproj A (B \<Coprod> C)) \<circ>\<^sub>c  (left_coproj B C)"
+    by simp
+  have p_type: "p: B \<rightarrow> A \<Coprod> (B \<Coprod> C)"
+    using comp_type left_proj_type p_def right_proj_type by blast
+  have leftcoprojA_BC_type: "(left_coproj A (B \<Coprod> C)) : A \<rightarrow> A \<Coprod> (B \<Coprod> C)"
+    by (simp add: left_proj_type)
+  obtain h where h_def: "h = (left_coproj A (B \<Coprod> C)) \<amalg> p"
+    by simp
+  have h_prop1: "h \<circ>\<^sub>c (left_coproj A B)  = (left_coproj A (B \<Coprod> C))"
+    using h_def left_coproj_cfunc_coprod leftcoprojA_BC_type p_type by blast
+
+  have h_prop2: "h \<circ>\<^sub>c (right_coproj A B) = p"
+    using h_def leftcoprojA_BC_type p_type right_coproj_cfunc_coprod by blast
+
+  have h_type: "h: (A \<Coprod> B) \<rightarrow> A \<Coprod> (B \<Coprod> C)"
+    by (simp add: cfunc_coprod_type h_def leftcoprojA_BC_type p_type)
+
+  have h_unique: "\<exists>! h. ((h: (A \<Coprod> B) \<rightarrow> A \<Coprod> (B \<Coprod> C)) \<and> (h \<circ>\<^sub>c (left_coproj A B)  = (left_coproj A (B \<Coprod> C))) \<and> (h \<circ>\<^sub>c (right_coproj A B) =p))"
+    using cfunc_coprod_unique h_prop1 h_prop2 h_type leftcoprojA_BC_type p_type by blast
+
+
+
+
+(*Diagram 4*)
+  obtain j where j_def: "j = (right_coproj A (B \<Coprod> C)) \<circ>\<^sub>c  (right_coproj B C)"
+    by simp
+  obtain k where k_def: "k = h \<amalg> j"
+    by simp
+  have k_type: "k: (A \<Coprod> B) \<Coprod> C \<rightarrow> A \<Coprod> (B \<Coprod> C)"
+    using h_type cfunc_coprod_type comp_type j_def k_def right_proj_type by blast
+  have gk_type: "g \<circ>\<^sub>c k : (A \<Coprod> B) \<Coprod> C\<rightarrow> (A \<Coprod> B) \<Coprod> C"
+    by (meson comp_type g_type k_type)
+  have kg_type: "k \<circ>\<^sub>c g : A \<Coprod> (B \<Coprod> C) \<rightarrow> A \<Coprod> (B \<Coprod> C)"
+    by (meson comp_type g_type k_type)
+
+(*Master diagram*)
+  have fact1: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = (left_coproj A (B \<Coprod> C))"
+     by (typecheck_cfuncs, smt comp_associative2 comp_type g_prop g_type h_def h_type j_def k_def k_type left_coproj_cfunc_coprod left_proj_type m_def p_type right_proj_type)
+   have fact2: "(g \<circ>\<^sub>c k) \<circ>\<^sub>c (left_coproj (A \<Coprod> B) C) = (left_coproj (A \<Coprod> B) C)"
+     by (typecheck_cfuncs, smt cfunc_coprod_comp cfunc_coprod_unique comp_associative2 comp_type f_prop g_prop g_type h_def h_type j_def k_def k_type left_coproj_cfunc_coprod left_proj_type m_def p_def p_type q_def right_proj_type)
+   have fact3: "(g \<circ>\<^sub>c k) \<circ>\<^sub>c (right_coproj (A \<Coprod> B) C) = (right_coproj (A \<Coprod> B) C)"
+     by (smt comp_associative2 comp_type f_def g_prop g_type h_type j_def k_def k_type q_type right_coproj_cfunc_coprod right_proj_type)
+   have fact4: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c (right_coproj A (B \<Coprod> C)) = (right_coproj A (B \<Coprod> C))"
+   proof -
+have f1: "\<forall>c ca cb cc cd ce cf. \<not> c : ca \<rightarrow> cb \<or> \<not> cc : cb \<rightarrow> cd \<or> \<not> ce : cd \<rightarrow> cf \<or> ce \<circ>\<^sub>c cc \<circ>\<^sub>c c = (ce \<circ>\<^sub>c cc) \<circ>\<^sub>c c"
+using comp_associative2 by satx
+have f2: "h \<amalg> j : (A \<Coprod> B) \<Coprod> C \<rightarrow> A \<Coprod> B \<Coprod> C"
+  using k_def k_type by blast
+then have f3: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c right_coproj A (B \<Coprod> C) = h \<amalg> j \<circ>\<^sub>c g \<circ>\<^sub>c right_coproj A (B \<Coprod> C)"
+using f1 g_type k_def right_proj_type by fastforce
+  have f4: "\<forall>c ca. domain c \<noteq> codomain ca \<or> domain (c \<circ>\<^sub>c ca) = domain ca"
+    using domain_comp by blast
+  have f5: "\<forall>c ca cb. (c : ca \<rightarrow> cb) = (domain c = ca \<and> codomain c = cb)"
+    using cfunc_type_def by blast
+  then have f6: "domain (right_coproj A (B \<Coprod> C)) = B \<Coprod> C \<and> codomain (right_coproj A (B \<Coprod> C)) = A \<Coprod> B \<Coprod> C"
+    using right_proj_type by auto
+  have f7: "\<forall>c ca. domain c \<noteq> codomain ca \<or> codomain (c \<circ>\<^sub>c ca) = codomain c"
+    using codomain_comp by blast
+  then have "right_coproj A (B \<Coprod> C) \<circ>\<^sub>c left_coproj B C : B \<rightarrow> A \<Coprod> B \<Coprod> C"
+    using f6 f5 f4 left_proj_type by presburger
+  then have f8: "right_coproj A (B \<Coprod> C) \<circ>\<^sub>c left_coproj B C = left_coproj A (B \<Coprod> C) \<amalg> p \<circ>\<^sub>c right_coproj A B"
+    by (metis left_proj_type p_def right_coproj_cfunc_coprod)
+  have "right_coproj A (B \<Coprod> C) \<circ>\<^sub>c right_coproj B C : C \<rightarrow> A \<Coprod> B \<Coprod> C"
+    using f7 f5 f4 right_proj_type by presburger
+  then have "h \<amalg> j \<circ>\<^sub>c left_coproj (A \<Coprod> B) C = left_coproj A (B \<Coprod> C) \<amalg> p"
+    using h_def h_type j_def left_coproj_cfunc_coprod by presburger
+  then have f9: "right_coproj A (B \<Coprod> C) \<circ>\<^sub>c left_coproj B C = h \<amalg> j \<circ>\<^sub>c left_coproj (A \<Coprod> B) C \<circ>\<^sub>c right_coproj A B"
+    using f8 f2 f1 left_proj_type right_proj_type by fastforce
+  have "right_coproj A (B \<Coprod> C) \<circ>\<^sub>c right_coproj B C : C \<rightarrow> A \<Coprod> B \<Coprod> C"
+    using f7 f5 f4 right_proj_type by presburger
+  then have "right_coproj A (B \<Coprod> C) \<circ>\<^sub>c right_coproj B C = h \<amalg> j \<circ>\<^sub>c right_coproj (A \<Coprod> B) C"
+    using h_type j_def right_coproj_cfunc_coprod by force
+  then have "(k \<circ>\<^sub>c g) \<circ>\<^sub>c right_coproj A (B \<Coprod> C) = (right_coproj A (B \<Coprod> C) \<circ>\<^sub>c left_coproj B C) \<amalg> (right_coproj A (B \<Coprod> C) \<circ>\<^sub>c right_coproj B C)"
+    using f9 f3 f2 by (metis (full_types) cfunc_coprod_comp f_def g_prop q_def q_type right_proj_type)
+  then show ?thesis
+    by (metis cfunc_coprod_comp id_coprod id_right_unit2 left_proj_type right_proj_type)
+qed
+
+  have fact5: "(k \<circ>\<^sub>c g) = id( A \<Coprod> (B \<Coprod> C))"
+    by (metis (full_types) cfunc_coprod_unique fact1 fact4 id_coprod kg_type left_proj_type right_proj_type)
+  have fact6: "(g \<circ>\<^sub>c k) = id((A \<Coprod> B) \<Coprod> C)"
+    by (metis cfunc_coprod_unique fact2 fact3 gk_type id_coprod left_proj_type right_proj_type)
+
+  show ?thesis
+  proof -
+        have "\<forall>c ca cb. (c : ca \<rightarrow> cb) = (domain c = ca \<and> codomain c = cb)"
+            using cfunc_type_def by blast
+        then have "isomorphism g"
+            using fact5 fact6 g_type isomorphism_def k_type by auto
+        then show ?thesis
+            using g_type is_isomorphic_def by blast
+        qed
+qed
+
+
+
+
 (* Proposition 2.4.1 *)
 lemma coproducts_disjoint:
   "\<forall>x y. (x\<in>\<^sub>c X \<and> y \<in>\<^sub>c Y)  \<longrightarrow>  ((left_coproj X Y) \<circ>\<^sub>c x \<noteq> (right_coproj X Y) \<circ>\<^sub>c y)"
@@ -941,7 +1069,7 @@ lemma product_distribute_over_coproduct_right:
 
 
 
-(* These aren't actually equal... more like "equal up to isomorphism*)
+(* These aren't actually equal... more like "equal up to isomorphism"*)
 lemma func_product_distribute_over_coproduct_left:
   "f \<times>\<^sub>f (g \<amalg> h) = (f \<times>\<^sub>f g) \<amalg> (f \<times>\<^sub>f h)"
   oops
