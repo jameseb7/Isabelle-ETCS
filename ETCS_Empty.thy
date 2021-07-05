@@ -134,6 +134,17 @@ next
     using f_type is_isomorphic_def isomorphic_is_symmetric by blast
 qed
 
+lemma prod_iso_to_empty_right:
+  assumes "nonempty(X)"
+  assumes "X \<times>\<^sub>c Y \<cong> \<emptyset>"
+  shows "\<not>(nonempty(Y))"
+  by (meson assms cfunc_prod_type no_el_iff_iso_0 nonempty_def)
+
+lemma prod_iso_to_empty_left:
+  assumes "nonempty(Y)"
+  assumes "X \<times>\<^sub>c Y \<cong> \<emptyset>"
+  shows "\<not>(nonempty(X))"
+  using assms prod_iso_to_empty_right by blast
 
 
 

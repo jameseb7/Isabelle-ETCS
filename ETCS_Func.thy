@@ -151,6 +151,20 @@ proof (rule same_evals_equal[where Z=W, where X=X, where A=A])
     using calculation by auto
 qed
 
+
+lemma exponential_object_identity2: 
+  "id(X)\<^bsup>A\<^esup>\<^sub>f = id\<^sub>c(X\<^bsup>A\<^esup>)"
+  by (metis eval_func_type exp_func_def exponential_object_identity id_domain id_left_unit2)
+
+lemma transpose_factors: 
+  assumes "f: X \<rightarrow> Y"
+  assumes "g: Y \<rightarrow> Z"
+  shows "(g \<circ>\<^sub>c f)\<^bsup>A\<^esup>\<^sub>f = (g\<^bsup>A\<^esup>\<^sub>f) \<circ>\<^sub>c (f\<^bsup>A\<^esup>\<^sub>f)"
+  using assms by (typecheck_cfuncs, smt comp_associative2 comp_type eval_func_type exp_func_def2 transpose_of_comp)
+
+
+
+
 lemma eval_func_X_one_injective:
   "injective (eval_func X one)"
 proof (cases "\<exists> x. x \<in>\<^sub>c X")
@@ -535,7 +549,83 @@ proof -
 qed
 
 
+(*Power  rule*)
+lemma "(A\<^bsup>B\<^esup>)\<^bsup>C\<^esup> \<cong> A \<^bsup>(B \<times>\<^sub>c C)\<^esup>"
+  oops
 
+
+lemma exp_pres_iso_left:
+  assumes "A \<cong> X" 
+  shows "A\<^bsup>Y\<^esup> \<cong>  X\<^bsup>Y\<^esup>"
+proof - 
+  obtain \<phi> where \<phi>_def: "\<phi>: X \<rightarrow> A \<and> isomorphism(\<phi>)"
+    using assms is_isomorphic_def isomorphic_is_symmetric by blast
+  obtain \<psi> where \<psi>_def: "\<psi>: A \<rightarrow> X \<and> isomorphism(\<psi>) \<and> (\<psi> \<circ>\<^sub>c \<phi> = id(X))"
+    using \<phi>_def cfunc_type_def isomorphism_def by fastforce
+  have idA: "\<phi> \<circ>\<^sub>c \<psi> = id(A)"
+    by (metis \<phi>_def \<psi>_def cfunc_type_def comp_associative id_left_unit2 isomorphism_def)
+  have phi_eval_type: "(\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp>: X\<^bsup>Y\<^esup> \<rightarrow> A\<^bsup>Y\<^esup>"
+    using \<phi>_def by (typecheck_cfuncs, blast)
+  have psi_eval_type: "(\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp>: A\<^bsup>Y\<^esup> \<rightarrow> X\<^bsup>Y\<^esup>"
+    using \<psi>_def by (typecheck_cfuncs, blast)
+
+
+  have idXY: "(\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp> \<circ>\<^sub>c  (\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp> = id(X\<^bsup>Y\<^esup>)"
+  proof - 
+    have "(\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp> \<circ>\<^sub>c  (\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp> = 
+          (\<psi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c (eval_func A Y)\<^sup>\<sharp>)\<circ>\<^sub>c  (\<phi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c (eval_func X Y)\<^sup>\<sharp>)"
+    using \<phi>_def \<psi>_def exp_func_def2 exponential_object_identity id_right_unit2 phi_eval_type psi_eval_type by auto
+  also have "... = (\<psi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c id(A\<^bsup>Y\<^esup>))\<circ>\<^sub>c  (\<phi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c id(X\<^bsup>Y\<^esup>))"
+    by (simp add: exponential_object_identity)
+  also have "... = \<psi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c (id(A\<^bsup>Y\<^esup>)\<circ>\<^sub>c  (\<phi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c id(X\<^bsup>Y\<^esup>)))" 
+    by (typecheck_cfuncs, metis \<phi>_def \<psi>_def comp_associative2)
+  also have "... = \<psi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c (id(A\<^bsup>Y\<^esup>)\<circ>\<^sub>c  \<phi>\<^bsup>Y\<^esup>\<^sub>f )"
+    using \<phi>_def exp_func_def2 id_right_unit2 phi_eval_type by auto
+  also have "... = \<psi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c \<phi>\<^bsup>Y\<^esup>\<^sub>f"
+    using \<phi>_def \<psi>_def calculation exp_func_def2 by auto
+  also have "... = (\<psi> \<circ>\<^sub>c \<phi>)\<^bsup>Y\<^esup>\<^sub>f"
+    by (metis \<phi>_def \<psi>_def transpose_factors)
+  also have "... = (id X)\<^bsup>Y\<^esup>\<^sub>f"
+    by (simp add: \<psi>_def)
+  also have "...  = id(X\<^bsup>Y\<^esup>)"
+    by (simp add: exponential_object_identity2)
+  then show "(\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp> \<circ>\<^sub>c  (\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp> = id(X\<^bsup>Y\<^esup>)"
+    by (simp add: calculation)
+qed
+
+    have idAY: "(\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp> \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp>  = id(A\<^bsup>Y\<^esup>)"
+proof - 
+    have "(\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp> \<circ>\<^sub>c  (\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp> = 
+          (\<phi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c (eval_func X Y)\<^sup>\<sharp>)\<circ>\<^sub>c  (\<psi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c (eval_func A Y)\<^sup>\<sharp>)"
+    using \<phi>_def \<psi>_def exp_func_def2 exponential_object_identity id_right_unit2 phi_eval_type psi_eval_type by auto
+  also have "... = (\<phi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c id(X\<^bsup>Y\<^esup>))\<circ>\<^sub>c  (\<psi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c id(A\<^bsup>Y\<^esup>))"
+    by (simp add: exponential_object_identity)
+  also have "... = \<phi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c (id(X\<^bsup>Y\<^esup>)\<circ>\<^sub>c  (\<psi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c id(A\<^bsup>Y\<^esup>)))" 
+    by (typecheck_cfuncs, metis \<phi>_def \<psi>_def comp_associative2)
+  also have "... = \<phi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c (id(X\<^bsup>Y\<^esup>)\<circ>\<^sub>c  \<psi>\<^bsup>Y\<^esup>\<^sub>f )"
+    using \<psi>_def exp_func_def2 id_right_unit2 psi_eval_type by auto
+  also have "... = \<phi>\<^bsup>Y\<^esup>\<^sub>f \<circ>\<^sub>c \<psi>\<^bsup>Y\<^esup>\<^sub>f"
+    using \<phi>_def \<psi>_def calculation exp_func_def2 by auto
+  also have "... = (\<phi> \<circ>\<^sub>c \<psi>)\<^bsup>Y\<^esup>\<^sub>f"
+    by (metis \<phi>_def \<psi>_def transpose_factors)
+  also have "... = (id A)\<^bsup>Y\<^esup>\<^sub>f"
+    by (simp add: idA)
+  also have "...  = id(A\<^bsup>Y\<^esup>)"
+    by (simp add: exponential_object_identity2)
+  then show "(\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp> \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp>  = id(A\<^bsup>Y\<^esup>)"
+    by (simp add: calculation)
+qed
+
+  show  "A\<^bsup>Y\<^esup> \<cong>  X\<^bsup>Y\<^esup>"
+    by (metis CollectI cfunc_type_def comp_epi_imp_epi comp_monic_imp_monic epi_mon_is_iso idAY idXY id_isomorphism is_isomorphic_def iso_imp_epi_and_monic phi_eval_type psi_eval_type)
+qed
+
+  
+
+lemma empty_to_nonempty:
+  assumes "nonempty X" "\<not>(nonempty Y)" 
+  shows "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
+  oops
 
 (* Definition 2.5.11 *)
 definition powerset :: "cset \<Rightarrow> cset" ("\<P>_" [101]100) where

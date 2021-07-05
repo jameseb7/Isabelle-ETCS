@@ -440,7 +440,7 @@ next
   proof (auto, typecheck_cfuncs, unfold relative_member_def2, auto)
     have "monomorphism m"
       using assms unfolding reflexive_on_def subobject_of_def2 by auto
-    then show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
+     show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
       using \<open>monomorphism m\<close> cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_right_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
   next
     oops

@@ -538,7 +538,7 @@ lemma NuN_is_countable:
 lemma coproduct_of_countables_is_countable:
   assumes "countable X" "countable Y"
   shows "countable(X \<Coprod> Y)"
-
+  oops
 
 
 lemma finite_is_countable: 

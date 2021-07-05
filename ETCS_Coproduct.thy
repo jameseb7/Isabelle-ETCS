@@ -1062,6 +1062,7 @@ proof-
     using \<phi>_type is_isomorphic_def by blast
 qed
 
+ 
 
 lemma product_distribute_over_coproduct_right:
   "(A \<Coprod> B) \<times>\<^sub>c C  \<cong> (A \<times>\<^sub>c C) \<Coprod> (B \<times>\<^sub>c C)"

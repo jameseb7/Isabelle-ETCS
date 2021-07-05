@@ -1143,7 +1143,17 @@ proof(rule natural_number_object_func_unique[where X = "\<nat>\<^sub>c\<^bsup>(\
   then show ?thesis using calculation by auto
 qed
 
-
+lemma power_rule:
+   assumes "a \<in>\<^sub>c  \<nat>\<^sub>c" "b \<in>\<^sub>c  \<nat>\<^sub>c" "c \<in>\<^sub>c  \<nat>\<^sub>c"
+   shows "(a ^\<^sub>\<nat> b)^\<^sub>\<nat> c = (a^\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> c))"
+proof- 
+  have main_result: "exp_uncurried \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f id(\<nat>\<^sub>c))  =  
+                     (exp_uncurried \<circ>\<^sub>c (id(\<nat>\<^sub>c) \<times>\<^sub>f mult2)) \<circ>\<^sub>c (associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)"
+  proof(rule natural_number_object_func_unique[where X = "\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esup>",
+ where f = "(mult2 \<circ>\<^sub>c \<langle>(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)), exp_uncurried \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp>"])
+    show "exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+      apply typecheck_cfuncs
+      oops
 
 
 end
