@@ -676,7 +676,7 @@ proof -
   qed
 
 
-  have fsharp_gsharp_id: "(g\<^sup>\<sharp>) \<circ>\<^sub>c (f\<^sup>\<sharp>) = id(Y\<^bsup>X\<^esup>)"
+  have gsharp_fsharp_id: "(g\<^sup>\<sharp>) \<circ>\<^sub>c (f\<^sup>\<sharp>) = id(Y\<^bsup>X\<^esup>)"
   proof(rule same_evals_equal[where Z = "Y\<^bsup>X\<^esup>", where X = Y, where A = X])
     show "g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> : Y\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>"
       using comp_type fsharp_type gsharp_type by auto
@@ -703,28 +703,41 @@ proof -
     qed
   qed
 
-  have f1: "domain (g\<^sup>\<sharp>) = Y\<^bsup>A\<^esup>"
-    using cfunc_type_def gsharp_type by blast 
-  have f2: "domain (f\<^sup>\<sharp>) = codomain (g\<^sup>\<sharp>)"
-    using cfunc_type_def fsharp_type gsharp_type by force
-  have f3: "codomain (f\<^sup>\<sharp>) = domain (g\<^sup>\<sharp>)"
-    using cfunc_type_def fsharp_type gsharp_type by presburger
-  have f4: "(f\<^sup>\<sharp>) \<circ>\<^sub>c (g\<^sup>\<sharp>) = id (domain(g\<^sup>\<sharp>))"
-    apply typecheck_cfuncs
-    oops
-             
+  show ?thesis
+    by (metis cfunc_type_def comp_epi_imp_epi comp_monic_imp_monic epi_mon_is_iso fsharp_gsharp_id fsharp_type gsharp_fsharp_id gsharp_type id_isomorphism is_isomorphic_def iso_imp_epi_and_monic singletonI)
+qed
 
-        
 
-  show "Y\<^bsup>A\<^esup> \<cong>  Y\<^bsup>X\<^esup>"
-    unfolding is_isomorphic_def isomorphism_def apply typecheck_cfuncs
+lemma exp_pres_iso:
+  assumes "A \<cong> X" "B \<cong> Y" 
+  shows "A\<^bsup>B\<^esup> \<cong>  X\<^bsup>Y\<^esup>"
+  by (meson assms exp_pres_iso_left exp_pres_iso_right isomorphic_is_transitive)
 
 
 
 lemma empty_to_nonempty:
   assumes "nonempty X" "\<not>(nonempty Y)" 
   shows "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
-  oops
+  using assms exp_pres_iso_left isomorphic_is_transitive no_el_iff_iso_0 zero_to_X by blast
+
+
+lemma Y_to_empty:
+  assumes "\<not>(nonempty X)" 
+  shows "Y\<^bsup>X\<^esup> \<cong> one"
+  using assms exp_pres_iso_right isomorphic_is_transitive no_el_iff_iso_0 set_to_power_zero by blast
+
+lemma nonempty_to_nonempty:
+  assumes "nonempty X" "nonempty Y"
+  shows "nonempty(Y\<^bsup>X\<^esup>)"
+  by (meson assms(2) comp_type nonempty_def terminal_func_type transpose_func_type)
+
+lemma empty_to_nonempty_converse:
+  assumes "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
+  shows "(nonempty X) \<and> (\<not>(nonempty Y))"
+  by (meson Y_to_empty assms no_el_iff_iso_0 nonempty_def nonempty_to_nonempty single_elem_iso_one)
+
+
+
 
 (* Definition 2.5.11 *)
 definition powerset :: "cset \<Rightarrow> cset" ("\<P>_" [101]100) where
