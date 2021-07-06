@@ -620,7 +620,106 @@ qed
     by (metis CollectI cfunc_type_def comp_epi_imp_epi comp_monic_imp_monic epi_mon_is_iso idAY idXY id_isomorphism is_isomorphic_def iso_imp_epi_and_monic phi_eval_type psi_eval_type)
 qed
 
+
+ 
+
+
+lemma exp_pres_iso_right:
+  assumes "A \<cong> X" 
+  shows "Y\<^bsup>A\<^esup> \<cong>  Y\<^bsup>X\<^esup>"
+proof - 
+  obtain \<phi> where \<phi>_def: "\<phi>: X \<rightarrow> A \<and> isomorphism(\<phi>)"
+    using assms is_isomorphic_def isomorphic_is_symmetric by blast
+  obtain \<psi> where \<psi>_def: "\<psi>: A \<rightarrow> X \<and> isomorphism(\<psi>) \<and> (\<psi> \<circ>\<^sub>c \<phi> = id(X))"
+    using \<phi>_def cfunc_type_def isomorphism_def by fastforce
+  have idA: "\<phi> \<circ>\<^sub>c \<psi> = id(A)"
+    by (metis \<phi>_def \<psi>_def cfunc_type_def comp_associative id_left_unit2 isomorphism_def)
+  obtain f where f_def: "f = (eval_func Y X) \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>X\<^esup>))"
+    by blast
+  obtain g where g_def: "g = (eval_func Y A) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))"
+    by blast
+  have f_type: "f: A\<times>\<^sub>c (Y\<^bsup>X\<^esup>) \<rightarrow> Y"
+    using \<psi>_def cfunc_cross_prod_type comp_type eval_func_type f_def id_type by blast
+  have g_type: "g: X\<times>\<^sub>c (Y\<^bsup>A\<^esup>) \<rightarrow> Y"
+    using \<phi>_def cfunc_cross_prod_type comp_type eval_func_type g_def id_type by blast
+  have fsharp_type: "f\<^sup>\<sharp> : Y\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>A\<^esup>"
+    by (simp add: f_type transpose_func_type)
+  have gsharp_type: "g\<^sup>\<sharp> : Y\<^bsup>A\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>"
+    by (simp add: g_type transpose_func_type)
+
   
+  have fsharp_gsharp_id: "(f\<^sup>\<sharp>) \<circ>\<^sub>c (g\<^sup>\<sharp>) = id(Y\<^bsup>A\<^esup>)"
+  proof(rule same_evals_equal[where Z = "Y\<^bsup>A\<^esup>", where X = Y, where A = A])
+    show "f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> : Y\<^bsup>A\<^esup> \<rightarrow> Y\<^bsup>A\<^esup>"
+      using comp_type fsharp_type gsharp_type by blast
+    show idYA_type: "id\<^sub>c (Y\<^bsup>A\<^esup>) : Y\<^bsup>A\<^esup> \<rightarrow> Y\<^bsup>A\<^esup>"
+      by (simp add: id_type)
+    show "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)"
+    proof - 
+      have "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g\<^sup>\<sharp>)"
+        using fsharp_type gsharp_type identity_distributes_across_composition by auto
+      also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g\<^sup>\<sharp>)"
+        using \<psi>_def cfunc_type_def comp_associative f_def f_type gsharp_type transpose_func_def by (typecheck_cfuncs, auto)
+      also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f g\<^sup>\<sharp>)"
+        by (smt \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod gsharp_type id_left_unit2 id_right_unit2 id_type)
+      also have "... = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g\<^sup>\<sharp>) \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))"
+        by (smt \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod gsharp_type id_left_unit2 id_right_unit2 id_type)
+      also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>)) \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))"
+        by (typecheck_cfuncs, smt \<phi>_def \<psi>_def comp_associative2 flat_cancels_sharp g_def g_type inv_transpose_func_def2)
+      also have "... = eval_func Y A \<circ>\<^sub>c ((\<phi> \<circ>\<^sub>c \<psi>) \<times>\<^sub>f (id(Y\<^bsup>A\<^esup>) \<circ>\<^sub>c id(Y\<^bsup>A\<^esup>)))"
+        using \<phi>_def \<psi>_def idYA_type cfunc_cross_prod_comp_cfunc_cross_prod by auto        
+      also have "... = eval_func Y A \<circ>\<^sub>c id(A) \<times>\<^sub>f id(Y\<^bsup>A\<^esup>)"
+        using idA idYA_type id_right_unit2 by auto
+      then show "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)"
+        by (simp add: calculation)
+    qed
+  qed
+
+
+  have fsharp_gsharp_id: "(g\<^sup>\<sharp>) \<circ>\<^sub>c (f\<^sup>\<sharp>) = id(Y\<^bsup>X\<^esup>)"
+  proof(rule same_evals_equal[where Z = "Y\<^bsup>X\<^esup>", where X = Y, where A = X])
+    show "g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> : Y\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>"
+      using comp_type fsharp_type gsharp_type by auto
+    show idYX_type: "id\<^sub>c (Y\<^bsup>X\<^esup>) : Y\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>"
+      by (simp add: id_type)
+    show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)"
+    proof - 
+      have "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp>)  \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
+        using fsharp_type gsharp_type identity_distributes_across_composition by auto
+      also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
+        using \<phi>_def cfunc_type_def comp_associative fsharp_type g_def g_type transpose_func_def by (typecheck_cfuncs, auto)
+      also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f f\<^sup>\<sharp>)"
+        by (smt \<phi>_def cfunc_cross_prod_comp_cfunc_cross_prod fsharp_type id_left_unit2 id_right_unit2 id_type)
+      also have "... = eval_func Y A \<circ>\<^sub>c (id(A) \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>))"
+        by (smt \<phi>_def cfunc_cross_prod_comp_cfunc_cross_prod fsharp_type id_left_unit2 id_right_unit2 id_type)
+      also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>))"
+        by (typecheck_cfuncs, smt \<phi>_def \<psi>_def comp_associative2 f_def f_type flat_cancels_sharp inv_transpose_func_def2)
+      also have "... = eval_func Y X \<circ>\<^sub>c ((\<psi> \<circ>\<^sub>c \<phi>) \<times>\<^sub>f (id(Y\<^bsup>X\<^esup>) \<circ>\<^sub>c id(Y\<^bsup>X\<^esup>)))"
+        using \<phi>_def \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod idYX_type by auto
+      also have "... = eval_func Y X \<circ>\<^sub>c id(X) \<times>\<^sub>f id(Y\<^bsup>X\<^esup>)"
+        using \<psi>_def idYX_type id_left_unit2 by auto
+      then show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)"
+        by (simp add: calculation)
+    qed
+  qed
+
+  have f1: "domain (g\<^sup>\<sharp>) = Y\<^bsup>A\<^esup>"
+    using cfunc_type_def gsharp_type by blast 
+  have f2: "domain (f\<^sup>\<sharp>) = codomain (g\<^sup>\<sharp>)"
+    using cfunc_type_def fsharp_type gsharp_type by force
+  have f3: "codomain (f\<^sup>\<sharp>) = domain (g\<^sup>\<sharp>)"
+    using cfunc_type_def fsharp_type gsharp_type by presburger
+  have f4: "(f\<^sup>\<sharp>) \<circ>\<^sub>c (g\<^sup>\<sharp>) = id (domain(g\<^sup>\<sharp>))"
+    apply typecheck_cfuncs
+    oops
+             
+
+        
+
+  show "Y\<^bsup>A\<^esup> \<cong>  Y\<^bsup>X\<^esup>"
+    unfolding is_isomorphic_def isomorphism_def apply typecheck_cfuncs
+
+
 
 lemma empty_to_nonempty:
   assumes "nonempty X" "\<not>(nonempty Y)" 
