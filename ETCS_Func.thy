@@ -16,6 +16,39 @@ where
   transpose_func_unique: 
     "f : A\<times>\<^sub>cZ \<rightarrow> X \<Longrightarrow> g: Z \<rightarrow> X\<^bsup>A\<^esup> \<Longrightarrow> (eval_func X A) \<circ>\<^sub>c (id A \<times>\<^sub>f g) = f \<Longrightarrow> g = f\<^sup>\<sharp>"
 
+
+lemma eval_func_surj:
+  assumes "nonempty(A)"
+  shows "surjective((eval_func X A))"
+  unfolding surjective_def
+proof(auto)
+  fix x
+  assume x_type: "x \<in>\<^sub>c codomain (eval_func X A)"
+  then have x_type2: "x \<in>\<^sub>c X"
+    using cfunc_type_def eval_func_type by auto
+  obtain a where a_def: "a \<in>\<^sub>c A"
+    using assms nonempty_def by auto
+  then have needed_type: "\<langle>a, (x \<circ>\<^sub>c right_cart_proj A one)\<^sup>\<sharp>\<rangle> \<in>\<^sub>c domain (eval_func X A)"
+    using cfunc_type_def x_type2 by (typecheck_cfuncs, auto)
+  have "(eval_func X A) \<circ>\<^sub>c  \<langle>a, (x \<circ>\<^sub>c right_cart_proj A one)\<^sup>\<sharp>\<rangle> =    
+        (eval_func X A) \<circ>\<^sub>c ((id(A) \<times>\<^sub>f (x \<circ>\<^sub>c right_cart_proj A one)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>a, id(one)\<rangle>)"
+    by (typecheck_cfuncs, smt a_def cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 x_type2)
+  also have "... = ((eval_func X A) \<circ>\<^sub>c (id(A) \<times>\<^sub>f (x \<circ>\<^sub>c right_cart_proj A one)\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>a, id(one)\<rangle>"
+    by (typecheck_cfuncs, meson a_def comp_associative2 x_type2)
+  also have "... = (x \<circ>\<^sub>c right_cart_proj A one) \<circ>\<^sub>c \<langle>a, id(one)\<rangle>"
+    by (metis comp_type right_cart_proj_type transpose_func_def x_type2) 
+  also have "... = x \<circ>\<^sub>c (right_cart_proj A one \<circ>\<^sub>c \<langle>a, id(one)\<rangle>)"
+    using a_def cfunc_type_def comp_associative x_type2 by (typecheck_cfuncs, auto)
+  also have "... = x"
+    using a_def id_right_unit2 right_cart_proj_cfunc_prod x_type2 by (typecheck_cfuncs, auto)
+  then show "\<exists>y. y \<in>\<^sub>c domain (eval_func X A) \<and> eval_func X A \<circ>\<^sub>c y = x"
+    using calculation needed_type by (typecheck_cfuncs, auto)
+qed
+
+
+
+
+
 (* Definition 2.5.1 *)
 definition exp_func :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc" ("(_)\<^bsup>_\<^esup>\<^sub>f" [100,100]100) where
   "exp_func g A = (g \<circ>\<^sub>c eval_func (domain g) A)\<^sup>\<sharp>"
@@ -169,6 +202,25 @@ lemma eval_func_X_empty_injective:
   unfolding injective_def
   by (typecheck_cfuncs,metis assms cfunc_type_def comp_type left_cart_proj_type nonempty_def)
   
+lemma flat_pres_epi:
+  assumes "nonempty(A)"
+  assumes "f : Z \<rightarrow> X\<^bsup>A\<^esup>"
+  assumes "epimorphism(f)"
+  shows "epimorphism(f\<^sup>\<flat>)"
+proof - 
+  have equals: "f\<^sup>\<flat> = (eval_func X A) \<circ>\<^sub>c (id(A) \<times>\<^sub>f f)"
+    using assms(2) inv_transpose_func_def2 by auto
+  have idA_f_epi: "epimorphism((id(A) \<times>\<^sub>f f))"
+    using assms(2) assms(3) cfunc_cross_prod_surj epi_is_surj id_isomorphism id_type iso_imp_epi_and_monic surjective_is_epimorphism by blast
+  have eval_epi: "epimorphism((eval_func X A))"
+    by (simp add: assms(1) eval_func_surj surjective_is_epimorphism)
+  have "codomain ((id(A) \<times>\<^sub>f f)) = domain ((eval_func X A))"
+    using assms(2) cfunc_type_def by (typecheck_cfuncs, auto)
+  then show ?thesis
+    by (simp add: composition_of_epi_pair_is_epi equals eval_epi idA_f_epi)
+qed
+
+
 
 
 
@@ -820,7 +872,6 @@ qed
 
 
 (*non empty is required, consider when X = Omega and A = empty set*)
-
 
 
 
