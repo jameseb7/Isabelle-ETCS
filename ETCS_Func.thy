@@ -918,6 +918,53 @@ lemma emptyset_is_smallest_set:
   "\<emptyset> \<le>\<^sub>c X"
   using empty_subset is_smaller_than_def subobject_of_def2 by auto
 
+lemma Y_nonempty_then_X_le_XtoY:
+  assumes "nonempty(Y)"
+  shows "X \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+proof - 
+  obtain f where f_def: "f = (right_cart_proj Y X)\<^sup>\<sharp>"
+    by blast
+  then have f_type: "f : X \<rightarrow> X\<^bsup>Y\<^esup>"
+    by (simp add: right_cart_proj_type transpose_func_type)
+  have mono_f: "injective(f)"
+    unfolding injective_def
+  proof(auto)
+    fix x y 
+    assume x_type: "x \<in>\<^sub>c domain f"
+    assume y_type: "y \<in>\<^sub>c domain f"
+    assume equals: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+    have x_type2 : "x \<in>\<^sub>c X"
+      using cfunc_type_def f_type x_type by auto
+    have y_type2 : "y \<in>\<^sub>c X"
+      using cfunc_type_def f_type y_type by auto
+    have "x \<circ>\<^sub>c (right_cart_proj Y one) = (right_cart_proj Y X) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f x)"
+      using right_cart_proj_cfunc_cross_prod x_type2 by (typecheck_cfuncs, auto)
+    also have "... = ((eval_func X Y) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f f)) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f x)"
+      by (typecheck_cfuncs, simp add: f_def transpose_func_def)
+    also have "... = (eval_func X Y) \<circ>\<^sub>c ((id(Y) \<times>\<^sub>f f) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f x))"
+      using comp_associative2 f_type x_type2 by (typecheck_cfuncs, fastforce)
+    also have "... = (eval_func X Y) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f (f \<circ>\<^sub>c x))"
+      using f_type identity_distributes_across_composition x_type2 by auto
+    also have "... = (eval_func X Y) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f (f \<circ>\<^sub>c y))"
+      by (simp add: equals)
+    also have "... = (eval_func X Y) \<circ>\<^sub>c ((id(Y) \<times>\<^sub>f f) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f y))"
+      using f_type identity_distributes_across_composition y_type2 by auto
+    also have "... = ((eval_func X Y) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f f)) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f y)"
+      using comp_associative2 f_type y_type2 by (typecheck_cfuncs, fastforce)
+    also have "... = (right_cart_proj Y X) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f y)"
+      by (typecheck_cfuncs, simp add: f_def transpose_func_def)
+    also have "... = y \<circ>\<^sub>c (right_cart_proj Y one)"
+      using right_cart_proj_cfunc_cross_prod y_type2 by (typecheck_cfuncs, auto)
+    then show "x = y"
+      using  assms calculation epimorphism_def3 nonempty_left_imp_right_proj_epimorphism right_cart_proj_type x_type2 y_type2 by fastforce
+  qed
+  then show "X \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+    using f_type injective_imp_monomorphism is_smaller_than_def by blast
+qed
+
+
+
+
 
 lemma smaller_than_finite_is_finite:
   assumes "X \<le>\<^sub>c Y" "is_finite(Y)" "nonempty(X)"
