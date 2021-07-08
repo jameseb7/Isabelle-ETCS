@@ -59,6 +59,7 @@ next
     by simp
 qed
 
+
 (* Exercise 2.1.15 *)
 lemma terminal_objects_isomorphic:
   assumes "terminal_object X" "terminal_object Y"
@@ -182,6 +183,10 @@ next
     by (simp add: one_terminal_object terminal_objects_isomorphic)
 qed
 
+
+
+
+
 (* Converse to Exercise 2.1.15: Part 1 *)
 lemma iso_to1_is_term:
   assumes "X \<cong> one"
@@ -217,9 +222,10 @@ qed
 (* Converse to Exercise 2.1.15: Part 2 *)
 
 lemma iso_to_term_is_term:
-  assumes "X \<cong> Y" and "terminal_object Y"
+  assumes "X \<cong> Y"
+  assumes "terminal_object Y"
   shows "terminal_object X"
-  by (meson assms(1) assms(2) iso_to1_is_term isomorphic_is_transitive one_terminal_object terminal_objects_isomorphic)
+  by (meson assms iso_to1_is_term isomorphic_is_transitive one_terminal_object terminal_objects_isomorphic)
 
 (* Proposition 2.1.20 *)
 lemma X_is_cart_prod1:
@@ -629,6 +635,7 @@ qed
 
 
 
+  
   
 
 end

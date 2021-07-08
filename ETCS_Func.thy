@@ -163,6 +163,25 @@ lemma transpose_factors:
   using assms by (typecheck_cfuncs, smt comp_associative2 comp_type eval_func_type exp_func_def2 transpose_of_comp)
 
 
+lemma eval_func_X_empty_injective:
+  assumes "\<not>(nonempty(Y))"
+  shows "injective (eval_func X Y)"
+  unfolding injective_def
+  by (typecheck_cfuncs,metis assms cfunc_type_def comp_type left_cart_proj_type nonempty_def)
+  
+
+
+
+
+(*Is the following statement true?
+lemma transpose_mono:
+  assumes "g: Y \<rightarrow> Z"
+  assumes "monomorphism(g)"
+  shows "monomorphism(g\<^bsup>A\<^esup>\<^sub>f)"
+  using assms apply typecheck_cfuncs
+  oops
+*)
+
 
 
 lemma eval_func_X_one_injective:
@@ -715,6 +734,9 @@ lemma exp_pres_iso:
 
 
 
+
+
+
 lemma empty_to_nonempty:
   assumes "nonempty X" "\<not>(nonempty Y)" 
   shows "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
@@ -735,6 +757,69 @@ lemma empty_to_nonempty_converse:
   assumes "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
   shows "(nonempty X) \<and> (\<not>(nonempty Y))"
   by (meson Y_to_empty assms no_el_iff_iso_0 nonempty_def nonempty_to_nonempty single_elem_iso_one)
+
+
+
+lemma sharp_pres_mono:
+  assumes "f : A \<times>\<^sub>c Z \<rightarrow> X"
+  assumes "monomorphism(f)"
+  assumes "nonempty A"
+  shows   "monomorphism(f\<^sup>\<sharp>)"
+  unfolding monomorphism_def2
+proof(auto)
+  fix g h U Y x
+  assume g_type: "g : U \<rightarrow> Y"
+  assume h_type: "h : U \<rightarrow> Y"
+  assume f_sharp_type: "f\<^sup>\<sharp> : Y \<rightarrow> x"
+  assume equals: "f\<^sup>\<sharp> \<circ>\<^sub>c g = f\<^sup>\<sharp> \<circ>\<^sub>c h"
+  have f_sharp_type2: "f\<^sup>\<sharp> : Z \<rightarrow> X\<^bsup>A\<^esup>"
+    by (simp add: assms(1) transpose_func_type)
+  have Y_is_Z: "Y = Z"
+    using cfunc_type_def f_sharp_type f_sharp_type2 by auto
+  have x_is_XA: "x = X\<^bsup>A\<^esup>"
+    using cfunc_type_def f_sharp_type f_sharp_type2 by auto
+  have g_type2: "g : U \<rightarrow> Z"
+    using Y_is_Z g_type by blast
+  have h_type2: "h : U \<rightarrow> Z"
+    using Y_is_Z h_type by blast
+  have idg_type: "(id(A) \<times>\<^sub>f g) : A \<times>\<^sub>c U \<rightarrow> A \<times>\<^sub>c Z"
+    by (simp add: cfunc_cross_prod_type g_type2 id_type)
+  have idh_type: "(id(A) \<times>\<^sub>f h) : A \<times>\<^sub>c U \<rightarrow> A \<times>\<^sub>c Z"
+    by (simp add: cfunc_cross_prod_type h_type2 id_type)
+   then  have epic: "epimorphism(right_cart_proj A U)"
+     using assms(3) nonempty_left_imp_right_proj_epimorphism by blast
+
+
+
+   have fIdg_is_fIdh: "f \<circ>\<^sub>c (id(A) \<times>\<^sub>f g) = f \<circ>\<^sub>c (id(A) \<times>\<^sub>f h)"
+   proof - 
+    have "f \<circ>\<^sub>c (id(A) \<times>\<^sub>f g) = (eval_func X A \<circ>\<^sub>c (id(A) \<times>\<^sub>f f\<^sup>\<sharp>)) \<circ>\<^sub>c (id(A) \<times>\<^sub>f g)"
+      using assms(1) transpose_func_def by auto
+    also have "... = eval_func X A \<circ>\<^sub>c ((id(A) \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (id(A) \<times>\<^sub>f g))"
+      using comp_associative2 f_sharp_type2 idg_type by (typecheck_cfuncs, fastforce)
+    also have "... = eval_func X A \<circ>\<^sub>c (id(A) \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c g))"
+      using f_sharp_type2 g_type2 identity_distributes_across_composition by auto
+    also have "... = eval_func X A \<circ>\<^sub>c (id(A) \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c h))"
+      by (simp add: equals)
+    also have "... = eval_func X A \<circ>\<^sub>c ((id(A) \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (id(A) \<times>\<^sub>f h))"
+      using f_sharp_type h_type identity_distributes_across_composition by auto
+    also have "... = (eval_func X A \<circ>\<^sub>c (id(A) \<times>\<^sub>f f\<^sup>\<sharp>)) \<circ>\<^sub>c (id(A) \<times>\<^sub>f h)"
+      by (metis Y_is_Z assms(1) calculation equals f_sharp_type2 g_type h_type inv_transpose_func_def2 inv_transpose_of_composition transpose_func_def)
+    also have "... = f \<circ>\<^sub>c (id(A) \<times>\<^sub>f h)"
+      using assms(1) transpose_func_def by auto
+    then show ?thesis
+      by (simp add: calculation)   
+   qed
+   then have idg_is_idh: "(id(A) \<times>\<^sub>f g) = (id(A) \<times>\<^sub>f h)"
+    using assms fIdg_is_fIdh idg_type idh_type monomorphism_def3 by blast
+   then have "g \<circ>\<^sub>c (right_cart_proj A U) = h \<circ>\<^sub>c (right_cart_proj A U)"
+    by (smt g_type2 h_type2 id_type right_cart_proj_cfunc_cross_prod)
+   then show "g = h"
+    using epic epimorphism_def2 g_type2 h_type2 right_cart_proj_type by blast
+qed
+
+
+(*non empty is required, consider when X = Omega and A = empty set*)
 
 
 

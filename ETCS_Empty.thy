@@ -61,42 +61,10 @@ qed
 
 (* Proposition 2.4.7 *)
 lemma function_to_empty_is_iso:
-  assumes "codomain(f) = \<emptyset>" "f \<in> ETCS_func"
+  assumes "f: X \<rightarrow> \<emptyset>"
   shows "isomorphism(f)"
-proof -
-  have "surjective(f)"
-    by (simp add: assms emptyset_is_empty surjective_def)
-  have "epimorphism(f)"
-    by (simp add: \<open>surjective f\<close> surjective_is_epimorphism) 
- 
-  have dom_f_is_empty: "\<not>nonempty(domain(f))"
-  proof (rule ccontr, auto)
-    assume BWOC:  "nonempty(domain(f))"
-    obtain x where x_type: "x \<in>\<^sub>c domain(f)"
-    using BWOC nonempty_def by blast
-    have contradiction: "f \<circ>\<^sub>c x \<in>\<^sub>c \<emptyset>"
-       using assms(1) assms(2) cfunc_type_def comp_type x_type by blast
-     show False
-       using contradiction emptyset_is_empty by auto
-   qed
-   have f_inj: "injective(f)"
-     using dom_f_is_empty injective_def nonempty_def by blast
-   have f_mono: "monomorphism(f)"
-     using f_inj injective_imp_monomorphism by auto
-   show "isomorphism(f)"    (*Modify this proof after you've shown that mono + epi = iso*)
-      proof -
-          have f1: "f : domain f \<rightarrow> \<emptyset>"
-              using assms(1) assms(2) cfunc_type_def by blast
-              have f2: "\<forall>c. domain (\<alpha>\<^bsub>c\<^esub>) = \<emptyset>"
-              using cfunc_type_def initial_func_type by presburger
-              have f3: "f \<circ>\<^sub>c \<alpha>\<^bsub>domain f\<^esub> = id\<^sub>c \<emptyset>"
-              using f1 by (meson comp_type emptyset_is_empty id_type initial_func_type one_separator)
-              have "\<alpha>\<^bsub>domain f\<^esub> \<circ>\<^sub>c f = id\<^sub>c (domain f)"
-              using f1 by (meson comp_type emptyset_is_empty id_type initial_func_type one_separator)
-              then show ?thesis
-              using f3 f2 assms(1) cfunc_type_def initial_func_type isomorphism_def by auto
-      qed
-qed
+  by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso injective_def injective_imp_monomorphism singletonI surjective_def surjective_is_epimorphism)
+
 
 lemma zero_times_X:
   "\<emptyset> \<times>\<^sub>c X \<cong> \<emptyset>"
@@ -133,6 +101,14 @@ next
   then show "X \<cong> \<emptyset>"
     using f_type is_isomorphic_def isomorphic_is_symmetric by blast
 qed
+
+lemma function_to_empty_set_is_iso:
+  assumes "f: X \<rightarrow> Y"
+  assumes "\<not>(nonempty(Y))"
+  shows "isomorphism(f)"
+  by (metis assms(1) assms(2) cfunc_type_def comp_type epi_mon_is_iso injective_def injective_imp_monomorphism nonempty_def singletonI surjective_def surjective_is_epimorphism)
+  
+
 
 lemma prod_iso_to_empty_right:
   assumes "nonempty(X)"
