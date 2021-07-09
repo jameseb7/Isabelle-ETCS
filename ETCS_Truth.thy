@@ -16,6 +16,38 @@ where
   characteristic_function_exists:
     "m : B \<rightarrow> X \<Longrightarrow> monomorphism m \<Longrightarrow> \<exists>! \<chi>. is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi>"
 
+definition characteristic_func :: "cfunc \<Rightarrow> cfunc" where
+  "characteristic_func m =
+    (THE \<chi>. monomorphism m \<longrightarrow> is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m \<chi>)"
+
+lemma characteristic_func_is_pullback:
+  assumes "m : B \<rightarrow> X" "monomorphism m"
+  shows "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+proof -
+  obtain \<chi> where chi_is_pullback: "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi>"
+    using assms characteristic_function_exists by blast
+
+  have "monomorphism m \<longrightarrow> is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m (characteristic_func m)"
+  proof (unfold characteristic_func_def, rule theI', rule_tac a=\<chi> in ex1I, clarify)
+    show "is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m \<chi>"
+      using assms(1) cfunc_type_def chi_is_pullback by auto
+    show "\<And>x. monomorphism m \<longrightarrow> is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m x \<Longrightarrow> x = \<chi>"
+      using assms(1) assms(2) cfunc_type_def characteristic_function_exists chi_is_pullback by fastforce
+  qed
+  then show "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+    using assms cfunc_type_def by auto
+qed
+
+lemma characteristic_func_type[type_rule]:
+  assumes "m : B \<rightarrow> X" "monomorphism m"
+  shows "characteristic_func m : X \<rightarrow> \<Omega>"
+proof -
+  have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+    using assms by (rule characteristic_func_is_pullback)
+  then show "characteristic_func m : X \<rightarrow> \<Omega>"
+    unfolding is_pullback_def square_commutes_def by auto
+qed
+
 definition eq_pred :: "cset \<Rightarrow> cfunc" where
   "eq_pred X = (THE \<chi>. is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) \<chi>)"
 
@@ -420,6 +452,46 @@ proof - (*there are serious errors in the diagram in the book!*)
      using g_epi g_type pullback_of_epi_is_epi by blast
    then show ?thesis
      using fid_epi cfunc_type_def composition_of_epi_pair_is_epi decompose_fxg is_pullback_def pullback pullback2 square_commutes_def by auto
+ qed
+
+definition set_subtraction :: "cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> cset" (infix "\<setminus>" 60) where
+  "Y \<setminus> X = (SOME E. \<exists> m'.  equalizer E m' (characteristic_func (snd X)) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
+
+lemma set_subtraction_equalizer:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "\<exists> m'.  equalizer (Y \<setminus> (X,m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+proof -
+  have "\<exists> E m'. equalizer E m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    using assms equalizer_exists by (typecheck_cfuncs, auto)
+  then have "\<exists> m'.  equalizer (Y \<setminus> (X,m)) m' (characteristic_func (snd (X,m))) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    by (unfold set_subtraction_def, rule_tac someI_ex, auto)
+  then show "\<exists> m'.  equalizer (Y \<setminus> (X,m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    by auto
 qed
+
+definition complement_morphism :: "cfunc \<Rightarrow> cfunc" ("_\<^sup>c" [1000]) where
+  "m\<^sup>c = (SOME m'.  equalizer (codomain m \<setminus> (domain m, m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>))"
+
+lemma complement_morphism_equalizer:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "equalizer (Y \<setminus> (X,m)) m\<^sup>c (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+proof -
+  have "\<exists> m'. equalizer (codomain m \<setminus> (domain m, m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>)"
+    by (simp add: assms cfunc_type_def set_subtraction_equalizer)
+  then have "equalizer (codomain m \<setminus> (domain m, m)) m\<^sup>c (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>)"
+    by (unfold complement_morphism_def, rule_tac someI_ex, auto)
+  then show "equalizer (Y \<setminus> (X, m)) m\<^sup>c (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    using assms unfolding cfunc_type_def by auto
+qed
+
+lemma complement_morphism_type[type_rule]:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "m\<^sup>c : Y \<setminus> (X,m) \<rightarrow> Y"
+  using assms cfunc_type_def characteristic_func_type complement_morphism_equalizer equalizer_def by auto
+
+lemma complement_morphism_mono:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "monomorphism m\<^sup>c"
+  using assms complement_morphism_equalizer equalizer_is_monomorphism by blast
 
 end
