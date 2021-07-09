@@ -1143,17 +1143,25 @@ proof(rule natural_number_object_func_unique[where X = "\<nat>\<^sub>c\<^bsup>(\
   then show ?thesis using calculation by auto
 qed
 
-lemma power_rule:
+lemma power_tower_rule:
    assumes "a \<in>\<^sub>c  \<nat>\<^sub>c" "b \<in>\<^sub>c  \<nat>\<^sub>c" "c \<in>\<^sub>c  \<nat>\<^sub>c"
    shows "(a ^\<^sub>\<nat> b)^\<^sub>\<nat> c = (a^\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> c))"
 proof- 
+  have bc_type: "\<langle>b,c\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(2) assms(3) cfunc_prod_type)
+  have ab_type: "\<langle>a,b\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(1) assms(2) cfunc_prod_type)
+  have ac_type: "\<langle>a,c\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: assms(1) assms(3) cfunc_prod_type)
+  have abc_type: "\<langle>\<langle>a,b\<rangle>,c\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c \<nat>\<^sub>c"
+    by (simp add: ab_type assms(3) cfunc_prod_type)
   have main_result: "(exp_uncurried \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f id(\<nat>\<^sub>c)))\<^sup>\<sharp>  =  
                      ((exp_uncurried \<circ>\<^sub>c (id(\<nat>\<^sub>c) \<times>\<^sub>f mult2)) \<circ>\<^sub>c (associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>"
   proof(rule natural_number_object_func_unique[where X = "\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esup>",
  where f = "(mult2 \<circ>\<^sub>c \<langle>(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)), exp_uncurried \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>))\<rangle>)\<^sup>\<sharp>"])
-    show "(exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+    show type1: "(exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
       by typecheck_cfuncs
-    show "((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+    show type2: "((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
       by typecheck_cfuncs
     show "(mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup> \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
       by typecheck_cfuncs
@@ -1274,26 +1282,11 @@ proof-
             by (simp add: x_def)
           have yst_type: "\<langle>y,successor \<circ>\<^sub>c t\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c"
             by (simp add: cfunc_prod_type succ_n_type x_def)
-
-
-          have "(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c x =  
-               ((eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f  (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>)) \<circ>\<^sub>c x"
-            apply typecheck_cfuncs
-            by (metis inv_transpose_func_def2 inv_transpose_of_composition)
-          also have "... = ((mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f  (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>)) \<circ>\<^sub>c x"
-            apply typecheck_cfuncs
-            by (simp add: transpose_func_def)
-          also have "... = (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>) \<circ>\<^sub>c ((id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f  (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c x)"
-            apply typecheck_cfuncs
-            using comp_associative2 x_type by auto
-          also have "... = mult2 \<circ>\<^sub>c (\<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle> \<circ>\<^sub>c ((id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f  (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>)) \<circ>\<^sub>c x)"
-            apply typecheck_cfuncs
-            by (metis cfunc_type_def comp_associative x_type)
-          also have "... = mult2 \<circ>\<^sub>c (\<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle> \<circ>\<^sub>c ((id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f  (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>)) \<circ>\<^sub>c x)"
-            oops
-
-
-(*
+          obtain F where F_def: "F = (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f  (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>)"
+            by blast
+          have F_type: "F: (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)"
+            by (simp add: F_def type1 cfunc_cross_prod_type id_type)
+        
           have "(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
                 ((eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor)) \<circ>\<^sub>c x"
             by (typecheck_cfuncs, metis inv_transpose_func_def2 inv_transpose_of_composition)
@@ -1313,7 +1306,182 @@ proof-
             using id_left_unit2 x_def by (typecheck_cfuncs, fastforce)
           also have "... = (m ^\<^sub>\<nat> n) ^\<^sub>\<nat> (successor \<circ>\<^sub>c t)"
             by (simp add: exp_def y_def)
-          *)
+          also have "... =((m ^\<^sub>\<nat> n)^\<^sub>\<nat> t)  \<cdot>\<^sub>\<nat>  (m ^\<^sub>\<nat> n)"
+            by (simp add: exp_closure exp_respects_successor mult_commutative x_def y_def)
+          also have "... = mult2 \<circ>\<^sub>c (\<langle>exp_uncurried \<circ>\<^sub>c   \<langle>exp_uncurried \<circ>\<^sub>c y,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c t\<rangle> , exp_uncurried  \<circ>\<^sub>c y\<rangle> )"
+            using exp_def id_left_unit2 mult_def x_def y_def by auto
+          also have "... = mult2 \<circ>\<^sub>c (\<langle>exp_uncurried \<circ>\<^sub>c ((exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c x), exp_uncurried  \<circ>\<^sub>c y\<rangle> )"
+            using cfunc_cross_prod_comp_cfunc_prod x_def by (typecheck_cfuncs, auto)
+          also have "... = mult2 \<circ>\<^sub>c (\<langle>(exp_uncurried \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)) \<circ>\<^sub>c x, exp_uncurried  \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<circ>\<^sub>c x \<rangle> )"
+            by (typecheck_cfuncs, metis comp_associative2 left_cart_proj_cfunc_prod x_def x_type)
+          also have "... = mult2 \<circ>\<^sub>c (\<langle>(exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c), exp_uncurried  \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<rangle> \<circ>\<^sub>c x)"
+            using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, auto)
+          also have "... = (mult2 \<circ>\<^sub>c \<langle>(exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c), exp_uncurried \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<rangle>) \<circ>\<^sub>c x"
+            using comp_associative2 id_left_unit2 x_type by (typecheck_cfuncs, auto)
+          also have "... = (mult2 \<circ>\<^sub>c \<langle>(exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c), exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>) \<circ>\<^sub>c F\<rangle>) \<circ>\<^sub>c x"
+            using F_def left_cart_proj_cfunc_cross_prod type1 by (typecheck_cfuncs, auto)
+          also have "... = (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c F, (exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)) \<circ>\<^sub>c F\<rangle>) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, metis F_def F_type comp_associative2 transpose_func_def)
+          also have "... = (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle> \<circ>\<^sub>c F) \<circ>\<^sub>c x"
+            using F_type cfunc_prod_comp by (typecheck_cfuncs, auto)
+          also have "... = ((mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)
+                                    \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f  (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>)) \<circ>\<^sub>c x"
+            using F_def comp_associative2 by (typecheck_cfuncs, auto)
+          also have "... = ((eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f  (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>)) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, simp add: transpose_func_def)
+          also have "... = (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, metis inv_transpose_func_def2 inv_transpose_of_composition)
+          then show " (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
+         (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c exp_uncurried \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c x"
+            by (simp add: calculation)
+        qed
+      qed
+    qed
+    show "((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c
+    successor =
+    (mult2 \<circ>\<^sub>c
+     \<langle>eval_func \<nat>\<^sub>c
+       (\<nat>\<^sub>c \<times>\<^sub>c
+        \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c
+              left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
+    ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
+    proof(rule same_evals_equal[where Z = "\<nat>\<^sub>c", where X = "\<nat>\<^sub>c", where A = "\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"])
+      show "((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+        by typecheck_cfuncs
+      show "(mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+        by typecheck_cfuncs
+      show "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor =
+  eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
+      proof(rule one_separator[where X = "(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c \<nat>\<^sub>c", where Y = "\<nat>\<^sub>c"])
+        show "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+          by typecheck_cfuncs
+        show "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+          by typecheck_cfuncs
+        show "\<And>x. x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+         (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
+         (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c x"
+        proof - 
+          fix x 
+          assume x_type: "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c"
+          then have x_def: "\<exists>y t . y \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<and> t \<in>\<^sub>c \<nat>\<^sub>c \<and> x = \<langle>y,t\<rangle>"
+            using cart_prod_decomp by blast
+          then obtain y t where x_def: "y \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<and> t \<in>\<^sub>c \<nat>\<^sub>c \<and> x = \<langle>y,t\<rangle>"
+            by blast
+          then have y_exists: "\<exists>m n. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<and> y = \<langle>m,n\<rangle>"
+            using cart_prod_decomp by blast
+          then obtain m n where y_def: "m \<in>\<^sub>c \<nat>\<^sub>c \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<and> y = \<langle>m,n\<rangle>"
+            by blast
+          then have x_def2: "x = \<langle>\<langle>m,n\<rangle>,t\<rangle>"
+            by (simp add: x_def)
+          have nt_type: "\<langle>n,t\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+            by (simp add: cfunc_prod_type x_def y_def)
+          have mnt_type: "\<langle>m,\<langle>n,t\<rangle>\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+            by (simp add: cfunc_prod_type nt_type y_def)
+          have yst_type: "\<langle>y,successor \<circ>\<^sub>c t\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c"
+            by (simp add: cfunc_prod_type succ_n_type x_def)
+          have nst_type: "\<langle>n,successor \<circ>\<^sub>c t\<rangle> \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+            by (simp add: cfunc_prod_type succ_n_type x_def y_def)
+          obtain F where F_def: "F = ((exp_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2)) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)"
+            by blast
+          have type3: "(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2): \<nat>\<^sub>c \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+            by (simp add: cfunc_cross_prod_type id_type mult2_type)
+          then have type4: "(exp_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2)) : \<nat>\<^sub>c \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> \<nat>\<^sub>c"
+            using comp_type exp_uncurried_type by blast
+          then have F_type: "F: (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+            using F_def associate_right_type cfunc_type_def codomain_comp domain_comp  by auto
+          then have Fsharp_tyep: "F\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+            by (simp add: F_def type2)
+          obtain G where G_def: "G = (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f F\<^sup>\<sharp>)"
+            by blast
+          have G_type: "G : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+            by (simp add: Fsharp_tyep G_def cfunc_cross_prod_type id_type)
+          
+          have "(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
+                ((eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c(id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor)) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, metis inv_transpose_func_def2 inv_transpose_of_composition)
+          also have "... = ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c(id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor) \<circ>\<^sub>c x"
+            using comp_associative2 transpose_func_def x_type by (typecheck_cfuncs, auto)
+          also have "... = ((exp_uncurried \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c))) \<circ>\<^sub>c(id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor) \<circ>\<^sub>c x"
+            using comp_associative2 by (typecheck_cfuncs, auto)
+          also have "... = ((exp_uncurried \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c))) \<circ>\<^sub>c   \<langle>id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  y,successor \<circ>\<^sub>c t\<rangle>"
+            using cfunc_cross_prod_comp_cfunc_prod x_def by (typecheck_cfuncs, auto)
+          also have "... = ((exp_uncurried \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c))) \<circ>\<^sub>c   \<langle>\<langle>m,n\<rangle>,successor \<circ>\<^sub>c t\<rangle>"
+            by (typecheck_cfuncs, metis id_left_unit2 y_def)
+          also have "... = exp_uncurried \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>\<langle>m,n\<rangle>,successor \<circ>\<^sub>c t\<rangle>)"
+            using comp_associative2 y_def yst_type by (typecheck_cfuncs, auto)
+          also have "... = exp_uncurried \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c  \<langle>m,\<langle>n,successor \<circ>\<^sub>c t\<rangle>\<rangle>)"
+            using associate_right_ap x_def y_def by (typecheck_cfuncs, auto)
+          also have "... = exp_uncurried \<circ>\<^sub>c  \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m,mult2 \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c t\<rangle>\<rangle>"
+            using cfunc_cross_prod_comp_cfunc_prod nst_type y_def by (typecheck_cfuncs, auto)
+          also have "... = exp_uncurried \<circ>\<^sub>c  \<langle>m,mult2 \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c t\<rangle>\<rangle>"
+            using id_left_unit2 y_def by auto
+          also have "... = m ^\<^sub>\<nat>(n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c t))"
+            by (simp add: exp_def mult_def)
+          also have "... = m ^\<^sub>\<nat> ( (n \<cdot>\<^sub>\<nat> t) +\<^sub>\<nat> n)"
+            by (simp add: exp_closure exp_right_dist mult_closure mult_commutative mult_respects_succ_right x_def y_def)
+          also have "... =  (m ^\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> t) )  \<cdot>\<^sub>\<nat> (m ^\<^sub>\<nat> n)"
+            by (simp add: exp_right_dist mult_closure x_def y_def)
+          also have "... = mult2 \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>id\<^sub>c(\<nat>\<^sub>c) \<circ>\<^sub>c m,mult2 \<circ>\<^sub>c \<langle>n,t\<rangle>\<rangle> ,exp_uncurried \<circ>\<^sub>c  y \<rangle>"
+            using exp_def id_left_unit2 mult_def y_def by auto
+          also have "... = mult2 \<circ>\<^sub>c \<langle>(exp_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2)) \<circ>\<^sub>c \<langle>m,\<langle>n,t\<rangle>\<rangle> ,exp_uncurried \<circ>\<^sub>c  y \<rangle>"
+            by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod comp_associative2 mnt_type nt_type y_def)
+          also have "... = mult2 \<circ>\<^sub>c \<langle>(exp_uncurried \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2)) \<circ>\<^sub>c( associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c x) ,exp_uncurried \<circ>\<^sub>c  y \<rangle>"
+            using associate_right_ap x_def y_def by auto
+          also have "... = mult2 \<circ>\<^sub>c \<langle>F \<circ>\<^sub>c x ,exp_uncurried \<circ>\<^sub>c   (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c) \<circ>\<^sub>c x \<rangle>"
+            by (typecheck_cfuncs,smt F_def comp_associative2 left_cart_proj_cfunc_prod x_def x_type)
+          also have "... = mult2 \<circ>\<^sub>c \<langle>F ,exp_uncurried \<circ>\<^sub>c   (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)  \<rangle> \<circ>\<^sub>c x"
+            using F_type cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, auto)
+          also have "... = (mult2 \<circ>\<^sub>c \<langle>F ,exp_uncurried \<circ>\<^sub>c   id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)  \<rangle>) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, metis F_type comp_associative2 id_left_unit2 x_type)
+          also have "... = (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c G ,exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>) \<circ>\<^sub>c G \<rangle>) \<circ>\<^sub>c x"
+            using F_type Fsharp_tyep G_def left_cart_proj_cfunc_cross_prod transpose_func_def by (typecheck_cfuncs, auto)
+          also have "... = (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle> \<circ>\<^sub>c G) \<circ>\<^sub>c x"
+            using G_type cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, auto)
+          also have "... = ((mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>) \<circ>\<^sub>c G) \<circ>\<^sub>c x"
+            using G_type comp_associative2 by (typecheck_cfuncs, auto)
+          also have "... = ((eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c(id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f F\<^sup>\<sharp>)) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, simp add: G_def transpose_func_def)
+          also have "... = (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c F\<^sup>\<sharp>) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, metis F_def inv_transpose_func_def2 inv_transpose_of_composition type2)
+          then show " (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
+         (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c),exp_uncurried \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c ((exp_uncurried \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c x"
+            by (simp add: F_def calculation)
+        qed
+      qed
+    qed
+  qed
+
+
+
+
+  then  have main_result_flat: "(exp_uncurried \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f id(\<nat>\<^sub>c)))  =  
+                     ((exp_uncurried \<circ>\<^sub>c (id(\<nat>\<^sub>c) \<times>\<^sub>f mult2)) \<circ>\<^sub>c (associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c))"
+    by (typecheck_cfuncs, metis flat_cancels_sharp main_result)
+  have "(a ^\<^sub>\<nat> b)^\<^sub>\<nat> c = exp_uncurried \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a,b\<rangle>, id(\<nat>\<^sub>c) \<circ>\<^sub>c c\<rangle>"
+    using assms(3) exp_def id_left_unit2 by auto
+  also have "... =  exp_uncurried \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f id(\<nat>\<^sub>c)) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, c\<rangle>"
+    using ab_type assms(3) cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, auto)
+  also have "... =  (exp_uncurried \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f id(\<nat>\<^sub>c))) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, c\<rangle>"
+    using abc_type comp_associative2 by (typecheck_cfuncs, auto)
+  also have "... = ((exp_uncurried \<circ>\<^sub>c (id(\<nat>\<^sub>c) \<times>\<^sub>f mult2)) \<circ>\<^sub>c (associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, c\<rangle>"
+    using main_result_flat by auto
+  also have "... = exp_uncurried \<circ>\<^sub>c ((id(\<nat>\<^sub>c) \<times>\<^sub>f mult2) \<circ>\<^sub>c (associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, c\<rangle>"
+    using abc_type cfunc_type_def comp_associative by (typecheck_cfuncs, auto)
+  also have "... = exp_uncurried \<circ>\<^sub>c ((id(\<nat>\<^sub>c) \<times>\<^sub>f mult2) \<circ>\<^sub>c (associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, c\<rangle>)"
+    using abc_type comp_associative2 by (typecheck_cfuncs, auto)
+  also have "... = exp_uncurried \<circ>\<^sub>c ((id(\<nat>\<^sub>c) \<times>\<^sub>f mult2) \<circ>\<^sub>c \<langle>a,\<langle>b, c\<rangle>\<rangle>)"
+    using assms associate_right_ap by auto
+  also have "... = exp_uncurried \<circ>\<^sub>c   \<langle>id(\<nat>\<^sub>c) \<circ>\<^sub>c a,mult2 \<circ>\<^sub>c \<langle>b, c\<rangle>\<rangle>"
+    using assms(1) bc_type cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, auto)
+  also have "... = (a^\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> c))"
+    using assms(1) exp_def id_left_unit2 mult_def by auto
+  then show ?thesis
+    by (simp add: calculation)
+qed
+
+
+
+
 
 
 end
