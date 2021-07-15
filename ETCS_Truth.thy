@@ -48,6 +48,51 @@ proof -
     unfolding is_pullback_def square_commutes_def by auto
 qed
 
+lemma characteristic_func_true_relative_member:
+  assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
+  assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
+  shows "x \<in>\<^bsub>X\<^esub> (B,m)"
+proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
+  thm is_pullback_def
+
+  have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+    by (simp add: assms characteristic_func_is_pullback)
+  then have "\<exists>j. j : one \<rightarrow> B \<and> \<beta>\<^bsub>B\<^esub> \<circ>\<^sub>c j = id one \<and> m \<circ>\<^sub>c j = x"
+    unfolding is_pullback_def using assms by (metis id_right_unit2 id_type true_func_type)
+  then show "\<exists>j. j : domain x \<rightarrow> domain m \<and> m \<circ>\<^sub>c j = x"
+    using assms(1) assms(3) cfunc_type_def by auto
+qed
+
+lemma characteristic_func_false_not_relative_member:
+  assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
+  assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<f>"
+  shows "\<not> (x \<in>\<^bsub>X\<^esub> (B,m))"
+proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
+  fix h
+  assume x_def: "x = m \<circ>\<^sub>c h"
+
+  assume "h : domain (m \<circ>\<^sub>c h) \<rightarrow> domain m"
+  then have h_type: "h \<in>\<^sub>c B"
+    using assms(1) assms(3) cfunc_type_def x_def by auto
+
+  have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+    by (simp add: assms characteristic_func_is_pullback)
+  then have char_m_true: "characteristic_func m \<circ>\<^sub>c m = \<t> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>"
+    unfolding is_pullback_def square_commutes_def by auto
+
+  then have "characteristic_func m \<circ>\<^sub>c m \<circ>\<^sub>c h = \<f>"
+    using x_def characteristic_func_true by auto
+  then have "(characteristic_func m \<circ>\<^sub>c m) \<circ>\<^sub>c h = \<f>"
+    using assms h_type by (typecheck_cfuncs, simp add: comp_associative2)
+  then have "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>) \<circ>\<^sub>c h = \<f>"    
+    using char_m_true by auto
+  then have "\<t> = \<f>"
+    by (metis cfunc_type_def comp_associative h_type id_right_unit2 id_type one_unique_element
+        terminal_func_comp terminal_func_type true_func_type)
+  then show "False"
+    using true_false_distinct by auto
+qed
+
 definition eq_pred :: "cset \<Rightarrow> cfunc" where
   "eq_pred X = (THE \<chi>. is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) \<chi>)"
 
@@ -493,5 +538,58 @@ lemma complement_morphism_mono:
   assumes "m : X \<rightarrow> Y" "monomorphism m"
   shows "monomorphism m\<^sup>c"
   using assms complement_morphism_equalizer equalizer_is_monomorphism by blast
+
+lemma characteristic_func_true_not_complement_member:
+  assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
+  assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
+  shows "\<not> x \<in>\<^bsub>X\<^esub> (X \<setminus> (B, m),m\<^sup>c)"
+proof
+  assume in_complement: "x \<in>\<^bsub>X\<^esub> (X \<setminus> (B, m), m\<^sup>c)"
+  then obtain x' where x'_type: "x' \<in>\<^sub>c X \<setminus> (B,m)" and x'_def: "m\<^sup>c \<circ>\<^sub>c x' = x"
+    using assms cfunc_type_def complement_morphism_type factors_through_def relative_member_def2
+    by auto
+  then have "characteristic_func m \<circ>\<^sub>c m\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c m\<^sup>c"
+    using assms complement_morphism_equalizer equalizer_def by blast
+  then have "characteristic_func m \<circ>\<^sub>c x = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x"
+    using assms x'_type complement_morphism_type
+    by (typecheck_cfuncs, smt x'_def assms cfunc_type_def comp_associative domain_comp)
+  then have "characteristic_func m \<circ>\<^sub>c x = \<f>"
+    using assms by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+  then show False
+    using characteristic_func_true true_false_distinct by auto
+qed
+
+lemma characteristic_func_false_complement_member:
+  assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
+  assumes characteristic_func_false: "characteristic_func m \<circ>\<^sub>c x = \<f>"
+  shows "x \<in>\<^bsub>X\<^esub> (X \<setminus> (B, m),m\<^sup>c)"
+proof -
+  have x_equalizes: "characteristic_func m \<circ>\<^sub>c x = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x"
+    by (metis assms(3) characteristic_func_false false_func_type id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+  have "\<And>h F. h : F \<rightarrow> X \<and> characteristic_func m \<circ>\<^sub>c h = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c h \<longrightarrow>
+                  (\<exists>!k. k : F \<rightarrow> X \<setminus> (B, m) \<and> m\<^sup>c \<circ>\<^sub>c k = h)"
+    using assms complement_morphism_equalizer unfolding equalizer_def
+    by (smt cfunc_type_def characteristic_func_type) 
+  then obtain x' where x'_type: "x' \<in>\<^sub>c X \<setminus> (B, m)" and x'_def: "m\<^sup>c \<circ>\<^sub>c x' = x"
+    by (metis assms(3) cfunc_type_def comp_associative false_func_type terminal_func_type x_equalizes)
+  then show "x \<in>\<^bsub>X\<^esub> (X \<setminus> (B, m),m\<^sup>c)"
+    unfolding relative_member_def factors_through_def
+    using assms complement_morphism_mono complement_morphism_type cfunc_type_def by auto
+qed
+
+lemma in_complement_not_in_subset:
+  assumes "m : X \<rightarrow> Y" "monomorphism m" "x \<in>\<^sub>c Y"
+  assumes "x \<in>\<^bsub>Y\<^esub> (Y \<setminus> (X,m), m\<^sup>c)"
+  shows "\<not> x \<in>\<^bsub>Y\<^esub> (X, m)"
+  using assms characteristic_func_false_not_relative_member
+    characteristic_func_true_not_complement_member characteristic_func_type comp_type
+    true_false_only_truth_values by blast
+
+lemma not_in_subset_in_complement:
+  assumes "m : X \<rightarrow> Y" "monomorphism m" "x \<in>\<^sub>c Y"
+  assumes "\<not> x \<in>\<^bsub>Y\<^esub> (X, m)"
+  shows "x \<in>\<^bsub>Y\<^esub> (Y \<setminus> (X,m), m\<^sup>c)"
+  using assms characteristic_func_false_complement_member characteristic_func_true_relative_member
+    characteristic_func_type comp_type true_false_only_truth_values by blast
 
 end
