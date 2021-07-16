@@ -48,6 +48,11 @@ proof -
     unfolding is_pullback_def square_commutes_def by auto
 qed
 
+lemma characteristic_func_eq:
+  assumes "m : B \<rightarrow> X" "monomorphism m"
+  shows "characteristic_func m \<circ>\<^sub>c m = \<t> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>"
+  using assms characteristic_func_is_pullback unfolding is_pullback_def square_commutes_def by auto
+
 lemma characteristic_func_true_relative_member:
   assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
@@ -539,6 +544,11 @@ lemma complement_morphism_mono:
   shows "monomorphism m\<^sup>c"
   using assms complement_morphism_equalizer equalizer_is_monomorphism by blast
 
+lemma complement_morphism_eq:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "characteristic_func m \<circ>\<^sub>c m\<^sup>c  = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c m\<^sup>c"
+  using assms complement_morphism_equalizer unfolding equalizer_def by auto
+
 lemma characteristic_func_true_not_complement_member:
   assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
@@ -591,5 +601,27 @@ lemma not_in_subset_in_complement:
   shows "x \<in>\<^bsub>Y\<^esub> (Y \<setminus> (X,m), m\<^sup>c)"
   using assms characteristic_func_false_complement_member characteristic_func_true_relative_member
     characteristic_func_type comp_type true_false_only_truth_values by blast
+
+lemma complement_disjoint:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  assumes "x \<in>\<^sub>c X" "x' \<in>\<^sub>c Y \<setminus> (X,m)"
+  shows "m \<circ>\<^sub>c x \<noteq> m\<^sup>c \<circ>\<^sub>c x'"
+proof 
+  assume "m \<circ>\<^sub>c x = m\<^sup>c \<circ>\<^sub>c x'"
+  then have "characteristic_func m \<circ>\<^sub>c m \<circ>\<^sub>c x = characteristic_func m \<circ>\<^sub>c m\<^sup>c \<circ>\<^sub>c x'"
+    by auto
+  then have "(characteristic_func m \<circ>\<^sub>c m) \<circ>\<^sub>c x = (characteristic_func m \<circ>\<^sub>c m\<^sup>c) \<circ>\<^sub>c x'"
+    using assms comp_associative2 by (typecheck_cfuncs, auto)
+  then have "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c x = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c m\<^sup>c) \<circ>\<^sub>c x'"
+    using assms characteristic_func_eq complement_morphism_eq by auto
+  then have "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c m\<^sup>c \<circ>\<^sub>c x'"
+    using assms comp_associative2 by (typecheck_cfuncs, smt terminal_func_comp terminal_func_type)
+  then have "\<t> \<circ>\<^sub>c id one = \<f> \<circ>\<^sub>c id one"
+    using assms by (metis cfunc_type_def comp_associative complement_morphism_type id_type one_unique_element terminal_func_comp terminal_func_type)
+  then have "\<t> = \<f>"
+    using false_func_type id_right_unit2 true_func_type by auto
+  then show False
+    using true_false_distinct by auto
+qed
 
 end
