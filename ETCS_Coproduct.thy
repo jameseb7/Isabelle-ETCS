@@ -1075,7 +1075,7 @@ lemma func_product_distribute_over_coproduct_left:
   "f \<times>\<^sub>f (g \<amalg> h) = (f \<times>\<^sub>f g) \<amalg> (f \<times>\<^sub>f h)"
   oops
 
-
+(* Proposition 2.4.5 *)
 definition into_super :: "cfunc \<Rightarrow> cfunc" where
   "into_super m = m \<amalg> m\<^sup>c"
 
@@ -1209,5 +1209,12 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, auto)
       by (rule_tac x="right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'" in exI, typecheck_cfuncs, auto)
   qed
 qed
+
+lemma into_super_iso:
+  assumes "monomorphism m" "m : X \<rightarrow> Y"
+  shows "isomorphism (into_super m)"
+  using assms epi_mon_is_iso into_super_epi into_super_mono by auto
+
+(* end of Proposition 2.4.5 *)
 
 end
