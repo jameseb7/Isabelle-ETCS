@@ -156,13 +156,12 @@ lemma regmono_is_mono: "regular_monomorphism(m) \<Longrightarrow> monomorphism(m
 
 (* Proposition 2.2.4 *)
 lemma mono_is_regmono:
-  assumes "m \<in> ETCS_func"
   shows "monomorphism(m) \<Longrightarrow> regular_monomorphism(m)"
   unfolding regular_monomorphism_def
 proof - 
   assume m_mono: "monomorphism(m)"
   then obtain \<chi> where chi_pullback: "is_pullback (domain(m)) one  (codomain(m)) \<Omega> (\<beta>\<^bsub>domain(m)\<^esub>) \<t> m \<chi> "
-    using assms cfunc_type_def characteristic_function_exists by blast
+    using cfunc_type_def characteristic_function_exists by blast
 
   have pullback: "\<And>k h Z. k : Z \<rightarrow> one \<and> h : Z \<rightarrow> codomain m \<and> \<t> \<circ>\<^sub>c k = \<chi> \<circ>\<^sub>c h \<longrightarrow>
      (\<exists>!j. j : Z \<rightarrow> domain m \<and> \<beta>\<^bsub>domain m\<^esub> \<circ>\<^sub>c j = k \<and> m \<circ>\<^sub>c j = h)"
@@ -176,7 +175,7 @@ proof -
     show chi_type: "\<chi> : codomain(m) \<rightarrow>  \<Omega>"
       using chi_pullback is_pullback_def square_commutes_def by auto
     show m_type: "m : domain m \<rightarrow> codomain m"
-      by (simp add: assms cfunc_type_def)
+      by (simp add: cfunc_type_def)
 
     have comm: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>domain m\<^esub> = \<chi> \<circ>\<^sub>c m"
       using chi_pullback unfolding is_pullback_def square_commutes_def by auto
@@ -201,7 +200,6 @@ qed
 
 (*Proposition 2.2.5*)
 lemma epi_mon_is_iso:
-  assumes "f \<in> ETCS_func"
   assumes "epimorphism(f)" "monomorphism(f)"
   shows "isomorphism(f)"
   using assms epi_regmon_is_iso mono_is_regmono by auto
