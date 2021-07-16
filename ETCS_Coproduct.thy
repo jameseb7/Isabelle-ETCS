@@ -1217,4 +1217,47 @@ lemma into_super_iso:
 
 (* end of Proposition 2.4.5 *)
 
+definition try_cast :: "cfunc \<Rightarrow> cfunc" where
+  "try_cast m = (THE m'. m' : (codomain m) \<rightarrow> (domain m) \<Coprod> ((codomain m) \<setminus> ((domain m),m))
+    \<and> m' \<circ>\<^sub>c into_super m = id ((domain m) \<Coprod> ((codomain m) \<setminus> ((domain m),m)))
+    \<and> into_super m \<circ>\<^sub>c m' = id (codomain m))"
+
+lemma try_cast_def2:
+  assumes "monomorphism m" "m : X \<rightarrow> Y"
+  shows "try_cast m : (codomain m) \<rightarrow> (domain m) \<Coprod> ((codomain m) \<setminus> ((domain m),m))
+    \<and> try_cast m \<circ>\<^sub>c into_super m = id ((domain m) \<Coprod> ((codomain m) \<setminus> ((domain m),m)))
+    \<and> into_super m \<circ>\<^sub>c try_cast m = id (codomain m)"
+  unfolding try_cast_def
+proof (rule theI', auto)
+  show "\<exists>x. x : codomain m \<rightarrow> domain m \<Coprod> (codomain m \<setminus> (domain m, m)) \<and>
+        x \<circ>\<^sub>c into_super m = id\<^sub>c (domain m \<Coprod> (codomain m \<setminus> (domain m, m))) \<and>
+        into_super m \<circ>\<^sub>c x = id\<^sub>c (codomain m)"
+    using assms into_super_iso cfunc_type_def into_super_type unfolding isomorphism_def by fastforce
+next
+  fix x y
+  assume x_type: "x : codomain m \<rightarrow> domain m \<Coprod> (codomain m \<setminus> (domain m, m))"
+  assume y_type: "y : codomain m \<rightarrow> domain m \<Coprod> (codomain m \<setminus> (domain m, m))"
+  assume "into_super m \<circ>\<^sub>c x = id\<^sub>c (codomain m)" and "into_super m \<circ>\<^sub>c y = id\<^sub>c (codomain m)"
+  then have "into_super m \<circ>\<^sub>c x = into_super m \<circ>\<^sub>c y"
+    by auto
+  then show "x = y"
+    using into_super_mono unfolding monomorphism_def
+    by (metis assms(1) cfunc_type_def into_super_type monomorphism_def x_type y_type)
+qed
+
+lemma try_cast_type[type_rule]:
+  assumes "monomorphism m" "m : X \<rightarrow> Y"
+  shows "try_cast m : Y \<rightarrow> X \<Coprod> (Y \<setminus> (X,m))"
+  using assms cfunc_type_def try_cast_def2 by auto 
+
+lemma try_cast_into_super:
+  assumes "monomorphism m" "m : X \<rightarrow> Y"
+  shows "try_cast m \<circ>\<^sub>c into_super m = id (X \<Coprod> (Y \<setminus> (X,m)))"
+  using assms cfunc_type_def try_cast_def2 by auto
+
+lemma into_super_try_cast:
+  assumes "monomorphism m" "m : X \<rightarrow> Y"
+  shows "into_super m \<circ>\<^sub>c  try_cast m = id Y"
+  using assms cfunc_type_def try_cast_def2 by auto
+
 end
