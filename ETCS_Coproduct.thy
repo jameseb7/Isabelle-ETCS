@@ -1076,8 +1076,109 @@ lemma func_product_distribute_over_coproduct_left:
   oops
 
 
+definition into_super :: "cfunc \<Rightarrow> cfunc" where
+  "into_super m = m \<amalg> m\<^sup>c"
 
+lemma into_super_type[type_rule]:
+  "monomorphism m \<Longrightarrow> m : X \<rightarrow> Y \<Longrightarrow> into_super m : X \<Coprod> (Y \<setminus> (X,m)) \<rightarrow> Y"
+  unfolding into_super_def by typecheck_cfuncs
 
+lemma into_super_mono:
+  assumes "monomorphism m" "m : X \<rightarrow> Y"
+  shows "monomorphism (into_super m)"
+proof -
+  have "injective (into_super m)"
+    unfolding injective_def
+  proof auto
+    fix x y
+    assume "x \<in>\<^sub>c domain (into_super m)"
+    then have x_type: "x \<in>\<^sub>c X \<Coprod> (Y \<setminus> (X,m))"
+      using assms cfunc_type_def into_super_type by auto
+    
+    assume "y \<in>\<^sub>c domain (into_super m)"
+    then have y_type: "y \<in>\<^sub>c X \<Coprod> (Y \<setminus> (X,m))"
+      using assms cfunc_type_def into_super_type by auto
 
-         
+    assume into_super_eq: "into_super m \<circ>\<^sub>c x = into_super m \<circ>\<^sub>c y"
+
+    have x_cases: "(\<exists> x'. (x' \<in>\<^sub>c X \<and> x = (left_coproj X (Y \<setminus> (X,m))) \<circ>\<^sub>c x'))
+      \<or>  (\<exists> x'. (x' \<in>\<^sub>c Y \<setminus> (X,m) \<and> x = (right_coproj X (Y \<setminus> (X,m))) \<circ>\<^sub>c x'))"
+      by (simp add: coprojs_jointly_surj x_type)
+
+    have y_cases: "(\<exists> y'. (y' \<in>\<^sub>c X \<and> y = (left_coproj X (Y \<setminus> (X,m))) \<circ>\<^sub>c y'))
+      \<or>  (\<exists> y'. (y' \<in>\<^sub>c Y \<setminus> (X,m) \<and> y = (right_coproj X (Y \<setminus> (X,m))) \<circ>\<^sub>c y'))"
+      by (simp add: coprojs_jointly_surj y_type)
+
+    show "x = y"
+      using x_cases y_cases
+    proof auto
+      fix x' y'
+      assume x'_type: "x' \<in>\<^sub>c X" and x_def: "x = left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'"
+      assume y'_type: "y' \<in>\<^sub>c X" and y_def: "y = left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+
+      have "into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x' = into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+        using into_super_eq unfolding x_def y_def by auto
+      then have "(into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X, m))) \<circ>\<^sub>c x' = (into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X, m))) \<circ>\<^sub>c y'"
+        using assms x'_type y'_type comp_associative2 by (typecheck_cfuncs, auto)
+      then have "m \<circ>\<^sub>c x' = m \<circ>\<^sub>c y'"
+        using assms unfolding into_super_def
+        by (simp add: complement_morphism_type left_coproj_cfunc_coprod)
+      then have "x' = y'"
+        using assms cfunc_type_def monomorphism_def x'_type y'_type by auto
+      then show "left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x' = left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+        by simp
+    next
+      fix x' y'
+      assume x'_type: "x' \<in>\<^sub>c X" and x_def: "x = left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'"
+      assume y'_type: "y' \<in>\<^sub>c Y \<setminus> (X, m)" and y_def: "y = right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+
+      have "into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x' = into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+        using into_super_eq unfolding x_def y_def by auto
+      then have "(into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X, m))) \<circ>\<^sub>c x' = (into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X, m))) \<circ>\<^sub>c y'"
+        using assms x'_type y'_type comp_associative2 by (typecheck_cfuncs, auto)
+      then have "m \<circ>\<^sub>c x' = m\<^sup>c \<circ>\<^sub>c y'"
+        using assms unfolding into_super_def
+        by (simp add: complement_morphism_type left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
+      then have False
+        using assms(1) assms(2) complement_disjoint x'_type y'_type by blast
+      then show "left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x' = right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+        by auto
+    next
+      fix x' y'
+      assume x'_type: "x' \<in>\<^sub>c Y \<setminus> (X, m)" and x_def: "x = right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'"
+      assume y'_type: "y' \<in>\<^sub>c X" and y_def: "y = left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+
+      have "into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x' = into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+        using into_super_eq unfolding x_def y_def by auto
+      then have "(into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X, m))) \<circ>\<^sub>c x' = (into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X, m))) \<circ>\<^sub>c y'"
+        using assms x'_type y'_type comp_associative2 by (typecheck_cfuncs, auto)
+      then have "m\<^sup>c \<circ>\<^sub>c x' = m \<circ>\<^sub>c y'"
+        using assms unfolding into_super_def
+        by (simp add: complement_morphism_type left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
+      then have False
+        using assms(1) assms(2) complement_disjoint x'_type y'_type by fastforce
+      then show "right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x' = left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+        by auto
+    next
+      fix x' y'
+      assume x'_type: "x' \<in>\<^sub>c Y \<setminus> (X, m)" and x_def: "x = right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'"
+      assume y'_type: "y' \<in>\<^sub>c Y \<setminus> (X, m)" and y_def: "y = right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+
+      have "into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x' = into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+        using into_super_eq unfolding x_def y_def by auto
+      then have "(into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X, m))) \<circ>\<^sub>c x' = (into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X, m))) \<circ>\<^sub>c y'"
+        using assms x'_type y'_type comp_associative2 by (typecheck_cfuncs, auto)
+      then have "m\<^sup>c \<circ>\<^sub>c x' = m\<^sup>c \<circ>\<^sub>c y'"
+        using assms unfolding into_super_def
+        by (simp add: complement_morphism_type right_coproj_cfunc_coprod)
+      then have "x' = y'"
+        using assms complement_morphism_mono complement_morphism_type monomorphism_def2 x'_type y'_type by blast
+      then show "right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x' = right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c y'"
+        by simp
+    qed
+  qed
+  then show "monomorphism (into_super m)"
+    using injective_imp_monomorphism by blast
+qed
+
 end
