@@ -1,5 +1,5 @@
 theory ETCS_Comparison
-  imports ETCS_Quantifier ETCS_Add
+  imports ETCS_Quantifier ETCS_Add 
 begin
 
 definition leq :: "cfunc" where
@@ -733,8 +733,6 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<cir
     using OR_true_implies_one_is_true cfunc_prod_type comp_type leq_type m_type n_type by blast
     
 qed
-
-
 
 
 end

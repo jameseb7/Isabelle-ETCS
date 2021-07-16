@@ -2096,183 +2096,37 @@ lemma mult_cancellative:
   using assms mult_cancellative_contrapositve nonzero_is_succ by blast
 
 
+lemma mult_monotonic:
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and u_type: "u \<in>\<^sub>c \<nat>\<^sub>c" and v_type: "v \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes m_leq_n: "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>" 
+  assumes u_leq_v: "leq \<circ>\<^sub>c \<langle>u, v\<rangle> = \<t>" 
+  shows "leq \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> u, n \<cdot>\<^sub>\<nat> v\<rangle> = \<t>"
+proof - 
+  obtain k where k_def: "k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> m = n"
+    using leq_true_implies_exists m_leq_n m_type n_type by auto
+  obtain j where j_def:  "j \<in>\<^sub>c \<nat>\<^sub>c \<and> j +\<^sub>\<nat> u = v"
+    using leq_true_implies_exists u_leq_v u_type v_type by auto
+  have "n \<cdot>\<^sub>\<nat> v = (k +\<^sub>\<nat> m) \<cdot>\<^sub>\<nat> (j +\<^sub>\<nat> u)"
+    by (simp add: j_def k_def)
+  also have "... = ((k +\<^sub>\<nat> m)\<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> ((k +\<^sub>\<nat> m)\<cdot>\<^sub>\<nat> u)"
+    using j_def k_def mult_right_distributivity n_type u_type by blast
+  also have "... = ((k \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (k \<cdot>\<^sub>\<nat> u)) +\<^sub>\<nat> ((m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> u))"
+    by (typecheck_cfuncs, metis j_def k_def m_type mult_Left_Distributivity mult_right_distributivity u_type v_type)
+  also have "... = ((k \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (k \<cdot>\<^sub>\<nat> u) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> j)) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> u)" 
+    by (typecheck_cfuncs, simp add: add_associates j_def k_def m_type u_type)
+  then show "leq \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> u, n \<cdot>\<^sub>\<nat> v\<rangle> = \<t>"
+    by (metis add_type calculation exists_implies_leq_true j_def k_def m_type mult_closure u_type)
+qed
 
-(*
-lemma mult2_cancellative:  
-  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" 
-  shows "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor\<rangle>\<rangle>
-    = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
 
-  show type1: "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by (meson assms cfunc_prod_type comp_type eq_pred_type mult2_type successor_type terminal_func_type)
-  show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    using assms by typecheck_cfuncs
-  show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-    by (simp add: id_type)
-  show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero = 
-        (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
-  proof- 
-    have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero = 
-           eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> \<circ>\<^sub>c zero"
-                using assms by (typecheck_cfuncs, simp add: comp_associative2)    
-    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> ,successor \<rangle> \<circ>\<^sub>c zero,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> ,successor\<rangle> \<circ>\<^sub>c zero\<rangle>"
-        using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
-    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c zero ,successor  \<circ>\<^sub>c zero  \<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero  ,successor  \<circ>\<^sub>c zero\<rangle>\<rangle>"
-      by (typecheck_cfuncs, smt assms cfunc_prod_comp cfunc_type_def comp_associative)
-    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a ,successor  \<circ>\<^sub>c zero  \<rangle>,mult2 \<circ>\<^sub>c \<langle>b,successor  \<circ>\<^sub>c zero\<rangle>\<rangle>"
-      by (typecheck_cfuncs, metis assms id_right_unit2 id_type terminal_func_unique)
-    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(a \<cdot>\<^sub>\<nat>(successor  \<circ>\<^sub>c zero)) ,(b \<cdot>\<^sub>\<nat>(successor  \<circ>\<^sub>c zero))\<rangle>"
-      by (simp add: mult_def)
-    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a, b\<rangle>"
-      by (simp add: assms s0_is_right_id)
-    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c zero, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c zero\<rangle>"
-      by (typecheck_cfuncs, metis assms id_right_unit2 id_type terminal_func_unique)
-    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero"
-      by (typecheck_cfuncs, smt assms cfunc_prod_comp comp_associative2)
-    also have "... = (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
-      using assms by (typecheck_cfuncs, simp add: comp_associative2)    
-    then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero = 
-        (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
-      by (simp add: calculation)
-  qed
-  show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor =
-    id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>"
-  proof(rule one_separator[where X ="\<nat>\<^sub>c", where Y = "\<Omega>"] )
-    show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      using comp_type successor_type type1 by blast
-    show "id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      using id_left_unit2 type1 by auto
-    show "\<And>x. x \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
-         ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c x = (id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c x"
-    proof - 
-      fix x 
-      assume x_type: "x \<in>\<^sub>c \<nat>\<^sub>c"
-      then have sx_type: "successor \<circ>\<^sub>c x \<in>\<^sub>c \<nat>\<^sub>c"
-        by typecheck_cfuncs
 
-      have "((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c x = 
-            (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c x"
-                using x_type assms  by (typecheck_cfuncs, simp add: comp_associative2)    
-      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c x)"
-                using sx_type  assms  by (typecheck_cfuncs, simp add: comp_associative2)    
-      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c x) ,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c x)\<rangle>"
-        by (typecheck_cfuncs, smt assms(1) assms(2) cfunc_prod_comp comp_associative2 x_type)
-      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c (successor \<circ>\<^sub>c x),successor \<circ>\<^sub>c (successor \<circ>\<^sub>c x)\<rangle>  ,mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c (successor \<circ>\<^sub>c x),successor \<circ>\<^sub>c (successor \<circ>\<^sub>c x) \<rangle>\<rangle>"
-        by (typecheck_cfuncs, smt assms(1) assms(2) cfunc_prod_comp comp_associative2 x_type)
-      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c (successor \<circ>\<^sub>c x)\<rangle>  ,mult2 \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c (successor \<circ>\<^sub>c x) \<rangle>\<rangle>"
-        using assms beta_N_succ_mEqs_Id1 id_right_unit2 x_type by (typecheck_cfuncs, auto)
-      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c x\<rangle>  ,mult2 \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c  x \<rangle>\<rangle>"
-      proof(cases "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c x\<rangle>  ,mult2 \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c  x \<rangle>\<rangle> = \<t>", auto)
-        assume is_true: "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c x\<rangle>,mult2 \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c x\<rangle>\<rangle> = \<t>"
-        have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c x),b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c x)\<rangle> = \<t>"
-          by (simp add: is_true mult_def)
-        then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<cdot>\<^sub>\<nat> (successor  \<circ>\<^sub>c (successor \<circ>\<^sub>c x)),b \<cdot>\<^sub>\<nat> (successor  \<circ>\<^sub>c (successor \<circ>\<^sub>c x))\<rangle> = \<t>"
-          oops
-*)
 
-(*
-lemma mult_cancellative:
-  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c) = b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c)) = (a = b)"
-  oops 
-*)
-  
 
-(*
 
-lemma mult_cancellative:
-  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "c \<noteq> zero"
-  shows "(a \<cdot>\<^sub>\<nat> c = b \<cdot>\<^sub>\<nat> c) = (a = b)"
-proof -
-  have "OR \<circ>\<^sub>c \<langle>
-        NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>
-      = OR \<circ>\<^sub>c \<langle>eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>, eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>"
-  proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
-    show "OR \<circ>\<^sub>c \<langle>
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>
-      : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      using assms by typecheck_cfuncs
-    show "OR \<circ>\<^sub>c \<langle>eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      using assms by typecheck_cfuncs
-    show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-      using id_type by auto
 
-    show "(OR \<circ>\<^sub>c \<langle>
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero
-      = (OR \<circ>\<^sub>c \<langle>eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero"
-    proof -
-      have "(OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero
-        = OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero, id \<nat>\<^sub>c \<circ>\<^sub>c zero\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero, id \<nat>\<^sub>c \<circ>\<^sub>c zero\<rangle>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c zero, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero\<rangle>\<rangle>"
-        using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
-      also have "... = OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a, zero\<rangle>, mult2 \<circ>\<^sub>c \<langle>b, zero\<rangle>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, zero\<rangle>\<rangle>"
-        using assms by (typecheck_cfuncs, smt id_left_unit2 id_right_unit2 id_type one_unique_element)
-      also have "... = OR \<circ>\<^sub>c \<langle>eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a, zero\<rangle>, mult2 \<circ>\<^sub>c \<langle>b, zero\<rangle>\<rangle>, \<t>\<rangle>"
-        using eq_pred_iff_eq zero_type by fastforce
-      also have "... = \<t>"
-        using assms OR_true_right_is_true by (typecheck_cfuncs, auto)
-      also have "... = OR \<circ>\<^sub>c \<langle>eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a, b\<rangle>, \<t>\<rangle>"
-        using assms OR_true_right_is_true by (typecheck_cfuncs, auto)
-      also have "... = OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, zero\<rangle>\<rangle>"
-        using assms by (typecheck_cfuncs, metis OR_true_right_is_true eq_pred_iff_eq)
-      also have "... = OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c zero, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero\<rangle>\<rangle>"
-        using assms by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 id_type terminal_func_unique)
-      also have "... = (OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero"
-        using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
-      also show ?thesis
-        using calculation by auto
-    qed
 
-    show "(OR \<circ>\<^sub>c \<langle>
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c successor
-      = id\<^sub>c \<Omega> \<circ>\<^sub>c (OR \<circ>\<^sub>c \<langle>
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-        eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>)"
-    proof -
-      have "(OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c successor
-        = OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>
-            mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor, id \<nat>\<^sub>c \<circ>\<^sub>c successor\<rangle>,
-            mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor, id \<nat>\<^sub>c \<circ>\<^sub>c successor\<rangle>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c successor, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor\<rangle>\<rangle>"
-        using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
-      also have "... = OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor\<rangle>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>"
-        using assms by (typecheck_cfuncs, metis id_left_unit2 terminal_func_unique)
-      also have "... = OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>
-            add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-            add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>"
-        using assms by (typecheck_cfuncs, simp add: mult2_respects_succ_right)
-      also have "... = OR \<circ>\<^sub>c \<langle>
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, mult2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>, 
-          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>"
-        using assms apply typecheck_cfuncs
 
-  show "a = b \<Longrightarrow> a \<cdot>\<^sub>\<nat> c = b \<cdot>\<^sub>\<nat> c"
-    by auto
-  oops
-  *)
-    
+
+
 
 end
