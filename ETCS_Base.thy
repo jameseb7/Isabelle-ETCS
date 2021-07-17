@@ -186,13 +186,14 @@ ML \<open>fun extract_prems ((@{term Trueprop}) $ P) = extract_prems P
 ML \<open>fun typecheck_cfuncs_subproof ctxt type_rules subgoal n (focus : Subgoal.focus) = 
           let val type_rules' = type_rules @ (#prems focus) @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
               val lems = construct_cfunc_type_lemmas ctxt type_rules' subgoal
-          in Method.insert_tac ctxt lems n THEN asm_full_simp_tac ctxt n
+          in Method.insert_tac ctxt lems n
           end\<close>
 
 (* typecheck_cfuncs_subtac implements a tactic that generates cfunc type facts as assumptions of a goal,
   in the right format to be passed to the SUBGOAL combinator *)
 ML \<open>fun typecheck_cfuncs_subtac ctxt type_rules (subgoal, n) = 
-          Subgoal.FOCUS (typecheck_cfuncs_subproof ctxt type_rules subgoal n) ctxt n\<close>
+          Subgoal.FOCUS (typecheck_cfuncs_subproof ctxt type_rules subgoal n) ctxt n
+          THEN asm_full_simp_tac ctxt n\<close>
 
 (* typecheck_cfuncs_tac lifts typecheck_cfuncs_subproof to a tactic
   that generates cfunc type facts as assumptions of a specified goal *)

@@ -1195,7 +1195,7 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, auto)
       by (unfold relative_member_def2, auto, unfold factors_through_def2, auto)
     then show "\<exists>x. x \<in>\<^sub>c domain (into_super m) \<and> into_super m \<circ>\<^sub>c x = y"
       unfolding into_super_def using assms cfunc_type_def comp_associative left_coproj_cfunc_coprod
-      by (rule_tac x="left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x" in exI, typecheck_cfuncs, auto)
+      by (rule_tac x="left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x" in exI, typecheck_cfuncs)
   next
     assume "characteristic_func m \<circ>\<^sub>c y = \<f>"
     then have "\<not> y \<in>\<^bsub>Y\<^esub> (X, m)"
@@ -1206,7 +1206,7 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, auto)
       by (unfold relative_member_def2, auto, unfold factors_through_def2, auto)
     then show "\<exists>x. x \<in>\<^sub>c domain (into_super m) \<and> into_super m \<circ>\<^sub>c x = y"
       unfolding into_super_def using assms cfunc_type_def comp_associative right_coproj_cfunc_coprod
-      by (rule_tac x="right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'" in exI, typecheck_cfuncs, auto)
+      by (rule_tac x="right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'" in exI, typecheck_cfuncs)
   qed
 qed
 
