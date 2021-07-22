@@ -298,7 +298,6 @@ proof auto
   show "m \<circ>\<^sub>c right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m =
       f \<circ>\<^sub>c left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m"
     using assms inverse_image_mapping_eq by auto
-
 next
   fix Z k h
   assume k_type: "k : Z \<rightarrow> B" and h_type: "h : Z \<rightarrow> X"
@@ -384,10 +383,50 @@ qed
 
 (* Proposition 2.1.41 *)
 lemma in_inverse_image:
-  assumes "f : X \<rightarrow> Y" "(B,m) \<subseteq>\<^sub>c Y"
- (* assumes "x \<in>\<^sub>c X" *)
-  shows "(x \<in>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)) = (f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B,m))"
-  oops
+  assumes "f : X \<rightarrow> Y" "(B,m) \<subseteq>\<^sub>c Y" "x \<in>\<^sub>c X"
+  shows "(x \<in>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m)) = (f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B,m))"
+proof
+  have m_type: "m : B \<rightarrow> Y" "monomorphism m"
+    using assms(2) unfolding subobject_of_def2 by auto
+
+  assume "x \<in>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m)"
+  then obtain h where h_type: "h \<in>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
+      and h_def: "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c h = x"
+    unfolding relative_member_def2 factors_through_def by (auto simp add: cfunc_type_def)
+  then have "f \<circ>\<^sub>c x = f \<circ>\<^sub>c left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m \<circ>\<^sub>c h"
+    using assms m_type by (typecheck_cfuncs, simp add: comp_associative2 h_def)
+  then have "f \<circ>\<^sub>c x = (f \<circ>\<^sub>c left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c h"
+    using assms m_type h_type h_def comp_associative2 by (typecheck_cfuncs, blast)
+  then have "f \<circ>\<^sub>c x = (m \<circ>\<^sub>c right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c h"
+    using assms h_type m_type by (typecheck_cfuncs, simp add: inverse_image_mapping_eq m_type)
+  then have "f \<circ>\<^sub>c x = m \<circ>\<^sub>c right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m \<circ>\<^sub>c h"
+    using assms m_type h_type by (typecheck_cfuncs, smt cfunc_type_def comp_associative domain_comp)
+  then have "(f \<circ>\<^sub>c x) factorsthru m"
+    unfolding factors_through_def using assms h_type m_type
+    by (rule_tac x="right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m \<circ>\<^sub>c h" in exI,
+        typecheck_cfuncs, auto simp add: cfunc_type_def)
+  then show "f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B, m)"
+    unfolding relative_member_def2 using assms m_type by (typecheck_cfuncs, auto)
+next
+  have m_type: "m : B \<rightarrow> Y" "monomorphism m"
+    using assms(2) unfolding subobject_of_def2 by auto
+
+  assume "f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B, m)"
+  then have "\<exists>h. h : domain (f \<circ>\<^sub>c x) \<rightarrow> domain m \<and> m \<circ>\<^sub>c h = f \<circ>\<^sub>c x"
+    unfolding relative_member_def2 factors_through_def by auto
+  then obtain h where h_type: "h \<in>\<^sub>c B" and h_def: "m \<circ>\<^sub>c h = f \<circ>\<^sub>c x"
+    unfolding relative_member_def2 factors_through_def 
+    using assms cfunc_type_def domain_comp m_type by auto
+  then have "\<exists>j. j \<in>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and>
+         (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h \<and>
+         (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = x"
+    using inverse_image_pullback assms m_type unfolding is_pullback_def by blast
+  then have "x factorsthru (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m)"
+    using m_type assms cfunc_type_def by (typecheck_cfuncs, unfold factors_through_def, auto)
+  then show "x \<in>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m)"
+    unfolding relative_member_def2 using m_type assms
+    by (typecheck_cfuncs, simp add: inverse_image_monomorphism)
+qed
 
 (* Definition 2.1.42 *)
 definition fibered_product :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" ("_ \<^bsub>_\<^esub>\<times>\<^sub>c\<^bsub>_\<^esub> _" [66,66,65,65]65) where
