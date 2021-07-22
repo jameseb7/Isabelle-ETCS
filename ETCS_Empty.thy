@@ -12,8 +12,23 @@ where
   initial_func_unique: "h : \<emptyset> \<rightarrow> X \<Longrightarrow> h = initial_func X" and
   emptyset_is_empty: "\<not>(x \<in>\<^sub>c \<emptyset>)"
 
+
 (*characteristic_function_exists:
     "\<forall> X m. ((m : B \<rightarrow> X) \<and> monomorphism(m)) \<longrightarrow> (\<exists>! \<chi>. is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi> )"*)
+
+definition initial_object :: "cset \<Rightarrow> bool" where
+  "initial_object(X) \<longleftrightarrow> (\<forall> Y. \<exists>! f. f : X \<rightarrow> Y)"
+
+
+lemma emptyset_is_initial:
+  "initial_object(\<emptyset>)"
+  using initial_func_type initial_func_unique initial_object_def by blast
+
+lemma initial_iso_empty:
+  assumes "initial_object(X)"
+  shows "X \<cong> \<emptyset>"
+  by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso initial_object_def injective_def injective_imp_monomorphism is_isomorphic_def singletonI surjective_def surjective_is_epimorphism)
+
 
 
 (* Exercise 2.4.6 *)
@@ -66,6 +81,8 @@ lemma function_to_empty_is_iso:
   by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso injective_def injective_imp_monomorphism singletonI surjective_def surjective_is_epimorphism)
 
 
+
+
 lemma zero_times_X:
   "\<emptyset> \<times>\<^sub>c X \<cong> \<emptyset>"
   using cfunc_type_def function_to_empty_is_iso is_isomorphic_def left_cart_proj_type by blast
@@ -73,6 +90,10 @@ lemma zero_times_X:
 lemma X_times_zero: 
   "X \<times>\<^sub>c \<emptyset> \<cong> \<emptyset>"
   using cfunc_type_def function_to_empty_is_iso is_isomorphic_def right_cart_proj_type by blast
+
+
+
+
 
 (* Proposition  2.4.8 *)
 lemma no_el_iff_iso_0:
@@ -102,11 +123,18 @@ next
     using f_type is_isomorphic_def isomorphic_is_symmetric by blast
 qed
 
+lemma iso_empty_initial:
+  assumes "X \<cong> \<emptyset>"
+  shows "initial_object(X)"
+  unfolding initial_object_def
+  by (meson assms comp_type is_isomorphic_def isomorphic_is_symmetric isomorphic_is_transitive no_el_iff_iso_0 nonempty_def one_separator terminal_func_type)
+ 
+
 lemma function_to_empty_set_is_iso:
   assumes "f: X \<rightarrow> Y"
   assumes "\<not>(nonempty(Y))"
   shows "isomorphism(f)"
-  by (metis assms(1) assms(2) cfunc_type_def comp_type epi_mon_is_iso injective_def injective_imp_monomorphism nonempty_def singletonI surjective_def surjective_is_epimorphism)
+  by (metis assms cfunc_type_def comp_type epi_mon_is_iso injective_def injective_imp_monomorphism nonempty_def singletonI surjective_def surjective_is_epimorphism)
   
 
 
@@ -122,6 +150,7 @@ lemma prod_iso_to_empty_left:
   shows "\<not>(nonempty(X))"
   using assms prod_iso_to_empty_right by blast
 
+ 
 
 
 lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>c X"

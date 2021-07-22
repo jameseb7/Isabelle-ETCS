@@ -302,6 +302,8 @@ lemma char_of_singleton4:
 
 
 
+
+
 (*Proposition 2.4.3*)
 lemma coprojs_jointly_surj:
   assumes "z \<in>\<^sub>c X \<Coprod> Y"

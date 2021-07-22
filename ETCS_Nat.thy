@@ -507,10 +507,10 @@ lemma NxN_is_countable:
   oops
 
 
-(*Once we have this result above we can generalize it to any countable sets*)
-(*Try proving it in one step if possible... otherwise use the mostly complete code below*)
+(*Once we have this  result above we can generalize it to any countable sets*)
 lemma product_of_countables_is_countable:
   assumes "countable X" "countable Y"
+  assumes NxN_is_countable: "countable(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)" (*DELETE later*)
   shows "countable(X \<times>\<^sub>c Y)"
 proof - 
   have "\<exists>f. f: X \<rightarrow> \<nat>\<^sub>c \<and> monomorphism(f)"
@@ -526,7 +526,14 @@ proof -
   have fg_mono: "monomorphism(f \<times>\<^sub>f g)"
     using cfunc_cross_prod_mono f_def g_def by blast
   obtain \<phi> where \<phi>_def: "(\<phi> : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> \<nat>\<^sub>c) \<and> monomorphism(\<phi>)"
-    oops  (*This follows from the fact that NxN is countable.*)
+    using NxN_is_countable countable_def by blast
+  have "(\<phi> \<circ>\<^sub>c (f \<times>\<^sub>f g) : (X \<times>\<^sub>c Y) \<rightarrow> \<nat>\<^sub>c) \<and> monomorphism(\<phi> \<circ>\<^sub>c (f \<times>\<^sub>f g))"
+    using \<phi>_def cfunc_type_def comp_type composition_of_monic_pair_is_monic fg_mono fg_type by auto
+  then show "countable(X \<times>\<^sub>c Y)"
+    using countable_def by blast
+qed
+
+      
 
 
 lemma NuN_is_countable:

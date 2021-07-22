@@ -2095,6 +2095,13 @@ lemma mult_cancellative:
   shows  "(a \<cdot>\<^sub>\<nat> c = b \<cdot>\<^sub>\<nat> c) = (a = b)"
   using assms mult_cancellative_contrapositve nonzero_is_succ by blast
 
+lemma l_mult_cancellative:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "c \<noteq> zero"
+  shows  "(c \<cdot>\<^sub>\<nat> a = c \<cdot>\<^sub>\<nat> b) = (a = b)"
+  by (metis assms mult_cancellative_contrapositve mult_commutative nonzero_is_succ)
+
+
+
 
 lemma mult_monotonic:
   assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and u_type: "u \<in>\<^sub>c \<nat>\<^sub>c" and v_type: "v \<in>\<^sub>c \<nat>\<^sub>c"
@@ -2118,14 +2125,78 @@ proof -
     by (metis add_type calculation exists_implies_leq_true j_def k_def m_type mult_closure u_type)
 qed
 
+lemma equal_sqrs_equal: 
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes eq_sqr: "m \<cdot>\<^sub>\<nat> m = n \<cdot>\<^sub>\<nat> n"
+  shows "m = n"
+proof(rule ccontr)
+  assume "m \<noteq> n"
+  show False
+  proof(cases "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>")
+    assume "leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>"
+    have mm_leq_mn: "leq \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> m, m \<cdot>\<^sub>\<nat> n\<rangle> = \<t>"
+      using \<open>leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>\<close> lqe_connexity m_type mult_monotonic n_type by blast
+    have mn_leq_nn: "leq \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> n, n \<cdot>\<^sub>\<nat> n\<rangle> = \<t>"
+      using \<open>leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>\<close> lqe_connexity m_type mult_monotonic n_type by blast
+    have mn_neq_nn: "m \<cdot>\<^sub>\<nat> n \<noteq> n \<cdot>\<^sub>\<nat> n"
+      using \<open>leq \<circ>\<^sub>c \<langle>m,n\<rangle> = \<t>\<close> \<open>m \<noteq> n\<close> lqe_antisymmetry m_type mult_cancellative n_type zero_is_smallest by blast
+    have "m \<cdot>\<^sub>\<nat> n \<noteq> m \<cdot>\<^sub>\<nat> n"
+      using eq_sqr lqe_antisymmetry m_type mm_leq_mn mn_leq_nn mn_neq_nn mult_closure n_type by auto
+    then show False
+      by simp
+  next
+    assume "leq \<circ>\<^sub>c \<langle>m,n\<rangle> \<noteq> \<t>"
+    then have "leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<t>"
+      using lqe_connexity m_type n_type by blast
+    have mm_leq_mn: "leq \<circ>\<^sub>c \<langle>n \<cdot>\<^sub>\<nat> n, n \<cdot>\<^sub>\<nat> m\<rangle> = \<t>"
+      using \<open>leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<t>\<close> lqe_connexity m_type mult_monotonic n_type by blast
+    have mn_leq_nn: "leq \<circ>\<^sub>c \<langle>n \<cdot>\<^sub>\<nat> m, m \<cdot>\<^sub>\<nat> m\<rangle> = \<t>"
+      using \<open>leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<t>\<close> lqe_connexity m_type mult_monotonic n_type by blast
+    have mn_neq_nn: "n \<cdot>\<^sub>\<nat> m \<noteq> m \<cdot>\<^sub>\<nat> m"
+      using \<open>leq \<circ>\<^sub>c \<langle>n,m\<rangle> = \<t>\<close> \<open>m \<noteq> n\<close> lqe_antisymmetry m_type mult_cancellative n_type zero_is_smallest by blast
+    have "n \<cdot>\<^sub>\<nat> m \<noteq> n \<cdot>\<^sub>\<nat> m"
+      using eq_sqr lqe_antisymmetry m_type mm_leq_mn mn_leq_nn mn_neq_nn mult_closure n_type by auto
+    then show False
+      by simp
+  qed
+qed
 
+lemma mult_leq_cancellative: 
+  assumes n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and u_type: "u \<in>\<^sub>c \<nat>\<^sub>c" and v_type: "v \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes n_nonzer: "n \<noteq> zero"
+  assumes nu_leq_nv: "leq \<circ>\<^sub>c \<langle>n \<cdot>\<^sub>\<nat> u, n \<cdot>\<^sub>\<nat> v\<rangle> = \<t>"
+  shows "leq \<circ>\<^sub>c \<langle>u, v\<rangle> = \<t>"
+proof(cases "u=v")
+  show "u = v \<Longrightarrow> leq \<circ>\<^sub>c \<langle>u,v\<rangle> = \<t>"
+    using lqe_connexity v_type by blast
+next 
+  assume neq: "u \<noteq> v" 
+  show "leq \<circ>\<^sub>c \<langle>u,v\<rangle> = \<t>"
+  proof(rule ccontr)
+    assume "leq \<circ>\<^sub>c \<langle>u,v\<rangle> \<noteq> \<t>"
+    then have "leq \<circ>\<^sub>c \<langle>v,u\<rangle> = \<t>"
+      using lqe_connexity u_type v_type by blast
+    then have "leq \<circ>\<^sub>c \<langle>n \<cdot>\<^sub>\<nat> v,n \<cdot>\<^sub>\<nat> u\<rangle> = \<t>"
+      using lqe_connexity mult_monotonic n_type u_type v_type by blast
+    then have "n \<cdot>\<^sub>\<nat> v = n \<cdot>\<^sub>\<nat> u"
+      by (simp add: lqe_antisymmetry mult_closure n_type nu_leq_nv u_type v_type)
+    then have "v = u"
+      using l_mult_cancellative n_nonzer n_type u_type v_type by blast
+    then show False
+      using neq by blast
+  qed
+qed
 
-
-
-
-
-
-
+(*
+lemma mult_monotonic_converse:
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and u_type: "u \<in>\<^sub>c \<nat>\<^sub>c" and v_type: "v \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes m_nonzero: "m \<noteq> zero"
+  assumes m_leq_n: "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>" 
+  assumes mu_leq_nv: "leq \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> u, n \<cdot>\<^sub>\<nat> v\<rangle> = \<t>"
+  shows u_leq_v: "leq \<circ>\<^sub>c \<langle>u, v\<rangle> = \<t>"
+(*NOT TRUE*) 
+ 3 < 5 and 3*6 < 4*5 as 18 < 20 nevertheless it is false that 6<5.
+*)
 
 
 
