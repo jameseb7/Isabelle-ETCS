@@ -299,27 +299,55 @@ proof auto
       f \<circ>\<^sub>c left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m"
     using assms inverse_image_mapping_eq by auto
 
-  show "\<And>Z k h.  k : Z \<rightarrow> B \<Longrightarrow> h : Z \<rightarrow> X \<Longrightarrow> m \<circ>\<^sub>c k = f \<circ>\<^sub>c h \<Longrightarrow>
-       \<exists>j. j : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and>
-           (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = k \<and>
-           (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h"
-  proof -
-    fix Z k h
-    assume k_type: "k : Z \<rightarrow> B" and h_type: "h : Z \<rightarrow> X"
-    assume mk_eq_fh: "m \<circ>\<^sub>c k = f \<circ>\<^sub>c h"
+next
+  fix Z k h
+  assume k_type: "k : Z \<rightarrow> B" and h_type: "h : Z \<rightarrow> X"
+  assume mk_eq_fh: "m \<circ>\<^sub>c k = f \<circ>\<^sub>c h"
 
-    have "equalizer (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) (inverse_image_mapping f B m) (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B )"
-      using assms inverse_image_is_equalizer2 by blast
-    then have "\<forall>h F. h : F \<rightarrow> (X \<times>\<^sub>c B) 
-              \<and> (f \<circ>\<^sub>c left_cart_proj X B) \<circ>\<^sub>c h = (m \<circ>\<^sub>c right_cart_proj X B) \<circ>\<^sub>c h \<longrightarrow>
-            (\<exists>!k. k : F \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and> inverse_image_mapping f B m \<circ>\<^sub>c k = h)"
-      unfolding equalizer_def using assms(2) cfunc_type_def domain_comp left_cart_proj_type by auto 
-    show "\<exists>j. j : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and>
-           (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = k \<and>
-           (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h"
-      apply typecheck_cfuncs
-      oops
-      
+  have "equalizer (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) (inverse_image_mapping f B m) (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B )"
+    using assms inverse_image_is_equalizer2 by blast
+  then have "\<forall>h F. h : F \<rightarrow> (X \<times>\<^sub>c B) 
+            \<and> (f \<circ>\<^sub>c left_cart_proj X B) \<circ>\<^sub>c h = (m \<circ>\<^sub>c right_cart_proj X B) \<circ>\<^sub>c h \<longrightarrow>
+          (\<exists>!u. u : F \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and> inverse_image_mapping f B m \<circ>\<^sub>c u = h)"
+    unfolding equalizer_def using assms(2) cfunc_type_def domain_comp left_cart_proj_type by auto
+  then have "\<langle>h,k\<rangle> : Z \<rightarrow> X \<times>\<^sub>c B  \<Longrightarrow>
+      (f \<circ>\<^sub>c left_cart_proj X B) \<circ>\<^sub>c \<langle>h,k\<rangle> = (m \<circ>\<^sub>c right_cart_proj X B) \<circ>\<^sub>c \<langle>h,k\<rangle> \<Longrightarrow>
+      (\<exists>!u. u : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and> inverse_image_mapping f B m \<circ>\<^sub>c u = \<langle>h,k\<rangle>)"
+    by (erule_tac x="\<langle>h,k\<rangle>" in allE, erule_tac x=Z in allE, auto)
+  then have "\<exists>!u. u : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and> inverse_image_mapping f B m \<circ>\<^sub>c u = \<langle>h,k\<rangle>"
+    using k_type h_type assms
+    by (typecheck_cfuncs, smt comp_associative2 left_cart_proj_cfunc_prod left_cart_proj_type
+        mk_eq_fh right_cart_proj_cfunc_prod right_cart_proj_type)
+  then show "\<exists>j. j : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) \<and>
+         (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = k \<and>
+         (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h"
+  proof (insert k_type h_type assms, typecheck_cfuncs, safe, rule_tac x=u in exI, safe)
+    fix u
+
+    assume u_type: "u : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
+    assume u_eq: "inverse_image_mapping f B m \<circ>\<^sub>c u = \<langle>h,k\<rangle>"
+
+    show "(right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c u = k"
+      using assms u_type h_type k_type u_eq
+      by (typecheck_cfuncs, metis (full_types) comp_associative2 right_cart_proj_cfunc_prod)
+
+    show "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c u = h"
+      using assms u_type h_type k_type u_eq
+      by (typecheck_cfuncs, metis (full_types) comp_associative2 left_cart_proj_cfunc_prod)
+  qed
+next
+  fix Z j y
+
+  assume j_type: "j : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
+  assume y_type: "y : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
+
+  assume "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c y =
+       (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j"
+  then show "j = y"
+    using assms j_type y_type
+    by (metis fst_conv inverse_image_subobject monomorphism_def2 snd_conv subobject_of_def)
+qed
+
 
 (* Definition 2.1.39 *)
 definition relative_member :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" ("_ \<in>\<^bsub>_\<^esub> _" [51,50,51]50) where
