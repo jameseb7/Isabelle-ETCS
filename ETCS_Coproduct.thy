@@ -1262,4 +1262,46 @@ lemma into_super_try_cast:
   shows "into_super m \<circ>\<^sub>c  try_cast m = id Y"
   using assms cfunc_type_def try_cast_def2 by auto
 
+lemma try_cast_in_X:
+  assumes m_type: "monomorphism m" "m : X \<rightarrow> Y"
+  assumes y_in_X: "y \<in>\<^bsub>Y\<^esub> (X, m)"
+  shows "\<exists> x. x \<in>\<^sub>c X \<and> try_cast m \<circ>\<^sub>c y = left_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
+proof -
+  have y_type: "y \<in>\<^sub>c Y"
+    using y_in_X unfolding relative_member_def2 by auto
+  obtain x where x_type: "x \<in>\<^sub>c X" and x_def: "y = m \<circ>\<^sub>c x"
+    using y_in_X unfolding relative_member_def2 factors_through_def by (auto simp add: cfunc_type_def)
+  then have "y = (into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X,m))) \<circ>\<^sub>c x"
+    unfolding into_super_def using complement_morphism_type left_coproj_cfunc_coprod m_type by auto
+  then have "y = into_super m \<circ>\<^sub>c left_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
+    using x_type m_type by (typecheck_cfuncs, simp add:  comp_associative2)
+  then have "try_cast m \<circ>\<^sub>c y = (try_cast m \<circ>\<^sub>c into_super m) \<circ>\<^sub>c left_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
+    using x_type m_type by (typecheck_cfuncs, smt comp_associative2)
+  then have "try_cast m \<circ>\<^sub>c y = left_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
+    using m_type x_type by (typecheck_cfuncs, simp add: id_left_unit2 try_cast_into_super)
+  then show ?thesis
+    using x_type by blast
+qed
+
+lemma try_cast_not_in_X:
+  assumes m_type: "monomorphism m" "m : X \<rightarrow> Y"
+  assumes y_in_X: "\<not> y \<in>\<^bsub>Y\<^esub> (X, m)" and y_type: "y \<in>\<^sub>c Y"
+  shows "\<exists> x. x \<in>\<^sub>c Y \<setminus> (X,m) \<and> try_cast m \<circ>\<^sub>c y = right_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
+proof -
+  have y_in_complement: "y \<in>\<^bsub>Y\<^esub> (Y \<setminus> (X,m), m\<^sup>c)"
+    by (simp add: assms not_in_subset_in_complement)
+  then obtain x where x_type: "x \<in>\<^sub>c Y \<setminus> (X,m)" and x_def: "y = m\<^sup>c \<circ>\<^sub>c x"
+    unfolding relative_member_def2 factors_through_def by (auto simp add: cfunc_type_def)
+  then have "y = (into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X,m))) \<circ>\<^sub>c x"
+    unfolding into_super_def using complement_morphism_type m_type right_coproj_cfunc_coprod by auto 
+  then have "y = into_super m \<circ>\<^sub>c right_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
+    using x_type m_type by (typecheck_cfuncs, simp add:  comp_associative2)
+  then have "try_cast m \<circ>\<^sub>c y = (try_cast m \<circ>\<^sub>c into_super m) \<circ>\<^sub>c right_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
+    using x_type m_type by (typecheck_cfuncs, smt comp_associative2)
+  then have "try_cast m \<circ>\<^sub>c y = right_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
+    using m_type x_type by (typecheck_cfuncs, simp add: id_left_unit2 try_cast_into_super)
+  then show ?thesis
+    using x_type by blast
+qed
+
 end
