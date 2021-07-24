@@ -166,6 +166,12 @@ qed
 definition cfunc_cross_prod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<times>\<^sub>f" 55) where
   "f \<times>\<^sub>f g = \<langle>f \<circ>\<^sub>c left_cart_proj (domain f) (domain g), g \<circ>\<^sub>c right_cart_proj (domain f) (domain g)\<rangle>"
 
+lemma cfunc_cross_prod_def2: 
+  assumes "f : X \<rightarrow> Y" "g : V\<rightarrow> W"
+  shows "f \<times>\<^sub>f g = \<langle>f \<circ>\<^sub>c left_cart_proj X V, g \<circ>\<^sub>c right_cart_proj X V\<rangle>"
+  using assms cfunc_cross_prod_def cfunc_type_def by auto
+    
+
 lemma cfunc_cross_prod_type[type_rule]:
   "f : W \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Z \<Longrightarrow> f \<times>\<^sub>f g : W \<times>\<^sub>c X \<rightarrow> Y \<times>\<^sub>c Z"
   unfolding cfunc_cross_prod_def
@@ -294,6 +300,14 @@ lemma cart_prod_eq:
     (left_cart_proj X Y \<circ>\<^sub>c a = left_cart_proj X Y \<circ>\<^sub>c b 
       \<and> right_cart_proj X Y \<circ>\<^sub>c a = right_cart_proj X Y \<circ>\<^sub>c b)"
   by (metis (full_types) assms cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type)
+
+lemma cart_prod_eqI:
+  assumes "a : Z \<rightarrow> X \<times>\<^sub>c Y" "b : Z \<rightarrow>  X \<times>\<^sub>c Y"
+  assumes "(left_cart_proj X Y \<circ>\<^sub>c a = left_cart_proj X Y \<circ>\<^sub>c b 
+      \<and> right_cart_proj X Y \<circ>\<^sub>c a = right_cart_proj X Y \<circ>\<^sub>c b)"
+  shows "a = b"
+  using assms cart_prod_eq by blast
+    
 
 lemma cart_prod_eq2:
   assumes "a : Z \<rightarrow> X" "b : Z \<rightarrow> Y" "c : Z \<rightarrow>  X" "d : Z \<rightarrow>  Y"
@@ -452,6 +466,31 @@ proof -
     using calculation by auto
 qed
 
+lemma associate_right_crossprod_ap:
+  assumes "x : A \<rightarrow> X" "y : B \<rightarrow> Y" "z : C \<rightarrow> Z"
+  shows "associate_right X Y Z \<circ>\<^sub>c ((x \<times>\<^sub>f y) \<times>\<^sub>f z) = (x \<times>\<^sub>f (y\<times>\<^sub>f z)) \<circ>\<^sub>c  associate_right A B C"
+proof-
+
+  have "associate_right X Y Z \<circ>\<^sub>c ((x \<times>\<^sub>f y)\<times>\<^sub>f z) =
+        associate_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x  \<circ>\<^sub>c left_cart_proj A B, y  \<circ>\<^sub>c (right_cart_proj A B)\<rangle> \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C , z \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) C \<rangle>"
+    using assms by(unfold cfunc_cross_prod_def2, typecheck_cfuncs, unfold cfunc_cross_prod_def2, auto) 
+  also have "... = associate_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x  \<circ>\<^sub>c left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C, y  \<circ>\<^sub>c (right_cart_proj A B) \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C \<rangle>  , z \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) C \<rangle>"
+    using assms  cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, auto)
+  also have "... = \<langle>x  \<circ>\<^sub>c left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C, \<langle>y  \<circ>\<^sub>c (right_cart_proj A B) \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C   , z \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) C \<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: associate_right_ap)
+  also have "... = \<langle>x  \<circ>\<^sub>c left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C,  (y \<times>\<^sub>f z)\<circ>\<^sub>c \<langle>(right_cart_proj A B) \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C   ,right_cart_proj (A \<times>\<^sub>c B) C \<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+  also have "... = (x \<times>\<^sub>f (y\<times>\<^sub>f z)) \<circ>\<^sub>c \<langle>left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C,\<langle>(right_cart_proj A B) \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C   ,right_cart_proj (A \<times>\<^sub>c B) C \<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+  also have "... = (x \<times>\<^sub>f (y\<times>\<^sub>f z)) \<circ>\<^sub>c  associate_right A B C"   
+    unfolding associate_right_def by auto
+  then show ?thesis using calculation by auto
+qed
+
+
+
+
+
 subsubsection \<open>Permuting a Cartesian product to associate to the left\<close>
 
 definition associate_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
@@ -518,23 +557,43 @@ proof -
     using calculation by auto
 qed
 
+lemma right_left: 
+ "(associate_right A B C) \<circ>\<^sub>c (associate_left A B C) = id (A \<times>\<^sub>c (B \<times>\<^sub>c C))"
+    by (smt associate_left_def associate_right_ap cfunc_cross_prod_def cfunc_prod_unique comp_type id_cross_prod id_domain id_left_unit2 left_cart_proj_type right_cart_proj_type)
+
+lemma left_right: 
+ "(associate_left A B C) \<circ>\<^sub>c (associate_right A B C) = id ((A \<times>\<^sub>c B) \<times>\<^sub>c C)"
+    by (smt associate_left_ap associate_right_def cfunc_cross_prod_def cfunc_prod_unique comp_type id_cross_prod id_domain id_left_unit2 left_cart_proj_type right_cart_proj_type)
+
 lemma product_associates:
   "A \<times>\<^sub>c (B \<times>\<^sub>c C)  \<cong> (A \<times>\<^sub>c B) \<times>\<^sub>c C"
-proof-
-  have right_left: "(associate_right A B C) \<circ>\<^sub>c (associate_left A B C) = id (A \<times>\<^sub>c (B \<times>\<^sub>c C))"
-    by (smt associate_left_def associate_right_ap cfunc_cross_prod_def cfunc_prod_unique comp_type id_cross_prod id_domain id_left_unit2 left_cart_proj_type right_cart_proj_type)
-  have left_right: "(associate_left A B C) \<circ>\<^sub>c (associate_right A B C) = id ((A \<times>\<^sub>c B) \<times>\<^sub>c C)"
-    by (smt associate_left_ap associate_right_def cfunc_cross_prod_def cfunc_prod_unique comp_type id_cross_prod id_domain id_left_unit2 left_cart_proj_type right_cart_proj_type)
-  show ?thesis
     by (metis associate_left_type associate_right_type cfunc_type_def is_isomorphic_def isomorphism_def left_right right_left) 
+
+
+
+lemma associate_left_crossprod_ap:
+  assumes "x : A \<rightarrow> X" "y : B \<rightarrow> Y" "z : C \<rightarrow> Z"
+  shows "associate_left X Y Z \<circ>\<^sub>c (x \<times>\<^sub>f (y\<times>\<^sub>f z)) = ((x \<times>\<^sub>f y)\<times>\<^sub>f z) \<circ>\<^sub>c  associate_left A B C"
+proof-
+  have "associate_left X Y Z \<circ>\<^sub>c (x \<times>\<^sub>f (y\<times>\<^sub>f z)) =
+        associate_left X Y Z \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c left_cart_proj A (B\<times>\<^sub>cC), \<langle>y \<circ>\<^sub>c left_cart_proj B C,z \<circ>\<^sub>c right_cart_proj B C \<rangle>   \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC)\<rangle>"
+    using assms by(unfold cfunc_cross_prod_def2, typecheck_cfuncs, unfold cfunc_cross_prod_def2, auto) 
+  also have "... = associate_left X Y Z \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c left_cart_proj A (B\<times>\<^sub>cC), \<langle>y \<circ>\<^sub>c left_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC),z \<circ>\<^sub>c right_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC) \<rangle>   \<rangle>"
+    using assms  cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, auto)
+  also have "... = \<langle>\<langle>x \<circ>\<^sub>c left_cart_proj A (B\<times>\<^sub>cC), y \<circ>\<^sub>c left_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC) \<rangle>,z \<circ>\<^sub>c right_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC) \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: associate_left_ap)
+  also have "... = \<langle>(x \<times>\<^sub>f y)\<circ>\<^sub>c \<langle> left_cart_proj A (B\<times>\<^sub>cC), left_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC) \<rangle>,z \<circ>\<^sub>c right_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC) \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+  also have "... = ((x \<times>\<^sub>f y)\<times>\<^sub>f z) \<circ>\<^sub>c \<langle>\<langle>left_cart_proj A (B\<times>\<^sub>cC), left_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC) \<rangle>,right_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC) \<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+  also have "... = ((x \<times>\<^sub>f y)\<times>\<^sub>f z) \<circ>\<^sub>c  associate_left A B C"   
+    unfolding associate_left_def by auto
+  then show ?thesis using calculation by auto
 qed
 
 
-
-
-
-
-subsubsection \<open>Distributing over a Cartesian product from the right\<close>
+  
+    subsubsection \<open>Distributing over a Cartesian product from the right\<close>
 
 definition distribute_right_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_right_left X Y Z = 

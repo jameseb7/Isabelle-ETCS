@@ -134,7 +134,7 @@ proof -
    have fact4: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c (right_coproj A (B \<Coprod> C)) = (right_coproj A (B \<Coprod> C))"
    proof -
 have f1: "\<forall>c ca cb cc cd ce cf. \<not> c : ca \<rightarrow> cb \<or> \<not> cc : cb \<rightarrow> cd \<or> \<not> ce : cd \<rightarrow> cf \<or> ce \<circ>\<^sub>c cc \<circ>\<^sub>c c = (ce \<circ>\<^sub>c cc) \<circ>\<^sub>c c"
-using comp_associative2 by satx
+  using comp_associative2 by satx
 have f2: "h \<amalg> j : (A \<Coprod> B) \<Coprod> C \<rightarrow> A \<Coprod> B \<Coprod> C"
   using k_def k_type by blast
 then have f3: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c right_coproj A (B \<Coprod> C) = h \<amalg> j \<circ>\<^sub>c g \<circ>\<^sub>c right_coproj A (B \<Coprod> C)"

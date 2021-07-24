@@ -424,6 +424,136 @@ lemma NUone_iso_N:
   "\<nat>\<^sub>c \<Coprod> one \<cong> \<nat>\<^sub>c"
   using coproduct_commutes isomorphic_is_transitive oneUN_iso_N by blast
 
+
+
+
+
+    
+
+lemma expset_power_tower:
+  "((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>) \<cong> (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)"
+proof - 
+  obtain \<phi> where \<phi>_def: "\<phi> = ((eval_func A (B\<times>\<^sub>c C)) \<circ>\<^sub>c (associate_left B C (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)))"
+    by blast
+  then have \<phi>_type[type_rule]: "\<phi>: B \<times>\<^sub>c (C\<times>\<^sub>c (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)) \<rightarrow> A "
+    using \<phi>_def associate_left_type comp_type eval_func_type by blast
+  then have \<phi>dbsharp_type[type_rule]: "(\<phi>\<^sup>\<sharp>)\<^sup>\<sharp> : (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>) \<rightarrow> ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)"
+    by typecheck_cfuncs
+
+  obtain \<psi> where \<psi>_def: "\<psi> = (eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c (associate_right B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>))"
+    by blast
+  then have \<psi>_type[type_rule]: "\<psi> :  (B \<times>\<^sub>c C) \<times>\<^sub>c ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>) \<rightarrow> A"
+    unfolding \<psi>_def
+    by typecheck_cfuncs
+  have \<psi>sharp_type[type_rule]: "\<psi>\<^sup>\<sharp>: ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>) \<rightarrow> (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)"
+    unfolding \<psi>_def
+    by typecheck_cfuncs
+  have "(\<phi>\<^sup>\<sharp>)\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> = id((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)"
+  proof(rule same_evals_equal[where Z= "((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)", where X = "(A\<^bsup>B\<^esup>)", where A = "C"])
+    show "\<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> : A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>\<^bsup>C\<^esup>"
+      using \<phi>dbsharp_type \<psi>sharp_type comp_type by auto
+    show "id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>) : A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>\<^bsup>C\<^esup>"
+      by (simp add: id_type)
+    show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> =
+    eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
+    proof(rule same_evals_equal[where Z= "C \<times>\<^sub>c ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)", where X = "A", where A = "B"])
+      show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> : C \<times>\<^sub>c A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>"
+        by typecheck_cfuncs
+      show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>) : C \<times>\<^sub>c A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>"
+        by typecheck_cfuncs
+      show "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp>)) =
+    eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
+      proof - 
+        have "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp>)) =
+             eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
+          using \<phi>dbsharp_type \<psi>sharp_type identity_distributes_across_composition by auto
+        also have "... = eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ((eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
+          by (typecheck_cfuncs, simp add: comp_associative2)
+        also have "... = eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (\<phi>\<^sup>\<sharp> \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
+          by (typecheck_cfuncs, simp add: transpose_func_def)        
+        also have "... = eval_func A B \<circ>\<^sub>c ((id\<^sub>c B \<times>\<^sub>f \<phi>\<^sup>\<sharp>)  \<circ>\<^sub>c (id\<^sub>c B \<times>\<^sub>f (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>)))"
+          using identity_distributes_across_composition by (typecheck_cfuncs, auto)
+        also have "... = (eval_func A B \<circ>\<^sub>c ((id\<^sub>c B \<times>\<^sub>f \<phi>\<^sup>\<sharp>)))  \<circ>\<^sub>c (id\<^sub>c B \<times>\<^sub>f (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
+          using comp_associative2 by (typecheck_cfuncs,blast)
+        also have "... = \<phi>  \<circ>\<^sub>c (id\<^sub>c B \<times>\<^sub>f (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
+          by (typecheck_cfuncs, simp add: transpose_func_def)
+        also have "... = ((eval_func A (B\<times>\<^sub>c C)) \<circ>\<^sub>c (associate_left B C (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>))) \<circ>\<^sub>c (id\<^sub>c B \<times>\<^sub>f (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
+          by (simp add: \<phi>_def)
+        also have "... = (eval_func A (B\<times>\<^sub>c C)) \<circ>\<^sub>c (associate_left B C (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)) \<circ>\<^sub>c (id\<^sub>c B \<times>\<^sub>f (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
+          using comp_associative2 by (typecheck_cfuncs, auto)
+        also have "... = (eval_func A (B\<times>\<^sub>c C)) \<circ>\<^sub>c ((id\<^sub>c B \<times>\<^sub>f id\<^sub>c C) \<times>\<^sub>f \<psi>\<^sup>\<sharp>) \<circ>\<^sub>c  associate_left B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)"
+          by (typecheck_cfuncs, simp add: associate_left_crossprod_ap)
+        also have "... = (eval_func A (B\<times>\<^sub>c C)) \<circ>\<^sub>c ((id\<^sub>c (B \<times>\<^sub>c C)) \<times>\<^sub>f \<psi>\<^sup>\<sharp>) \<circ>\<^sub>c  associate_left B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)"
+          by (simp add: id_cross_prod)
+        also have "... = \<psi>  \<circ>\<^sub>c  associate_left B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)"
+          by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
+        also have "... = ((eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C)) \<circ>\<^sub>c ((associate_right B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>))\<circ>\<^sub>c  associate_left B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>))"
+          by (typecheck_cfuncs, simp add: \<psi>_def cfunc_type_def comp_associative)
+        also have "... = ((eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C)) \<circ>\<^sub>c id(B \<times>\<^sub>c (C \<times>\<^sub>c ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)))"
+          by (simp add: right_left)
+        also have "... = (eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C)"
+          by (typecheck_cfuncs, meson id_right_unit2)
+        also have "... = eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
+          by (typecheck_cfuncs, simp add: id_cross_prod id_right_unit2)
+        then show ?thesis using calculation by auto
+      qed
+    qed
+  qed
+  have "  \<psi>\<^sup>\<sharp> \<circ>\<^sub>c (\<phi>\<^sup>\<sharp>)\<^sup>\<sharp>=  id(A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)"
+    proof(rule same_evals_equal[where Z= "A\<^bsup>(B\<times>\<^sub>c C)\<^esup>", where X = "A", where A = "(B\<times>\<^sub>c C)"])
+      show "\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp> : A\<^bsup>(B \<times>\<^sub>c C)\<^esup> \<rightarrow> A\<^bsup>(B \<times>\<^sub>c C)\<^esup>"
+        by typecheck_cfuncs
+      show "id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>) : A\<^bsup>(B \<times>\<^sub>c C)\<^esup> \<rightarrow> A\<^bsup>(B \<times>\<^sub>c C)\<^esup>"
+        by typecheck_cfuncs
+      show "eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) =
+    eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)"
+      proof -
+        have "eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) =
+              eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c ((id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp>)) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f\<phi>\<^sup>\<sharp>\<^sup>\<sharp>))"
+          by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
+        also have "... = ( eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp>))) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f\<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
+          using comp_associative2 by (typecheck_cfuncs, blast)
+        also have "... = \<psi> \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
+          by (typecheck_cfuncs, simp add: transpose_func_def)
+        also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c (associate_right B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>))  \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
+          by (typecheck_cfuncs, smt \<psi>_def cfunc_type_def comp_associative domain_comp)
+        also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c (associate_right B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>))  \<circ>\<^sub>c ((id\<^sub>c (B) \<times>\<^sub>f id( C)) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
+          by (typecheck_cfuncs, simp add: id_cross_prod)
+        also have "... =(eval_func A B) \<circ>\<^sub>c ((id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c    ((id\<^sub>c (B) \<times>\<^sub>f (id(C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))))"
+          using associate_right_crossprod_ap by (typecheck_cfuncs, auto)
+        also have "... =(eval_func A B) \<circ>\<^sub>c ((id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c    (id\<^sub>c (B) \<times>\<^sub>f (id(C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>))) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))"
+          by (typecheck_cfuncs, simp add: comp_associative2)
+        also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f ((eval_func (A\<^bsup>B\<^esup>) C)\<circ>\<^sub>c (id(C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>))) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))"
+          using identity_distributes_across_composition by (typecheck_cfuncs, auto)
+        also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f \<phi>\<^sup>\<sharp>) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))"
+          by (typecheck_cfuncs, simp add: transpose_func_def)
+        also have "... =((eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f \<phi>\<^sup>\<sharp>)) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))"
+          using comp_associative2 by (typecheck_cfuncs, blast)
+        also have "... = \<phi> \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))"
+          by (typecheck_cfuncs, simp add: transpose_func_def)
+        also have "... = (eval_func A (B\<times>\<^sub>c C)) \<circ>\<^sub>c ((associate_left B C (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)))"
+          by (typecheck_cfuncs, simp add: \<phi>_def comp_associative2)  
+        also have "... = eval_func A (B\<times>\<^sub>c C) \<circ>\<^sub>c id ((B \<times>\<^sub>c C) \<times>\<^sub>c  (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>))"
+          by (typecheck_cfuncs, simp add: left_right)
+        also have "... = eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)"
+          by (typecheck_cfuncs, simp add: id_cross_prod)
+        then show ?thesis using calculation by auto
+      qed
+    qed
+    have "isomorphism(\<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp>)"
+      by (simp add: \<open>\<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> = id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)\<close> id_isomorphism)
+    then show ?thesis
+      by (typecheck_cfuncs, metis \<open>\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp> = id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)\<close>  \<phi>dbsharp_type \<psi>sharp_type cfunc_type_def comp_epi_imp_epi comp_monic_imp_monic epi_mon_is_iso id_isomorphism is_isomorphic_def iso_imp_epi_and_monic)
+qed
+
+
+
+
+
+
+
+
+
 (* Proposition 2.6.7 *)
 lemma Peano's_Axioms:
  "injective(successor) \<and> \<not>surjective(successor)"
@@ -475,6 +605,8 @@ lemma emptyset_is_not_epi_countable:
 (* Definition 2.6.9 *)
 definition countable :: "cset \<Rightarrow> bool" where
   "countable X \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> \<nat>\<^sub>c \<and> monomorphism f)"
+
+
 
 lemma emptyset_is_countable:
   "countable \<emptyset>"

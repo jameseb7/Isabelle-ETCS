@@ -443,7 +443,23 @@ next
      show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
       using \<open>monomorphism m\<close> cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_right_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
   next
-    oops
+    assume "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+    assume "\<langle>x,z\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
+    assume "distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+    assume "distribute_right X X Z : (X \<times>\<^sub>c X) \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+    assume "m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c X) \<times>\<^sub>c Z"
+    assume "distribute_right X X Z : (X \<times>\<^sub>c X) \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+    assume "m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c X) \<times>\<^sub>c Z"
+    assume "id\<^sub>c Z : Z \<rightarrow> Z"
+    assume "x \<in>\<^sub>c X"
+    assume "z \<in>\<^sub>c Z"
+    assume "xz = \<langle>x,z\<rangle>"
+    assume "m : Y \<rightarrow> X \<times>\<^sub>c X"
+    have "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> = distribute_right X X Z \<circ>\<^sub>c \<langle>\<langle>x, x\<rangle>, z\<rangle>"
+      using \<open>z \<in>\<^sub>c Z\<close> distribute_right_ap x_type by auto
+    then show "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> factorsthru (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
+
+
 
 
 (*lemma left_pair_equiv_rel:
