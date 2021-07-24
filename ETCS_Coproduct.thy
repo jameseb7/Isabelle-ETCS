@@ -533,21 +533,224 @@ proof-
     using epi_mon_is_iso epic by auto
 qed
 
+definition dist_prod_coprod :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "dist_prod_coprod A B C = (id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C))"
 
+lemma dist_prod_coprod_type[type_rule]:
+  "dist_prod_coprod A B C : (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
+  unfolding dist_prod_coprod_def by typecheck_cfuncs
 
-(*Proposition 2.5.10 ... Better version*)
-lemma product_distribute_over_coproduct_left:
-  "A \<times>\<^sub>c (B \<Coprod> C) \<cong> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
-proof-
-  have type1: "id(A) \<times>\<^sub>f (left_coproj B C) : (A \<times>\<^sub>c B) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
-    by typecheck_cfuncs
- have type2: "id(A) \<times>\<^sub>f (right_coproj B C) : (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
-   by typecheck_cfuncs
+lemma dist_prod_coprod_mono:
+  "monomorphism (dist_prod_coprod A B C)"
+proof -
   obtain \<phi> where \<phi>_def: "\<phi> = (id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C))"
     by blast
-  then have \<phi>_type: "\<phi> : (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
-    by (simp add: cfunc_coprod_type type1 type2)
+  then have \<phi>_type[type_rule]: "\<phi> : (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
+   using dist_prod_coprod_type unfolding dist_prod_coprod_def by auto
 
+  have injective: "injective(\<phi>)"
+    unfolding injective_def
+  proof(auto) 
+    fix x y
+    assume x_type: "x \<in>\<^sub>c domain \<phi>"
+    assume y_type: "y \<in>\<^sub>c domain \<phi>"
+    assume equal: "\<phi> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c y"
+
+    have x_type[type_rule]: "x \<in>\<^sub>c (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
+      using cfunc_type_def \<phi>_type x_type by auto
+    then have x_form: "(\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> x = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))
+      \<or>  (\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> x = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))"
+      by (simp add: coprojs_jointly_surj)
+    have y_type[type_rule]: "y \<in>\<^sub>c (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
+      using cfunc_type_def \<phi>_type y_type by auto
+    then have y_form: "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))
+      \<or>  (\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
+      by (simp add: coprojs_jointly_surj)
+    
+    show "x = y" 
+    proof(cases "(\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> x = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))")
+      assume "(\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> x = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))"
+      then obtain x' where x'_def[type_rule]: "x' \<in>\<^sub>c A \<times>\<^sub>c B" "x = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c x'"
+        by blast
+      then have ab_exists: "\<exists> a b. a \<in>\<^sub>c A \<and> b \<in>\<^sub>c B \<and> x' =\<langle>a,b\<rangle>"
+        using cart_prod_decomp by blast
+      then obtain a b where ab_def[type_rule]: "a \<in>\<^sub>c A" "b \<in>\<^sub>c B"  "x' =\<langle>a,b\<rangle>"
+        by blast
+      show "x = y"  
+      proof(cases "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))")
+        assume "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
+        then obtain y' where y'_def: "y' \<in>\<^sub>c (A \<times>\<^sub>c B)" "y = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
+          by blast
+        then have ab_exists: "\<exists> a' b'. a' \<in>\<^sub>c A \<and> b' \<in>\<^sub>c B \<and> y' =\<langle>a',b'\<rangle>"
+          using cart_prod_decomp by blast
+        then obtain a' b' where a'b'_def[type_rule]: "a' \<in>\<^sub>c A" "b' \<in>\<^sub>c B" "y' =\<langle>a',b'\<rangle>"
+          by blast
+        have equal_pair: "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
+        proof - 
+        have "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, (left_coproj B C) \<circ>\<^sub>c b\<rangle>"
+          using ab_def id_left_unit2 by force
+        also have "... = (id(A) \<times>\<^sub>f (left_coproj B C))  \<circ>\<^sub>c \<langle> a,  b\<rangle>"
+          by (smt ab_def cfunc_cross_prod_comp_cfunc_prod id_type left_proj_type)
+        also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, b\<rangle>"
+          unfolding \<phi>_def using  left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+        also have "... = \<phi> \<circ>\<^sub>c x"
+          using ab_def comp_associative2 x'_def by (typecheck_cfuncs, fastforce)
+        also have "... = \<phi> \<circ>\<^sub>c y"
+          by (simp add: local.equal)
+        also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a', b'\<rangle>"
+          using a'b'_def comp_associative2 \<phi>_type y'_def by (typecheck_cfuncs, blast)
+        also have "... = (id(A) \<times>\<^sub>f (left_coproj B C))  \<circ>\<^sub>c \<langle> a',  b'\<rangle>"
+          unfolding \<phi>_def using left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+        also have "... = \<langle>id(A) \<circ>\<^sub>c a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
+          using a'b'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, auto)
+        also have "... =  \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
+          using a'b'_def id_left_unit2 by force
+        then show "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
+          by (simp add: calculation)
+      qed
+      then have a_equal: "(a = a') \<and> (((left_coproj B C) \<circ>\<^sub>c b) = ((left_coproj B C) \<circ>\<^sub>c b'))"
+        using a'b'_def ab_def cart_prod_eq2 equal_pair by (typecheck_cfuncs, blast)
+      then have b_equal: "b = b'"
+        using a'b'_def a_equal ab_def left_coproj_are_monomorphisms left_proj_type monomorphism_def3 by blast
+      then show "x = y"
+        by (simp add: a'b'_def a_equal ab_def x'_def y'_def)
+    next 
+      assume "\<nexists>y'. y' \<in>\<^sub>c A \<times>\<^sub>c B \<and> y = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
+      then have "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
+        using y_form by blast
+      then obtain y' where y'_def: "y' \<in>\<^sub>c (A \<times>\<^sub>c C)" "y = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'"
+        by blast
+      then have ab_exists: "\<exists> a' c'. a' \<in>\<^sub>c A \<and> c' \<in>\<^sub>c C \<and> y' =\<langle>a',c'\<rangle>"
+          using cart_prod_decomp by blast
+      then obtain a' c' where a'c'_def: "a' \<in>\<^sub>c A" "c' \<in>\<^sub>c C" "y' =\<langle>a',c'\<rangle>"
+        by blast 
+      have equal_pair: "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
+      proof - 
+        have "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, (left_coproj B C) \<circ>\<^sub>c b\<rangle>"
+          using ab_def id_left_unit2 by force
+        also have "... = (id(A) \<times>\<^sub>f (left_coproj B C))  \<circ>\<^sub>c \<langle> a,  b\<rangle>"
+          by (smt ab_def cfunc_cross_prod_comp_cfunc_prod id_type left_proj_type)
+        also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, b\<rangle>"
+          unfolding \<phi>_def using left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+        also have "... = \<phi> \<circ>\<^sub>c x"
+          using ab_def comp_associative2 \<phi>_type x'_def by (typecheck_cfuncs, fastforce)
+        also have "... = \<phi> \<circ>\<^sub>c y"
+          by (simp add: local.equal)
+        also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a', c'\<rangle>"
+          using a'c'_def comp_associative2 y'_def by (typecheck_cfuncs, blast)
+          also have "... = (id(A) \<times>\<^sub>f (right_coproj B C))  \<circ>\<^sub>c \<langle> a',  c'\<rangle>"
+          unfolding \<phi>_def using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+        also have "... = \<langle>id(A) \<circ>\<^sub>c a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
+          using a'c'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
+        also have "... =  \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
+          using a'c'_def id_left_unit2 by force
+        then show "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
+          by (simp add: calculation)
+      qed        
+      then have impossible: "(left_coproj B C) \<circ>\<^sub>c b = (right_coproj B C) \<circ>\<^sub>c c'"
+        using a'c'_def ab_def element_pair_eq equal_pair by (typecheck_cfuncs, blast)
+      then show "x = y"
+        using a'c'_def ab_def coproducts_disjoint  by blast
+    qed
+  next
+    assume "\<nexists>x'. x' \<in>\<^sub>c A \<times>\<^sub>c B \<and> x = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c x'"
+    then have "(\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> x = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))"
+      using x_form by blast
+    then obtain x' where x'_def: "x' \<in>\<^sub>c A \<times>\<^sub>c C" "x = right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c x'"
+        by blast
+      then have ac_exists: "\<exists> a c. a \<in>\<^sub>c A \<and> c \<in>\<^sub>c C \<and> x' =\<langle>a,c\<rangle>"
+        using cart_prod_decomp by blast
+      then obtain a c where ac_def: "a \<in>\<^sub>c A" "c \<in>\<^sub>c C" "x' =\<langle>a,c\<rangle>"
+        by blast
+            show "x = y"  
+      proof(cases "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))")
+        assume "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
+        then obtain y' where y'_def: "y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
+          by blast
+        then have ab_exists: "\<exists> a' b'. a' \<in>\<^sub>c A \<and> b' \<in>\<^sub>c B \<and> y' =\<langle>a',b'\<rangle>"
+          using cart_prod_decomp by blast
+        then obtain a' b' where a'b'_def: "a' \<in>\<^sub>c A \<and> b' \<in>\<^sub>c B \<and> y' =\<langle>a',b'\<rangle>"
+          by blast
+        have equal_pair: "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
+        proof - 
+          have "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, (right_coproj B C) \<circ>\<^sub>c c\<rangle>"
+            using ac_def id_left_unit2 by force
+          also have "... = (id(A) \<times>\<^sub>f (right_coproj B C))  \<circ>\<^sub>c \<langle>a,  c\<rangle>"
+            by (smt ac_def cfunc_cross_prod_comp_cfunc_prod id_type right_proj_type)
+          also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, c\<rangle>"
+            unfolding \<phi>_def using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+          also have "... = \<phi> \<circ>\<^sub>c x"
+            using ac_def comp_associative2 \<phi>_type x'_def by (typecheck_cfuncs, fastforce)
+          also have "... = \<phi> \<circ>\<^sub>c y"
+            by (simp add: local.equal)
+          also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a', b'\<rangle>"
+            using a'b'_def comp_associative2 \<phi>_type y'_def by (typecheck_cfuncs, blast)
+            also have "... = (id(A) \<times>\<^sub>f (left_coproj B C))  \<circ>\<^sub>c \<langle> a',  b'\<rangle>"
+            unfolding \<phi>_def using left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+          also have "... = \<langle>id(A) \<circ>\<^sub>c a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
+            using a'b'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
+          also have "... =  \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
+            using a'b'_def id_left_unit2 by force
+          then show "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
+            by (simp add: calculation)
+        qed        
+        then have impossible:  "(right_coproj B C) \<circ>\<^sub>c c = (left_coproj B C) \<circ>\<^sub>c b'"
+          using a'b'_def ac_def cart_prod_eq2 equal_pair by (typecheck_cfuncs, blast)
+        then show "x = y"
+          using a'b'_def ac_def coproducts_disjoint by force
+      next 
+        assume "\<nexists>y'. y' \<in>\<^sub>c A \<times>\<^sub>c B \<and> y = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
+        then have "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
+          using y_form by blast
+        then obtain y' where y'_def: "y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
+          by blast
+        then have a'c'_exists: "\<exists> a' c'. a' \<in>\<^sub>c A \<and> c' \<in>\<^sub>c C \<and> y' =\<langle>a',c'\<rangle>"
+          using cart_prod_decomp by blast
+        then obtain a' c' where a'c'_def: "a' \<in>\<^sub>c A" "c' \<in>\<^sub>c C" "y' =\<langle>a',c'\<rangle>"
+          by blast
+        have equal_pair: "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
+        proof - 
+          have "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, (right_coproj B C) \<circ>\<^sub>c c\<rangle>"
+            using ac_def id_left_unit2 by force
+          also have "... = (id(A) \<times>\<^sub>f (right_coproj B C))  \<circ>\<^sub>c \<langle>a,  c\<rangle>"
+            by (smt ac_def cfunc_cross_prod_comp_cfunc_prod id_type right_proj_type)
+          also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, c\<rangle>"
+            unfolding \<phi>_def using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+          also have "... = \<phi> \<circ>\<^sub>c x"
+            using ac_def comp_associative2 \<phi>_type x'_def by (typecheck_cfuncs, fastforce)
+          also have "... = \<phi> \<circ>\<^sub>c y"
+            by (simp add: local.equal)
+          also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a', c'\<rangle>"
+            using a'c'_def comp_associative2 \<phi>_type y'_def by (typecheck_cfuncs, blast)
+          also have "... = (id(A) \<times>\<^sub>f (right_coproj B C))  \<circ>\<^sub>c \<langle> a',  c'\<rangle>"
+            unfolding \<phi>_def using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+          also have "... = \<langle>id(A) \<circ>\<^sub>c a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
+            using a'c'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
+          also have "... =  \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
+            using a'c'_def id_left_unit2 by force
+          then show "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
+            by (simp add: calculation)
+        qed     
+        then have a_equal: "(a = a') \<and> ((right_coproj B C) \<circ>\<^sub>c c = (right_coproj B C) \<circ>\<^sub>c c')"
+          using a'c'_def ac_def element_pair_eq equal_pair by (typecheck_cfuncs, blast)
+        then have c_equal: "c = c'" 
+          using a'c'_def a_equal ac_def right_coproj_are_monomorphisms right_proj_type monomorphism_def3 by blast
+        then show "x = y"
+          by (simp add: a'c'_def a_equal ac_def x'_def y'_def)
+      qed
+    qed
+  qed
+  then show "monomorphism (dist_prod_coprod A B C)"
+    using \<phi>_def dist_prod_coprod_def injective_imp_monomorphism by fastforce
+qed
+
+lemma dist_prod_coprod_epi:
+  "epimorphism (dist_prod_coprod A B C)"
+proof -
+  obtain \<phi> where \<phi>_def: "\<phi> = (id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C))"
+    by blast
+  then have \<phi>_type[type_rule]: "\<phi> : (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
+   using dist_prod_coprod_type unfolding dist_prod_coprod_def by auto
 
   have surjective: "surjective((id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C)))"
     unfolding surjective_def
@@ -583,7 +786,7 @@ proof-
       have "y = (id(A) \<times>\<^sub>f (left_coproj B C)) \<circ>\<^sub>c \<langle>a,b\<rangle>"
         using a_def b_def cfunc_cross_prod_comp_cfunc_prod id_left_unit2 y_def2 by (typecheck_cfuncs, auto)
       also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, b\<rangle>"
-        by (typecheck_cfuncs, simp add: \<phi>_def left_coproj_cfunc_coprod type2)
+        unfolding \<phi>_def by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
       also have "... = \<phi> \<circ>\<^sub>c x"
         using \<phi>_type x_def ab_type comp_associative2 by (typecheck_cfuncs, auto)
       then show "\<exists>x. x \<in>\<^sub>c domain ((id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C)) \<and>
@@ -606,7 +809,7 @@ proof-
       have "y = (id(A) \<times>\<^sub>f (right_coproj B C)) \<circ>\<^sub>c \<langle>a,c\<rangle>"
         using a_def c_def cfunc_cross_prod_comp_cfunc_prod id_left_unit2 y_def2 by (typecheck_cfuncs, auto)
       also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, c\<rangle>"
-        using \<phi>_def right_coproj_cfunc_coprod type1 by (typecheck_cfuncs, auto)
+        unfolding \<phi>_def using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
       also have "... = \<phi> \<circ>\<^sub>c x"
         using \<phi>_type x_def ac_type comp_associative2 by (typecheck_cfuncs, auto)
       then show "\<exists>x. x \<in>\<^sub>c domain ((id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C)) \<and>
@@ -614,214 +817,18 @@ proof-
         using \<phi>_def calculation x_type by auto
     qed
   qed
-  
-        
-  have injective: "injective(\<phi>)"
-    unfolding injective_def
-  proof(auto) 
-    fix x y
-    assume x_type: "x \<in>\<^sub>c domain \<phi>"
-    assume y_type: "y \<in>\<^sub>c domain \<phi>"
-    assume equal: "\<phi> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c y"
-
-    have "x \<in>\<^sub>c (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
-      using cfunc_type_def \<phi>_type x_type by auto
-    then have x_form: "(\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> x = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))
-      \<or>  (\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> x = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))"
-      by (simp add: coprojs_jointly_surj)
-    have "y \<in>\<^sub>c (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
-      using cfunc_type_def \<phi>_type y_type by auto
-    then have y_form: "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))
-      \<or>  (\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
-      by (simp add: coprojs_jointly_surj)
-    
-    show "x = y" 
-    proof(cases "(\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> x = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))")
-      assume "(\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> x = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))"
-      then obtain x' where x'_def: "x' \<in>\<^sub>c A \<times>\<^sub>c B \<and> x = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c x'"
-        by blast
-      then have ab_exists: "\<exists> a b. a \<in>\<^sub>c A \<and> b \<in>\<^sub>c B \<and> x' =\<langle>a,b\<rangle>"
-        using cart_prod_decomp by blast
-      then obtain a b where ab_def: "a \<in>\<^sub>c A \<and> b \<in>\<^sub>c B \<and> x' =\<langle>a,b\<rangle>"
-        by blast
-      show "x = y"  
-      proof(cases "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))")
-        assume "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
-        then obtain y' where y'_def: "y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
-          by blast
-        then have ab_exists: "\<exists> a' b'. a' \<in>\<^sub>c A \<and> b' \<in>\<^sub>c B \<and> y' =\<langle>a',b'\<rangle>"
-          using cart_prod_decomp by blast
-        then obtain a' b' where a'b'_def: "a' \<in>\<^sub>c A \<and> b' \<in>\<^sub>c B \<and> y' =\<langle>a',b'\<rangle>"
-          by blast
-        have equal_pair: "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
-        proof - 
-        have "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, (left_coproj B C) \<circ>\<^sub>c b\<rangle>"
-          using ab_def id_left_unit2 by force
-        also have "... = (id(A) \<times>\<^sub>f (left_coproj B C))  \<circ>\<^sub>c \<langle> a,  b\<rangle>"
-          by (smt ab_def cfunc_cross_prod_comp_cfunc_prod id_type left_proj_type)
-        also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, b\<rangle>"
-          using \<phi>_def left_coproj_cfunc_coprod type1 type2 by auto
-        also have "... = \<phi> \<circ>\<^sub>c x"
-          using ab_def comp_associative2 \<phi>_type x'_def by (typecheck_cfuncs, fastforce)
-        also have "... = \<phi> \<circ>\<^sub>c y"
-          by (simp add: local.equal)
-        also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a', b'\<rangle>"
-          using a'b'_def comp_associative2 \<phi>_type y'_def by (typecheck_cfuncs, blast)
-        also have "... = (id(A) \<times>\<^sub>f (left_coproj B C))  \<circ>\<^sub>c \<langle> a',  b'\<rangle>"
-          using \<phi>_def left_coproj_cfunc_coprod type1 type2 by auto
-        also have "... = \<langle>id(A) \<circ>\<^sub>c a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
-          using a'b'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
-        also have "... =  \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
-          using a'b'_def id_left_unit2 by force
-        then show "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
-          by (simp add: calculation)
-      qed
-      then have a_equal: "(a = a') \<and> (((left_coproj B C) \<circ>\<^sub>c b) = ((left_coproj B C) \<circ>\<^sub>c b'))"
-        using a'b'_def ab_def cart_prod_eq2 equal_pair by (typecheck_cfuncs, blast)
-      then have b_equal: "b = b'"
-        using a'b'_def a_equal ab_def left_coproj_are_monomorphisms left_proj_type monomorphism_def3 by blast
-      then show "x = y"
-        by (simp add: a'b'_def a_equal ab_def x'_def y'_def)
-    
-    next 
-      assume "\<nexists>y'. y' \<in>\<^sub>c A \<times>\<^sub>c B \<and> y = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
-      then have "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
-        using y_form by blast
-      then obtain y' where y'_def: "(y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y')"
-        by blast
-      then have ab_exists: "\<exists> a' c'. a' \<in>\<^sub>c A \<and> c' \<in>\<^sub>c C \<and> y' =\<langle>a',c'\<rangle>"
-          using cart_prod_decomp by blast
-      then obtain a' c' where a'c'_def: "a' \<in>\<^sub>c A \<and> c' \<in>\<^sub>c C \<and> y' =\<langle>a',c'\<rangle>"
-        by blast 
-      have equal_pair: "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
-         proof - 
-                have "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, (left_coproj B C) \<circ>\<^sub>c b\<rangle>"
-                  using ab_def id_left_unit2 by force
-                also have "... = (id(A) \<times>\<^sub>f (left_coproj B C))  \<circ>\<^sub>c \<langle> a,  b\<rangle>"
-                  by (smt ab_def cfunc_cross_prod_comp_cfunc_prod id_type left_proj_type)
-                also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, b\<rangle>"
-                  using \<phi>_def left_coproj_cfunc_coprod type1 type2 by auto
-                also have "... = \<phi> \<circ>\<^sub>c x"
-                  using ab_def comp_associative2 \<phi>_type x'_def by (typecheck_cfuncs, fastforce)
-                also have "... = \<phi> \<circ>\<^sub>c y"
-                  by (simp add: local.equal)
-                also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a', c'\<rangle>"
-                  using a'c'_def comp_associative2 \<phi>_type y'_def by (typecheck_cfuncs, blast)
-                  also have "... = (id(A) \<times>\<^sub>f (right_coproj B C))  \<circ>\<^sub>c \<langle> a',  c'\<rangle>"
-                  using \<phi>_def right_coproj_cfunc_coprod type1 type2 by auto
-                also have "... = \<langle>id(A) \<circ>\<^sub>c a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
-                  using a'c'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
-                also have "... =  \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
-                  using a'c'_def id_left_unit2 by force
-                then show "\<langle>a, (left_coproj B C) \<circ>\<^sub>c b\<rangle> = \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
-                  by (simp add: calculation)
-              qed        
-      then have impossible: "(left_coproj B C) \<circ>\<^sub>c b = (right_coproj B C) \<circ>\<^sub>c c'"
-        using a'c'_def ab_def element_pair_eq equal_pair by (typecheck_cfuncs, blast)
-      then show "x = y"
-        using a'c'_def ab_def coproducts_disjoint  by blast
-    qed
-  next
-    assume "\<nexists>x'. x' \<in>\<^sub>c A \<times>\<^sub>c B \<and> x = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c x'"
-    then have "(\<exists> x'. (x' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> x = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c x'))"
-      using x_form by blast
-    then obtain x' where x'_def: "x' \<in>\<^sub>c A \<times>\<^sub>c C \<and> x = right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c x'"
-        by blast
-      then have ac_exists: "\<exists> a c. a \<in>\<^sub>c A \<and> c \<in>\<^sub>c C \<and> x' =\<langle>a,c\<rangle>"
-        using cart_prod_decomp by blast
-      then obtain a c where ac_def: "a \<in>\<^sub>c A \<and> c \<in>\<^sub>c C \<and> x' =\<langle>a,c\<rangle>"
-        by blast
-            show "x = y"  
-      proof(cases "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))")
-        assume "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
-        then obtain y' where y'_def: "y' \<in>\<^sub>c (A \<times>\<^sub>c B) \<and> y = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
-          by blast
-        then have ab_exists: "\<exists> a' b'. a' \<in>\<^sub>c A \<and> b' \<in>\<^sub>c B \<and> y' =\<langle>a',b'\<rangle>"
-          using cart_prod_decomp by blast
-        then obtain a' b' where a'b'_def: "a' \<in>\<^sub>c A \<and> b' \<in>\<^sub>c B \<and> y' =\<langle>a',b'\<rangle>"
-          by blast
-        have equal_pair: "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
-        proof - 
-                have "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, (right_coproj B C) \<circ>\<^sub>c c\<rangle>"
-                  using ac_def id_left_unit2 by force
-                also have "... = (id(A) \<times>\<^sub>f (right_coproj B C))  \<circ>\<^sub>c \<langle>a,  c\<rangle>"
-                  by (smt ac_def cfunc_cross_prod_comp_cfunc_prod id_type right_proj_type)
-                also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, c\<rangle>"
-                  using \<phi>_def right_coproj_cfunc_coprod type1 type2 by auto
-                also have "... = \<phi> \<circ>\<^sub>c x"
-                  using ac_def comp_associative2 \<phi>_type x'_def by (typecheck_cfuncs, fastforce)
-                also have "... = \<phi> \<circ>\<^sub>c y"
-                  by (simp add: local.equal)
-                also have "... = (\<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a', b'\<rangle>"
-                  using a'b'_def comp_associative2 \<phi>_type y'_def by (typecheck_cfuncs, blast)
-                  also have "... = (id(A) \<times>\<^sub>f (left_coproj B C))  \<circ>\<^sub>c \<langle> a',  b'\<rangle>"
-                  using \<phi>_def left_coproj_cfunc_coprod type1 type2 by auto
-                also have "... = \<langle>id(A) \<circ>\<^sub>c a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
-                  using a'b'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
-                also have "... =  \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
-                  using a'b'_def id_left_unit2 by force
-                then show "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>a', (left_coproj B C) \<circ>\<^sub>c b'\<rangle>"
-                  by (simp add: calculation)
-              qed        
-        then have impossible:  "(right_coproj B C) \<circ>\<^sub>c c = (left_coproj B C) \<circ>\<^sub>c b'"
-          using a'b'_def ac_def cart_prod_eq2 equal_pair by (typecheck_cfuncs, blast)
-      then show "x = y"
-        using a'b'_def ac_def coproducts_disjoint by force
-    next 
-      assume "\<nexists>y'. y' \<in>\<^sub>c A \<times>\<^sub>c B \<and> y = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
-      then have "(\<exists> y'. (y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c y'))"
-        using y_form by blast
-      then obtain y' where y'_def: "y' \<in>\<^sub>c (A \<times>\<^sub>c C) \<and> y = right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c y'"
-          by blast
-        then have a'c'_exists: "\<exists> a' c'. a' \<in>\<^sub>c A \<and> c' \<in>\<^sub>c C \<and> y' =\<langle>a',c'\<rangle>"
-          using cart_prod_decomp by blast
-        then obtain a' c' where a'c'_def: "a' \<in>\<^sub>c A \<and> c' \<in>\<^sub>c C \<and> y' =\<langle>a',c'\<rangle>"
-          by blast
-        have equal_pair: "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
-         proof - 
-                have "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, (right_coproj B C) \<circ>\<^sub>c c\<rangle>"
-                  using ac_def id_left_unit2 by force
-                also have "... = (id(A) \<times>\<^sub>f (right_coproj B C))  \<circ>\<^sub>c \<langle>a,  c\<rangle>"
-                  by (smt ac_def cfunc_cross_prod_comp_cfunc_prod id_type right_proj_type)
-                also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a, c\<rangle>"
-                  using \<phi>_def right_coproj_cfunc_coprod type1 type2 by auto
-                also have "... = \<phi> \<circ>\<^sub>c x"
-                  using ac_def comp_associative2 \<phi>_type x'_def by (typecheck_cfuncs, fastforce)
-                also have "... = \<phi> \<circ>\<^sub>c y"
-                  by (simp add: local.equal)
-                also have "... = (\<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C))) \<circ>\<^sub>c \<langle>a', c'\<rangle>"
-                  using a'c'_def comp_associative2 \<phi>_type y'_def by (typecheck_cfuncs, blast)
-                  also have "... = (id(A) \<times>\<^sub>f (right_coproj B C))  \<circ>\<^sub>c \<langle> a',  c'\<rangle>"
-                  using \<phi>_def right_coproj_cfunc_coprod type1 type2 by auto
-                also have "... = \<langle>id(A) \<circ>\<^sub>c a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
-                  using a'c'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
-                also have "... =  \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
-                  using a'c'_def id_left_unit2 by force
-                then show "\<langle>a, (right_coproj B C) \<circ>\<^sub>c c\<rangle> = \<langle>a', (right_coproj B C) \<circ>\<^sub>c c'\<rangle>"
-                  by (simp add: calculation)
-              qed     
-              then have a_equal: "(a = a') \<and> ((right_coproj B C) \<circ>\<^sub>c c = (right_coproj B C) \<circ>\<^sub>c c')"
-                using a'c'_def ac_def element_pair_eq equal_pair by (typecheck_cfuncs, blast)
-              then have c_equal: "c = c'" 
-        using a'c'_def a_equal ac_def right_coproj_are_monomorphisms right_proj_type monomorphism_def3 by blast
-      then show "x = y"
-        by (simp add: a'c'_def a_equal ac_def x'_def y'_def)
-    qed
-  qed
+  then show "epimorphism (dist_prod_coprod A B C)"
+    by (simp add: dist_prod_coprod_def surjective_is_epimorphism)
 qed
 
+lemma dist_prod_coprod_iso:
+  "isomorphism(dist_prod_coprod A B C)"
+  by (simp add: dist_prod_coprod_epi dist_prod_coprod_mono epi_mon_is_iso)
 
-  have monomorphism: "monomorphism(\<phi>)"
-    using injective injective_imp_monomorphism by auto
-  have epimorphism: "epimorphism(\<phi>)"
-    by (simp add: \<phi>_def surjective surjective_is_epimorphism)
-  have "isomorphism(\<phi>)"
-    using epi_mon_is_iso epimorphism monomorphism by auto
-  then show "A \<times>\<^sub>c (B \<Coprod> C) \<cong> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
-    using \<phi>_type is_isomorphic_def isomorphic_is_symmetric by blast
-qed
-
-
+(*Proposition 2.5.10 ... Better version*)
+lemma product_distribute_over_coproduct_left:
+  "A \<times>\<^sub>c (B \<Coprod> C) \<cong> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
+  using dist_prod_coprod_type dist_prod_coprod_iso is_isomorphic_def isomorphic_is_symmetric by blast
 
 lemma prod_pres_iso:
   assumes "A \<cong>  C"  "B \<cong> D"
