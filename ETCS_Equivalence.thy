@@ -419,6 +419,24 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
       using assms g_type h_type unfolding monomorphism_def2 by (typecheck_cfuncs, blast)
   qed
 qed
+
+
+lemma reflexive_def2:
+  assumes reflexive_Y: "reflexive_on X (Y, m)"
+  assumes x_type: "x \<in>\<^sub>c X" 
+  shows "\<exists>y. y \<in>\<^sub>c Y \<and>  m \<circ>\<^sub>c y = \<langle>x,x\<rangle>"
+  using assms unfolding reflexive_on_def relative_member_def factors_through_def2
+proof -
+    assume a1: "(Y, m) \<subseteq>\<^sub>c X \<times>\<^sub>c X \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> \<langle>x,x\<rangle> \<in>\<^sub>c X \<times>\<^sub>c X \<and> monomorphism (snd (Y, m)) \<and> snd (Y, m) : fst (Y, m) \<rightarrow> X \<times>\<^sub>c X \<and> \<langle>x,x\<rangle> factorsthru snd (Y, m))"
+    have xx_type: "\<langle>x,x\<rangle> \<in>\<^sub>c X \<times>\<^sub>c X"
+      by (typecheck_cfuncs, simp add: x_type)
+    have "\<langle>x,x\<rangle> factorsthru m"
+      using a1 x_type by auto
+    then show ?thesis
+      using a1 xx_type cfunc_type_def factors_through_def subobject_of_def2 by force
+qed
+
+
    
 lemma left_pair_reflexive:
   assumes "reflexive_on X (Y, m)"
@@ -443,21 +461,31 @@ next
      show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
       using \<open>monomorphism m\<close> cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_right_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
   next
-    assume "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
-    assume "\<langle>x,z\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
-    assume "distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
-    assume "distribute_right X X Z : (X \<times>\<^sub>c X) \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
-    assume "m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c X) \<times>\<^sub>c Z"
-    assume "distribute_right X X Z : (X \<times>\<^sub>c X) \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
-    assume "m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c X) \<times>\<^sub>c Z"
-    assume "id\<^sub>c Z : Z \<rightarrow> Z"
-    assume "x \<in>\<^sub>c X"
-    assume "z \<in>\<^sub>c Z"
-    assume "xz = \<langle>x,z\<rangle>"
-    assume "m : Y \<rightarrow> X \<times>\<^sub>c X"
-    have "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> = distribute_right X X Z \<circ>\<^sub>c \<langle>\<langle>x, x\<rangle>, z\<rangle>"
-      using \<open>z \<in>\<^sub>c Z\<close> distribute_right_ap x_type by auto
+    assume xzxz_type: "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+    assume m_type: "m : Y \<rightarrow> X \<times>\<^sub>c X"
+    obtain y where y_def: "y \<in>\<^sub>c Y \<and> m \<circ>\<^sub>c y = \<langle>x, x\<rangle>"
+      using assms reflexive_def2 x_type by blast
+    have mid_type: "m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c X) \<times>\<^sub>c Z"
+      by (simp add: cfunc_cross_prod_type id_type m_type)
+    have dist_mid_type:"distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+      using comp_type distribute_right_type mid_type by force
+
+    have yz_tyep: "\<langle>y,z\<rangle> \<in>\<^sub>c Y \<times>\<^sub>c Z"
+      by (typecheck_cfuncs, simp add: \<open>z \<in>\<^sub>c Z\<close> y_def)
+    have "(distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,z\<rangle>  = distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id(Z)) \<circ>\<^sub>c \<langle>y,z\<rangle>"
+      using \<open>m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c X) \<times>\<^sub>c Z\<close> comp_associative2 yz_tyep by (typecheck_cfuncs, auto)
+    also have "...  =  distribute_right X X Z \<circ>\<^sub>c  \<langle>m \<circ>\<^sub>c y,id(Z) \<circ>\<^sub>c z\<rangle>"
+      using \<open>z \<in>\<^sub>c Z\<close> cfunc_cross_prod_comp_cfunc_prod m_type y_def by (typecheck_cfuncs, auto)
+    also have distxxz: "... = distribute_right X X Z \<circ>\<^sub>c  \<langle> \<langle>x, x\<rangle>, z\<rangle>"
+      using \<open>z \<in>\<^sub>c Z\<close> id_left_unit2 y_def by auto
+    also have "... = \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle>"
+      by (meson \<open>z \<in>\<^sub>c Z\<close> distribute_right_ap x_type)
+    then have "\<exists>h. \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> = (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c h"
+      by (metis  calculation)
     then show "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> factorsthru (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
+      using  xzxz_type \<open>distribute_right X X Z \<circ>\<^sub>c \<langle>\<langle>x,x\<rangle>,z\<rangle> = \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle>\<close> dist_mid_type calculation factors_through_def2 yz_tyep by auto
+  qed
+qed
 
 
 
