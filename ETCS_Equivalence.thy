@@ -420,6 +420,32 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
   qed
 qed
 
+lemma right_pair_subset:
+  assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
+  shows "(Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<subseteq>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c (Z \<times>\<^sub>c X)"
+  unfolding subobject_of_def2 using assms
+proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+  fix g h A
+  assume g_type: "g : A \<rightarrow> Z \<times>\<^sub>c Y"
+  assume h_type: "h : A \<rightarrow> Z \<times>\<^sub>c Y"
+
+  assume "(distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c g = (distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c h"
+  then have "distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c g = distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c h"
+    using assms g_type h_type by (typecheck_cfuncs, simp add: comp_associative2)
+  then have "(id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c g = (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c h"
+    using assms g_type h_type distribute_left_mono distribute_left_type monomorphism_def2
+    by (typecheck_cfuncs, blast)
+  then show "g = h"
+  proof -
+    have "monomorphism (id\<^sub>c Z \<times>\<^sub>f m)"
+      using assms cfunc_cross_prod_mono id_isomorphism id_type iso_imp_epi_and_monic by blast
+    then show "(id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c g = (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c h \<Longrightarrow> g = h"
+      using assms g_type h_type unfolding monomorphism_def2 by (typecheck_cfuncs, blast)
+  qed
+qed
+
+
+
 
 lemma reflexive_def2:
   assumes reflexive_Y: "reflexive_on X (Y, m)"
@@ -486,6 +512,13 @@ next
       using  xzxz_type \<open>distribute_right X X Z \<circ>\<^sub>c \<langle>\<langle>x,x\<rangle>,z\<rangle> = \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle>\<close> dist_mid_type calculation factors_through_def2 yz_tyep by auto
   qed
 qed
+
+lemma right_pair_reflexive:
+  assumes "reflexive_on X (Y, m)"
+  shows "reflexive_on (Z \<times>\<^sub>c X) (Y \<times>\<^sub>c Z, distribute_left X X Z \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+proof (unfold reflexive_on_def, auto)
+  have "m : Y \<rightarrow> X \<times>\<^sub>c X \<and> monomorphism m"
+    using assms unfolding reflexive_on_def subobject_of_def2 by auto
 
 
 
