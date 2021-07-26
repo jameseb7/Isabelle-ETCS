@@ -461,8 +461,8 @@ next
      show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
       using \<open>monomorphism m\<close> cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_right_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
   next
-    assume xzxz_type: "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
-    assume m_type: "m : Y \<rightarrow> X \<times>\<^sub>c X"
+    have xzxz_type: "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+      using \<open>xz \<in>\<^sub>c X \<times>\<^sub>c Z\<close> cfunc_prod_type xz_def by blast
     obtain y where y_def: "y \<in>\<^sub>c Y \<and> m \<circ>\<^sub>c y = \<langle>x, x\<rangle>"
       using assms reflexive_def2 x_type by blast
     have mid_type: "m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c X) \<times>\<^sub>c Z"
