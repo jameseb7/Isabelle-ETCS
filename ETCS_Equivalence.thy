@@ -496,8 +496,8 @@ next
   fix xz
   have m_type: "m : Y \<rightarrow> X \<times>\<^sub>c X"
     using assms unfolding reflexive_on_def subobject_of_def2 by auto
-  assume "xz \<in>\<^sub>c X \<times>\<^sub>c Z"
-  then obtain x z where x_type: "x \<in>\<^sub>c X" and "z \<in>\<^sub>c Z" and xz_def: "xz = \<langle>x, z\<rangle>"
+  assume xz_type: "xz \<in>\<^sub>c X \<times>\<^sub>c Z"
+  then obtain x z where x_type: "x \<in>\<^sub>c X" and z_type: "z \<in>\<^sub>c Z" and xz_def: "xz = \<langle>x, z\<rangle>"
     using cart_prod_decomp by blast
   then show "\<langle>xz,xz\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
     using m_type
@@ -508,28 +508,28 @@ next
       using  cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_right_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
   next
     have xzxz_type: "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
-      using \<open>xz \<in>\<^sub>c X \<times>\<^sub>c Z\<close> cfunc_prod_type xz_def by blast
-    obtain y where y_def: "y \<in>\<^sub>c Y \<and> m \<circ>\<^sub>c y = \<langle>x, x\<rangle>"
+      using xz_type cfunc_prod_type xz_def by blast
+    obtain y where y_def: "y \<in>\<^sub>c Y" "m \<circ>\<^sub>c y = \<langle>x, x\<rangle>"
       using assms reflexive_def2 x_type by blast
     have mid_type: "m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c X) \<times>\<^sub>c Z"
       by (simp add: cfunc_cross_prod_type id_type m_type)
     have dist_mid_type:"distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
       using comp_type distribute_right_type mid_type by force
 
-    have yz_tyep: "\<langle>y,z\<rangle> \<in>\<^sub>c Y \<times>\<^sub>c Z"
+    have yz_type: "\<langle>y,z\<rangle> \<in>\<^sub>c Y \<times>\<^sub>c Z"
       by (typecheck_cfuncs, simp add: \<open>z \<in>\<^sub>c Z\<close> y_def)
     have "(distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,z\<rangle>  = distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id(Z)) \<circ>\<^sub>c \<langle>y,z\<rangle>"
-      using comp_associative2 mid_type yz_tyep by (typecheck_cfuncs, auto)
+      using comp_associative2 mid_type yz_type by (typecheck_cfuncs, auto)
     also have "...  =  distribute_right X X Z \<circ>\<^sub>c  \<langle>m \<circ>\<^sub>c y,id(Z) \<circ>\<^sub>c z\<rangle>"
-      using \<open>z \<in>\<^sub>c Z\<close> cfunc_cross_prod_comp_cfunc_prod m_type y_def by (typecheck_cfuncs, auto)
+      using z_type cfunc_cross_prod_comp_cfunc_prod m_type y_def by (typecheck_cfuncs, auto)
     also have distxxz: "... = distribute_right X X Z \<circ>\<^sub>c  \<langle> \<langle>x, x\<rangle>, z\<rangle>"
-      using \<open>z \<in>\<^sub>c Z\<close> id_left_unit2 y_def by auto
+      using z_type id_left_unit2 y_def by auto
     also have "... = \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle>"
-      by (meson \<open>z \<in>\<^sub>c Z\<close> distribute_right_ap x_type)
+      by (meson z_type distribute_right_ap x_type)
     then have "\<exists>h. \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> = (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c h"
       by (metis  calculation)
     then show "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> factorsthru (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
-      using  xzxz_type \<open>distribute_right X X Z \<circ>\<^sub>c \<langle>\<langle>x,x\<rangle>,z\<rangle> = \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle>\<close> dist_mid_type calculation factors_through_def2 yz_tyep by auto
+      using  xzxz_type z_type distribute_right_ap x_type dist_mid_type calculation factors_through_def2 yz_type by auto
   qed
 qed
 
@@ -545,8 +545,8 @@ proof (unfold reflexive_on_def, auto)
   fix zx
   have m_type: "m : Y \<rightarrow> X \<times>\<^sub>c X"
     using assms unfolding reflexive_on_def subobject_of_def2 by auto
-  assume "zx \<in>\<^sub>c Z \<times>\<^sub>c X"
-  then obtain z x where x_type: "x \<in>\<^sub>c X" and "z \<in>\<^sub>c Z" and zx_def: "zx = \<langle>z, x\<rangle>"
+  assume zx_type: "zx \<in>\<^sub>c Z \<times>\<^sub>c X"
+  then obtain z x where x_type: "x \<in>\<^sub>c X" and z_type: "z \<in>\<^sub>c Z" and zx_def: "zx = \<langle>z, x\<rangle>"
     using cart_prod_decomp by blast
   then show "\<langle>zx,zx\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
     using m_type
@@ -557,28 +557,28 @@ proof (unfold reflexive_on_def, auto)
       using  cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_left_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
   next
     have zxzx_type: "\<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle> \<in>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
-      using \<open>zx \<in>\<^sub>c Z \<times>\<^sub>c X\<close> cfunc_prod_type zx_def by blast
-    obtain y where y_def: "y \<in>\<^sub>c Y \<and> m \<circ>\<^sub>c y = \<langle>x, x\<rangle>"
+      using zx_type cfunc_prod_type zx_def by blast
+    obtain y where y_def: "y \<in>\<^sub>c Y" "m \<circ>\<^sub>c y = \<langle>x, x\<rangle>"
       using assms reflexive_def2 x_type by blast
         have mid_type: "(id\<^sub>c Z \<times>\<^sub>f m) : Z \<times>\<^sub>c Y \<rightarrow>   Z \<times>\<^sub>c (X \<times>\<^sub>c X)"
       by (simp add: cfunc_cross_prod_type id_type m_type)
     have dist_mid_type:"distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) : Z \<times>\<^sub>c Y \<rightarrow> (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
       using comp_type distribute_left_type mid_type by force
 
-    have yz_tyep: "\<langle>z,y\<rangle> \<in>\<^sub>c Z \<times>\<^sub>c Y"
+    have yz_type: "\<langle>z,y\<rangle> \<in>\<^sub>c Z \<times>\<^sub>c Y"
       by (typecheck_cfuncs, simp add: \<open>z \<in>\<^sub>c Z\<close> y_def)
     have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c \<langle>z,y\<rangle>  = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>z,y\<rangle>"
-      using comp_associative2 mid_type yz_tyep by (typecheck_cfuncs, auto)
+      using comp_associative2 mid_type yz_type by (typecheck_cfuncs, auto)
     also have "...  =  distribute_left Z X X  \<circ>\<^sub>c  \<langle>id\<^sub>c Z \<circ>\<^sub>c z , m \<circ>\<^sub>c y \<rangle>"
-      using \<open>z \<in>\<^sub>c Z\<close> cfunc_cross_prod_comp_cfunc_prod m_type y_def by (typecheck_cfuncs, auto)
+      using z_type cfunc_cross_prod_comp_cfunc_prod m_type y_def by (typecheck_cfuncs, auto)
     also have distxxz: "... = distribute_left Z X X  \<circ>\<^sub>c  \<langle>z, \<langle>x, x\<rangle>\<rangle>"
-      using \<open>z \<in>\<^sub>c Z\<close> id_left_unit2 y_def by auto
+      using z_type id_left_unit2 y_def by auto
     also have "... = \<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle>"
-      by (meson \<open>z \<in>\<^sub>c Z\<close> distribute_left_ap x_type)
+      by (meson z_type distribute_left_ap x_type)
     then have "\<exists>h. \<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle> = (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c h"
       by (metis  calculation)
     then show "\<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle> factorsthru (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
-      using \<open>distribute_left Z X X \<circ>\<^sub>c \<langle>z,\<langle>x,x\<rangle>\<rangle> = \<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle>\<close> calculation dist_mid_type factors_through_def2 yz_tyep zxzx_type by auto
+      using z_type distribute_left_ap x_type calculation dist_mid_type factors_through_def2 yz_type zxzx_type by auto
   qed
 qed
 
