@@ -460,7 +460,27 @@ proof -
       using a1 x_type by auto
     then show ?thesis
       using a1 xx_type cfunc_type_def factors_through_def subobject_of_def2 by force
-qed
+  qed
+
+lemma symmetric_def2:
+  assumes symmetric_Y: "symmetric_on X (Y, m)"
+  assumes x_type: "x \<in>\<^sub>c X"
+  assumes y_type: "y \<in>\<^sub>c X"
+  assumes relation: "\<exists>v. v \<in>\<^sub>c Y \<and>  m \<circ>\<^sub>c v = \<langle>x,y\<rangle>"
+  shows "\<exists>w. w \<in>\<^sub>c Y \<and>  m \<circ>\<^sub>c w = \<langle>y,x\<rangle>"
+  using assms unfolding symmetric_on_def relative_member_def factors_through_def2
+  by (metis cfunc_prod_type factors_through_def2 fst_conv snd_conv subobject_of_def2)
+
+lemma transitive_def2:
+  assumes transitive_Y: "transitive_on X (Y, m)"
+  assumes x_type: "x \<in>\<^sub>c X"
+  assumes y_type: "y \<in>\<^sub>c X"
+  assumes z_type: "z \<in>\<^sub>c X"
+  assumes relation1: "\<exists>v. v \<in>\<^sub>c Y \<and>  m \<circ>\<^sub>c v = \<langle>x,y\<rangle>"
+  assumes relation2: "\<exists>w. w \<in>\<^sub>c Y \<and>  m \<circ>\<^sub>c w = \<langle>y,z\<rangle>"
+  shows "\<exists>u. u \<in>\<^sub>c Y \<and>  m \<circ>\<^sub>c u = \<langle>x,z\<rangle>"
+  using assms unfolding transitive_on_def relative_member_def factors_through_def2
+  by (metis cfunc_prod_type factors_through_def2 fst_conv snd_conv subobject_of_def2)
 
 
    
@@ -484,8 +504,8 @@ next
   proof (auto, typecheck_cfuncs, unfold relative_member_def2, auto)
     have "monomorphism m"
       using assms unfolding reflexive_on_def subobject_of_def2 by auto
-     show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
-      using \<open>monomorphism m\<close> cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_right_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
+    then show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
+      using  cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_right_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
   next
     have xzxz_type: "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
       using \<open>xz \<in>\<^sub>c X \<times>\<^sub>c Z\<close> cfunc_prod_type xz_def by blast
@@ -533,8 +553,8 @@ proof (unfold reflexive_on_def, auto)
   proof (auto, typecheck_cfuncs, unfold relative_member_def2, auto)
     have "monomorphism m"
       using assms unfolding reflexive_on_def subobject_of_def2 by auto
-     show "monomorphism (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
-      using \<open>monomorphism m\<close> cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_left_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
+    then show "monomorphism (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+      using  cfunc_cross_prod_mono cfunc_type_def composition_of_monic_pair_is_monic distribute_left_mono id_isomorphism iso_imp_epi_and_monic m_type by (typecheck_cfuncs, auto)
   next
     have zxzx_type: "\<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle> \<in>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
       using \<open>zx \<in>\<^sub>c Z \<times>\<^sub>c X\<close> cfunc_prod_type zx_def by blast
@@ -563,6 +583,39 @@ proof (unfold reflexive_on_def, auto)
 qed
 
 
+lemma left_pair_symmetric:
+  assumes "symmetric_on X (Y, m)"
+  shows "symmetric_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))"
+proof (unfold symmetric_on_def, auto)
+  have "m : Y \<rightarrow> X \<times>\<^sub>c X \<and> monomorphism m"
+    using assms subobject_of_def2 symmetric_on_def by blast
+  then show "(Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<subseteq>\<^sub>c
+    (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+    by (simp add: left_pair_subset)
+next
+  fix s t 
+  assume s_type: "s \<in>\<^sub>c X \<times>\<^sub>c Z"
+  assume t_type: "t \<in>\<^sub>c X \<times>\<^sub>c Z"
+  assume st_relation: "\<langle>s,t\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
+  obtain x1 z1 where s_def: " x1 \<in>\<^sub>c X \<and> z1 \<in>\<^sub>c Z \<and> s =  \<langle>x1,z1\<rangle>"
+    using cart_prod_decomp s_type by blast
+  obtain x2 z2 where t_def: " x2 \<in>\<^sub>c X \<and> z2 \<in>\<^sub>c Z \<and> t =  \<langle>x2,z2\<rangle>"
+    using cart_prod_decomp t_type by blast 
+  then show "\<langle>t,s\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c
+                   X \<times>\<^sub>c
+                   Z\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)" 
+  proof (auto, typecheck_cfuncs, unfold relative_member_def2, auto)
+    show "\<langle>\<langle>x2,z2\<rangle>,s\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+      by (typecheck_cfuncs, simp add: s_type t_def)
+    show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
+      using relative_member_def2 st_relation by blast
+    show "distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
+      using relative_member_def2 st_relation by (typecheck_cfuncs, blast)
+
+
+
+    show "\<langle>\<langle>x2,z2\<rangle>,s\<rangle> factorsthru (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
+      oops     
 
 
 (*lemma left_pair_equiv_rel:
