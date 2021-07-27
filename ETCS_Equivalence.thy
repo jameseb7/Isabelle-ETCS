@@ -664,6 +664,90 @@ next
   qed
 qed
 
+lemma right_pair_symmetric:
+  assumes "symmetric_on X (Y, m)"
+  shows "symmetric_on (Z \<times>\<^sub>c X) (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+proof (unfold symmetric_on_def, auto)
+  have "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
+    using assms subobject_of_def2 symmetric_on_def by auto
+  then show "(Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<subseteq>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
+    by (simp add: right_pair_subset)
+next
+  have m_def[type_rule]: "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
+    using assms subobject_of_def2 symmetric_on_def by auto
+
+  fix s t 
+  assume s_type[type_rule]: "s \<in>\<^sub>c Z \<times>\<^sub>c X"
+  assume t_type[type_rule]: "t \<in>\<^sub>c Z \<times>\<^sub>c X"
+  assume st_relation: "\<langle>s,t\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+  
+  obtain xs zs where s_def[type_rule]: " xs \<in>\<^sub>c Z" "zs \<in>\<^sub>c X" "s =  \<langle>xs,zs\<rangle>"
+    using cart_prod_decomp s_type by blast
+  obtain xt zt where t_def[type_rule]: "xt \<in>\<^sub>c Z" "zt \<in>\<^sub>c X" "t =  \<langle>xt,zt\<rangle>"
+    using cart_prod_decomp t_type by blast 
+
+  show "\<langle>t,s\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c (Z \<times>\<^sub>c X)\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))" 
+    using s_def t_def m_def
+  proof (simp, typecheck_cfuncs, auto, unfold relative_member_def2, auto)
+    show "monomorphism (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+      using relative_member_def2 st_relation by blast
+
+    have "\<langle>\<langle>xs,zs\<rangle>, \<langle>xt,zt\<rangle>\<rangle> factorsthru (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+      using st_relation s_def t_def unfolding relative_member_def2 by auto
+    then obtain zy where zy_type[type_rule]: "zy \<in>\<^sub>c Z \<times>\<^sub>c Y"
+      and zy_def: "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c zy = \<langle>\<langle>xs,zs\<rangle>, \<langle>xt,zt\<rangle>\<rangle>"
+      using s_def t_def m_def by (typecheck_cfuncs, unfold factors_through_def2, auto)
+    then obtain y z where
+      y_type[type_rule]: "y \<in>\<^sub>c Y" and z_type[type_rule]: "z \<in>\<^sub>c Z" and yz_pair: "zy = \<langle>z, y\<rangle>"
+      using cart_prod_decomp by blast
+    then obtain my1 my2 where my_types[type_rule]: "my1 \<in>\<^sub>c X" "my2 \<in>\<^sub>c X" and my_def: "m \<circ>\<^sub>c y = \<langle>my2,my1\<rangle>"
+      by (metis cart_prod_decomp cfunc_type_def codomain_comp domain_comp m_def(1))
+    then obtain y' where y'_type[type_rule]: "y' \<in>\<^sub>c Y" and y'_def: "m \<circ>\<^sub>c y' = \<langle>my1,my2\<rangle>"
+      using assms symmetric_def2 y_type by blast
+
+    have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c zy = \<langle>\<langle>z,my2\<rangle>, \<langle>z,my1\<rangle>\<rangle>"
+    proof -
+      have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c zy = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c zy"
+        unfolding yz_pair by (typecheck_cfuncs, simp add: comp_associative2)
+      also have "... = distribute_left Z X X  \<circ>\<^sub>c \<langle>id\<^sub>c Z \<circ>\<^sub>c z , m \<circ>\<^sub>c y\<rangle>"
+        by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod yz_pair)
+      also have "... = distribute_left Z X X  \<circ>\<^sub>c \<langle>z , \<langle>my2,my1\<rangle>\<rangle>"
+        unfolding my_def by (typecheck_cfuncs, simp add: id_left_unit2)
+      also have "... = \<langle>\<langle>z,my2\<rangle>, \<langle>z,my1\<rangle>\<rangle>"
+        using distribute_left_ap by (typecheck_cfuncs, auto)
+      then show ?thesis
+        using calculation by auto
+    qed   
+    then have "\<langle>\<langle>xs,zs\<rangle>,\<langle>xt,zt\<rangle>\<rangle> = \<langle>\<langle>z,my2\<rangle>,\<langle>z,my1\<rangle>\<rangle>"
+      using zy_def by auto
+    then have "\<langle>xs,zs\<rangle> = \<langle>z,my2\<rangle> \<and> \<langle>xt,zt\<rangle> = \<langle>z, my1\<rangle>"
+      using element_pair_eq by (typecheck_cfuncs, auto)
+    then have eqs: "xs = z \<and> zs = my2 \<and> xt = z \<and> zt = my1"
+      using element_pair_eq by (typecheck_cfuncs, auto)
+
+    have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c \<langle>z,y'\<rangle> = \<langle>\<langle>xt,zt\<rangle>, \<langle>xs,zs\<rangle>\<rangle>"
+    proof -
+      have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c \<langle>z,y'\<rangle> = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>z,y'\<rangle>"
+        by (typecheck_cfuncs, simp add: comp_associative2)
+      also have "... = distribute_left Z X X \<circ>\<^sub>c \<langle>id\<^sub>c Z \<circ>\<^sub>c z, m \<circ>\<^sub>c y'\<rangle>"
+        by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+      also have "... = distribute_left Z X X \<circ>\<^sub>c \<langle>z, \<langle>my1,my2\<rangle>\<rangle>"
+        unfolding y'_def by (typecheck_cfuncs, simp add: id_left_unit2)
+      also have "... = \<langle>\<langle>z,my1\<rangle>, \<langle>z,my2\<rangle>\<rangle>"
+        using distribute_left_ap by (typecheck_cfuncs, auto)
+      also have "... = \<langle>\<langle>xt,zt\<rangle>, \<langle>xs,zs\<rangle>\<rangle>"
+        using eqs by auto
+      then show ?thesis
+        using calculation by auto
+    qed
+    then show "\<langle>\<langle>xt,zt\<rangle>,\<langle>xs,zs\<rangle>\<rangle> factorsthru (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+      by (typecheck_cfuncs, unfold factors_through_def2, rule_tac x="\<langle>z,y'\<rangle>" in exI, typecheck_cfuncs)
+  qed
+qed
+
+
+
+
 (*lemma left_pair_equiv_rel:
   assumes "equiv_rel_on X (Y, m)"
   shows "equiv_rel_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, m \<times>\<^sub>f id Z)"
