@@ -1079,10 +1079,231 @@ lemma product_distribute_over_coproduct_right:
 
 
 
+definition cfunc_bowtie_prod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<bowtie>\<^sub>f" 55) where
+  "f \<bowtie>\<^sub>f g = ((left_coproj (codomain f) (codomain g)) \<circ>\<^sub>c f) \<amalg> ((right_coproj (codomain f) (codomain g)) \<circ>\<^sub>c g)"
+
+lemma cfunc_bowtie_prod_def2: 
+  assumes "f : X \<rightarrow> Y" "g : V\<rightarrow> W"
+  shows "f \<bowtie>\<^sub>f g = (left_coproj Y W \<circ>\<^sub>c f) \<amalg> (right_coproj Y W \<circ>\<^sub>c g)"
+  using assms cfunc_bowtie_prod_def cfunc_type_def by auto
+
+lemma cfunc_bowtie_prod_type[type_rule]:
+  "f : X \<rightarrow> Y \<Longrightarrow> g : V \<rightarrow> W \<Longrightarrow> f \<bowtie>\<^sub>f g : X \<Coprod> V \<rightarrow> Y \<Coprod> W"
+  unfolding cfunc_bowtie_prod_def
+  using cfunc_coprod_type cfunc_type_def comp_type left_proj_type right_proj_type by auto
+
+
+lemma left_coproj_cfunc_bowtie_prod:
+  "f : X \<rightarrow> Y \<Longrightarrow> g : V \<rightarrow> W \<Longrightarrow> (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X V) = (left_coproj Y W) \<circ>\<^sub>c f"
+  unfolding cfunc_bowtie_prod_def2
+  by (meson comp_type left_coproj_cfunc_coprod left_proj_type right_proj_type)
+
+
+ lemma right_coproj_cfunc_bowtie_prod:
+  "f : X \<rightarrow> Y \<Longrightarrow> g : V \<rightarrow> W \<Longrightarrow> (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X V) = (right_coproj Y W) \<circ>\<^sub>c g"
+  unfolding cfunc_bowtie_prod_def2
+  by (meson comp_type right_coproj_cfunc_coprod right_proj_type left_proj_type)
+
+
+lemma cfunc_bowtie_prod_unique: "f : X \<rightarrow> Y \<Longrightarrow> g : V \<rightarrow> W \<Longrightarrow> h : X \<Coprod> V \<rightarrow> Y \<Coprod> W \<Longrightarrow>
+    h \<circ>\<^sub>c left_coproj X V   = (left_coproj Y W) \<circ>\<^sub>c f \<Longrightarrow>
+    h \<circ>\<^sub>c right_coproj X V = (right_coproj Y W) \<circ>\<^sub>c g \<Longrightarrow> h = f \<bowtie>\<^sub>f g"
+  unfolding cfunc_bowtie_prod_def
+  using cfunc_coprod_unique cfunc_type_def codomain_comp domain_comp left_proj_type right_proj_type by auto
+
+(*
+(*Dual to Proposition 2.1.11*)
+lemma identity_distributes_across_composition_dual:
+  assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C"
+  shows "(g  \<circ>\<^sub>c f) \<bowtie>\<^sub>f id(X)  = (g \<bowtie>\<^sub>f id(X)) \<circ>\<^sub>c (f \<bowtie>\<^sub>f id(X))"
+proof - 
+  from cfunc_bowtie_prod_unique
+  have uniqueness: "\<forall>h. h : X \<Coprod>  A \<rightarrow> X \<Coprod> C \<and>
+    h \<circ>\<^sub>c left_coproj X C  =   left_coproj X A \<circ>\<^sub>c id\<^sub>c X \<and>
+    h \<circ>\<^sub>c right_coproj X C = right_coproj X A \<circ>\<^sub>c(g \<circ>\<^sub>c f)  \<longrightarrow>
+    h =  (g \<circ>\<^sub>c f) \<bowtie>\<^sub>f  id\<^sub>c X"
+*)
+
+
+  (*The above may not be stated correctly*)
+
+lemma coproduct_of_beta:
+  "\<beta>\<^bsub>X\<^esub> \<amalg> \<beta>\<^bsub>Y\<^esub> = \<beta>\<^bsub>X\<Coprod>Y\<^esub>"
+  by (metis (full_types) cfunc_coprod_unique left_proj_type right_proj_type terminal_func_comp terminal_func_type)
+
+
+
+lemma cfunc_bowtieprod_comp_cfunc_coprod:
+  assumes a_type: "a : Y \<rightarrow> Z" and b_type: "b : W \<rightarrow> Z"
+  assumes f_type: "f : X \<rightarrow> Y" and g_type: "g : V \<rightarrow> W"
+  shows "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)   = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
+
+proof - 
+
+  from cfunc_bowtie_prod_unique have uniqueness:
+    "\<forall>h. h : X \<Coprod> V \<rightarrow> Z \<and> h \<circ>\<^sub>c left_coproj X V   = a \<circ>\<^sub>c f \<and> h \<circ>\<^sub>c right_coproj X V  = b \<circ>\<^sub>c g \<longrightarrow> 
+      h = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
+    using assms comp_type by (metis (full_types) cfunc_coprod_unique) 
+
+  have left_eq: "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)"
+  proof - 
+    have "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V = (a \<amalg> b)  \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f"
+      using f_type g_type left_coproj_cfunc_bowtie_prod by auto
+    also have "... = ((a \<amalg> b)  \<circ>\<^sub>c left_coproj Y W) \<circ>\<^sub>c f"
+      using a_type assms(2) cfunc_type_def comp_associative f_type by (typecheck_cfuncs, auto)
+    also have "... = (a \<circ>\<^sub>c f)"
+      using a_type b_type left_coproj_cfunc_coprod by presburger
+    then show  "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)"
+      by (simp add: calculation)
+  qed
+
+  have right_eq: "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
+  proof - 
+    have "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (a \<amalg> b)  \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
+      using f_type g_type right_coproj_cfunc_bowtie_prod by auto
+    also have "... = ((a \<amalg> b)  \<circ>\<^sub>c right_coproj Y W) \<circ>\<^sub>c g"
+      using a_type assms(2) cfunc_type_def comp_associative g_type by (typecheck_cfuncs, auto)
+    also have "... = (b \<circ>\<^sub>c g)"
+      using a_type b_type right_coproj_cfunc_coprod by auto
+    then show "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
+      by (simp add: calculation)
+  qed
+
+  show "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)   = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
+    using uniqueness left_eq right_eq assms apply (erule_tac x="(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)" in allE)
+    oops
+
+
+lemma id_bowtie_prod: "id(X) \<bowtie>\<^sub>f id(Y) = id(X \<Coprod> Y)"
+  by (metis cfunc_bowtie_prod_def id_codomain id_coprod id_right_unit2 left_proj_type right_proj_type)
+
+
+
+lemma cfunc_bowtie_prod_comp_cfunc_bowtie_prod:
+  assumes "f : X \<rightarrow> Y" "g : V \<rightarrow> W" "x : Y \<rightarrow> S" "y : W \<rightarrow> T"
+  shows "(x \<bowtie>\<^sub>f y) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) = (x \<circ>\<^sub>c f) \<bowtie>\<^sub>f (y \<circ>\<^sub>c g)"
+proof- 
+  have "(x \<bowtie>\<^sub>f y) \<circ>\<^sub>c ((left_coproj Y W \<circ>\<^sub>c f) \<amalg> (right_coproj Y W \<circ>\<^sub>c g))
+      = ((x \<bowtie>\<^sub>f y) \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f) \<amalg> ((x \<bowtie>\<^sub>f y) \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g)"
+    using assms by (typecheck_cfuncs, simp add: cfunc_coprod_comp)
+  also have "... = (((x \<bowtie>\<^sub>f y) \<circ>\<^sub>c left_coproj Y W) \<circ>\<^sub>c f) \<amalg> (((x \<bowtie>\<^sub>f y) \<circ>\<^sub>c right_coproj Y W) \<circ>\<^sub>c g)"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2)
+  also have "... = ((left_coproj S T \<circ>\<^sub>c x) \<circ>\<^sub>c f) \<amalg> ((right_coproj S T \<circ>\<^sub>c y) \<circ>\<^sub>c g)"
+    using assms(3) assms(4) left_coproj_cfunc_bowtie_prod right_coproj_cfunc_bowtie_prod by auto
+  also have "... = (left_coproj S T \<circ>\<^sub>c x \<circ>\<^sub>c f) \<amalg> (right_coproj S T \<circ>\<^sub>c y \<circ>\<^sub>c g)"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2)
+  also have "... = (x \<circ>\<^sub>c f) \<bowtie>\<^sub>f (y \<circ>\<^sub>c g)"
+    using assms cfunc_bowtie_prod_def cfunc_type_def codomain_comp by auto
+  then show "(x \<bowtie>\<^sub>f y) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) = (x \<circ>\<^sub>c f) \<bowtie>\<^sub>f (y \<circ>\<^sub>c g)"
+    using assms(1) assms(2) calculation cfunc_bowtie_prod_def2 by auto
+qed
+
+
+lemma coprod_eq:
+  assumes "a : X \<Coprod> Y \<rightarrow> Z" "b : X \<Coprod> Y \<rightarrow>  Z"
+  shows "a = b \<longleftrightarrow> 
+    (a \<circ>\<^sub>c left_coproj X Y   = b \<circ>\<^sub>c left_coproj X Y 
+      \<and> a \<circ>\<^sub>c right_coproj X Y  = b \<circ>\<^sub>c right_coproj X Y)"
+  by (smt assms cfunc_coprod_unique cfunc_type_def codomain_comp domain_comp left_proj_type right_proj_type)
+
+lemma coprod_eqI:
+  assumes "a : X \<Coprod> Y \<rightarrow> Z" "b : X \<Coprod> Y \<rightarrow> Z"
+  assumes "(a \<circ>\<^sub>c left_coproj X Y   = b \<circ>\<^sub>c left_coproj X Y 
+      \<and> a \<circ>\<^sub>c right_coproj X Y  = b \<circ>\<^sub>c right_coproj X Y)"
+  shows "a = b"
+  using assms coprod_eq  by blast
+
+lemma coprod_eq2:
+  assumes "a : X \<rightarrow> Z" "b : Y \<rightarrow> Z" "c : X \<rightarrow>  Z" "d : Y \<rightarrow>  Z"
+  shows "(a \<amalg> b) = (c \<amalg> d) \<longleftrightarrow> (a = c \<and> b = d)"
+  by (metis assms left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
+
+
+lemma coprod_decomp:
+  assumes "a : X \<Coprod> Y \<rightarrow> A"
+  shows "\<exists> x y. a = (x \<amalg> y) \<and> x : X \<rightarrow> A \<and> y : Y \<rightarrow> A"
+proof (rule_tac x="a \<circ>\<^sub>c left_coproj X Y" in exI, rule_tac x="a \<circ>\<^sub>c right_coproj X Y" in exI, auto)
+  show "a = (a \<circ>\<^sub>c left_coproj X Y) \<amalg> (a \<circ>\<^sub>c right_coproj X Y)"
+    using assms cfunc_coprod_unique cfunc_type_def codomain_comp domain_comp left_proj_type right_proj_type by auto
+  show "a \<circ>\<^sub>c left_coproj X Y : X \<rightarrow> A"
+    by (meson assms comp_type left_proj_type)
+  show "a \<circ>\<^sub>c right_coproj X Y : Y \<rightarrow> A"
+    by (meson assms comp_type right_proj_type)
+qed
+
+
+lemma cfunc_bowtieprod_epi:
+  assumes type_assms: "f : X \<rightarrow> Y" "g : V \<rightarrow> W"
+  assumes f_epi: "epimorphism f" and g_epi: "epimorphism g"
+  shows "epimorphism (f \<bowtie>\<^sub>f g)"
+  using type_assms
+proof (typecheck_cfuncs, unfold epimorphism_def3, auto)
+  fix x y A
+  assume x_type: "x: Y \<Coprod> W \<rightarrow> A"
+  assume y_type: "y: Y \<Coprod> W \<rightarrow> A"
+  assume eqs: "x \<circ>\<^sub>c f \<bowtie>\<^sub>f g = y \<circ>\<^sub>c f \<bowtie>\<^sub>f g"
+
+  obtain x1 x2 where x_expand: "x = x1 \<amalg> x2" and x1_x2_type: "x1 : Y \<rightarrow> A" "x2 : W \<rightarrow> A"
+    using coprod_decomp x_type by blast
+  obtain y1 y2 where y_expand: "y = y1 \<amalg> y2" and y1_y2_type: "y1 : Y \<rightarrow> A" "y2 : W \<rightarrow> A"
+    using coprod_decomp y_type by blast
+
+
+  have "(x1 = y1) \<and> (x2 = y2)"
+  proof(auto)
+    have "x1 \<circ>\<^sub>c f = ((x1 \<amalg> x2) \<circ>\<^sub>c (left_coproj Y W)) \<circ>\<^sub>c f"
+      using x1_x2_type left_coproj_cfunc_coprod by auto 
+    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (left_coproj Y W) \<circ>\<^sub>c f"
+      using assms comp_associative2 x_expand x_type by (typecheck_cfuncs, auto)
+    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X V)"
+      using left_coproj_cfunc_bowtie_prod type_assms by force
+    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X V)"
+      using assms cfunc_type_def comp_associative eqs x_expand x_type y_expand y_type by (typecheck_cfuncs, auto)
+    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (left_coproj Y W) \<circ>\<^sub>c f"
+      using assms by (typecheck_cfuncs, simp add: left_coproj_cfunc_bowtie_prod)
+    also have "... = ((y1 \<amalg> y2) \<circ>\<^sub>c (left_coproj Y W)) \<circ>\<^sub>c f"
+      using assms comp_associative2 y_expand y_type by (typecheck_cfuncs, blast)
+    also have "... = y1 \<circ>\<^sub>c f"
+      using y1_y2_type left_coproj_cfunc_coprod by auto 
+    then show "x1 = y1"
+      using calculation epimorphism_def3 f_epi type_assms(1) x1_x2_type(1) y1_y2_type(1) by fastforce
+  next
+    have "x2 \<circ>\<^sub>c g = ((x1 \<amalg> x2) \<circ>\<^sub>c (right_coproj Y W)) \<circ>\<^sub>c g"
+      using x1_x2_type right_coproj_cfunc_coprod by auto 
+    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (right_coproj Y W) \<circ>\<^sub>c g"
+      using assms comp_associative2 x_expand x_type by (typecheck_cfuncs, auto)
+    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X V)"
+      using right_coproj_cfunc_bowtie_prod type_assms by force
+    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X V)"
+      using assms cfunc_type_def comp_associative eqs x_expand x_type y_expand y_type by (typecheck_cfuncs, auto)
+    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (right_coproj Y W) \<circ>\<^sub>c g"
+      using assms by (typecheck_cfuncs, simp add: right_coproj_cfunc_bowtie_prod)
+    also have "... = ((y1 \<amalg> y2) \<circ>\<^sub>c (right_coproj Y W)) \<circ>\<^sub>c g"
+      using assms comp_associative2 y_expand y_type by (typecheck_cfuncs, blast)
+    also have "... = y2 \<circ>\<^sub>c g"
+      using right_coproj_cfunc_coprod y1_y2_type(1) y1_y2_type(2) by auto
+    then show "x2 = y2"
+      using calculation epimorphism_def3 g_epi type_assms(2) x1_x2_type(2) y1_y2_type(2) by fastforce
+  qed
+  then show "x = y"
+    by (simp add: x_expand y_expand)
+qed
+
+
+
+
+
+(* begin section on subset inclusion*)
+
+
+
+
+(*
 (* These aren't actually equal... more like "equal up to isomorphism"*)
 lemma func_product_distribute_over_coproduct_left:
   "f \<times>\<^sub>f (g \<amalg> h) = (f \<times>\<^sub>f g) \<amalg> (f \<times>\<^sub>f h)"
   oops
+*)
 
 (* Proposition 2.4.5 *)
 definition into_super :: "cfunc \<Rightarrow> cfunc" where
