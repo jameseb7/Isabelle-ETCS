@@ -1289,6 +1289,174 @@ proof (typecheck_cfuncs, unfold epimorphism_def3, auto)
     by (simp add: x_expand y_expand)
 qed
 
+lemma cfunc_bowtieprod_inj:
+  assumes type_assms: "f : X \<rightarrow> Y" "g : V \<rightarrow> W"
+  assumes f_epi: "injective f" and g_epi: "injective g"
+  shows "injective (f \<bowtie>\<^sub>f g)"
+  unfolding injective_def
+proof(auto)
+  fix z1 z2 
+  assume x_type: "z1 \<in>\<^sub>c domain (f \<bowtie>\<^sub>f g)"
+  assume y_type: "z2 \<in>\<^sub>c domain (f \<bowtie>\<^sub>f g)"
+  assume eqs: "(f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z1 = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z2"
+
+  have f_bowtie_g_type: "(f \<bowtie>\<^sub>f g) : X \<Coprod> V \<rightarrow> Y \<Coprod> W"
+    by (simp add: cfunc_bowtie_prod_type type_assms(1) type_assms(2))
+
+  have x_type2: "z1 \<in>\<^sub>c X \<Coprod> V"
+    using cfunc_type_def f_bowtie_g_type x_type by auto
+  have y_type2: "z2 \<in>\<^sub>c X \<Coprod> V"
+    using cfunc_type_def f_bowtie_g_type y_type by auto
+
+  have z1_decomp: "(\<exists> x1. (x1 \<in>\<^sub>c X \<and> z1 = (left_coproj X V) \<circ>\<^sub>c x1))
+      \<or>  (\<exists> y1. (y1 \<in>\<^sub>c V \<and> z1 = (right_coproj X V) \<circ>\<^sub>c y1))"
+    by (simp add: coprojs_jointly_surj x_type2)
+
+  have z2_decomp: "(\<exists> x2. (x2 \<in>\<^sub>c X \<and> z2 = (left_coproj X V) \<circ>\<^sub>c x2))
+      \<or>  (\<exists> y2. (y2 \<in>\<^sub>c V \<and> z2 = (right_coproj X V) \<circ>\<^sub>c y2))"
+    by (simp add: coprojs_jointly_surj y_type2)
+
+  show "z1 = z2"
+  proof(cases "(\<exists> x1. (x1 \<in>\<^sub>c X \<and> z1 = (left_coproj X V) \<circ>\<^sub>c x1))")
+    assume case1: "\<exists>x1. x1 \<in>\<^sub>c X \<and> z1 = left_coproj X V \<circ>\<^sub>c x1"
+    obtain x1 where x1_def: "x1 \<in>\<^sub>c X \<and> z1 = left_coproj X V \<circ>\<^sub>c x1"
+          using case1 by blast
+    show "z1 = z2"
+    proof(cases "(\<exists> x2. (x2 \<in>\<^sub>c X \<and> z2 = (left_coproj X V) \<circ>\<^sub>c x2))")
+      assume caseA: "\<exists>x2. x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2"
+      show "z1 = z2"
+      proof - 
+        obtain x2 where x2_def: "x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2"
+          using caseA by blast
+        have "x1 = x2"
+        proof - 
+          have "(left_coproj Y W) \<circ>\<^sub>c f  \<circ>\<^sub>c x1  = ((left_coproj Y W) \<circ>\<^sub>c f) \<circ>\<^sub>c x1"
+            using cfunc_type_def comp_associative left_proj_type type_assms(1) x1_def by auto            
+          also have "... = 
+                ((((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (left_coproj X V)) \<circ>\<^sub>c x1"
+            using cfunc_bowtie_prod_def2 left_coproj_cfunc_bowtie_prod type_assms(1) type_assms(2) by auto
+          also have "... = (((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (left_coproj X V) \<circ>\<^sub>c x1"
+            using comp_associative2 type_assms(1) type_assms(2) x1_def by (typecheck_cfuncs, fastforce)
+          also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z1"
+            using cfunc_bowtie_prod_def2 type_assms x1_def by auto
+          also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z2"
+            by (meson eqs)
+          also have "... = (((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (left_coproj X V) \<circ>\<^sub>c x2"
+            using cfunc_bowtie_prod_def2 type_assms(1) type_assms(2) x2_def by auto
+          also have "... = ((((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (left_coproj X V)) \<circ>\<^sub>c x2"
+            by (typecheck_cfuncs, meson comp_associative2 type_assms(1) type_assms(2) x2_def)
+          also have "... = ((left_coproj Y W) \<circ>\<^sub>c f) \<circ>\<^sub>c x2"
+            using cfunc_bowtie_prod_def2 left_coproj_cfunc_bowtie_prod type_assms by auto
+          also have "... = (left_coproj Y W) \<circ>\<^sub>c f  \<circ>\<^sub>c x2"
+            by (metis comp_associative2 left_proj_type type_assms(1) x2_def)
+          then have "f  \<circ>\<^sub>c x1 = f  \<circ>\<^sub>c x2"
+            using  calculation cfunc_type_def left_coproj_are_monomorphisms
+            left_proj_type monomorphism_def type_assms(1) x1_def x2_def by (typecheck_cfuncs,auto)
+          then show "x1 = x2"
+            by (metis cfunc_type_def f_epi injective_def type_assms(1) x1_def x2_def)
+        qed
+        then show "z1 = z2"
+          by (simp add: x1_def x2_def)
+      qed
+    next 
+      assume caseB: "\<nexists>x2. x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2"
+      then obtain y2 where y2_def: "(y2 \<in>\<^sub>c V \<and> z2 = (right_coproj X V) \<circ>\<^sub>c y2)"
+        using z2_decomp by blast
+      have "(left_coproj Y W) \<circ>\<^sub>c f  \<circ>\<^sub>c x1  = ((left_coproj Y W) \<circ>\<^sub>c f) \<circ>\<^sub>c x1"
+            using cfunc_type_def comp_associative left_proj_type type_assms(1) x1_def by auto            
+      also have "... = 
+            ((((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (left_coproj X V)) \<circ>\<^sub>c x1"
+        using cfunc_bowtie_prod_def2 left_coproj_cfunc_bowtie_prod type_assms(1) type_assms(2) by auto
+      also have "... = (((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (left_coproj X V) \<circ>\<^sub>c x1"
+        using comp_associative2 type_assms(1) type_assms(2) x1_def by (typecheck_cfuncs, fastforce)
+      also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z1"
+        using cfunc_bowtie_prod_def2 type_assms x1_def by auto
+      also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z2"
+        by (meson eqs)
+      also have "... = (((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (right_coproj X V) \<circ>\<^sub>c y2"
+        using cfunc_bowtie_prod_def2 type_assms(1) type_assms(2) y2_def by auto
+      also have "... = ((((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (right_coproj X V)) \<circ>\<^sub>c y2"
+        by (typecheck_cfuncs, meson comp_associative2 type_assms(1) type_assms(2) y2_def)
+      also have "... = ((right_coproj Y W) \<circ>\<^sub>c g) \<circ>\<^sub>c y2"
+        using right_coproj_cfunc_coprod type_assms by (typecheck_cfuncs, fastforce)
+      also have "... = (right_coproj Y W) \<circ>\<^sub>c g  \<circ>\<^sub>c y2"
+        using comp_associative2 type_assms(2) y2_def by (typecheck_cfuncs, auto)
+      then have False
+        using calculation comp_type coproducts_disjoint type_assms x1_def y2_def by auto
+      then show "z1 = z2"
+        by simp
+    qed
+  next
+    assume case2: "\<nexists>x1. x1 \<in>\<^sub>c X \<and> z1 = left_coproj X V \<circ>\<^sub>c x1"
+    then obtain y1 where y1_def: "(y1 \<in>\<^sub>c V \<and> z1 = (right_coproj X V) \<circ>\<^sub>c y1)"
+      using z1_decomp by blast
+    show "z1 = z2"
+    proof(cases "(\<exists> x2. (x2 \<in>\<^sub>c X \<and> z2 = (left_coproj X V) \<circ>\<^sub>c x2))")
+      assume caseA: "\<exists>x2. x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2"
+      show "z1 = z2"
+      proof - 
+        obtain x2 where x2_def: "x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2"
+          using caseA by blast
+        have "(left_coproj Y W) \<circ>\<^sub>c f  \<circ>\<^sub>c x2  = ((left_coproj Y W) \<circ>\<^sub>c f) \<circ>\<^sub>c x2"
+          using comp_associative2 type_assms(1) x2_def by (typecheck_cfuncs, auto)
+        also have "... =
+              ((((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (left_coproj X V)) \<circ>\<^sub>c x2"
+          using cfunc_bowtie_prod_def2 left_coproj_cfunc_bowtie_prod type_assms by auto
+        also have "... = (((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (left_coproj X V) \<circ>\<^sub>c x2"
+          using comp_associative2 type_assms x2_def by (typecheck_cfuncs, fastforce)
+        also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z2"
+          using cfunc_bowtie_prod_def2 type_assms x2_def by auto
+        also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z1"
+          by (simp add: eqs)
+        also have "... = (((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (right_coproj X V) \<circ>\<^sub>c y1"
+          using cfunc_bowtie_prod_def2 type_assms y1_def by auto
+        also have "... = ((((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (right_coproj X V)) \<circ>\<^sub>c y1"
+          by (typecheck_cfuncs, meson comp_associative2 type_assms(1) type_assms(2) y1_def)
+        also have "... = ((right_coproj Y W) \<circ>\<^sub>c g) \<circ>\<^sub>c y1"
+          using right_coproj_cfunc_coprod type_assms  by (typecheck_cfuncs, fastforce)
+        also have "... = (right_coproj Y W) \<circ>\<^sub>c g  \<circ>\<^sub>c y1"
+          using comp_associative2 type_assms(2) y1_def by (typecheck_cfuncs, auto)
+        then have False
+          using calculation comp_type coproducts_disjoint type_assms x2_def y1_def by auto
+        then show "z1 = z2"
+          by simp
+      qed
+    next
+      assume caseB: "\<nexists>x2. x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2"
+      then obtain y2 where y2_def: "(y2 \<in>\<^sub>c V \<and> z2 = (right_coproj X V) \<circ>\<^sub>c y2)"
+        using z2_decomp by blast
+        have "y1 = y2"
+        proof - 
+          have "(right_coproj Y W) \<circ>\<^sub>c g  \<circ>\<^sub>c y1  = ((right_coproj Y W) \<circ>\<^sub>c g) \<circ>\<^sub>c y1"
+            using comp_associative2 type_assms(2) y1_def by (typecheck_cfuncs, auto)
+          also have "... =
+                ((((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (right_coproj X V)) \<circ>\<^sub>c y1"
+            using right_coproj_cfunc_coprod type_assms by (typecheck_cfuncs, fastforce)
+          also have "... = (((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (right_coproj X V) \<circ>\<^sub>c y1"
+            using comp_associative2 type_assms  y1_def by (typecheck_cfuncs, fastforce)
+          also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z1"
+            using cfunc_bowtie_prod_def2 type_assms y1_def by auto
+          also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c z2"
+            by (meson eqs)
+          also have "... = (((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (right_coproj X V) \<circ>\<^sub>c y2"
+            using cfunc_bowtie_prod_def2 type_assms y2_def by auto
+          also have "... = ((((left_coproj Y W) \<circ>\<^sub>c f) \<amalg> ((right_coproj Y W) \<circ>\<^sub>c g)) \<circ>\<^sub>c (right_coproj X V)) \<circ>\<^sub>c y2"
+            by (typecheck_cfuncs, meson comp_associative2 type_assms  y2_def)
+          also have "... = ((right_coproj Y W) \<circ>\<^sub>c g) \<circ>\<^sub>c y2"
+            using right_coproj_cfunc_coprod type_assms by (typecheck_cfuncs, fastforce)
+          also have "... = (right_coproj Y W) \<circ>\<^sub>c g  \<circ>\<^sub>c y2"
+            using comp_associative2 type_assms(2) y2_def by (typecheck_cfuncs, auto)
+          then have "g  \<circ>\<^sub>c y1 = g  \<circ>\<^sub>c y2"
+            using  calculation cfunc_type_def right_coproj_are_monomorphisms
+            right_proj_type monomorphism_def type_assms(2) y1_def y2_def by (typecheck_cfuncs,auto)
+          then show "y1 = y2"
+            by (metis cfunc_type_def g_epi injective_def type_assms(2) y1_def y2_def)
+        qed
+        then show "z1 = z2"
+          by (simp add: y1_def y2_def)
+      qed
+   qed
+qed
 
 
 

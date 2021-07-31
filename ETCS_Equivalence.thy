@@ -791,6 +791,8 @@ fix s t u
     (*then obtain y' where y'_type[type_rule]: "y' \<in>\<^sub>c Y" and y'_def: "m \<circ>\<^sub>c y' = \<langle>my2,my1\<rangle>"
       using assms symmetric_def2 y_type by blast*)
     oops
+
+
 (*this last line right above is probably not what we want. Try obtaining m3?
   Need to review the proof of the previous result as well*)
 

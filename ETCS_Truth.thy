@@ -387,6 +387,12 @@ proof -
     using surjective_is_epimorphism by blast
 qed
 
+(*This is essentially a duplicate of cfunc_cross_prod_surj from the Terminal
+Theory file.  If differs in style by proving the product of epis is epi rather
+than proving the products of surjective maps is surjective.  It makes use of 
+pullbacks, but ultimately it's a duplicate. However, I think we should leave it 
+because it offers different insights into proof style.*)
+
 (* Proposition 2.2.10 *)
 lemma product_of_epis_is_epi:
   assumes f_type: "f: X \<rightarrow> Y" and f_epi: "epimorphism(f)"

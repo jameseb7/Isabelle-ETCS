@@ -322,7 +322,7 @@ proof -
   qed
 qed
 
-(*Dual to Proposition 2.1.23 *)
+(*Pair to Proposition 2.1.23 *)
 lemma nonempty_left_imp_right_proj_epimorphism:
   "nonempty X \<Longrightarrow> epimorphism (right_cart_proj X Y)"
 proof - 
