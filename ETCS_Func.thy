@@ -959,7 +959,7 @@ qed
 lemma all_emptysets_are_finite:
   assumes "\<not>(nonempty(X))"
   shows "is_finite(X)"
-  by (metis CollectI assms epi_mon_is_iso epimorphism_def3 is_finite_def nonempty_def one_separator)
+  by (metis assms epi_mon_is_iso epimorphism_def3 is_finite_def nonempty_def one_separator)
 
 
 
