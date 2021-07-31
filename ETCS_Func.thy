@@ -1030,23 +1030,10 @@ proof(auto)
     using assms(1) is_smaller_than_def by blast
   then obtain j where j_def: "j: X \<rightarrow> Y \<and> monomorphism j"
     by blast
-  show "isomorphism m"
-  proof(rule ccontr)
-    assume not_iso: "\<not> isomorphism m"
-    have not_surj: "\<not> surjective m"
-      by (meson CollectI epi_mon_is_iso m_mono not_iso surjective_is_epimorphism)
 
-    then have not_surj0: "\<not>(\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (\<exists>z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z = x)))"
-      using cfunc_type_def m_type surjective_def by auto
-    then have not_surj1: "(\<exists>x. x \<in>\<^sub>c X \<longrightarrow> (\<forall> z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z \<noteq> x)))"
-      by auto
-    then have not_surj2: "(\<exists>x. x \<in>\<^sub>c X \<and> (\<forall> z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z \<noteq> x)))"
-      apply typecheck_cfuncs
-      oops
-    (*then obtain x where x_def: "x \<in>\<^sub>c X \<and> (\<forall> z. (z \<in>\<^sub>c X \<and> m \<circ>\<^sub>c z \<noteq> x))"
-      apply typecheck_cfuncs
-*)
+(* into_super o (i0 m U i1) o try_cast *)
+  oops
 
-
-
+  
+  
 end
