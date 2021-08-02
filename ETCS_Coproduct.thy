@@ -830,6 +830,67 @@ lemma product_distribute_over_coproduct_left:
   "A \<times>\<^sub>c (B \<Coprod> C) \<cong> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
   using dist_prod_coprod_type dist_prod_coprod_iso is_isomorphic_def isomorphic_is_symmetric by blast
 
+definition dist_prod_coprod_inv :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "dist_prod_coprod_inv A B C = (THE f. f : A \<times>\<^sub>c (B \<Coprod> C) \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)
+    \<and> f \<circ>\<^sub>c dist_prod_coprod A B C = id ((A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C))
+    \<and> dist_prod_coprod A B C \<circ>\<^sub>c f = id (A \<times>\<^sub>c (B \<Coprod> C)))"
+
+thm dist_prod_coprod_type
+
+lemma dist_prod_coprod_inv_def2:
+  shows "dist_prod_coprod_inv A B C : A \<times>\<^sub>c (B \<Coprod> C) \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)
+    \<and> dist_prod_coprod_inv A B C \<circ>\<^sub>c dist_prod_coprod A B C = id ((A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C))
+    \<and> dist_prod_coprod A B C \<circ>\<^sub>c dist_prod_coprod_inv A B C = id (A \<times>\<^sub>c (B \<Coprod> C))"
+  unfolding dist_prod_coprod_inv_def
+proof (rule theI', safe)
+  show "\<exists>x. x : A \<times>\<^sub>c B \<Coprod> C \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C \<and>
+        x \<circ>\<^sub>c dist_prod_coprod A B C = id\<^sub>c ((A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C) \<and>
+        dist_prod_coprod A B C \<circ>\<^sub>c x = id\<^sub>c (A \<times>\<^sub>c B \<Coprod> C)"
+    using dist_prod_coprod_iso[where A=A, where B=B, where C=C] unfolding isomorphism_def
+    by (typecheck_cfuncs, auto simp add: cfunc_type_def)
+  then obtain inv where inv_type: "inv : A \<times>\<^sub>c B \<Coprod> C \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C" and
+        inv_left: "inv \<circ>\<^sub>c dist_prod_coprod A B C = id\<^sub>c ((A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C)" and
+        inv_right: "dist_prod_coprod A B C \<circ>\<^sub>c inv = id\<^sub>c (A \<times>\<^sub>c B \<Coprod> C)"
+    by auto
+
+  show "\<And>x y. x : A \<times>\<^sub>c B \<Coprod> C \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C \<Longrightarrow>
+           y : A \<times>\<^sub>c B \<Coprod> C \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C \<Longrightarrow>
+           x \<circ>\<^sub>c dist_prod_coprod A B C = id\<^sub>c ((A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C) \<Longrightarrow>
+           dist_prod_coprod A B C \<circ>\<^sub>c x = id\<^sub>c (A \<times>\<^sub>c B \<Coprod> C) \<Longrightarrow>
+           y \<circ>\<^sub>c dist_prod_coprod A B C = id\<^sub>c ((A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C) \<Longrightarrow>
+           dist_prod_coprod A B C \<circ>\<^sub>c y = id\<^sub>c (A \<times>\<^sub>c B \<Coprod> C) \<Longrightarrow> x = y"
+  proof -
+    fix x y
+    assume x_type: "x : A \<times>\<^sub>c B \<Coprod> C \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C"
+    assume y_type: "y : A \<times>\<^sub>c B \<Coprod> C \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C"
+
+    assume "x \<circ>\<^sub>c dist_prod_coprod A B C = id\<^sub>c ((A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C)"
+      and "y \<circ>\<^sub>c dist_prod_coprod A B C = id\<^sub>c ((A \<times>\<^sub>c B) \<Coprod> A \<times>\<^sub>c C)"
+    then have "x \<circ>\<^sub>c dist_prod_coprod A B C = y \<circ>\<^sub>c dist_prod_coprod A B C"
+      by auto
+    then have "(x \<circ>\<^sub>c dist_prod_coprod A B C) \<circ>\<^sub>c inv = (y \<circ>\<^sub>c dist_prod_coprod A B C) \<circ>\<^sub>c inv"
+      by auto
+    then have "x \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c inv = y \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c inv"
+      using inv_type x_type y_type by (typecheck_cfuncs, auto simp add: comp_associative2)
+    then have "x \<circ>\<^sub>c id\<^sub>c (A \<times>\<^sub>c B \<Coprod> C) = y \<circ>\<^sub>c id\<^sub>c (A \<times>\<^sub>c B \<Coprod> C)"
+      by (simp add: inv_right)
+    then show "x = y"
+      using id_right_unit2 x_type y_type by auto
+  qed
+qed
+
+lemma dist_prod_coprod_inv_type[type_rule]:
+  "dist_prod_coprod_inv A B C : A \<times>\<^sub>c (B \<Coprod> C) \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
+  by (simp add: dist_prod_coprod_inv_def2)
+
+lemma dist_prod_coprod_inv_left:
+  "dist_prod_coprod_inv A B C \<circ>\<^sub>c dist_prod_coprod A B C = id ((A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C))"
+  by (simp add: dist_prod_coprod_inv_def2)
+
+lemma dist_prod_coprod_inv_right:
+  "dist_prod_coprod A B C \<circ>\<^sub>c dist_prod_coprod_inv A B C = id (A \<times>\<^sub>c (B \<Coprod> C))"
+  by (simp add: dist_prod_coprod_inv_def2)
+
 lemma prod_pres_iso:
   assumes "A \<cong>  C"  "B \<cong> D"
   shows "A \<times>\<^sub>c B \<cong>  C \<times>\<^sub>c D"
@@ -1162,33 +1223,38 @@ proof -
       h = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
     using assms comp_type by (metis (full_types) cfunc_coprod_unique) 
 
-  have left_eq: "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)"
+  have left_eq: "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)"
   proof - 
-    have "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V = (a \<amalg> b)  \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f"
+    have "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V = (a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V"
+      using assms by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (a \<amalg> b)  \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f"
       using f_type g_type left_coproj_cfunc_bowtie_prod by auto
     also have "... = ((a \<amalg> b)  \<circ>\<^sub>c left_coproj Y W) \<circ>\<^sub>c f"
       using a_type assms(2) cfunc_type_def comp_associative f_type by (typecheck_cfuncs, auto)
     also have "... = (a \<circ>\<^sub>c f)"
       using a_type b_type left_coproj_cfunc_coprod by presburger
-    then show  "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)"
+    then show  "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)"
       by (simp add: calculation)
   qed
 
-  have right_eq: "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
+  have right_eq: "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
   proof - 
-    have "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (a \<amalg> b)  \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
+    have "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V"
+      using assms by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (a \<amalg> b)  \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
       using f_type g_type right_coproj_cfunc_bowtie_prod by auto
     also have "... = ((a \<amalg> b)  \<circ>\<^sub>c right_coproj Y W) \<circ>\<^sub>c g"
       using a_type assms(2) cfunc_type_def comp_associative g_type by (typecheck_cfuncs, auto)
     also have "... = (b \<circ>\<^sub>c g)"
       using a_type b_type right_coproj_cfunc_coprod by auto
-    then show "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
+    then show "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
       by (simp add: calculation)
   qed
 
   show "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)   = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
-    using uniqueness left_eq right_eq assms apply (erule_tac x="(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)" in allE)
-    oops
+    using uniqueness left_eq right_eq assms
+    by (typecheck_cfuncs, erule_tac x="(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)" in allE, auto)
+qed
 
 
 lemma id_bowtie_prod: "id(X) \<bowtie>\<^sub>f id(Y) = id(X \<Coprod> Y)"
