@@ -1111,21 +1111,38 @@ lemma cfunc_bowtie_prod_unique: "f : X \<rightarrow> Y \<Longrightarrow> g : V \
   unfolding cfunc_bowtie_prod_def
   using cfunc_coprod_unique cfunc_type_def codomain_comp domain_comp left_proj_type right_proj_type by auto
 
-(*
+
 (*Dual to Proposition 2.1.11*)
 lemma identity_distributes_across_composition_dual:
   assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C"
   shows "(g  \<circ>\<^sub>c f) \<bowtie>\<^sub>f id(X)  = (g \<bowtie>\<^sub>f id(X)) \<circ>\<^sub>c (f \<bowtie>\<^sub>f id(X))"
 proof - 
   from cfunc_bowtie_prod_unique
-  have uniqueness: "\<forall>h. h : X \<Coprod>  A \<rightarrow> X \<Coprod> C \<and>
-    h \<circ>\<^sub>c left_coproj X C  =   left_coproj X A \<circ>\<^sub>c id\<^sub>c X \<and>
-    h \<circ>\<^sub>c right_coproj X C = right_coproj X A \<circ>\<^sub>c(g \<circ>\<^sub>c f)  \<longrightarrow>
+  have uniqueness: "\<forall>h. h : A \<Coprod>  X \<rightarrow> C \<Coprod> X \<and>
+    h \<circ>\<^sub>c left_coproj A X  =   left_coproj C X \<circ>\<^sub>c (g \<circ>\<^sub>c f) \<and>
+    h \<circ>\<^sub>c right_coproj A X = right_coproj C X \<circ>\<^sub>c  id(X) \<longrightarrow>
     h =  (g \<circ>\<^sub>c f) \<bowtie>\<^sub>f  id\<^sub>c X"
-*)
+    using assms by (typecheck_cfuncs, simp add: cfunc_bowtie_prod_unique)
+    
+
+  have left_eq: " ((g \<bowtie>\<^sub>f id\<^sub>c X) \<circ>\<^sub>c (f \<bowtie>\<^sub>f id\<^sub>c X)) \<circ>\<^sub>c left_coproj A X = left_coproj C X \<circ>\<^sub>c (g  \<circ>\<^sub>c f)"
+  using assms apply (typecheck_cfuncs)
+  thm type_rule
+  by (smt comp_associative2 left_coproj_cfunc_bowtie_prod left_proj_type)
+
+  have right_eq: " ((g \<bowtie>\<^sub>f id\<^sub>c X) \<circ>\<^sub>c (f \<bowtie>\<^sub>f id\<^sub>c X)) \<circ>\<^sub>c right_coproj A X = right_coproj C X \<circ>\<^sub>c id X"
+  using assms apply (typecheck_cfuncs)
+  thm type_rule
+  by (smt comp_associative2 id_right_unit2 right_coproj_cfunc_bowtie_prod right_proj_type)
+
+  show ?thesis
+    using assms left_eq right_eq uniqueness by (typecheck_cfuncs, auto)
+qed
 
 
-  (*The above may not be stated correctly*)
+
+    
+
 
 lemma coproduct_of_beta:
   "\<beta>\<^bsub>X\<^esub> \<amalg> \<beta>\<^bsub>Y\<^esub> = \<beta>\<^bsub>X\<Coprod>Y\<^esub>"
