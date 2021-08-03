@@ -17,6 +17,8 @@ where
     "f : A\<times>\<^sub>cZ \<rightarrow> X \<Longrightarrow> g: Z \<rightarrow> X\<^bsup>A\<^esup> \<Longrightarrow> (eval_func X A) \<circ>\<^sub>c (id A \<times>\<^sub>f g) = f \<Longrightarrow> g = f\<^sup>\<sharp>"
 
 
+
+
 lemma eval_func_surj:
   assumes "nonempty(A)"
   shows "surjective((eval_func X A))"
@@ -67,6 +69,11 @@ lemma exp_func_type[type_rule]:
 lemma exponential_object_identity:
   "(eval_func X A)\<^sup>\<sharp> = id\<^sub>c(X\<^bsup>A\<^esup>)"
   by (metis cfunc_type_def eval_func_type id_cross_prod id_right_unit id_type transpose_func_unique)
+
+lemma exp_of_id_is_id_of_exp:
+  "id(X\<^bsup>A\<^esup>) = (id(X))\<^bsup>A\<^esup>\<^sub>f"
+  by (metis (no_types) eval_func_type exp_func_def exponential_object_identity id_domain id_left_unit2)
+
 
 (* Note below Definition 2.5.1 *)
 lemma exponential_square_diagram:
