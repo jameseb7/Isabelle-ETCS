@@ -538,4 +538,108 @@ next
     using calculation by auto
 qed
 
+lemma isomorphism_sandwich: 
+  assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C" and h_type: "h: C \<rightarrow> D"
+  assumes f_iso: "isomorphism(f)"
+  assumes h_iso: "isomorphism(h)"
+  assumes hgf_iso: "isomorphism(h \<circ>\<^sub>c g \<circ>\<^sub>c f)"
+  shows "isomorphism(g)"
+proof -
+  obtain cc :: "cfunc \<Rightarrow> cfunc" where
+       f1: "\<forall>c. (\<not> isomorphism c \<or> domain (cc c) = codomain c \<and> codomain (cc c) = domain c \<and> cc c \<circ>\<^sub>c c = id\<^sub>c (domain c) \<and> c \<circ>\<^sub>c cc c = id\<^sub>c (domain (cc c))) \<and> (isomorphism c \<or> (\<forall>ca. domain ca \<noteq> codomain c \<or> codomain ca \<noteq> domain c \<or> ca \<circ>\<^sub>c c \<noteq> id\<^sub>c (domain c) \<or> c \<circ>\<^sub>c ca \<noteq> id\<^sub>c (domain ca)))"
+    using isomorphism_def by moura
+  have f2: "\<forall>c ca cb. domain c \<noteq> codomain ca \<or> domain ca \<noteq> codomain cb \<or> c \<circ>\<^sub>c ca \<circ>\<^sub>c cb = (c \<circ>\<^sub>c ca) \<circ>\<^sub>c cb"
+    using comp_associative by blast
+  have f3: "\<forall>c ca cb. (c : ca \<rightarrow> cb) = (domain c = ca \<and> codomain c = cb)"
+    using cfunc_type_def by blast
+  then have f4: "domain g = B \<and> codomain g = C"
+    using g_type by blast
+  have f5: "domain h = C \<and> codomain h = D"
+    using f3 h_type by blast
+  then have f6: "domain h = codomain g"
+    using f4 by simp
+  have f7: "\<forall>c ca. domain c \<noteq> codomain ca \<or> domain (c \<circ>\<^sub>c ca) = domain ca"
+    using domain_comp by blast
+  have f8: "\<forall>c ca. domain c \<noteq> codomain ca \<or> codomain (c \<circ>\<^sub>c ca) = codomain c"
+    using codomain_comp by blast
+  have f9: "domain g = B \<and> codomain g = C"
+    using f3 g_type by blast
+  have f10: "domain f = A \<and> codomain f = B"
+    using f3 f_type by presburger
+  then have f11: "domain g = codomain f"
+    using f9 by meson
+  then have f12: "domain h = codomain (g \<circ>\<^sub>c f)"
+    using f8 f5 f4 by presburger
+  then have f13: "domain (h \<circ>\<^sub>c g \<circ>\<^sub>c f) = domain (g \<circ>\<^sub>c f)"
+    using f7 by blast
+  have f14: "domain (g \<circ>\<^sub>c f) = domain f"
+    using f11 f7 by blast
+  have f15: "domain (cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) = codomain (h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<and> codomain (cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) = domain (h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<and> cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<circ>\<^sub>c h \<circ>\<^sub>c g \<circ>\<^sub>c f = id\<^sub>c (domain (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) \<and> (h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<circ>\<^sub>c cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f) = id\<^sub>c (domain (cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)))"
+    using f1 hgf_iso by blast
+  then have f16: "domain f = codomain (cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f))"
+    using f14 f13 by presburger
+  have f17: "h \<circ>\<^sub>c g \<circ>\<^sub>c f = (h \<circ>\<^sub>c g) \<circ>\<^sub>c f"
+    using f11 f6 f2 by blast
+  have f18: "codomain (h \<circ>\<^sub>c g \<circ>\<^sub>c f) = codomain h"
+    using f12 f8 by blast
+  then have f19: "domain (f \<circ>\<^sub>c cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) = codomain h"
+    using f16 f15 f7 by auto
+  have f20: "domain (cc f) = codomain f \<and> codomain (cc f) = domain f \<and> cc f \<circ>\<^sub>c f = id\<^sub>c (domain f) \<and> f \<circ>\<^sub>c cc f = id\<^sub>c (domain (cc f))"
+    using f1 f_iso by blast
+  then have f21: "domain (cc f) = B"
+    using f10 by meson
+  have "domain (cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) = codomain h"
+    using f15 f12 f8 by presburger
+  then have f22: "domain (cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) = codomain (h \<circ>\<^sub>c g)"
+    using f8 f6 by auto
+  have f23: "(h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<circ>\<^sub>c cc f = h \<circ>\<^sub>c g"
+    using f21 f20 f14 f12 f11 f2 by (metis (no_types) g_type id_right_unit2)
+  have f24: "domain (cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) = codomain ((h \<circ>\<^sub>c g) \<circ>\<^sub>c f)"
+    using f17 f15 by presburger
+  have "domain f = A \<and> codomain f = B"
+    using f3 f_type by blast
+  then have f25: "cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<circ>\<^sub>c (h \<circ>\<^sub>c g) \<circ>\<^sub>c f = id\<^sub>c A"
+    using f17 f15 f14 f13 by presburger
+  have f26: "id\<^sub>c B = f \<circ>\<^sub>c cc f"
+    using f21 f20 by presburger
+  have f27: "codomain (id\<^sub>c B) = B"
+    using f20 f10 f8 by (metis (full_types))
+  have f28: "domain (id\<^sub>c B) = codomain f"
+    using f26 f20 f7 by metis
+  have f29: "\<forall>c ca cb. \<not> c : ca \<rightarrow> cb \<or> id\<^sub>c cb \<circ>\<^sub>c c = c"
+    using id_left_unit2 by presburger
+  then have f30: "((f \<circ>\<^sub>c cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) \<circ>\<^sub>c h) \<circ>\<^sub>c g = id\<^sub>c B"
+    using f28 f27 f25 f24 f23 f22 f20 f19 f16 f14 f13 f10 f9 f6 f2 by (metis (no_types) f_type)
+  have f31: "codomain ((f \<circ>\<^sub>c cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) \<circ>\<^sub>c h) = B"
+    using f19 f16 f10 f8 by presburger
+  have f32: "domain ((f \<circ>\<^sub>c cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) \<circ>\<^sub>c h) = codomain g"
+    using f19 f7 f5 f4 by presburger
+  have f33: "domain (h \<circ>\<^sub>c g) = domain g"
+    using f7 f6 by blast
+  have f34: "domain (cc h) = codomain h \<and> codomain (cc h) = domain h \<and> cc h \<circ>\<^sub>c h = id\<^sub>c (domain h) \<and> h \<circ>\<^sub>c cc h = id\<^sub>c (domain (cc h))"
+    using f1 h_iso by blast
+  have f35: "id\<^sub>c C \<circ>\<^sub>c g = g"
+    using f29 g_type by blast
+  have f36: "codomain f = domain g"
+    using f10 f9 by presburger
+  have f37: "codomain (h \<circ>\<^sub>c g) = codomain h"
+    using f8 f6 by blast
+  have f38: "domain h = C \<and> codomain h = D"
+    using f3 h_type by blast
+  have f39: "g \<circ>\<^sub>c f \<circ>\<^sub>c cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f) = cc h \<circ>\<^sub>c id\<^sub>c (domain (cc h))"
+    using f37 f36 f35 f34 f33 f18 f16 f15 f6 f5 f2 by (metis (full_types))
+  have f40: "domain (id\<^sub>c (domain (cc h))) = codomain h"
+    using f34 f7 by (metis (no_types))
+  have "id\<^sub>c (domain (cc h)) \<circ>\<^sub>c h = h"
+    using f38 f34 f29 h_type by presburger
+  then have f41: "g \<circ>\<^sub>c (f \<circ>\<^sub>c cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) \<circ>\<^sub>c h = id\<^sub>c C"
+    using f40 f39 f34 f19 f16 f10 f9 f8 f5 f2 by fastforce
+  have "domain ((f \<circ>\<^sub>c cc (h \<circ>\<^sub>c g \<circ>\<^sub>c f)) \<circ>\<^sub>c h) = C"
+    using f19 f7 f5 by presburger
+  then show ?thesis
+    using f41 f32 f31 f30 f9 f1 by blast
+qed
+  
+  
+
 end

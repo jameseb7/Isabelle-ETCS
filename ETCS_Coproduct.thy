@@ -1539,13 +1539,217 @@ proof(auto)
           by (simp add: y1_def y2_def)
       qed
    qed
+ qed
+
+
+lemma cfunc_bowtieprod_inj_converse:
+  assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
+  assumes inj_f_bowtie_g: "injective (f \<bowtie>\<^sub>f g)"
+  shows "(injective f)\<and> (injective g)"
+  unfolding injective_def
+proof(auto)
+  fix x y 
+  assume x_type: "x \<in>\<^sub>c domain f" 
+  assume y_type: "y \<in>\<^sub>c domain f"
+  assume eqs:    "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+
+  have x_type2: "x \<in>\<^sub>c X"
+    using cfunc_type_def type_assms(1) x_type by auto
+  have y_type2: "y \<in>\<^sub>c X"
+    using cfunc_type_def type_assms(1) y_type by auto
+  have fg_bowtie_tyepe: "(f \<bowtie>\<^sub>f g) : (X \<Coprod> Z) \<rightarrow> (Y \<Coprod> W)"
+    by (simp add: cfunc_bowtie_prod_type type_assms(1) type_assms(2))
+  have lift: "(f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X Z) \<circ>\<^sub>c x = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X Z) \<circ>\<^sub>c y"
+  proof - 
+    have "(f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X Z) \<circ>\<^sub>c x = ((f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X Z)) \<circ>\<^sub>c x"
+      using x_type2 comp_associative2 fg_bowtie_tyepe by (typecheck_cfuncs, auto)
+    also have  "... =  ((left_coproj Y W) \<circ>\<^sub>c f) \<circ>\<^sub>c x"
+      using left_coproj_cfunc_bowtie_prod type_assms(1) type_assms(2) by auto
+    also have "... = (left_coproj Y W) \<circ>\<^sub>c f \<circ>\<^sub>c x"
+      using x_type2 comp_associative2 type_assms(1) by (typecheck_cfuncs, auto)
+    also have "... = (left_coproj Y W) \<circ>\<^sub>c f \<circ>\<^sub>c y"
+      by (simp add: eqs)
+    also have "... = ((left_coproj Y W) \<circ>\<^sub>c f) \<circ>\<^sub>c y"
+      using y_type2 comp_associative2 type_assms(1) by (typecheck_cfuncs, auto)
+    also have "... = ((f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X Z)) \<circ>\<^sub>c y"
+      using left_coproj_cfunc_bowtie_prod type_assms(1) type_assms(2) by auto
+    also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X Z) \<circ>\<^sub>c y"
+      using y_type2 comp_associative2 fg_bowtie_tyepe by (typecheck_cfuncs, auto)
+    then show ?thesis using calculation by auto
+  qed
+  then have "monomorphism((f \<bowtie>\<^sub>f g))"
+    using inj_f_bowtie_g injective_imp_monomorphism by auto
+  then have "(left_coproj X Z) \<circ>\<^sub>c x = (left_coproj X Z) \<circ>\<^sub>c y"
+    using cfunc_type_def codomain_comp fg_bowtie_tyepe left_proj_type lift monomorphism_def x_type2 y_type2 by auto
+  then show "x = y"
+    using x_type2 y_type2 cfunc_type_def left_coproj_are_monomorphisms left_proj_type monomorphism_def by auto
+next
+  fix x y 
+  assume x_type: "x \<in>\<^sub>c domain g" 
+  assume y_type: "y \<in>\<^sub>c domain g"
+  assume eqs:    "g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
+
+  have x_type2: "x \<in>\<^sub>c Z"
+    using cfunc_type_def type_assms(2) x_type by auto
+  have y_type2: "y \<in>\<^sub>c Z"
+    using cfunc_type_def type_assms(2) y_type by auto
+  have fg_bowtie_tyepe: "(f \<bowtie>\<^sub>f g) : (X \<Coprod> Z) \<rightarrow> (Y \<Coprod> W)"
+    by (simp add: cfunc_bowtie_prod_type type_assms(1) type_assms(2))
+  have lift: "(f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X Z) \<circ>\<^sub>c x = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X Z) \<circ>\<^sub>c y"
+  proof - 
+    have "(f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X Z) \<circ>\<^sub>c x = ((f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X Z)) \<circ>\<^sub>c x"
+      using x_type2 comp_associative2 fg_bowtie_tyepe by (typecheck_cfuncs, auto)
+    also have  "... =  ((right_coproj Y W) \<circ>\<^sub>c g) \<circ>\<^sub>c x"
+      using right_coproj_cfunc_bowtie_prod type_assms(1) type_assms(2) by auto
+    also have "... = (right_coproj Y W) \<circ>\<^sub>c g \<circ>\<^sub>c x"
+      using x_type2 comp_associative2 type_assms(2) by (typecheck_cfuncs, auto)
+    also have "... = (right_coproj Y W) \<circ>\<^sub>c g \<circ>\<^sub>c y"
+      by (simp add: eqs)
+    also have "... = ((right_coproj Y W) \<circ>\<^sub>c g) \<circ>\<^sub>c y"
+      using y_type2 comp_associative2 type_assms(2) by (typecheck_cfuncs, auto)
+    also have "... = ((f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X Z)) \<circ>\<^sub>c y"
+      using right_coproj_cfunc_bowtie_prod type_assms(1) type_assms(2) by auto
+    also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X Z) \<circ>\<^sub>c y"
+      using y_type2 comp_associative2 fg_bowtie_tyepe by (typecheck_cfuncs, auto)
+    then show ?thesis using calculation by auto
+  qed
+  then have "monomorphism((f \<bowtie>\<^sub>f g))"
+    using inj_f_bowtie_g injective_imp_monomorphism by auto
+  then have "(right_coproj X Z) \<circ>\<^sub>c x = (right_coproj X Z) \<circ>\<^sub>c y"
+    using cfunc_type_def codomain_comp fg_bowtie_tyepe right_proj_type lift monomorphism_def x_type2 y_type2 by auto
+  then show "x = y"
+      using x_type2 y_type2 cfunc_type_def right_coproj_are_monomorphisms right_proj_type monomorphism_def by auto
+qed
+
+
+lemma cfunc_bowtieprod_surj_converse:
+  assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
+  assumes inj_f_bowtie_g: "surjective (f \<bowtie>\<^sub>f g)"
+  shows "(surjective f)\<and> (surjective g)"
+  unfolding surjective_def
+proof(auto)
+  fix y 
+  assume y_type: "y \<in>\<^sub>c codomain f" 
+  then have y_type2: "y \<in>\<^sub>c Y"
+    using cfunc_type_def type_assms(1) by auto
+  then have coproj_y_type: "(left_coproj Y W) \<circ>\<^sub>c y \<in>\<^sub>c (Y \<Coprod> W)" 
+    by typecheck_cfuncs
+  have fg_type: "(f \<bowtie>\<^sub>f g) : (X \<Coprod> Z) \<rightarrow> (Y \<Coprod> W)"
+    by (simp add: cfunc_bowtie_prod_type type_assms)
+  obtain xz where xz_def: "xz \<in>\<^sub>c (X \<Coprod> Z) \<and> (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (xz) =  (left_coproj Y W) \<circ>\<^sub>c y"
+    using fg_type y_type2 cfunc_type_def inj_f_bowtie_g surjective_def by (typecheck_cfuncs, auto)
+  then have xz_form: "(\<exists> x. x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x =   xz) \<or>  
+                      (\<exists> z. z \<in>\<^sub>c Z \<and> right_coproj X Z \<circ>\<^sub>c z =  xz)"
+    using coprojs_jointly_surj xz_def by (typecheck_cfuncs, blast)
+  show "\<exists> x. x \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = y"
+  proof(cases "(\<exists> x. x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x =   xz)")
+    assume "(\<exists> x. x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x =   xz)"
+    then obtain x where x_def: "x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x = xz"
+      by blast
+    have "f \<circ>\<^sub>c x = y"
+    proof - 
+      have "left_coproj Y W \<circ>\<^sub>c y = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (xz)"
+        by (simp add: xz_def)
+      also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X Z \<circ>\<^sub>c x"
+        by (simp add: x_def)
+      also have "... = ((f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X Z) \<circ>\<^sub>c x"
+        using  comp_associative2 fg_type x_def by (typecheck_cfuncs, auto)
+      also have "... = (left_coproj Y W \<circ>\<^sub>c f) \<circ>\<^sub>c x"
+        using left_coproj_cfunc_bowtie_prod type_assms by auto
+      also have "... = left_coproj Y W \<circ>\<^sub>c f \<circ>\<^sub>c x"
+        using comp_associative2 type_assms(1) x_def by (typecheck_cfuncs, auto)
+      then show "f \<circ>\<^sub>c x = y"
+        using type_assms(1) x_def y_type2  
+        by (typecheck_cfuncs, metis calculation cfunc_type_def left_coproj_are_monomorphisms left_proj_type monomorphism_def x_def)
+    qed
+    then show ?thesis
+      using cfunc_type_def type_assms(1) x_def by auto
+ next
+    assume "\<nexists>x. x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x = xz"
+  then obtain z where z_def: "z \<in>\<^sub>c Z \<and> right_coproj X Z \<circ>\<^sub>c z = xz"
+    using xz_form by blast
+  have False
+    proof - 
+      have "left_coproj Y W \<circ>\<^sub>c y = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (xz)"
+        by (simp add: xz_def)         
+      also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X Z \<circ>\<^sub>c z"
+        by (simp add: z_def)
+      also have "... = ((f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X Z) \<circ>\<^sub>c z"
+        using comp_associative2 fg_type z_def by (typecheck_cfuncs, auto)
+      also have "... = (right_coproj Y W \<circ>\<^sub>c g) \<circ>\<^sub>c z"
+        using right_coproj_cfunc_bowtie_prod type_assms by auto
+      also have "... = right_coproj Y W \<circ>\<^sub>c g \<circ>\<^sub>c z"
+        using comp_associative2 type_assms(2) z_def by (typecheck_cfuncs, auto)
+      then show False
+        using calculation comp_type coproducts_disjoint type_assms(2) y_type2 z_def by auto
+    qed
+    then show ?thesis
+      by simp
+  qed
+next
+  fix y
+  assume y_type: "y \<in>\<^sub>c codomain g"
+  then have y_type2: "y \<in>\<^sub>c W"
+    using cfunc_type_def type_assms(2) by auto 
+  then have coproj_y_type: "(right_coproj Y W) \<circ>\<^sub>c y \<in>\<^sub>c (Y \<Coprod> W)" 
+    using cfunc_type_def comp_type right_proj_type type_assms(2) by auto
+  have fg_type: "(f \<bowtie>\<^sub>f g) : (X \<Coprod> Z) \<rightarrow> (Y \<Coprod> W)"
+    by (simp add: cfunc_bowtie_prod_type type_assms)
+  obtain xz where xz_def: "xz \<in>\<^sub>c (X \<Coprod> Z) \<and> (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (xz) =  (right_coproj Y W) \<circ>\<^sub>c y"
+    using fg_type y_type2 cfunc_type_def inj_f_bowtie_g surjective_def by (typecheck_cfuncs, auto)
+  then have xz_form: "(\<exists> x. x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x =   xz) \<or>  
+                      (\<exists> z. z \<in>\<^sub>c Z \<and> right_coproj X Z \<circ>\<^sub>c z =  xz)"
+    using coprojs_jointly_surj xz_def by (typecheck_cfuncs, blast)
+  show "\<exists>x. x \<in>\<^sub>c domain g \<and> g \<circ>\<^sub>c x = y"
+  proof(cases "(\<exists> x. x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x =   xz)")
+    assume "(\<exists> x. x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x =   xz)"
+    then obtain x where x_def: "x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x = xz"
+      by blast
+    have False
+    proof - 
+      have "right_coproj Y W \<circ>\<^sub>c y = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (xz)"
+        by (simp add: xz_def)
+      also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X Z \<circ>\<^sub>c x"
+        by (simp add: x_def)
+      also have "... = ((f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X Z) \<circ>\<^sub>c x"
+        using  comp_associative2 fg_type x_def by (typecheck_cfuncs, auto)
+      also have "... = (left_coproj Y W \<circ>\<^sub>c f) \<circ>\<^sub>c x"
+        using left_coproj_cfunc_bowtie_prod type_assms by auto
+      also have "... = left_coproj Y W \<circ>\<^sub>c f \<circ>\<^sub>c x"
+        using comp_associative2 type_assms(1) x_def by (typecheck_cfuncs, auto)
+      then show False
+        by (metis calculation comp_type coproducts_disjoint type_assms(1) x_def y_type2)
+    qed
+    then show ?thesis
+      by simp
+next
+  assume "\<nexists>x. x \<in>\<^sub>c X \<and> left_coproj X Z \<circ>\<^sub>c x = xz"
+  then obtain z where z_def: "z \<in>\<^sub>c Z \<and> right_coproj X Z \<circ>\<^sub>c z = xz"
+    using xz_form by blast
+  have "g \<circ>\<^sub>c z = y"
+    proof - 
+      have "right_coproj Y W \<circ>\<^sub>c y = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (xz)"
+        by (simp add: xz_def)         
+      also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X Z \<circ>\<^sub>c z"
+        by (simp add: z_def)
+      also have "... = ((f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X Z) \<circ>\<^sub>c z"
+        using comp_associative2 fg_type z_def by (typecheck_cfuncs, auto)
+      also have "... = (right_coproj Y W \<circ>\<^sub>c g) \<circ>\<^sub>c z"
+        using right_coproj_cfunc_bowtie_prod type_assms by auto
+      also have "... = right_coproj Y W \<circ>\<^sub>c g \<circ>\<^sub>c z"
+        using comp_associative2 type_assms(2) z_def by (typecheck_cfuncs, auto)
+      then show ?thesis
+        by (metis calculation cfunc_type_def codomain_comp monomorphism_def 
+           right_coproj_are_monomorphisms right_proj_type type_assms(2) y_type2 z_def)
+    qed
+    then show ?thesis
+      using cfunc_type_def type_assms(2) z_def by auto
+ qed
 qed
 
 
 
-
 (* begin section on subset inclusion*)
-
 
 
 
@@ -1782,5 +1986,43 @@ proof -
   then show ?thesis
     using x_type by blast
 qed
+
+
+
+lemma try_cast_mono:
+  assumes m_type: "monomorphism m" "m : X \<rightarrow> Y"
+  shows "monomorphism(try_cast m)"
+  using assms apply typecheck_cfuncs
+proof -
+  assume a1: "try_cast m : Y \<rightarrow> X \<Coprod> (Y \<setminus> (X, m))"
+  assume a2: "m : X \<rightarrow> Y"
+  obtain cc :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc" and cca :: "cset \<Rightarrow> cfunc \<Rightarrow> cset" and ccb :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc" where
+    "\<forall>x1 x2. (\<exists>v3 v4 v5. (v3 : v5 \<rightarrow> x1 \<and> v4 : v5 \<rightarrow> x1 \<and> x2 \<circ>\<^sub>c v3 = x2 \<circ>\<^sub>c v4) \<and> v3 \<noteq> v4) = ((cc x1 x2 : cca x1 x2 \<rightarrow> x1 \<and> ccb x1 x2 : cca x1 x2 \<rightarrow> x1 \<and> x2 \<circ>\<^sub>c cc x1 x2 = x2 \<circ>\<^sub>c ccb x1 x2) \<and> cc x1 x2 \<noteq> ccb x1 x2)"
+    by moura
+  moreover
+  { assume "cc Y (try_cast m) \<noteq> ccb Y (try_cast m)"
+    { assume "cc Y (try_cast m) \<noteq> id\<^sub>c Y \<circ>\<^sub>c ccb Y (try_cast m)"
+      then have "into_super m \<circ>\<^sub>c try_cast m \<circ>\<^sub>c ccb Y (try_cast m) \<noteq> (into_super m \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c ccb Y (try_cast m) \<or> cc Y (try_cast m) \<noteq> into_super m \<circ>\<^sub>c try_cast m \<circ>\<^sub>c ccb Y (try_cast m)"
+        using a2 into_super_try_cast m_type(1) by auto
+      moreover
+      { assume "cc Y (try_cast m) \<noteq> into_super m \<circ>\<^sub>c try_cast m \<circ>\<^sub>c ccb Y (try_cast m)"
+        moreover
+        { assume "cc Y (try_cast m) \<noteq> into_super m \<circ>\<^sub>c try_cast m \<circ>\<^sub>c cc Y (try_cast m)"
+          moreover
+          { assume "into_super m \<circ>\<^sub>c try_cast m \<circ>\<^sub>c cc Y (try_cast m) \<noteq> (into_super m \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c cc Y (try_cast m)"
+            then have "\<not> cc Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> \<not> ccb Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> try_cast m \<circ>\<^sub>c cc Y (try_cast m) \<noteq> try_cast m \<circ>\<^sub>c ccb Y (try_cast m) \<or> cc Y (try_cast m) = ccb Y (try_cast m)"
+              using a2 a1 by (meson comp_associative2 into_super_type m_type(1)) }
+          ultimately have "\<not> cc Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> \<not> ccb Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> try_cast m \<circ>\<^sub>c cc Y (try_cast m) \<noteq> try_cast m \<circ>\<^sub>c ccb Y (try_cast m) \<or> cc Y (try_cast m) = ccb Y (try_cast m)"
+            using a2 id_left_unit2 into_super_try_cast m_type(1) by force }
+        ultimately have "\<not> cc Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> \<not> ccb Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> try_cast m \<circ>\<^sub>c cc Y (try_cast m) \<noteq> try_cast m \<circ>\<^sub>c ccb Y (try_cast m) \<or> cc Y (try_cast m) = ccb Y (try_cast m)"
+          by force }
+      ultimately have "\<not> cc Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> \<not> ccb Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> try_cast m \<circ>\<^sub>c cc Y (try_cast m) \<noteq> try_cast m \<circ>\<^sub>c ccb Y (try_cast m) \<or> cc Y (try_cast m) = ccb Y (try_cast m)"
+        using a2 a1 by (meson comp_associative2 into_super_type m_type(1)) }
+    then have "\<not> cc Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> \<not> ccb Y (try_cast m) : cca Y (try_cast m) \<rightarrow> Y \<or> try_cast m \<circ>\<^sub>c cc Y (try_cast m) \<noteq> try_cast m \<circ>\<^sub>c ccb Y (try_cast m) \<or> cc Y (try_cast m) = ccb Y (try_cast m)"
+      using id_left_unit2 by force }
+  ultimately show ?thesis
+    using a1 by (metis (no_types) monomorphism_def3)
+qed
+
 
 end
