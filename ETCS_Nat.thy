@@ -559,12 +559,37 @@ lemma NuN_is_countable:
   unfolding countable_def
   oops
 
+
 (*Exercise 2.6.11*)
 lemma coproduct_of_countables_is_countable:
   assumes "countable X" "countable Y"
+  assumes NuN_is_countable: "countable(\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c)"
   shows "countable(X \<Coprod> Y)"
   unfolding countable_def
-  oops
+proof-
+  obtain x where x_def:  "x : X  \<rightarrow> \<nat>\<^sub>c \<and> monomorphism x"
+    using assms(1) countable_def by blast
+  obtain y where y_def:  "y : Y  \<rightarrow> \<nat>\<^sub>c \<and> monomorphism y"
+    using assms(2) countable_def by blast
+  obtain n where n_def: " n : \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<and> monomorphism n"
+    using NuN_is_countable countable_def by blast
+  have xy_type: "x \<bowtie>\<^sub>f y : X \<Coprod> Y \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
+    using x_def y_def by (typecheck_cfuncs, auto)
+  then have nxy_type: "n \<circ>\<^sub>c (x \<bowtie>\<^sub>f y) : X \<Coprod> Y \<rightarrow> \<nat>\<^sub>c"
+    using comp_type n_def by blast
+  have "injective(x \<bowtie>\<^sub>f y)"
+    using cfunc_bowtieprod_inj monomorphism_imp_injective x_def y_def by blast
+  then have "monomorphism(x \<bowtie>\<^sub>f y)"
+    using injective_imp_monomorphism by auto
+  then have "monomorphism(n \<circ>\<^sub>c (x \<bowtie>\<^sub>f y))"
+    using cfunc_type_def composition_of_monic_pair_is_monic n_def xy_type by auto
+  then show "\<exists>f. f : X \<Coprod> Y \<rightarrow> \<nat>\<^sub>c \<and> monomorphism f"
+    using nxy_type by blast
+qed
+
+    
+  
+  
 
 
 lemma finite_is_countable: 
