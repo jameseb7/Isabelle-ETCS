@@ -510,8 +510,21 @@ lemma smaller_than_countable_is_countable:
 
 lemma product_of_finite_is_finite:
   assumes "is_finite(X)" "is_finite(Y)"
+  assumes "nonempty(X)" "nonempty(Y)"
   shows "is_finite(X \<times>\<^sub>c Y)"
+  unfolding is_finite_def
+proof-  
+  fix xy
+  assume xy_type: "xy:  X \<times>\<^sub>c Y \<rightarrow> X \<times>\<^sub>c Y"
+  assume xy_mono: "monomorphism(xy)"
+  obtain m where m_def: "m :  X \<rightarrow> X \<times>\<^sub>c Y \<and> monomorphism(m)"
+    using assms(4) is_smaller_than_def smaller_than_product1 by blast
+  obtain n where n_def: "n :  Y \<rightarrow> X \<times>\<^sub>c Y \<and> monomorphism(n)"
+    using assms(3) is_smaller_than_def smaller_than_product2 by blast
   oops
+
+
+
 
 lemma coproduct_of_finite_is_finite:
   assumes "is_finite(X)" "is_finite(Y)"

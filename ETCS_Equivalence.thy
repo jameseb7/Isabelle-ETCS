@@ -848,10 +848,126 @@ next
   qed
 qed
 
+lemma right_pair_transitive:
+  assumes "transitive_on X (Y, m)"
+  shows "transitive_on (Z \<times>\<^sub>c X) (Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+proof (unfold transitive_on_def, auto)
+  have "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
+    using assms subobject_of_def2 transitive_on_def by auto
+  then show "(Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<subseteq>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
+    by (simp add: right_pair_subset)
+next
+  have m_def[type_rule]: "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
+    using assms subobject_of_def2 transitive_on_def by auto
+
+  fix s t u
+  assume s_type[type_rule]: "s \<in>\<^sub>c Z \<times>\<^sub>c X"
+  assume t_type[type_rule]: "t \<in>\<^sub>c Z \<times>\<^sub>c X"
+  assume u_type[type_rule]: "u \<in>\<^sub>c Z \<times>\<^sub>c X"
+
+  assume st_relation: "\<langle>s,t\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m)"
+  then obtain h where h_type[type_rule]: "h \<in>\<^sub>c Z \<times>\<^sub>c Y" and h_def: "(distribute_left Z X X  \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c h = \<langle>s,t\<rangle>"
+    by (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
+  then obtain hy hz where h_part_types[type_rule]: "hy \<in>\<^sub>c Y" "hz \<in>\<^sub>c Z" and h_decomp: "h = \<langle>hz, hy\<rangle>"
+    using cart_prod_decomp by blast
+  then obtain mhy1 mhy2 where mhy_types[type_rule]: "mhy1 \<in>\<^sub>c X" "mhy2 \<in>\<^sub>c X" and mhy_decomp:  "m \<circ>\<^sub>c hy = \<langle>mhy1, mhy2\<rangle>"
+    using cart_prod_decomp by (typecheck_cfuncs, blast)
+
+  have "\<langle>s,t\<rangle> = \<langle>\<langle>hz, mhy1\<rangle>, \<langle>hz, mhy2\<rangle>\<rangle>"
+  proof -
+    have "\<langle>s,t\<rangle> = (distribute_left Z X X  \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>hz, hy\<rangle>"
+      using h_decomp h_def by auto
+    also have "... = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>hz, hy\<rangle>"
+      by (typecheck_cfuncs, auto simp add: comp_associative2)
+    also have "... = distribute_left Z X X  \<circ>\<^sub>c \<langle> hz, m \<circ>\<^sub>c hy\<rangle>"
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+    also have "... = \<langle>\<langle>hz, mhy1\<rangle>, \<langle>hz, mhy2\<rangle>\<rangle>"
+      unfolding mhy_decomp by (typecheck_cfuncs, simp add: distribute_left_ap)
+    then show ?thesis
+      using calculation by auto
+  qed
+  then have s_def: "s = \<langle>hz, mhy1\<rangle>" and t_def: "t = \<langle>hz, mhy2\<rangle>"
+    using cart_prod_eq2 by (typecheck_cfuncs, auto, presburger)
+
+  assume tu_relation: "\<langle>t,u\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c
+               Z \<times>\<^sub>c X\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m)"
+  then obtain g where g_type[type_rule]: "g \<in>\<^sub>c Z \<times>\<^sub>c Y" and g_def: "(distribute_left Z X X  \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c g = \<langle>t,u\<rangle>"
+    by (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
+  then obtain gy gz where g_part_types[type_rule]: "gy \<in>\<^sub>c Y" "gz \<in>\<^sub>c Z" and g_decomp: "g = \<langle>gz, gy\<rangle>"
+    using cart_prod_decomp by blast
+  then obtain mgy1 mgy2 where mgy_types[type_rule]: "mgy1 \<in>\<^sub>c X" "mgy2 \<in>\<^sub>c X" and mgy_decomp:  "m \<circ>\<^sub>c gy = \<langle>mgy2, mgy1\<rangle>"
+    using cart_prod_decomp by (typecheck_cfuncs, blast)
+
+  have "\<langle>t,u\<rangle> = \<langle>\<langle>gz, mgy2\<rangle>, \<langle>gz, mgy1\<rangle>\<rangle>"
+  proof -
+    have "\<langle>t,u\<rangle> = (distribute_left Z X X  \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>gz, gy\<rangle>"
+      using g_decomp g_def by auto
+    also have "... = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>gz, gy\<rangle>"
+      by (typecheck_cfuncs, auto simp add: comp_associative2)
+    also have "... = distribute_left Z X X  \<circ>\<^sub>c \<langle>gz, m \<circ>\<^sub>c gy\<rangle>"
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+    also have "... = \<langle>\<langle>gz, mgy2\<rangle>, \<langle>gz, mgy1\<rangle>\<rangle>"
+      unfolding mgy_decomp by (typecheck_cfuncs, simp add: distribute_left_ap)
+    then show ?thesis
+      using calculation by auto
+  qed
+  then have t_def2: "t = \<langle>gz, mgy2\<rangle>" and u_def: "u = \<langle>gz, mgy1\<rangle>"
+    using cart_prod_eq2 by (typecheck_cfuncs, auto, presburger)
+
+
+
+  have mhy2_eq_mgy2: "mhy2 = mgy2"
+    using t_def2 t_def cart_prod_eq2 by (auto, typecheck_cfuncs)
+  have gy_eq_gz: "hz = gz"
+    using t_def2 t_def cart_prod_eq2 by (auto, typecheck_cfuncs)
+
+  have mhy_in_Y: "\<langle>mhy1, mhy2\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (Y, m)"
+    using m_def h_part_types mhy_decomp
+    by (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
+  have mgy_in_Y: "\<langle>mhy2, mgy1\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (Y, m)"
+    using m_def g_part_types mgy_decomp mhy2_eq_mgy2
+    by (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
+
+  have "\<langle>mhy1, mgy1\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (Y, m)"
+    using assms mhy_in_Y mgy_in_Y mgy_types mhy2_eq_mgy2 unfolding transitive_on_def
+    by (typecheck_cfuncs, blast)
+  then obtain y where y_type[type_rule]: "y \<in>\<^sub>c Y" and y_def: "m \<circ>\<^sub>c y = \<langle>mhy1, mgy1\<rangle>"
+    by (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
+
+  show " \<langle>s,u\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m)" 
+  proof (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
+    show "monomorphism (distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m)"
+      using relative_member_def2 st_relation by blast
+
+    show "\<exists>h. h \<in>\<^sub>c Z \<times>\<^sub>c Y \<and> (distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c h = \<langle>s,u\<rangle>"
+      unfolding s_def u_def gy_eq_gz
+    proof (rule_tac x="\<langle>gz,y\<rangle>" in exI, auto, typecheck_cfuncs)
+      have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c \<langle>gz,y\<rangle> = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>gz,y\<rangle>"
+        by (typecheck_cfuncs, auto simp add: comp_associative2)
+      also have "... = distribute_left Z X X  \<circ>\<^sub>c \<langle>gz, m \<circ>\<^sub>c y\<rangle>"
+        by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+      also have "... = \<langle>\<langle>gz,mhy1\<rangle>,\<langle>gz,mgy1\<rangle>\<rangle>"
+        by (typecheck_cfuncs, simp add: distribute_left_ap y_def)
+      then show "(distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>gz,y\<rangle> = \<langle>\<langle>gz,mhy1\<rangle>,\<langle>gz,mgy1\<rangle>\<rangle>"
+        using calculation by auto
+    qed
+  qed
+qed
+
+
 lemma left_pair_equiv_rel:
   assumes "equiv_rel_on X (Y, m)"
-  shows "equiv_rel_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id Z)"
+  shows "equiv_rel_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id Z))"
   using assms left_pair_reflexive left_pair_symmetric left_pair_transitive
   by (unfold equiv_rel_on_def, auto)
+
+lemma right_pair_equiv_rel:
+  assumes "equiv_rel_on X (Y, m)"
+  shows "equiv_rel_on (Z \<times>\<^sub>c X) (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id Z \<times>\<^sub>f m))"
+  using assms right_pair_reflexive right_pair_symmetric right_pair_transitive
+  by (unfold equiv_rel_on_def, auto)
+
+
+
 
 end
