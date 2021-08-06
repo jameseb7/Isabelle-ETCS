@@ -1993,6 +1993,19 @@ proof -
     using x_type by blast
 qed
 
+lemma try_cast_m_m:
+  assumes m_type: "monomorphism m" "m : X \<rightarrow> Y"
+  shows "(try_cast m) \<circ>\<^sub>c m = left_coproj X (Y \<setminus> (X,m))"
+  by (smt comp_associative2 complement_morphism_type id_left_unit2 into_super_def into_super_type left_coproj_cfunc_coprod left_proj_type m_type try_cast_into_super try_cast_type)
+
+lemma try_cast_m_m':
+  assumes m_type: "monomorphism m" "m : X \<rightarrow> Y"
+  shows "(try_cast m) \<circ>\<^sub>c m\<^sup>c = right_coproj X (Y \<setminus> (X,m))"
+  by (smt comp_associative2 complement_morphism_type id_left_unit2 into_super_def into_super_type m_type(1) m_type(2) right_coproj_cfunc_coprod right_proj_type try_cast_into_super try_cast_type)
+
+
+
+
 
 
 lemma try_cast_mono:
