@@ -879,6 +879,7 @@ proof (rule theI', safe)
   qed
 qed
 
+
 lemma dist_prod_coprod_inv_type[type_rule]:
   "dist_prod_coprod_inv A B C : A \<times>\<^sub>c (B \<Coprod> C) \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)"
   by (simp add: dist_prod_coprod_inv_def2)
@@ -890,6 +891,11 @@ lemma dist_prod_coprod_inv_left:
 lemma dist_prod_coprod_inv_right:
   "dist_prod_coprod A B C \<circ>\<^sub>c dist_prod_coprod_inv A B C = id (A \<times>\<^sub>c (B \<Coprod> C))"
   by (simp add: dist_prod_coprod_inv_def2)
+
+lemma dist_prod_coprod_inv_iso:
+  "isomorphism(dist_prod_coprod_inv A B C)"
+  by (metis dist_prod_coprod_inv_right dist_prod_coprod_inv_type dist_prod_coprod_iso dist_prod_coprod_type id_isomorphism id_right_unit2 id_type isomorphism_sandwich)
+
 
 lemma prod_pres_iso:
   assumes "A \<cong>  C"  "B \<cong> D"

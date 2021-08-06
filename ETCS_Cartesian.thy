@@ -404,6 +404,11 @@ lemma swap_idempotent:
   by (metis swap_def cfunc_prod_unique id_right_unit2 id_type left_cart_proj_type
       right_cart_proj_type swap_ap)
 
+lemma swap_mono:
+  "monomorphism(swap X Y)"
+  by (metis cfunc_type_def iso_imp_epi_and_monic isomorphism_def swap_idempotent swap_type)
+
+
 subsubsection \<open>Permuting a Cartesian product to associate to the right\<close>
 
 definition associate_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where

@@ -94,6 +94,14 @@ lemma element_monomorphism:
   unfolding monomorphism_def
   by (metis cfunc_type_def domain_comp terminal_func_unique)
 
+(* Generalization of Exercise 2.1.18 *)
+lemma terminal_el__monomorphism:
+  assumes "x : T \<rightarrow> X"
+  assumes "terminal_object(T)"
+  shows "monomorphism x"
+  unfolding monomorphism_def
+  by (metis assms cfunc_type_def domain_comp terminal_object_def)
+
 
 lemma one_unique_element:
   "\<exists>! x. x \<in>\<^sub>c one"
@@ -470,6 +478,14 @@ proof -
     using calculation by auto
 qed
 
+
+
+
+
+
+
+
+
 subsection \<open>More Results on Cartesian Products\<close>
 
 lemma cfunc_cross_prod_surj:
@@ -631,6 +647,7 @@ next
   then show "x=y"
     by auto
 qed
+
 
 
 

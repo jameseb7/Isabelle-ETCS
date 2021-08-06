@@ -123,6 +123,14 @@ next
     using f_type is_isomorphic_def isomorphic_is_symmetric by blast
 qed
 
+lemma initial_maps_mono:
+  assumes "initial_object(X)"
+  assumes "f : X \<rightarrow> Y"
+  shows "monomorphism(f)"
+  by (metis UNIV_I assms cfunc_type_def initial_iso_empty injective_def injective_imp_monomorphism no_el_iff_iso_0 nonempty_def)
+
+
+
 lemma iso_empty_initial:
   assumes "X \<cong> \<emptyset>"
   shows "initial_object(X)"
@@ -222,7 +230,6 @@ proof -
   then show "card ({(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X, m1), Y, m2). X \<cong> Y}) = 2"
     by (simp add: classes_distinct)
 qed
-
 
 
 
