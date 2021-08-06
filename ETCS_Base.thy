@@ -112,6 +112,15 @@ ML \<open>fun match_type_rule ctxt bound_typs t rule =
             | NONE => NONE
           end\<close>
 
+ML \<open>fun is_type_rule thm =
+          case Thm.concl_of thm of
+            Const ("HOL.Trueprop", _) $ boolrule =>
+              (case boolrule of 
+                (Const ("ETCS_Base.cfunc_type", _) $ _) $ _ $ _ => true
+              | _ => false)
+          | _ => false
+                \<close>
+
 (* find_type_rule searches a list of type rules, attempting to match each in turn *)
 ML \<open>fun find_type_rule _ _ _ [] = NONE (* no typing rules left *)
       | find_type_rule ctxt bound_typs t (rule::rules) =
@@ -209,6 +218,39 @@ ML \<open>fun typecheck_cfuncs_method ctxt =
 method_setup typecheck_cfuncs =
   \<open>Scan.succeed typecheck_cfuncs_method\<close>
   "Check types of cfuncs in current goal and add as assumptions of the current goal"
+
+(* typecheck_cfuncs_prems_subproof implements a tactic that generates cfunc type facts as assumptions of a goal,
+  in the right format to be passed to the Subgoal.FOCUS combinator *)
+ML \<open>fun typecheck_cfuncs_prems_subproof ctxt assms _ n (focus : Subgoal.focus) = 
+          let val type_rules' = assms @ (#prems focus) @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
+              val assms_to_typecheck = (filter (fn x => not (is_type_rule x)) assms)
+              val prems_to_typecheck = (filter (fn x => not (is_type_rule x)) (#prems focus))
+              val to_typecheck = assms_to_typecheck @ prems_to_typecheck
+              val typecheck_func = fn x => construct_cfunc_type_lemmas ctxt type_rules' (Thm.prop_of x)
+              val lems = flat (map typecheck_func to_typecheck)
+          in Method.insert_tac ctxt lems n
+          end\<close>
+
+(* typecheck_cfuncs_prems_subtac implements a tactic that generates cfunc type facts as assumptions of a goal,
+  in the right format to be passed to the SUBGOAL combinator *)
+ML \<open>fun typecheck_cfuncs_prems_subtac ctxt type_rules (subgoal, n) = 
+          Subgoal.FOCUS (typecheck_cfuncs_prems_subproof ctxt type_rules subgoal n) ctxt n
+          THEN asm_full_simp_tac ctxt n\<close>
+
+(* typecheck_cfuncs_prems_tac lifts typecheck_cfuncs_subproof to a tactic
+  that generates cfunc type facts as assumptions of a specified goal *)
+ML \<open>fun typecheck_cfuncs_prems_tac ctxt type_rules =
+  SUBGOAL (typecheck_cfuncs_prems_subtac ctxt type_rules)\<close>
+
+(* typecheck_cfuncs_prems_method lifts typecheck_cfuncs_tac to a proof method that
+  generates cfunc type facts for the first goal *)
+ML \<open>fun typecheck_cfuncs_prems_method ctxt = 
+          (fn thms => CONTEXT_TACTIC (typecheck_cfuncs_prems_tac ctxt thms 1)) : Method.method\<close>
+
+(* setup typecheck_cfuncs_prems_method as a proof method in the theory *)
+method_setup typecheck_cfuncs_prems =
+  \<open>Scan.succeed typecheck_cfuncs_prems_method\<close>
+  "Check types of cfuncs in assumptions of the current goal and add as assumptions of the current goal"
 
 (*ML \<open>fun typecheck_proof_tac_facts_subtac ctxt rules facts tac (subgoal, n) =
           let val type_rules = rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
