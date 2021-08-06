@@ -8,28 +8,6 @@ lemma exp_set_smaller_than:
                             since if A \<cong> \<emptyset> and X \<cong> \<emptyset> and B nonempty then 
                             X\<^bsup>A\<^esup> \<cong> 1 but X\<^bsup>B\<^esup> \<cong> \<emptyset> so the conclusion does not follow*)
   shows "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
-proof(cases "nonempty(A)")
-  assume "\<not>nonempty A"
-  then have "(X\<^bsup>A\<^esup>) \<cong> one"
-    by (simp add: Y_to_empty)
-  then have "terminal_object(X\<^bsup>A\<^esup>)"
-    by (simp add: iso_to1_is_term)
-  show "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
-  proof(cases "nonempty(X\<^bsup>B\<^esup>)")
-    show "nonempty (X\<^bsup>B\<^esup>) \<Longrightarrow> X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
-      by (smt \<open>X\<^bsup>A\<^esup> \<cong> one\<close> cfunc_type_def comp_type composition_of_monic_pair_is_monic element_monomorphism is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic nonempty_def)
-  next
-    assume  "\<not> nonempty (X\<^bsup>B\<^esup>)" 
-    then have "\<not> nonempty(X)"
-      using empty_to_nonempty_converse no_el_iff_iso_0 by blast
-    then have False
-      using assms(2) by blast
-    then show "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
-      by simp
-  qed
-next
-  assume nonemptyA: "nonempty A"
-  show "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
   proof (unfold is_smaller_than_def)
   
     obtain x where x_type[type_rule]: "x \<in>\<^sub>c X"
@@ -180,7 +158,6 @@ next
               by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
             then show "(eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f g) \<circ>\<^sub>c az = (eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f h) \<circ>\<^sub>c az"
               unfolding az_def by (typecheck_cfuncs_prems, auto simp add: comp_associative2)
-          qed
         qed
       qed
     qed
