@@ -540,6 +540,18 @@ lemma dist_prod_coprod_type[type_rule]:
   "dist_prod_coprod A B C : (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
   unfolding dist_prod_coprod_def by typecheck_cfuncs
 
+lemma dist_prod_coprod_left_ap:
+  assumes "a \<in>\<^sub>c A" "b \<in>\<^sub>c B"
+  shows "dist_prod_coprod A B C \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a, b\<rangle>) = \<langle>a, left_coproj B C \<circ>\<^sub>c b\<rangle>"
+  unfolding dist_prod_coprod_def using assms 
+  by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 left_coproj_cfunc_coprod)
+
+lemma dist_prod_coprod_right_ap:
+  assumes "a \<in>\<^sub>c A" "c \<in>\<^sub>c C"
+  shows "dist_prod_coprod A B C \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a, c\<rangle>) = \<langle>a, right_coproj B C \<circ>\<^sub>c c\<rangle>"
+  unfolding dist_prod_coprod_def using assms 
+  by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 right_coproj_cfunc_coprod)
+
 lemma dist_prod_coprod_mono:
   "monomorphism (dist_prod_coprod A B C)"
 proof -
@@ -896,6 +908,17 @@ lemma dist_prod_coprod_inv_iso:
   "isomorphism(dist_prod_coprod_inv A B C)"
   by (metis dist_prod_coprod_inv_right dist_prod_coprod_inv_type dist_prod_coprod_iso dist_prod_coprod_type id_isomorphism id_right_unit2 id_type isomorphism_sandwich)
 
+thm dist_prod_coprod_left_ap
+
+lemma dist_prod_coprod_inv_left_ap:
+  assumes "a \<in>\<^sub>c A" "b \<in>\<^sub>c B"
+  shows "dist_prod_coprod_inv A B C \<circ>\<^sub>c \<langle>a,left_coproj B C \<circ>\<^sub>c b\<rangle> = left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a,b\<rangle>"
+  using assms by (typecheck_cfuncs, smt comp_associative2 dist_prod_coprod_inv_def2 dist_prod_coprod_left_ap dist_prod_coprod_type id_left_unit2)
+
+lemma dist_prod_coprod_inv_right_ap:
+  assumes "a \<in>\<^sub>c A" "c \<in>\<^sub>c C"
+  shows "dist_prod_coprod_inv A B C \<circ>\<^sub>c \<langle>a,right_coproj B C \<circ>\<^sub>c c\<rangle> = right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a,c\<rangle>"
+  using assms by (typecheck_cfuncs, smt comp_associative2 dist_prod_coprod_inv_def2 dist_prod_coprod_right_ap dist_prod_coprod_type id_left_unit2)
 
 lemma prod_pres_iso:
   assumes "A \<cong>  C"  "B \<cong> D"
@@ -1221,7 +1244,6 @@ lemma cfunc_bowtieprod_comp_cfunc_coprod:
   assumes a_type: "a : Y \<rightarrow> Z" and b_type: "b : W \<rightarrow> Z"
   assumes f_type: "f : X \<rightarrow> Y" and g_type: "g : V \<rightarrow> W"
   shows "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)   = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
-
 proof - 
 
   from cfunc_bowtie_prod_unique have uniqueness:
