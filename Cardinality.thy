@@ -168,7 +168,47 @@ qed
 lemma exp_set_smaller_than2:
   assumes "A \<le>\<^sub>c B"
   shows "A\<^bsup>X\<^esup> \<le>\<^sub>c B\<^bsup>X\<^esup>"
-  oops
+proof (unfold is_smaller_than_def)
+
+  obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
+        using assms unfolding is_smaller_than_def by auto
+  show "\<exists>m. m : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup> \<and> monomorphism m"
+  proof (rule_tac x="(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>" in exI, auto)
+    show "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup>"
+      by typecheck_cfuncs
+    then show "monomorphism((m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)"
+    proof (unfold monomorphism_def3, auto)
+      fix g h Z
+      assume g_type[type_rule]: "g : Z \<rightarrow> A\<^bsup>X\<^esup>"
+      assume h_type[type_rule]: "h : Z \<rightarrow> A\<^bsup>X\<^esup>"
+
+      assume eq: "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c g = (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c h"
+      show "g = h"
+        proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=X, where X=A], auto)
+          show "eval_func A X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g = eval_func A X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f h"
+          proof (typecheck_cfuncs, rule one_separator[where X="X \<times>\<^sub>c Z", where Y="A"], auto)
+            fix xz
+            assume xz_type[type_rule]: "xz \<in>\<^sub>c X \<times>\<^sub>c Z"
+            have "((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c g)) \<circ>\<^sub>c xz  = 
+                  ((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c h)) \<circ>\<^sub>c xz"
+              using eq by auto
+            then have "((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c xz  = 
+                  ((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f h) \<circ>\<^sub>c xz"
+              by (typecheck_cfuncs, smt comp_associative2 eq inv_transpose_func_def2 inv_transpose_of_composition)
+            then have "(m \<circ>\<^sub>c eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c xz  = (m \<circ>\<^sub>c eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f h) \<circ>\<^sub>c xz"
+              by (smt comp_type eval_func_type m_def(1) transpose_func_def)
+            then have "m \<circ>\<^sub>c (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c xz)  = m \<circ>\<^sub>c (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h) \<circ>\<^sub>c xz)"
+              by (typecheck_cfuncs, smt comp_associative2)
+            then have "eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c xz = eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h) \<circ>\<^sub>c xz"
+              using m_def monomorphism_def3 by (typecheck_cfuncs, blast)
+            then show "(eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g)) \<circ>\<^sub>c xz = (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h)) \<circ>\<^sub>c xz"
+              by (typecheck_cfuncs, smt comp_associative2)
+        qed
+      qed
+    qed
+  qed
+qed
+
 
 lemma leq_transitive:
   assumes "A \<le>\<^sub>c B"
@@ -183,15 +223,19 @@ lemma exp_set_smaller_than3:
   assumes "A \<le>\<^sub>c B"
   assumes "X \<le>\<^sub>c Y"
   assumes "nonempty(X)"
-  assumes "\<And>a b x. (a \<le>\<^sub>c b \<Longrightarrow> a\<^bsup>x\<^esup> \<le>\<^sub>c b\<^bsup>x\<^esup>)"
   shows "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
 proof - 
   have leq1: "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
     using assms(1) assms(3) exp_set_smaller_than1 by blast
   have leq2: "X\<^bsup>B\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
-    by (simp add: assms(2) assms(4))
+    by (simp add: assms(2) exp_set_smaller_than2)
   show "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
     using leq1 leq2 leq_transitive by blast
 qed
+
+
+
+
+
 
 end
