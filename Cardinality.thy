@@ -2,7 +2,7 @@ theory Cardinality
   imports ETCS_Axioms
 begin
 
-lemma exp_set_smaller_than:
+lemma exp_set_smaller_than1:
   assumes "A \<le>\<^sub>c B"
   assumes "nonempty(X)"   (*This seems like the appropriate assumption
                             since if A \<cong> \<emptyset> and X \<cong> \<emptyset> and B nonempty then 
@@ -162,6 +162,36 @@ lemma exp_set_smaller_than:
       qed
     qed
   qed
+qed
+
+
+lemma exp_set_smaller_than2:
+  assumes "A \<le>\<^sub>c B"
+  shows "A\<^bsup>X\<^esup> \<le>\<^sub>c B\<^bsup>X\<^esup>"
+  oops
+
+lemma leq_transitive:
+  assumes "A \<le>\<^sub>c B"
+  assumes "B \<le>\<^sub>c C"
+  shows   "A \<le>\<^sub>c C"
+  by (typecheck_cfuncs, metis (full_types) assms cfunc_type_def comp_type composition_of_monic_pair_is_monic is_smaller_than_def)
+
+
+
+
+lemma exp_set_smaller_than3:
+  assumes "A \<le>\<^sub>c B"
+  assumes "X \<le>\<^sub>c Y"
+  assumes "nonempty(X)"
+  assumes "\<And>a b x. (a \<le>\<^sub>c b \<Longrightarrow> a\<^bsup>x\<^esup> \<le>\<^sub>c b\<^bsup>x\<^esup>)"
+  shows "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
+proof - 
+  have leq1: "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
+    using assms(1) assms(3) exp_set_smaller_than1 by blast
+  have leq2: "X\<^bsup>B\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
+    by (simp add: assms(2) assms(4))
+  show "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
+    using leq1 leq2 leq_transitive by blast
 qed
 
 end
