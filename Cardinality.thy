@@ -184,26 +184,18 @@ proof (unfold is_smaller_than_def)
 
       assume eq: "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c g = (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c h"
       show "g = h"
-        proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=X, where X=A], auto)
-          show "eval_func A X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g = eval_func A X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f h"
-          proof (typecheck_cfuncs, rule one_separator[where X="X \<times>\<^sub>c Z", where Y="A"], auto)
-            fix xz
-            assume xz_type[type_rule]: "xz \<in>\<^sub>c X \<times>\<^sub>c Z"
-            have "((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c g)) \<circ>\<^sub>c xz  = 
-                  ((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c h)) \<circ>\<^sub>c xz"
-              using eq by auto
-            then have "((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c xz  = 
-                  ((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f h) \<circ>\<^sub>c xz"
-              by (typecheck_cfuncs, smt comp_associative2 eq inv_transpose_func_def2 inv_transpose_of_composition)
-            then have "(m \<circ>\<^sub>c eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c xz  = (m \<circ>\<^sub>c eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f h) \<circ>\<^sub>c xz"
-              by (smt comp_type eval_func_type m_def(1) transpose_func_def)
-            then have "m \<circ>\<^sub>c (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c xz)  = m \<circ>\<^sub>c (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h) \<circ>\<^sub>c xz)"
-              by (typecheck_cfuncs, smt comp_associative2)
-            then have "eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c xz = eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h) \<circ>\<^sub>c xz"
-              using m_def monomorphism_def3 by (typecheck_cfuncs, blast)
-            then show "(eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g)) \<circ>\<^sub>c xz = (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h)) \<circ>\<^sub>c xz"
-              by (typecheck_cfuncs, smt comp_associative2)
-        qed
+      proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=X, where X=A], auto)
+          have "((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f g)  = 
+                ((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f h)"
+            by (typecheck_cfuncs, smt comp_associative2 eq inv_transpose_func_def2 inv_transpose_of_composition)
+          then have "(m \<circ>\<^sub>c eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f g)  = (m \<circ>\<^sub>c eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f h)"
+            by (smt comp_type eval_func_type m_def(1) transpose_func_def)
+          then have "m \<circ>\<^sub>c (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g))  = m \<circ>\<^sub>c (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h))"
+            by (typecheck_cfuncs, smt comp_associative2)
+          then have "eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g)  = eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h)"
+            using m_def monomorphism_def3 by (typecheck_cfuncs, blast)
+          then show "(eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f g))  = (eval_func A X \<circ>\<^sub>c (id X \<times>\<^sub>f h))"
+            by (typecheck_cfuncs, smt comp_associative2)
       qed
     qed
   qed
