@@ -1005,7 +1005,9 @@ definition is_finite :: "cset \<Rightarrow> bool"  where
 definition is_infinite :: "cset \<Rightarrow> bool"  where
    "is_infinite(X) \<longleftrightarrow> (\<exists> m. (m : X \<rightarrow> X \<and> monomorphism(m) \<and> \<not>surjective(m)))"
 
-
+lemma either_finite_or_infinite:
+  "is_finite(X) \<or> is_infinite(X)"
+  using epi_mon_is_iso is_finite_def is_infinite_def surjective_is_epimorphism by blast
 
 
 

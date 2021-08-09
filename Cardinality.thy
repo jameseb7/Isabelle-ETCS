@@ -2,6 +2,9 @@ theory Cardinality
   imports ETCS_Axioms
 begin
 
+  
+
+
 lemma exp_set_smaller_than1:
   assumes "A \<le>\<^sub>c B"
   assumes "nonempty(X)"   (*This seems like the appropriate assumption
@@ -226,7 +229,11 @@ proof -
 qed
 
 
-
+lemma smaller_than_N_finite:
+  assumes "X \<le>\<^sub>c \<nat>\<^sub>c"
+  assumes "\<not>(\<exists>s. (s: X \<rightarrow> \<nat>\<^sub>c \<and> surjective(s)))"
+  shows "is_finite(X)"
+  oops
 
 
 
