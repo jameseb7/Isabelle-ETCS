@@ -59,6 +59,14 @@ lemma coproduct_of_finite_is_finite:
 
 lemma NxN_is_countable:
   "countable(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
+proof -
+  obtain f where f_def:
+    "f = ((\<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c right_cart_proj one \<nat>\<^sub>c) \<amalg> id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))
+          \<circ>\<^sub>c dist_prod_coprod_inv2 one \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (predecessor \<times>\<^sub>f successor)"
+    by auto
+
+  have f_type[type_rule]: "f : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+    unfolding f_def by typecheck_cfuncs
   oops
 
 
