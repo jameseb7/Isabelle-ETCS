@@ -1167,8 +1167,6 @@ lemma product_distribute_over_coproduct_right:
   "(A \<Coprod> B) \<times>\<^sub>c C  \<cong> (A \<times>\<^sub>c C) \<Coprod> (B \<times>\<^sub>c C)"
   by (meson coprod_pres_iso isomorphic_is_transitive product_commutes product_distribute_over_coproduct_left)
 
-
-
 definition cfunc_bowtie_prod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<bowtie>\<^sub>f" 55) where
   "f \<bowtie>\<^sub>f g = ((left_coproj (codomain f) (codomain g)) \<circ>\<^sub>c f) \<amalg> ((right_coproj (codomain f) (codomain g)) \<circ>\<^sub>c g)"
 
@@ -1776,6 +1774,115 @@ next
 qed
 
 
+definition dist_prod_coprod2 :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "dist_prod_coprod2 A B C = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c (swap B A \<bowtie>\<^sub>f swap C A)"
+
+lemma dist_prod_coprod2_type[type_rule]:
+  "dist_prod_coprod2 A B C : (B \<times>\<^sub>c A) \<Coprod> (C \<times>\<^sub>c A) \<rightarrow> (B \<Coprod> C) \<times>\<^sub>c A"
+  unfolding dist_prod_coprod2_def by typecheck_cfuncs
+
+lemma dist_prod_coprod2_left_ap:
+  assumes "a \<in>\<^sub>c A" "b \<in>\<^sub>c B"
+  shows "dist_prod_coprod2 A B C \<circ>\<^sub>c (left_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>b, a\<rangle>) = \<langle>left_coproj B C \<circ>\<^sub>c b, a\<rangle>"
+proof -
+  have "dist_prod_coprod2 A B C \<circ>\<^sub>c (left_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>b, a\<rangle>)
+    = (swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c (swap B A \<bowtie>\<^sub>f swap C A)) \<circ>\<^sub>c (left_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>b, a\<rangle>)"
+    unfolding dist_prod_coprod2_def by auto
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c ((swap B A \<bowtie>\<^sub>f swap C A) \<circ>\<^sub>c left_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A)) \<circ>\<^sub>c \<langle>b, a\<rangle>"
+    using assms by (typecheck_cfuncs, smt comp_associative2)
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c swap B A) \<circ>\<^sub>c \<langle>b, a\<rangle>"
+    using assms by (typecheck_cfuncs, auto simp add: left_coproj_cfunc_bowtie_prod)
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c swap B A \<circ>\<^sub>c \<langle>b, a\<rangle>"
+    using assms by (typecheck_cfuncs, auto simp add: comp_associative2)
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a, b\<rangle>"
+    using assms swap_ap by (typecheck_cfuncs, auto)
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c \<langle>a, left_coproj B C \<circ>\<^sub>c b\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: dist_prod_coprod_left_ap)
+  also have "... = \<langle>left_coproj B C \<circ>\<^sub>c b, a\<rangle>"
+    using assms swap_ap by (typecheck_cfuncs, auto)
+  then show ?thesis
+    using calculation by auto
+qed
+
+lemma dist_prod_coprod2_right_ap:
+  assumes "a \<in>\<^sub>c A" "c \<in>\<^sub>c C"
+  shows "dist_prod_coprod2 A B C \<circ>\<^sub>c (right_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>c, a\<rangle>) = \<langle>right_coproj B C \<circ>\<^sub>c c, a\<rangle>"
+proof -
+  have "dist_prod_coprod2 A B C \<circ>\<^sub>c (right_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>c, a\<rangle>)
+    = (swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c (swap B A \<bowtie>\<^sub>f swap C A)) \<circ>\<^sub>c (right_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>c, a\<rangle>)"
+    unfolding dist_prod_coprod2_def by auto
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c ((swap B A \<bowtie>\<^sub>f swap C A) \<circ>\<^sub>c right_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A)) \<circ>\<^sub>c \<langle>c, a\<rangle>"
+    using assms by (typecheck_cfuncs, smt comp_associative2)
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c swap C A) \<circ>\<^sub>c \<langle>c, a\<rangle>"
+    using assms by (typecheck_cfuncs, auto simp add: right_coproj_cfunc_bowtie_prod)
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c swap C A \<circ>\<^sub>c \<langle>c, a\<rangle>"
+    using assms by (typecheck_cfuncs, auto simp add: comp_associative2)
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c dist_prod_coprod A B C \<circ>\<^sub>c right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a, c\<rangle>"
+    using assms swap_ap by (typecheck_cfuncs, auto)
+  also have "... = swap A (B \<Coprod> C) \<circ>\<^sub>c \<langle>a, right_coproj B C \<circ>\<^sub>c c\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: dist_prod_coprod_right_ap)
+  also have "... = \<langle>right_coproj B C \<circ>\<^sub>c c, a\<rangle>"
+    using assms swap_ap by (typecheck_cfuncs, auto)
+  then show ?thesis
+    using calculation by auto
+qed
+
+definition dist_prod_coprod_inv2 :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
+  "dist_prod_coprod_inv2 A B C = (swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c dist_prod_coprod_inv A B C \<circ>\<^sub>c swap (B \<Coprod> C) A"
+
+lemma dist_prod_coprod_inv2_type[type_rule]:
+  "dist_prod_coprod_inv2 A B C : (B \<Coprod> C) \<times>\<^sub>c A \<rightarrow> (B \<times>\<^sub>c A) \<Coprod> (C \<times>\<^sub>c A)"
+  unfolding dist_prod_coprod_inv2_def by typecheck_cfuncs
+
+lemma dist_prod_coprod_inv2_left_ap:
+  assumes "a \<in>\<^sub>c A" "b \<in>\<^sub>c B"
+  shows "dist_prod_coprod_inv2 A B C \<circ>\<^sub>c \<langle>left_coproj B C \<circ>\<^sub>c b, a\<rangle> = left_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>b, a\<rangle>"
+proof -
+  have "dist_prod_coprod_inv2 A B C \<circ>\<^sub>c \<langle>left_coproj B C \<circ>\<^sub>c b, a\<rangle>
+    = ((swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c dist_prod_coprod_inv A B C \<circ>\<^sub>c swap (B \<Coprod> C) A) \<circ>\<^sub>c \<langle>left_coproj B C \<circ>\<^sub>c b, a\<rangle>"
+    unfolding dist_prod_coprod_inv2_def by auto
+  also have "... = (swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c dist_prod_coprod_inv A B C \<circ>\<^sub>c swap (B \<Coprod> C) A \<circ>\<^sub>c \<langle>left_coproj B C \<circ>\<^sub>c b, a\<rangle>"
+    using assms by (typecheck_cfuncs, smt comp_associative2)
+  also have "... = (swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c dist_prod_coprod_inv A B C \<circ>\<^sub>c \<langle>a, left_coproj B C \<circ>\<^sub>c b\<rangle>"
+    using assms swap_ap by (typecheck_cfuncs, auto)
+  also have "... = (swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a, b\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: dist_prod_coprod_inv_left_ap)
+  also have "... = ((swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c \<langle>a, b\<rangle>"
+    using assms by (typecheck_cfuncs, smt comp_associative2)
+  also have "... = (left_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c swap A B) \<circ>\<^sub>c \<langle>a, b\<rangle>"
+    using assms left_coproj_cfunc_bowtie_prod by (typecheck_cfuncs, auto)
+  also have "... = left_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c swap A B \<circ>\<^sub>c \<langle>a, b\<rangle>"
+    using assms by (typecheck_cfuncs, smt comp_associative2)
+  also have "... = left_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>b, a\<rangle>"
+    using assms swap_ap by (typecheck_cfuncs, auto)
+  then show ?thesis
+    using calculation by auto
+qed
+
+lemma dist_prod_coprod_inv2_right_ap:
+  assumes "a \<in>\<^sub>c A" "c \<in>\<^sub>c C"
+  shows "dist_prod_coprod_inv2 A B C \<circ>\<^sub>c \<langle>right_coproj B C \<circ>\<^sub>c c, a\<rangle> = right_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>c, a\<rangle>"
+proof -
+  have "dist_prod_coprod_inv2 A B C \<circ>\<^sub>c \<langle>right_coproj B C \<circ>\<^sub>c c, a\<rangle>
+    = ((swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c dist_prod_coprod_inv A B C \<circ>\<^sub>c swap (B \<Coprod> C) A) \<circ>\<^sub>c \<langle>right_coproj B C \<circ>\<^sub>c c, a\<rangle>"
+    unfolding dist_prod_coprod_inv2_def by auto
+  also have "... = (swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c dist_prod_coprod_inv A B C \<circ>\<^sub>c swap (B \<Coprod> C) A \<circ>\<^sub>c \<langle>right_coproj B C \<circ>\<^sub>c c, a\<rangle>"
+    using assms by (typecheck_cfuncs, smt comp_associative2)
+  also have "... = (swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c dist_prod_coprod_inv A B C \<circ>\<^sub>c \<langle>a, right_coproj B C \<circ>\<^sub>c c\<rangle>"
+    using assms swap_ap by (typecheck_cfuncs, auto)
+  also have "... = (swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a, c\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: dist_prod_coprod_inv_right_ap)
+  also have "... = ((swap A B \<bowtie>\<^sub>f swap A C) \<circ>\<^sub>c right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c \<langle>a, c\<rangle>"
+    using assms by (typecheck_cfuncs, auto simp add: comp_associative2)
+  also have "... = (right_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c swap A C) \<circ>\<^sub>c \<langle>a, c\<rangle>"
+    using assms by (typecheck_cfuncs, auto simp add: right_coproj_cfunc_bowtie_prod)
+  also have "... = right_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c swap A C \<circ>\<^sub>c \<langle>a, c\<rangle>"
+    using assms by (typecheck_cfuncs, auto simp add: comp_associative2)
+  also have "... = right_coproj (B \<times>\<^sub>c A) (C \<times>\<^sub>c A) \<circ>\<^sub>c \<langle>c, a\<rangle>"
+    using assms swap_ap by (typecheck_cfuncs, auto)
+  then show ?thesis
+    using calculation by auto
+qed
 
 (* begin section on subset inclusion*)
 
