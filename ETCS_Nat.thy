@@ -366,6 +366,69 @@ lemma zUs_surj:
  "surjective(zero \<amalg> successor)"
   by (simp add: cfunc_type_def epi_is_surj zUs_epic)
 
+definition predecessor :: "cfunc" where
+  "predecessor = (THE f. f : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c 
+    \<and> f \<circ>\<^sub>c (zero \<amalg> successor) = id (one \<Coprod> \<nat>\<^sub>c) \<and>  (zero \<amalg> successor) \<circ>\<^sub>c f = id \<nat>\<^sub>c)"
+
+lemma predecessor_def2:
+  "predecessor : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c \<and> predecessor \<circ>\<^sub>c (zero \<amalg> successor) = id (one \<Coprod> \<nat>\<^sub>c)
+    \<and> (zero \<amalg> successor) \<circ>\<^sub>c predecessor = id \<nat>\<^sub>c"
+proof (unfold predecessor_def, rule theI', auto)
+  show "\<exists>x. x : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c \<and>
+        x \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (one \<Coprod> \<nat>\<^sub>c) \<and> zero \<amalg> successor \<circ>\<^sub>c x = id\<^sub>c \<nat>\<^sub>c"
+    using oneUN_iso_N_isomorphism by (typecheck_cfuncs, unfold isomorphism_def cfunc_type_def, auto)
+next
+  fix x y
+  assume x_type[type_rule]: "x : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c" and y_type[type_rule]: "y : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c"
+  assume x_left_inv: "zero \<amalg> successor \<circ>\<^sub>c x = id\<^sub>c \<nat>\<^sub>c"
+  assume "x \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (one \<Coprod> \<nat>\<^sub>c)" "y \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (one \<Coprod> \<nat>\<^sub>c)"
+  then have "x \<circ>\<^sub>c zero \<amalg> successor = y \<circ>\<^sub>c zero \<amalg> successor"
+    by auto
+  then have "x \<circ>\<^sub>c zero \<amalg> successor \<circ>\<^sub>c x = y \<circ>\<^sub>c zero \<amalg> successor \<circ>\<^sub>c x"
+    by (typecheck_cfuncs, auto simp add: comp_associative2)
+  then show "x = y"
+    using id_right_unit2 x_left_inv x_type y_type by auto
+qed
+
+lemma predecessor_type[type_rule]:
+  "predecessor : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c"
+  by (simp add: predecessor_def2)
+
+lemma predecessor_left_inv:
+  "(zero \<amalg> successor) \<circ>\<^sub>c predecessor = id \<nat>\<^sub>c"
+  by (simp add: predecessor_def2)
+
+lemma predecessor_right_inv:
+  "predecessor \<circ>\<^sub>c (zero \<amalg> successor) = id (one \<Coprod> \<nat>\<^sub>c)"
+  by (simp add: predecessor_def2)
+
+lemma predecessor_successor:
+  "predecessor \<circ>\<^sub>c successor = right_coproj one \<nat>\<^sub>c"
+proof -
+  have "predecessor \<circ>\<^sub>c successor = predecessor \<circ>\<^sub>c (zero \<amalg> successor) \<circ>\<^sub>c right_coproj one \<nat>\<^sub>c"
+    using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+  also have "... = (predecessor \<circ>\<^sub>c (zero \<amalg> successor)) \<circ>\<^sub>c right_coproj one \<nat>\<^sub>c"
+    by (typecheck_cfuncs, auto simp add: comp_associative2)
+  also have "... = right_coproj one \<nat>\<^sub>c"
+    by (typecheck_cfuncs, simp add: id_left_unit2 predecessor_def2)
+  then show ?thesis
+    using calculation by auto
+qed
+
+lemma predecessor_zero:
+  "predecessor \<circ>\<^sub>c zero = left_coproj one \<nat>\<^sub>c"
+proof -
+  have "predecessor \<circ>\<^sub>c zero = predecessor \<circ>\<^sub>c (zero \<amalg> successor) \<circ>\<^sub>c left_coproj one \<nat>\<^sub>c"
+    using left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+  also have "... = (predecessor \<circ>\<^sub>c (zero \<amalg> successor)) \<circ>\<^sub>c left_coproj one \<nat>\<^sub>c"
+    by (typecheck_cfuncs, auto simp add: comp_associative2)
+  also have "... = left_coproj one \<nat>\<^sub>c"
+    by (typecheck_cfuncs, simp add: id_left_unit2 predecessor_def2)
+  then show ?thesis
+    using calculation by auto
+qed
+    
+
 lemma nonzero_is_succ_pre:
   assumes "x \<in>\<^sub>c  (one \<Coprod> \<nat>\<^sub>c)"
   shows "(x = (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one) \<or>
