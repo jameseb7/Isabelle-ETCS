@@ -16,6 +16,15 @@ axiomatization
   axiom_of_choice :"epimorphism(f) \<longrightarrow> (\<exists> g . g sectionof f)"
 
 
+lemma epis_give_monos:  
+  assumes f_type: "f : X \<rightarrow> Y"
+  assumes f_epi: "epimorphism(f)"
+  shows "\<exists>g. (g: Y \<rightarrow> X \<and> monomorphism(g) )"
+  using assms  
+  by (typecheck_cfuncs_prems, metis axiom_of_choice cfunc_type_def comp_monic_imp_monic f_epi id_isomorphism iso_imp_epi_and_monic section_of_def)
+
+
+
 
 
 end

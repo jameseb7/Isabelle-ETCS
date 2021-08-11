@@ -15,6 +15,11 @@ lemma emptyset_is_not_epi_countable:
 definition countable :: "cset \<Rightarrow> bool" where
   "countable X \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> \<nat>\<^sub>c \<and> monomorphism f)"
 
+lemma epi_countable_is_countable: 
+  assumes "epi_countable X"
+  shows "countable X"
+  using assms countable_def epi_countable_def epis_give_monos by blast
+
 
 
 lemma emptyset_is_countable:
