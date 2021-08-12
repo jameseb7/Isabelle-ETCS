@@ -232,5 +232,26 @@ proof -
 qed
 
 
+lemma coprod_with_init_obj1: 
+  assumes "initial_object Y"
+  shows "X \<Coprod> Y \<cong> X"
+  by (meson assms coprod_pres_iso coproduct_with_zero_does_nothing initial_iso_empty isomorphic_is_reflexive isomorphic_is_transitive)
+
+lemma coprod_with_init_obj2: 
+  assumes "initial_object X"
+  shows "X \<Coprod> Y \<cong> Y"
+  using assms coprod_with_init_obj1 coproduct_commutes isomorphic_is_transitive by blast
+
+
+lemma prod_with_term_obj1:
+  assumes "terminal_object(X)" 
+  shows  "X \<times>\<^sub>c Y \<cong> Y" 
+  by (meson assms isomorphic_is_reflexive isomorphic_is_transitive one_terminal_object one_x_A_iso_A prod_pres_iso terminal_objects_isomorphic)
+
+lemma prod_with_term_obj2:
+  assumes "terminal_object(Y)" 
+  shows  "X \<times>\<^sub>c Y \<cong> X"
+  by (meson assms isomorphic_is_transitive prod_with_term_obj1 product_commutes)
+
 
 end

@@ -329,13 +329,69 @@ proof -
     using is_smaller_than_def m_type by blast
 qed
 
+lemma prod_finite_with_self_finite:
+  assumes "is_finite(Y)"
+  shows "is_finite(Y \<times>\<^sub>c Y)"
+proof(cases "initial_object(Y)")
+  assume "initial_object Y"
+  then have "Y \<times>\<^sub>c Y \<cong> Y"
+    using function_to_empty_set_is_iso initial_iso_empty is_isomorphic_def left_cart_proj_type no_el_iff_iso_0 by blast
+  then show ?thesis
+    using assms iso_pres_finite isomorphic_is_symmetric by blast
+next
+  assume "\<not> initial_object Y"
+  show ?thesis
+  proof(cases "terminal_object Y")
+    assume "terminal_object Y"
+    then have "Y \<times>\<^sub>c Y \<cong> Y"
+      by (simp add: prod_with_term_obj1)
+    then show ?thesis
+      using assms iso_pres_finite isomorphic_is_symmetric by blast
+  next
+    assume "\<not> terminal_object Y"
+    oops
+
+
+
+
+
+
+
 
 lemma product_of_finite_is_finite:
   assumes "is_finite(X)" "is_finite(Y)"
   assumes "nonempty(X)" "nonempty(Y)"
   shows "is_finite(X \<times>\<^sub>c Y)"
-  unfolding is_finite_def
-proof-  
+proof(cases "initial_object(X)")
+  assume "initial_object X"
+  then have "X \<times>\<^sub>c Y \<cong> \<emptyset>"
+    using assms(3) initial_iso_empty no_el_iff_iso_0 by blast
+  then show ?thesis
+    using \<open>initial_object X\<close> assms(3) initial_iso_empty no_el_iff_iso_0 by blast
+next
+  assume "\<not> initial_object X"
+  show ?thesis
+  proof(cases "terminal_object(X)")
+    assume "terminal_object(X)" 
+    then have "X \<times>\<^sub>c Y \<cong> Y"
+      by (simp add: prod_with_term_obj1) 
+    then show ?thesis
+      using assms(2) iso_pres_finite isomorphic_is_symmetric by blast
+  next
+    assume "\<not> terminal_object X"
+    show ?thesis
+    proof(cases "terminal_object(Y)")
+      assume "terminal_object Y"
+      then have "X \<times>\<^sub>c Y \<cong> X"
+        by (simp add: prod_with_term_obj2)
+      then show ?thesis
+        using assms(1) iso_pres_finite isomorphic_is_symmetric by blast
+    next
+      assume "\<not> terminal_object Y"
+      then show "is_finite (X \<times>\<^sub>c Y)"
+
+
+(*
   fix xy
   assume xy_type: "xy:  X \<times>\<^sub>c Y \<rightarrow> X \<times>\<^sub>c Y"
   assume xy_mono: "monomorphism(xy)"
@@ -344,9 +400,11 @@ proof-
   obtain n where n_def: "n :  Y \<rightarrow> X \<times>\<^sub>c Y \<and> monomorphism(n)"
     using assms(3) is_smaller_than_def smaller_than_product2 by blast
   oops
+*)
 
 
-(*
+
+
 lemma coprod_finite_with_self_finite:
   assumes "is_finite(Y)"
   shows "is_finite(Y \<Coprod> Y)"
@@ -354,12 +412,12 @@ lemma coprod_finite_with_self_finite:
 proof(safe)
   fix m 
   assume m_type: " m : Y \<Coprod> Y \<rightarrow> Y \<Coprod> Y"
-  then obtain x y where m_def: "m = (x \<amalg> y) \<and> x : Y \<rightarrow> Y \<Coprod> Y \<and> y : Y \<rightarrow> Y \<Coprod> Y"
-    using coprod_decomp by blast
-  oops
-  *)
-
-
+  assume m_mono: "monomorphism m"
+  obtain x y where m_def: "m = (x \<amalg> y) \<and> x : Y \<rightarrow> Y \<Coprod> Y \<and> y : Y \<rightarrow> Y \<Coprod> Y"
+    using m_type coprod_decomp by blast
+  show "isomorphism m"
+    using assms m_def m_type m_mono apply typecheck_cfuncs
+    oops
 
 
 
