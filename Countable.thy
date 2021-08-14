@@ -88,7 +88,6 @@ proof -
   then have m_type: "m : X  \<Coprod> Y \<rightarrow> (X \<times>\<^sub>c Y)"
     by (simp add: cfunc_coprod_type m_def type1)
 
-  (*Show that an elemet,c,  c \<in>\<^bsub>Y\<^esub> (one, y1) iff c = y1*)
   have relative: "\<And>y. y \<in>\<^sub>c Y \<Longrightarrow> (y \<in>\<^bsub>Y\<^esub> (one, y1)) = (y = y1)"
   proof(auto)
     fix y 
@@ -389,7 +388,7 @@ next
     next
       assume "\<not> terminal_object Y"
       then show "is_finite (X \<times>\<^sub>c Y)"
-
+        oops
 
 (*
   fix xy
