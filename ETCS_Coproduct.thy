@@ -1396,30 +1396,27 @@ lemma case_bool_iso:
   using case_bool_def2 unfolding isomorphism_def
   by (rule_tac x="\<t> \<amalg> \<f>" in exI, typecheck_cfuncs, auto simp add: cfunc_type_def)
 
-lemma case_bool_true:
-  "case_bool \<circ>\<^sub>c \<t> = left_coproj one one"
+lemma case_bool_true_and_false:
+  "(case_bool \<circ>\<^sub>c \<t> = left_coproj one one) \<and> (case_bool \<circ>\<^sub>c \<f> = right_coproj one one)"
 proof -
-  oops
-  
-
-
-lemma maps_into_1u1_2: 
-  assumes "\<psi> : \<Omega> \<rightarrow> (one \<Coprod> one)"
-  assumes "isomorphism(\<psi>)"
-  shows "(\<psi> \<circ>\<^sub>c \<t> = left_coproj one one) \<and> (\<psi> \<circ>\<^sub>c \<f> = right_coproj one one)"  
-proof - 
-  have type1[type_rule]: "\<psi> \<circ>\<^sub>c (\<t> \<amalg> \<f>) : (one \<Coprod> one) \<rightarrow> (one \<Coprod> one)"
-    using assms(1) cfunc_coprod_type comp_type false_func_type true_func_type by blast
-  have type2[type_rule]: "(\<t> \<amalg> \<f>) \<circ>\<^sub>c \<psi> : \<Omega> \<rightarrow> \<Omega>"
-    using assms(1) cfunc_coprod_type comp_type false_func_type true_func_type by auto
   have "(left_coproj one one) \<amalg>  (right_coproj one one) = id(one \<Coprod> one)"
     by (simp add: id_coprod)
-  also have "... = \<psi> \<circ>\<^sub>c (\<t> \<amalg> \<f>)"
-    using assms apply typecheck_cfuncs
+  also have "... = (case_bool) \<circ>\<^sub>c (\<t> \<amalg> \<f>)"
+    by (simp add: case_bool_def2)
+  also have "...  = (case_bool \<circ>\<^sub>c \<t>) \<amalg> (case_bool \<circ>\<^sub>c \<f>)"
+    using case_bool_def2 cfunc_coprod_comp false_func_type true_func_type by auto
+  then show ?thesis 
+    using  calculation coprod_eq2 by (typecheck_cfuncs, auto)
+qed
 
-(*
-  shows "(x = left_coproj one one) \<or> (x = right_coproj one one)"
-*)
+lemma case_bool_true:
+  "case_bool \<circ>\<^sub>c \<t> = left_coproj one one"
+  by (simp add: case_bool_true_and_false)
+
+lemma case_bool_false:
+  "case_bool \<circ>\<^sub>c \<f> = right_coproj one one"
+  by (simp add: case_bool_true_and_false)
+
 
 
 
