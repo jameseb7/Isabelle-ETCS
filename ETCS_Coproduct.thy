@@ -4,6 +4,8 @@ begin
 
 section  \<open>Axiom 7: Coproducts\<close>
 
+hide_const case_bool
+
 axiomatization
   coprod :: "cset \<Rightarrow> cset \<Rightarrow> cset" (infixr "\<Coprod>" 65) and
   left_coproj :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" and
@@ -1353,16 +1355,52 @@ proof (rule_tac x="a \<circ>\<^sub>c left_coproj X Y" in exI, rule_tac x="a \<ci
     by (meson assms comp_type right_proj_type)
 qed
 
-definition inverse_tuf  where
-  "inverse_tuf = (THE f. f : \<Omega> \<rightarrow> (one \<Coprod> one) \<and>  
+definition case_bool :: "cfunc" where
+  "case_bool = (THE f. f : \<Omega> \<rightarrow> (one \<Coprod> one) \<and>  
     (\<t> \<amalg> \<f>) \<circ>\<^sub>c f = id(\<Omega>) \<and> f \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (one \<Coprod> one))"
 
-lemma inverse_tuf_type[type_rule]: 
-  "inverse_tuf : \<Omega> \<rightarrow> (one \<Coprod> one)"
+lemma case_bool_def2:
+  "case_bool : \<Omega> \<rightarrow> (one \<Coprod> one) \<and>  
+    (\<t> \<amalg> \<f>) \<circ>\<^sub>c case_bool = id(\<Omega>) \<and> case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (one \<Coprod> one)"
+proof (unfold case_bool_def, rule theI', auto)
+  show "\<exists>x. x : \<Omega> \<rightarrow> one \<Coprod> one \<and> \<t> \<amalg> \<f> \<circ>\<^sub>c x = id\<^sub>c \<Omega> \<and> x \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (one \<Coprod> one)"
+    using truth_value_set_iso_1u1 unfolding isomorphism_def
+    by (auto, rule_tac x=g in exI, typecheck_cfuncs, simp add: cfunc_type_def)
+next
+  fix x y
+  assume x_type[type_rule]: "x : \<Omega> \<rightarrow> one \<Coprod> one" and y_type[type_rule]: "y : \<Omega> \<rightarrow> one \<Coprod> one"
+  assume x_left_inv: "\<t> \<amalg> \<f> \<circ>\<^sub>c x = id\<^sub>c \<Omega>"
+  assume "x \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (one \<Coprod> one)" "y \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (one \<Coprod> one)"
+  then have "x \<circ>\<^sub>c \<t> \<amalg> \<f> = y \<circ>\<^sub>c \<t> \<amalg> \<f>"
+    by auto
+  then have "x \<circ>\<^sub>c \<t> \<amalg> \<f> \<circ>\<^sub>c x = y \<circ>\<^sub>c \<t> \<amalg> \<f> \<circ>\<^sub>c x"
+    by (typecheck_cfuncs, auto simp add: comp_associative2)
+  then show "x = y"
+    using id_right_unit2 x_left_inv by (typecheck_cfuncs_prems, auto)
+qed
 
+lemma case_bool_type[type_rule]: 
+  "case_bool : \<Omega> \<rightarrow> (one \<Coprod> one)"
+  using case_bool_def2 by auto
 
-lemma inverse_tuf_iso:
-  "isomorphism(inverse_tuf)"
+lemma case_bool_true_coprod_false:
+  "case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (one \<Coprod> one)"
+  using case_bool_def2 by auto
+
+lemma true_coprod_false_case_bool:
+  "(\<t> \<amalg> \<f>) \<circ>\<^sub>c case_bool = id \<Omega>"
+  using case_bool_def2 by auto
+
+lemma case_bool_iso:
+  "isomorphism(case_bool)"
+  using case_bool_def2 unfolding isomorphism_def
+  by (rule_tac x="\<t> \<amalg> \<f>" in exI, typecheck_cfuncs, auto simp add: cfunc_type_def)
+
+lemma case_bool_true:
+  "case_bool \<circ>\<^sub>c \<t> = left_coproj one one"
+proof -
+  oops
+  
 
 
 lemma maps_into_1u1_2: 
