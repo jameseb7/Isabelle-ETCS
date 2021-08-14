@@ -454,6 +454,7 @@ lemma maps_into_1u1:
   shows "(x = left_coproj one one) \<or> (x = right_coproj one one)"
   using assms by (typecheck_cfuncs, metis coprojs_jointly_surj terminal_func_unique)
 
+  
 
 
 lemma coprod_preserves_left_epi:
@@ -532,6 +533,18 @@ proof-
   then show ?thesis
     using epi_mon_is_iso epic by auto
 qed
+
+lemma oneUone_iso_\<Omega>:
+  "(one \<Coprod> one) \<cong> \<Omega>"
+  using cfunc_coprod_type false_func_type is_isomorphic_def true_func_type truth_value_set_iso_1u1 by blast
+
+lemma Omega_iso_oneUone: 
+  "\<Omega> \<cong> (one \<Coprod> one)"
+  by (simp add: isomorphic_is_symmetric oneUone_iso_\<Omega>)
+
+
+
+
 
 definition dist_prod_coprod :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "dist_prod_coprod A B C = (id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C))"
@@ -1339,6 +1352,37 @@ proof (rule_tac x="a \<circ>\<^sub>c left_coproj X Y" in exI, rule_tac x="a \<ci
   show "a \<circ>\<^sub>c right_coproj X Y : Y \<rightarrow> A"
     by (meson assms comp_type right_proj_type)
 qed
+
+definition inverse_tuf  where
+  "inverse_tuf = (THE f. f : \<Omega> \<rightarrow> (one \<Coprod> one) \<and>  
+    (\<t> \<amalg> \<f>) \<circ>\<^sub>c f = id(\<Omega>) \<and> f \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (one \<Coprod> one))"
+
+lemma inverse_tuf_type[type_rule]: 
+  "inverse_tuf : \<Omega> \<rightarrow> (one \<Coprod> one)"
+
+
+lemma inverse_tuf_iso:
+  "isomorphism(inverse_tuf)"
+
+
+lemma maps_into_1u1_2: 
+  assumes "\<psi> : \<Omega> \<rightarrow> (one \<Coprod> one)"
+  assumes "isomorphism(\<psi>)"
+  shows "(\<psi> \<circ>\<^sub>c \<t> = left_coproj one one) \<and> (\<psi> \<circ>\<^sub>c \<f> = right_coproj one one)"  
+proof - 
+  have type1[type_rule]: "\<psi> \<circ>\<^sub>c (\<t> \<amalg> \<f>) : (one \<Coprod> one) \<rightarrow> (one \<Coprod> one)"
+    using assms(1) cfunc_coprod_type comp_type false_func_type true_func_type by blast
+  have type2[type_rule]: "(\<t> \<amalg> \<f>) \<circ>\<^sub>c \<psi> : \<Omega> \<rightarrow> \<Omega>"
+    using assms(1) cfunc_coprod_type comp_type false_func_type true_func_type by auto
+  have "(left_coproj one one) \<amalg>  (right_coproj one one) = id(one \<Coprod> one)"
+    by (simp add: id_coprod)
+  also have "... = \<psi> \<circ>\<^sub>c (\<t> \<amalg> \<f>)"
+    using assms apply typecheck_cfuncs
+
+(*
+  shows "(x = left_coproj one one) \<or> (x = right_coproj one one)"
+*)
+
 
 
 lemma cfunc_bowtieprod_epi:
