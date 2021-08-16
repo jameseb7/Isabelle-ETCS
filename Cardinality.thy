@@ -459,6 +459,21 @@ proof -
      using \<phi>_type is_isomorphic_def by blast
 qed
 
+lemma exp_coprod:
+  "A\<^bsup>(B \<Coprod> C)\<^esup> \<cong> A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup> "
+proof -
+  obtain \<phi> where \<phi>_def:
+    "\<phi> = 
+    (((eval_func A B \<circ>\<^sub>c distribute_left_left B (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>))
+        \<amalg>
+     (eval_func A C \<circ>\<^sub>c distribute_left_right C (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>)))
+      \<circ>\<^sub>c dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>))\<^sup>\<sharp>"
+    by auto
+
+  have \<phi>_type[type_rule]: "\<phi> : A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>(B \<Coprod> C)\<^esup>"
+    unfolding \<phi>_def by typecheck_cfuncs
+  oops
+
 lemma smaller_than_N_finite:
   assumes "X \<le>\<^sub>c \<nat>\<^sub>c"
   assumes "\<not>(\<exists>s. (s: X \<rightarrow> \<nat>\<^sub>c \<and> surjective(s)))"
