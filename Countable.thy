@@ -1,5 +1,5 @@
 theory Countable
-  imports ETCS_Axioms
+  imports ETCS_Axioms ETCS_Add ETCS_Pred
 begin
 
 (* Definition 2.6.9 *)
@@ -498,6 +498,32 @@ proof -
 
   have f_type[type_rule]: "f : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
     unfolding f_def by typecheck_cfuncs
+
+  obtain seq where seq_type[type_rule]: "seq : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c" and
+    seq_triangle: "seq \<circ>\<^sub>c zero = \<langle>zero, zero\<rangle>" and
+    seq_square: "seq \<circ>\<^sub>c successor = f \<circ>\<^sub>c seq"
+    using natural_number_object_property[where q = "\<langle>zero, zero\<rangle>", where f=f, where X="\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"]
+    unfolding triangle_commutes_def square_commutes_def by (auto, typecheck_cfuncs, metis)
+
+  (* seq((n+m)(n+m+1)/2 + n) = (m, n)? *)
+  (* seq(0) = (0,0) = seq(0*1/2 + 0) *)
+  (* seq(1) = (1,0) = seq(1*2/2 + 0) *)
+  (* seq(2) = (0,1) = seq(1*2/2 + 1) *)
+  (* seq(3) = (2,0) = seq(2*3/2 + 0) *)
+  (* seq(4) = (1,1) = seq(2*3/2 + 1) *)
+  (* seq(5) = (0,2) = seq(2*3/2 + 2) *)
+  (* seq(6) = (3,0) = seq(3*4/2 + 0) *)
+
+  have "\<And> k m. k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> seq \<circ>\<^sub>c k = \<langle>m, zero\<rangle> \<Longrightarrow> seq \<circ>\<^sub>c (k +\<^sub>\<nat> m) = \<langle>zero, m\<rangle>"
+  proof -
+    fix k m
+    assume k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c"
+    assume seq_k_eq: "seq \<circ>\<^sub>c k = \<langle>m, zero\<rangle>"
+
+    have "eq_pred (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>seq \<circ>\<^sub>c k \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, \<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle> =
+      eq_pred (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>seq\<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>k \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>"
+    proof (rule natural_number_object_func_unique[where X="\<Omega>", where f="id \<Omega>"])
+
   oops
 
 
