@@ -416,6 +416,11 @@ qed
 definition surjective :: "cfunc \<Rightarrow> bool" where
  "surjective f  \<longleftrightarrow> (\<forall>y. y \<in>\<^sub>c codomain f \<longrightarrow> (\<exists>x. x \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = y))"
 
+lemma surjective_def2:
+  assumes "f : X \<rightarrow> Y"
+  shows "surjective f  \<longleftrightarrow> (\<forall>y. y \<in>\<^sub>c Y \<longrightarrow> (\<exists>x. x \<in>\<^sub>c X \<and> f \<circ>\<^sub>c x = y))"
+  using assms unfolding surjective_def cfunc_type_def by auto
+
 
 (* Exercise 2.1.30 *)
 lemma surjective_is_epimorphism:
@@ -648,11 +653,5 @@ next
     by auto
 qed
 
-
-
-
-
-  
-  
 
 end

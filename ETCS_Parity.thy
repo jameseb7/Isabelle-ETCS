@@ -1,5 +1,5 @@
 theory ETCS_Parity
-  imports ETCS_Add ETCS_Mult ETCS_Pred
+  imports ETCS_Add ETCS_Mult ETCS_Pred ETCS_Quantifier
 begin
 
 definition nth_even :: "cfunc" where
@@ -315,17 +315,44 @@ lemma is_even_nth_odd_false:
   by (smt NOT_true_is_false NOT_type comp_associative2 is_odd_def2 is_odd_nth_odd_true
       is_even_not_is_odd nth_odd_def2 terminal_func_type true_func_type)
 
+lemma add_evens_is_even:
+  assumes "x \<in>\<^sub>c \<nat>\<^sub>c" "y \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "is_even \<circ>\<^sub>c x = \<t>" "is_even \<circ>\<^sub>c y = \<t>"
+  shows "is_even \<circ>\<^sub>c (x +\<^sub>\<nat> y) = \<t>"
+  oops
+
+(*lemma 
+  assumes "is_even \<circ>\<^sub>c y = \<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>" and "y : A \<rightarrow> \<nat>\<^sub>c"
+  shows "\<exists> x. x : A \<rightarrow> \<nat>\<^sub>c \<and> y = nth_even \<circ>\<^sub>c x"
+proof -
+  have "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>) = is_even"
+  proof (rule natural_number_object_func_unique[where f="NOT", where X=\<Omega>])
+    show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "NOT : \<Omega> \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+
+    show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = is_even \<circ>\<^sub>c zero"
+    proof -
+  *)    
+      
+
 (*lemma odd_even_iso:
-  "isomorphism (
-    (successor \<circ>\<^sub>c mult2 \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>)
-      \<amalg>
-    (mult2 \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>))"
+  "isomorphism (nth_odd \<amalg> nth_even)"
 proof (rule epi_mon_is_iso)
-  show "epimorphism
-     ((successor \<circ>\<^sub>c mult2 \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<amalg>
-      (mult2 \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>))"
-  proof (typecheck_cfuncs, unfold epimorphism_def3, auto)
-    fix g h A
+  show "epimorphism (nth_odd \<amalg> nth_even)"
+  proof (rule surjective_is_epimorphism, typecheck_cfuncs, unfold surjective_def2, auto)
+    fix y
+    assume y_type[type_rule]: "y \<in>\<^sub>c \<nat>\<^sub>c"
+
+    show "\<exists>x. x \<in>\<^sub>c \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> nth_odd \<amalg> nth_even \<circ>\<^sub>c x = y"
+    proof (cases "is_even \<circ>\<^sub>c y = \<t>")
+      assume y_is_even: "is_even \<circ>\<^sub>c y = \<t>"
+      then show "\<exists>x. x \<in>\<^sub>c \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> nth_odd \<amalg> nth_even \<circ>\<^sub>c x = y"
+        apply (rule_tac x="right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c "
+
     oops*)
 
 
