@@ -162,7 +162,7 @@ lemma is_even_def2:
   "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> is_even \<circ>\<^sub>c zero = \<t> \<and> NOT \<circ>\<^sub>c is_even = is_even \<circ>\<^sub>c successor"
   by (unfold is_even_def, rule theI', typecheck_cfuncs, rule natural_number_object_property2, auto)
 
-lemma is_even_type:
+lemma is_even_type[type_rule]:
   "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega>"
   by (simp add: is_even_def2)
 
@@ -181,7 +181,7 @@ lemma is_odd_def2:
   "is_odd : \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> is_odd \<circ>\<^sub>c zero = \<f> \<and> NOT \<circ>\<^sub>c is_odd = is_odd \<circ>\<^sub>c successor"
   by (unfold is_odd_def, rule theI', typecheck_cfuncs, rule natural_number_object_property2, auto)
 
-lemma is_odd_type:
+lemma is_odd_type[type_rule]:
   "is_odd : \<nat>\<^sub>c \<rightarrow> \<Omega>"
   by (simp add: is_odd_def2)
 
@@ -192,6 +192,34 @@ lemma is_odd_zero:
 lemma is_odd_successor:
   "is_odd \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_odd"
   by (simp add: is_odd_def2)
+
+lemma is_even_not_is_odd:
+  "is_even = NOT \<circ>\<^sub>c is_odd"
+proof (typecheck_cfuncs, rule natural_number_object_func_unique[where f="NOT", where X="\<Omega>"], auto)
+
+  show "is_even \<circ>\<^sub>c zero = (NOT \<circ>\<^sub>c is_odd) \<circ>\<^sub>c zero"
+    by (typecheck_cfuncs, metis NOT_false_is_true cfunc_type_def comp_associative is_even_def2 is_odd_def2)
+
+  show "is_even \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_even"
+    by (simp add: is_even_successor)
+
+  show "(NOT \<circ>\<^sub>c is_odd) \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c NOT \<circ>\<^sub>c is_odd"
+    by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative is_odd_def2)
+qed
+
+lemma is_odd_not_is_even:
+  "is_odd = NOT \<circ>\<^sub>c is_even"
+proof (typecheck_cfuncs, rule natural_number_object_func_unique[where f="NOT", where X="\<Omega>"], auto)
+
+  show "is_odd \<circ>\<^sub>c zero = (NOT \<circ>\<^sub>c is_even) \<circ>\<^sub>c zero"
+    by (typecheck_cfuncs, metis NOT_true_is_false cfunc_type_def comp_associative is_even_def2 is_odd_def2)
+
+  show "is_odd \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_odd"
+    by (simp add: is_odd_successor)
+
+  show "(NOT \<circ>\<^sub>c is_even) \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c NOT \<circ>\<^sub>c is_even"
+    by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative is_even_def2)
+qed
 
 (*lemma odd_even_iso:
   "isomorphism (
