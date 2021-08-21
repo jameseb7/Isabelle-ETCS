@@ -221,6 +221,100 @@ proof (typecheck_cfuncs, rule natural_number_object_func_unique[where f="NOT", w
     by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative is_even_def2)
 qed
 
+lemma is_even_nth_even_true:
+  "is_even \<circ>\<^sub>c nth_even = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+proof (rule natural_number_object_func_unique[where f="id \<Omega>", where X=\<Omega>])
+  show "is_even \<circ>\<^sub>c nth_even : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+
+  show "(is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+  proof -
+    have "(is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero = is_even \<circ>\<^sub>c nth_even \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = \<t>"
+      by (simp add: is_even_zero nth_even_zero)
+    also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, smt beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 successor_type terminal_func_comp)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "(is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c is_even \<circ>\<^sub>c nth_even"
+  proof -
+    have "(is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c successor = is_even \<circ>\<^sub>c nth_even \<circ>\<^sub>c successor"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = is_even \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c nth_even"
+      by (simp add: nth_even_successor2)
+    also have "... = ((is_even \<circ>\<^sub>c successor) \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even"
+      by (typecheck_cfuncs, smt comp_associative2)
+    also have "... =  is_even \<circ>\<^sub>c nth_even"
+      using is_even_def2 is_even_not_is_odd is_odd_def2 is_odd_not_is_even by (typecheck_cfuncs, auto)
+    also have "... = id \<Omega> \<circ>\<^sub>c is_even \<circ>\<^sub>c nth_even"
+      by (typecheck_cfuncs, simp add: id_left_unit2)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+    by (typecheck_cfuncs, smt comp_associative2 id_left_unit2 terminal_func_comp)
+qed
+
+lemma is_odd_nth_odd_true:
+  "is_odd \<circ>\<^sub>c nth_odd = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+proof (rule natural_number_object_func_unique[where f="id \<Omega>", where X=\<Omega>])
+  show "is_odd \<circ>\<^sub>c nth_odd : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+
+  show "(is_odd \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+  proof -
+    have "(is_odd \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = is_odd \<circ>\<^sub>c nth_odd \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = \<t>"
+      using comp_associative2 is_even_not_is_odd is_even_zero is_odd_def2 nth_odd_def2 successor_type zero_type by auto
+    also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, smt beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 successor_type terminal_func_comp)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "(is_odd \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c nth_odd"
+  proof -
+    have "(is_odd \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c successor = is_odd \<circ>\<^sub>c nth_odd \<circ>\<^sub>c successor"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = is_odd \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c nth_odd"
+      by (simp add: nth_odd_successor2)
+    also have "... = ((is_odd \<circ>\<^sub>c successor) \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_odd"
+      by (typecheck_cfuncs, smt comp_associative2)
+    also have "... =  is_odd \<circ>\<^sub>c nth_odd"
+      using is_even_def2 is_even_not_is_odd is_odd_def2 is_odd_not_is_even by (typecheck_cfuncs, auto)
+    also have "... = id \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c nth_odd"
+      by (typecheck_cfuncs, simp add: id_left_unit2)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+    by (typecheck_cfuncs, smt comp_associative2 id_left_unit2 terminal_func_comp)
+qed
+
+lemma is_odd_nth_even_false:
+  "is_odd \<circ>\<^sub>c nth_even = \<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+  by (smt NOT_true_is_false NOT_type comp_associative2 is_even_def2 is_even_nth_even_true
+      is_odd_not_is_even nth_even_def2 terminal_func_type true_func_type)
+
+lemma is_even_nth_odd_false:
+  "is_even \<circ>\<^sub>c nth_odd = \<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+  by (smt NOT_true_is_false NOT_type comp_associative2 is_odd_def2 is_odd_nth_odd_true
+      is_even_not_is_odd nth_odd_def2 terminal_func_type true_func_type)
+
 (*lemma odd_even_iso:
   "isomorphism (
     (successor \<circ>\<^sub>c mult2 \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>)
