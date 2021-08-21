@@ -1186,7 +1186,11 @@ proof(auto)
     by (simp add: epi_mon_is_iso x_mono)
 qed
 
-
+lemma larger_than_infinite_is_infinite:
+  assumes "X \<le>\<^sub>c Y" "is_infinite(X)" 
+  shows "is_infinite(Y)"
+  using assms either_finite_or_infinite epi_is_surj is_finite_def is_infinite_def
+    iso_imp_epi_and_monic smaller_than_finite_is_finite by blast
 
   
   
