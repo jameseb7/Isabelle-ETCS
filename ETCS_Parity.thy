@@ -1,5 +1,5 @@
 theory ETCS_Parity
-  imports ETCS_Add ETCS_Mult
+  imports ETCS_Add ETCS_Mult ETCS_Pred
 begin
 
 definition nth_even :: "cfunc" where
@@ -154,6 +154,44 @@ proof (rule natural_number_object_func_unique[where f="successor \<circ>\<^sub>c
       using calculation by auto
   qed
 qed
+
+definition is_even :: "cfunc" where
+  "is_even = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> u \<circ>\<^sub>c zero = \<t> \<and> NOT \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
+
+lemma is_even_def2:
+  "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> is_even \<circ>\<^sub>c zero = \<t> \<and> NOT \<circ>\<^sub>c is_even = is_even \<circ>\<^sub>c successor"
+  by (unfold is_even_def, rule theI', typecheck_cfuncs, rule natural_number_object_property2, auto)
+
+lemma is_even_type:
+  "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+  by (simp add: is_even_def2)
+
+lemma is_even_zero:
+  "is_even \<circ>\<^sub>c zero = \<t>"
+  by (simp add: is_even_def2)
+
+lemma is_even_successor:
+  "is_even \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_even"
+  by (simp add: is_even_def2)
+
+definition is_odd :: "cfunc" where
+  "is_odd = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> u \<circ>\<^sub>c zero = \<f> \<and> NOT \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
+
+lemma is_odd_def2:
+  "is_odd : \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> is_odd \<circ>\<^sub>c zero = \<f> \<and> NOT \<circ>\<^sub>c is_odd = is_odd \<circ>\<^sub>c successor"
+  by (unfold is_odd_def, rule theI', typecheck_cfuncs, rule natural_number_object_property2, auto)
+
+lemma is_odd_type:
+  "is_odd : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+  by (simp add: is_odd_def2)
+
+lemma is_odd_zero:
+  "is_odd \<circ>\<^sub>c zero = \<f>"
+  by (simp add: is_odd_def2)
+
+lemma is_odd_successor:
+  "is_odd \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_odd"
+  by (simp add: is_odd_def2)
 
 (*lemma odd_even_iso:
   "isomorphism (
