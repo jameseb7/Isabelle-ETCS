@@ -914,4 +914,30 @@ proof -
     by (metis add_type assms eq_pred_iff_eq)
 qed
 
+lemma add_associates2:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
+  shows   "(a +\<^sub>\<nat> b) +\<^sub>\<nat> (c +\<^sub>\<nat> d) = a +\<^sub>\<nat> (b +\<^sub>\<nat> (c +\<^sub>\<nat> d))"
+  using assms  by (typecheck_cfuncs, metis add_associates)
+
+lemma add_associates3:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
+  shows   "(a +\<^sub>\<nat> b) +\<^sub>\<nat> (c +\<^sub>\<nat> d) = (a +\<^sub>\<nat> (b +\<^sub>\<nat> c)) +\<^sub>\<nat> d"
+  using assms by (typecheck_cfuncs, simp add: add_associates)
+
+lemma add_associates4:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
+  shows   "(a +\<^sub>\<nat> b) +\<^sub>\<nat> (c +\<^sub>\<nat> d) = ((a +\<^sub>\<nat> b) +\<^sub>\<nat> c) +\<^sub>\<nat> d"
+  by (typecheck_cfuncs, simp add: add_associates assms)
+
+lemma add_associates_mix_commutes:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
+  shows   "(a +\<^sub>\<nat> b) +\<^sub>\<nat> (c +\<^sub>\<nat> d) = (a +\<^sub>\<nat> c) +\<^sub>\<nat> (b +\<^sub>\<nat> d)"
+  using assms by (typecheck_cfuncs, metis add_associates add_commutes)
+
+lemma one_plus_one_is_two: 
+  "(successor  \<circ>\<^sub>c zero) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)"
+  using add_commutes add_respects_succ3 add_respects_zero_on_right succ_n_type zero_type by force
+
+
+
 end

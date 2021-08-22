@@ -472,7 +472,65 @@ proof -
 
   have \<phi>_type[type_rule]: "\<phi> : A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>(B \<Coprod> C)\<^esup>"
     unfolding \<phi>_def by typecheck_cfuncs
-  oops
+  have "injective(\<phi>)"
+    unfolding  injective_def
+  proof(safe)
+    fix x y 
+    assume "x \<in>\<^sub>c domain \<phi>" then have x_type[type_rule]: "x \<in>\<^sub>c A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>"
+      using \<phi>_type cfunc_type_def by auto
+    assume "y \<in>\<^sub>c domain \<phi>" then have y_type[type_rule]: "y \<in>\<^sub>c A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>"
+      using \<phi>_type cfunc_type_def by auto
+    assume eqn: "\<phi> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c y"
+    obtain ab1 and ac1 where x_def: "ab1 \<in>\<^sub>c A\<^bsup>B\<^esup> \<and> ac1 \<in>\<^sub>c A\<^bsup>C\<^esup> \<and> x = \<langle>ab1,ac1\<rangle>"
+        using cart_prod_decomp x_type by blast
+    obtain ab2 and ac2 where y_def: "ab2 \<in>\<^sub>c A\<^bsup>B\<^esup> \<and> ac2 \<in>\<^sub>c A\<^bsup>C\<^esup> \<and> y = \<langle>ab2,ac2\<rangle>"
+        using cart_prod_decomp y_type by blast
+    have "ab1 = ab2"
+    proof(rule same_evals_equal[where Z = one, where X = A, where A = B])
+      show "ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>"
+        by (simp add: x_def)
+      show "ab2 \<in>\<^sub>c A\<^bsup>B\<^esup>"
+        by (simp add: y_def)
+      show "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1 = eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab2"
+      proof(rule one_separator[where X = "B\<times>\<^sub>c one", where Y = A])
+        show "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1 : B \<times>\<^sub>c one \<rightarrow> A"
+          using \<open>ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> flat_type inv_transpose_func_def2 by auto
+        show "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab2 : B \<times>\<^sub>c one \<rightarrow> A"
+          using \<open>ab2 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> flat_type inv_transpose_func_def2 by auto
+        show "\<And>x. x \<in>\<^sub>c B \<times>\<^sub>c one \<Longrightarrow>
+         (eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1) \<circ>\<^sub>c x =
+         (eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab2) \<circ>\<^sub>c x"
+        proof - 
+          fix x 
+          assume x_type: "x \<in>\<^sub>c B \<times>\<^sub>c one"
+          then obtain b where b_def: "b \<in>\<^sub>c B \<and> x = \<langle>b, id(one)\<rangle>"
+            by (typecheck_cfuncs, metis cart_prod_decomp terminal_func_unique)
+
+          have eqn1: "(eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c \<langle>left_coproj B C b), x\<rangle> 
+
+
+
+(*
+
+
+
+          have "(eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1) \<circ>\<^sub>c x = 
+                 eval_func A B \<circ>\<^sub>c ((id\<^sub>c B \<times>\<^sub>f ab1) \<circ>\<^sub>c x)"
+            using \<open>ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> comp_associative2 x_type by (typecheck_cfuncs, fastforce)
+          also have "... = eval_func A B \<circ>\<^sub>c \<langle>id\<^sub>c B \<circ>\<^sub>c b, ab1 \<circ>\<^sub>c id(one)\<rangle>"
+            using \<open>ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> b_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, auto)
+          also have "... = eval_func A B \<circ>\<^sub>c \<langle>b, ab1\<rangle>"
+            using \<open>ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> b_def id_left_unit2 id_right_unit2 by auto
+          also have "... = eval_func A B \<circ>\<^sub>c \<langle>b, ab2\<rangle>"
+            oops
+*)
+
+      
+      
+      
+        
+
+
 
 lemma smaller_than_N_finite:
   assumes "X \<le>\<^sub>c \<nat>\<^sub>c"

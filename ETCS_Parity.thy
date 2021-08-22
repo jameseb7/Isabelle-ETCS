@@ -315,11 +315,144 @@ lemma is_even_nth_odd_false:
   by (smt NOT_true_is_false NOT_type comp_associative2 is_odd_def2 is_odd_nth_odd_true
       is_even_not_is_odd nth_odd_def2 terminal_func_type true_func_type)
 
+
 lemma add_evens_is_even:
-  assumes "x \<in>\<^sub>c \<nat>\<^sub>c" "y \<in>\<^sub>c \<nat>\<^sub>c"
-  assumes "is_even \<circ>\<^sub>c x = \<t>" "is_even \<circ>\<^sub>c y = \<t>"
-  shows "is_even \<circ>\<^sub>c (x +\<^sub>\<nat> y) = \<t>"
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "\<exists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = m"
+  assumes "\<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k = n"
+  shows   "\<exists>l. l \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l = m +\<^sub>\<nat> n"
+proof - 
+  obtain j where j_def: "j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = m"
+    using assms(3) by blast
+  obtain k where k_def: "k \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k = n"
+    using assms(4) by blast
+  have m_pls_n: "m +\<^sub>\<nat> n = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k)"
+    using j_def k_def by fastforce
+  also have "... = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)) \<cdot>\<^sub>\<nat> (j +\<^sub>\<nat> k)"
+    by (simp add: j_def k_def mult_right_distributivity succ_n_type zero_type)
+  then show ?thesis
+    using  add_type j_def k_def by auto
+qed
+
+
+lemma add_odds_is_even:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "\<exists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m"
+  assumes "\<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n"
+  shows   "\<exists>l. l \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l = m +\<^sub>\<nat> n"
+proof - 
+  obtain j where j_def: "j \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m"
+    using assms(3) by blast
+  obtain k where k_def: "k \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n"
+    using assms(4) by blast
+
+  have m_pls_n: "m +\<^sub>\<nat> n = (((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)) +\<^sub>\<nat> (((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+    using j_def k_def by fastforce
+  also have "... = (((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k)) +\<^sub>\<nat> ((successor \<circ>\<^sub>c zero) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+    by (simp add: add_associates_mix_commutes j_def k_def mult_closure succ_n_type zero_type)
+  also have "... = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (j +\<^sub>\<nat> k)) +\<^sub>\<nat> ((successor \<circ>\<^sub>c zero) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+    by (simp add: j_def k_def mult_right_distributivity succ_n_type zero_type)
+  also have "... = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (j +\<^sub>\<nat> k)) +\<^sub>\<nat> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)"
+    using one_plus_one_is_two by auto
+  also have "... = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (j +\<^sub>\<nat> k)) +\<^sub>\<nat> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+    by (simp add: s0_is_right_id succ_n_type zero_type)
+  also have "... = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> ((j +\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+    by (typecheck_cfuncs, simp add: j_def k_def mult_right_distributivity)
+  then show ?thesis
+    by (typecheck_cfuncs, metis  add_type calculation j_def k_def)
+qed
+
+
+lemma add_mixed_is_odd: 
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "\<exists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = m"
+  assumes "\<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n"
+  shows   "\<exists>l. l \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m +\<^sub>\<nat> n"
+  apply typecheck_cfuncs
+proof -
+  assume a1: "successor \<circ>\<^sub>c zero \<in>\<^sub>c \<nat>\<^sub>c"
+  assume a2: "successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero \<in>\<^sub>c \<nat>\<^sub>c"
+  obtain cc :: cfunc where
+    "cc \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> cc = m"
+  using assms(3) by blast
+  then show ?thesis
+    using a2 a1 by (metis add_associates add_evens_is_even assms(4) mult_type)
+qed
+
+lemma even_or_odd:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(\<exists>j. (j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = n)) \<or> 
+         (\<exists>j. (j \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n))"
+proof(safe)
+  assume "\<nexists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and>
+        (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n"
+  show "\<exists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = n"
+  proof(cases "n = zero")
+    assume "n = zero" 
+    have "zero \<in>\<^sub>c \<nat>\<^sub>c \<and> zero = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> zero"
+      by (typecheck_cfuncs, simp add: mult_respects_zero_right)
+    then show "\<exists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = n"
+      using \<open>n = zero\<close> by auto
+  next
+    assume "n \<noteq> zero"
+    then obtain k where k_def:  "n = successor \<circ>\<^sub>c k"
+      using \<open>n \<noteq> zero\<close> assms nonzero_is_succ by blast
+    oops
+
+
+
+
+(*
+lemma even_or_odd:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(\<exists>n. n \<in>\<^sub>c \<nat>\<^sub>c \<and> m = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> n) \<or>
+         ( \<exists>n. n \<in>\<^sub>c \<nat>\<^sub>c \<and> m = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> n) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+proof(safe)
+  assume "\<nexists>n. n \<in>\<^sub>c \<nat>\<^sub>c \<and>
+        m = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> n +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)"
+*)  
+  
+  
+
+
+(*
+
+lemma is_even_def3:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "is_even \<circ>\<^sub>c  m = \<t>"
+  shows "\<exists>n. n \<in>\<^sub>c \<nat>\<^sub>c \<and> m = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> n"
+proof(cases "m = zero",auto)
+  assume "m = zero"
+  have "zero \<in>\<^sub>c \<nat>\<^sub>c \<and> zero = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> zero"
+    by (typecheck_cfuncs, simp add: mult_respects_zero_right)
+  then show "\<exists>n. n \<in>\<^sub>c \<nat>\<^sub>c \<and> zero = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> n"
+    by blast
+next
+  assume "m \<noteq> zero"
   oops
+*)
+
+  
+  
+
+
+
+(*is_even \<circ>\<^sub>c zero = \<t> \<and> NOT \<circ>\<^sub>c is_even = is_even \<circ>\<^sub>c successor*)
+
+(*
+
+lemma add_evens_is_even2:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "is_even \<circ>\<^sub>c m = \<t>" "is_even \<circ>\<^sub>c n = \<t>"
+  shows "is_even \<circ>\<^sub>c (m +\<^sub>\<nat> n) = \<t>"
+  using assms apply typecheck_cfuncs
+proof - 
+
+*)
+
+(*"nth_even = mult2 \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>*)
+
+
 
 (*lemma 
   assumes "is_even \<circ>\<^sub>c y = \<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>" and "y : A \<rightarrow> \<nat>\<^sub>c"
