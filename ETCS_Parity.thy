@@ -196,6 +196,68 @@ proof -
 qed
 
 
+lemma nth_odd_is_succ_nth_even:
+  "nth_odd = successor \<circ>\<^sub>c nth_even"
+proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f="successor \<circ>\<^sub>c successor"])
+  show "nth_odd : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "successor \<circ>\<^sub>c nth_even : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "successor \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+
+  show "nth_odd \<circ>\<^sub>c zero = (successor \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero"
+  proof -
+    have "nth_odd \<circ>\<^sub>c zero = successor \<circ>\<^sub>c zero"
+      by (simp add: nth_odd_zero)
+    also have "... = (successor \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero"
+      using nth_even_is_times_two nth_odd_def2 nth_odd_is_succ_times_two by (typecheck_cfuncs, auto)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "nth_odd \<circ>\<^sub>c successor = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_odd"
+    by (simp add: nth_odd_successor)
+
+  show "(successor \<circ>\<^sub>c nth_even) \<circ>\<^sub>c successor = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c successor \<circ>\<^sub>c nth_even"
+  proof -
+    have "(successor \<circ>\<^sub>c nth_even) \<circ>\<^sub>c successor = successor \<circ>\<^sub>c nth_even \<circ>\<^sub>c successor"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c nth_even"
+      by (simp add: nth_even_successor2)
+    also have "... = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c successor \<circ>\<^sub>c nth_even"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    then show ?thesis
+      using calculation by auto
+  qed
+qed
+
+lemma succ_nth_odd_is_nth_even_succ:
+  "successor \<circ>\<^sub>c nth_odd = nth_even \<circ>\<^sub>c successor"
+proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f="successor \<circ>\<^sub>c successor"])
+  show "successor \<circ>\<^sub>c nth_odd : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "nth_even \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "successor \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+
+  show "(successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = (nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c zero"
+  proof -
+    have "(successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero"
+      using comp_associative2 nth_odd_def2 successor_type zero_type by fastforce
+    also have "... = (nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c zero"
+      using calculation nth_even_successor2 nth_odd_is_succ_nth_even by auto
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "(successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c successor = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c successor \<circ>\<^sub>c nth_odd"
+    by (metis cfunc_type_def codomain_comp comp_associative nth_odd_def2 successor_type)
+  then show "(nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c successor = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even \<circ>\<^sub>c successor"
+    using nth_even_successor2 nth_odd_is_succ_nth_even by auto
+qed
+      
 
 definition is_even :: "cfunc" where
   "is_even = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> u \<circ>\<^sub>c zero = \<t> \<and> NOT \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
@@ -475,11 +537,132 @@ proof -
     by (typecheck_cfuncs, metis add_type calculation j_def k_def mult_closure)
 qed
 
+lemma EXISTS_zero_nth_even:
+  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = \<t>"
+proof -
+  have  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero
+      = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
+    by (typecheck_cfuncs, simp add: comp_associative2)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero))\<^sup>\<sharp>"
+    by (typecheck_cfuncs, simp add: comp_associative2 sharp_comp)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f zero))\<^sup>\<sharp>"
+    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>cone\<^esub>\<rangle> )\<^sup>\<sharp>"
+    by (typecheck_cfuncs, metis cfunc_cross_prod_def cfunc_type_def right_cart_proj_type terminal_func_unique)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one\<rangle> )\<^sup>\<sharp>"
+    by (typecheck_cfuncs, smt comp_associative2 terminal_func_comp)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
+    by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+  also have "... = \<t>"
+  proof (rule exists_true_implies_EXISTS_true)
+    show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "\<exists>x. x \<in>\<^sub>c \<nat>\<^sub>c \<and> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c x = \<t>"
+    proof (typecheck_cfuncs, rule_tac x="zero" in exI, auto)
+      have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero
+        = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero"
+        by (typecheck_cfuncs, simp add: comp_associative2)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c zero, zero\<rangle>"
+        by (typecheck_cfuncs, smt beta_N_succ_mEqs_Id1 cfunc_prod_comp comp_associative2 id_right_unit2 successor_type terminal_func_comp)
+      also have "... = \<t>"
+        using eq_pred_iff_eq nth_even_zero by (typecheck_cfuncs, blast)
+      then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = \<t>"
+        using calculation by auto
+    qed
+  qed
+  then show ?thesis
+    using calculation by auto
+qed
 
+lemma not_EXISTS_zero_nth_odd:
+  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = \<f>"
+proof -
+  have  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero
+      = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
+    by (typecheck_cfuncs, simp add: comp_associative2)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero))\<^sup>\<sharp>"
+    by (typecheck_cfuncs, simp add: comp_associative2 sharp_comp)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f zero))\<^sup>\<sharp>"
+    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>cone\<^esub>\<rangle> )\<^sup>\<sharp>"
+    by (typecheck_cfuncs, metis cfunc_cross_prod_def cfunc_type_def right_cart_proj_type terminal_func_unique)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one\<rangle> )\<^sup>\<sharp>"
+    by (typecheck_cfuncs, smt comp_associative2 terminal_func_comp)
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
+    by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+  also have "... = \<f>"
+  proof -
+    have "\<nexists> x. x \<in>\<^sub>c \<nat>\<^sub>c \<and> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c x = \<t>"
+    proof auto
+      fix x
+      assume x_type[type_rule]: "x \<in>\<^sub>c \<nat>\<^sub>c"
+
+      assume "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c x = \<t>"
+      then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c x = \<t>"
+        by (typecheck_cfuncs, simp add: comp_associative2)
+      then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd \<circ>\<^sub>c x, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c x\<rangle> = \<t>"
+        by (typecheck_cfuncs_prems, auto simp add: cfunc_prod_comp comp_associative2)
+      then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd \<circ>\<^sub>c x, zero\<rangle> = \<t>"
+        by (typecheck_cfuncs_prems, metis cfunc_type_def id_right_unit id_type one_unique_element)
+      then have "nth_odd \<circ>\<^sub>c x = zero"
+        using eq_pred_iff_eq by (typecheck_cfuncs_prems, blast)
+      then have "successor \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> x) = zero"
+        using  nth_odd_is_succ_times_twoB by (typecheck_cfuncs, auto)
+      then show "False"
+        by (metis mult_closure succ_n_type x_type zero_is_not_successor zero_type)
+    qed
+    then have "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> \<noteq> \<t>"
+      using EXISTS_true_implies_exists_true by (typecheck_cfuncs, blast)
+    then show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> = \<f>"
+      using true_false_only_truth_values by (typecheck_cfuncs, blast)
+  qed
+  then show ?thesis
+    using calculation by auto
+qed
+
+lemma nth_even_or_nth_odd:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(\<exists> m. nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. nth_odd \<circ>\<^sub>c m = n)"
+proof auto
+  have "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp> = NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>"
+  proof (rule natural_number_object_func_unique[where f="NOT", where X=\<Omega>])
+    show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "NOT : \<Omega> \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+
+    show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero =
+        (NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero"
+    proof -
+      have  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = \<t>"
+        by (simp add: EXISTS_zero_nth_even)
+      also have "... = NOT \<circ>\<^sub>c \<f>"
+        by (simp add: NOT_false_is_true)
+      also have "... = NOT \<circ>\<^sub>c (EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero"
+        by (simp add: not_EXISTS_zero_nth_odd)
+      also have "... = (NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero"
+        by (typecheck_cfuncs, simp add: comp_associative2)
+      then show ?thesis
+        using calculation by auto
+    qed
+
+    show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c successor =
+        NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
+    proof (rule one_separator[where X="\<nat>\<^sub>c", where Y=\<Omega>])
+      show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+    next
+      fix n
+      assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+      have "(\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n) = (\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n)"
 
 lemma is_even_def3:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>) = is_even"
+  shows "is_even = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>)"
   proof (rule natural_number_object_func_unique[where f="NOT", where X=\<Omega>])
     show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
       by typecheck_cfuncs
@@ -487,14 +670,84 @@ lemma is_even_def3:
       by typecheck_cfuncs
     show "NOT : \<Omega> \<rightarrow> \<Omega>"
       by typecheck_cfuncs
-    show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero =
-    is_even \<circ>\<^sub>c zero"
+    show "is_even \<circ>\<^sub>c zero = (EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero"
     proof - 
-      have  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = \<t>"
-        apply typecheck_cfuncs
+      have  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero
+          = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
+        by (typecheck_cfuncs, simp add: comp_associative2)
+      also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero))\<^sup>\<sharp>"
+        by (typecheck_cfuncs, simp add: comp_associative2 sharp_comp)
+      also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f zero))\<^sup>\<sharp>"
+        by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+      also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>cone\<^esub>\<rangle> )\<^sup>\<sharp>"
+        by (typecheck_cfuncs, metis cfunc_cross_prod_def cfunc_type_def right_cart_proj_type terminal_func_unique)
+      also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one\<rangle> )\<^sup>\<sharp>"
+        by (typecheck_cfuncs, smt comp_associative2 terminal_func_comp)
+      also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
+        by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+      also have "... = \<t>"
+      proof (rule exists_true_implies_EXISTS_true)
+        show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+          by typecheck_cfuncs
+        show "\<exists>x. x \<in>\<^sub>c \<nat>\<^sub>c \<and> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c x = \<t>"
+        proof (typecheck_cfuncs, rule_tac x="zero" in exI, auto)
+          have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero
+            = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c zero, zero\<rangle>"
+            by (typecheck_cfuncs, smt beta_N_succ_mEqs_Id1 cfunc_prod_comp comp_associative2 id_right_unit2 successor_type terminal_func_comp)
+          also have "... = \<t>"
+            using eq_pred_iff_eq nth_even_zero by (typecheck_cfuncs, blast)
+          then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = \<t>"
+            using calculation by auto
+        qed
+      qed
+      also have "... = is_even \<circ>\<^sub>c zero"
+        by (simp add: is_even_zero)
+      then show ?thesis
+        using calculation by auto
+    qed
+
+    show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c successor =
+      NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
+    proof (rule one_separator[where X="\<nat>\<^sub>c", where Y="\<Omega>"])
+      show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+    next
+      fix x
+      assume x_type[type_rule]: "x \<in>\<^sub>c \<nat>\<^sub>c"
+      have "(\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c x) = (\<nexists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = x)"
+      proof auto
+        fix m1 m2
+        assume m1_type[type_rule]: "m1 \<in>\<^sub>c \<nat>\<^sub>c" and m2_type[type_rule]: "m2 \<in>\<^sub>c \<nat>\<^sub>c"
+
+        assume "nth_even \<circ>\<^sub>c m1 = successor \<circ>\<^sub>c nth_even \<circ>\<^sub>c m2"
+        then have "is_even \<circ>\<^sub>c nth_even \<circ>\<^sub>c m1 = is_even \<circ>\<^sub>c successor \<circ>\<^sub>c nth_even \<circ>\<^sub>c m2"
+          by auto
+        then have "(is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c m1 = (is_even \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even \<circ>\<^sub>c m2"
+          by (typecheck_cfuncs, smt comp_associative2)
+        then have "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c m1 = (NOT \<circ>\<^sub>c is_even) \<circ>\<^sub>c nth_even \<circ>\<^sub>c m2"
+          by (simp add: is_even_nth_even_true is_even_successor)
+        then have "\<t> = NOT \<circ>\<^sub>c (is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c m2"
+          by (typecheck_cfuncs_prems, smt cfunc_type_def comp_associative id_right_unit id_type
+              is_even_nth_even_true m1_type one_unique_element terminal_func_comp terminal_func_type)
+        then have "\<t> = NOT \<circ>\<^sub>c \<t>"
+          by (typecheck_cfuncs_prems, smt comp_associative2 is_even_nth_even_true terminal_func_comp terminal_func_type)
+        then show "False"
+          using NOT_true_is_false true_false_distinct by auto
+      next
+            
+          
 
 
+        thm is_even_successor is_even_nth_even_true
+      
 
+      show "((EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
+         (NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c x"
+      
 
 (*shows "OR \<nat>\<^sub>c \<circ>\<^sub>c \<langle>EXISTS \<nat>\<^sub>c \<circ>\<^sub>c  ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>),
                   EXISTS \<nat>\<^sub>c \<circ>\<^sub>c  ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>)\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
