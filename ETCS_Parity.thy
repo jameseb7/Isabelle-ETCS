@@ -762,6 +762,89 @@ proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Coprod> 
     by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
 qed
 
+lemma nth_even_nth_odd_halve_with_parity:
+  "(nth_even \<amalg> nth_odd) \<circ>\<^sub>c halve_with_parity = id \<nat>\<^sub>c"
+proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f="successor"])
+  show "nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+
+  show "(nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+  proof -
+    have "(nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero = nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = nth_even \<amalg> nth_odd \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      by (simp add: halve_with_parity_zero)
+    also have "... = (nth_even \<amalg> nth_odd \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = nth_even \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+    also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      using id_left_unit2 nth_even_def2 zero_type by auto
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "(nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c successor =
+    successor \<circ>\<^sub>c nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity"
+  proof -
+    have "(nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c successor = nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c successor"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = nth_even \<amalg> nth_odd \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c halve_with_parity"
+      by (simp add: halve_with_parity_successor)
+    also have "... = (nth_even \<amalg> nth_odd \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = nth_odd \<amalg> (nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
+    also have "... = (successor \<circ>\<^sub>c nth_even) \<amalg> ((successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even) \<circ>\<^sub>c halve_with_parity"
+      by (simp add: nth_even_successor nth_odd_is_succ_nth_even)
+    also have "... = (successor \<circ>\<^sub>c nth_even) \<amalg> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c nth_even) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (successor \<circ>\<^sub>c nth_even) \<amalg> (successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c halve_with_parity"
+      by (simp add: nth_odd_is_succ_nth_even)
+    also have "... = successor \<circ>\<^sub>c nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: cfunc_coprod_comp comp_associative2)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
+    using id_left_unit2 id_right_unit2 successor_type by auto
+qed
+
+lemma halve_with_parity_nth_even_nth_odd:
+  "halve_with_parity \<circ>\<^sub>c (nth_even \<amalg> nth_odd) = id (\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c)"
+  by (typecheck_cfuncs, smt cfunc_coprod_comp halve_with_parity_nth_even halve_with_parity_nth_odd id_coprod)
+
+lemma even_odd_iso:
+  "isomorphism (nth_even \<amalg> nth_odd)"
+proof (unfold isomorphism_def, rule_tac x=halve_with_parity in exI, auto)
+  show "domain halve_with_parity = codomain (nth_even \<amalg> nth_odd)"
+    by (typecheck_cfuncs, unfold cfunc_type_def, auto)
+  show "codomain halve_with_parity = domain (nth_even \<amalg> nth_odd)"
+    by (typecheck_cfuncs, unfold cfunc_type_def, auto)
+  show "halve_with_parity \<circ>\<^sub>c nth_even \<amalg> nth_odd = id\<^sub>c (domain (nth_even \<amalg> nth_odd))"
+    by (typecheck_cfuncs, unfold cfunc_type_def, auto simp add: halve_with_parity_nth_even_nth_odd)
+  show "nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity = id\<^sub>c (domain halve_with_parity)"
+    by (typecheck_cfuncs, unfold cfunc_type_def, auto simp add: nth_even_nth_odd_halve_with_parity)
+qed
+
+lemma halve_with_parity_iso:
+  "isomorphism halve_with_parity"
+proof (unfold isomorphism_def, rule_tac x="nth_even \<amalg> nth_odd" in exI, auto)
+  show "domain (nth_even \<amalg> nth_odd) = codomain halve_with_parity"
+    by (typecheck_cfuncs, unfold cfunc_type_def, auto)
+  show "codomain (nth_even \<amalg> nth_odd) = domain halve_with_parity"
+    by (typecheck_cfuncs, unfold cfunc_type_def, auto)
+  show "nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity = id\<^sub>c (domain halve_with_parity)"
+    by (typecheck_cfuncs, unfold cfunc_type_def, auto simp add: nth_even_nth_odd_halve_with_parity)
+  show "halve_with_parity \<circ>\<^sub>c nth_even \<amalg> nth_odd = id\<^sub>c (domain (nth_even \<amalg> nth_odd))"
+    by (typecheck_cfuncs, unfold cfunc_type_def, auto simp add: halve_with_parity_nth_even_nth_odd)
+qed
+
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(\<exists> m. nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. nth_odd \<circ>\<^sub>c m = n)"
@@ -974,23 +1057,6 @@ proof -
     show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = is_even \<circ>\<^sub>c zero"
     proof -
   *)    
-      
-
-(*lemma odd_even_iso:
-  "isomorphism (nth_odd \<amalg> nth_even)"
-proof (rule epi_mon_is_iso)
-  show "epimorphism (nth_odd \<amalg> nth_even)"
-  proof (rule surjective_is_epimorphism, typecheck_cfuncs, unfold surjective_def2, auto)
-    fix y
-    assume y_type[type_rule]: "y \<in>\<^sub>c \<nat>\<^sub>c"
-
-    show "\<exists>x. x \<in>\<^sub>c \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> nth_odd \<amalg> nth_even \<circ>\<^sub>c x = y"
-    proof (cases "is_even \<circ>\<^sub>c y = \<t>")
-      assume y_is_even: "is_even \<circ>\<^sub>c y = \<t>"
-      then show "\<exists>x. x \<in>\<^sub>c \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> nth_odd \<amalg> nth_even \<circ>\<^sub>c x = y"
-        apply (rule_tac x="right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c "
-
-    oops*)
 
 
 
