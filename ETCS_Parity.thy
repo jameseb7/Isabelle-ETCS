@@ -620,6 +620,29 @@ proof -
     using calculation by auto
 qed
 
+definition halve_with_parity :: "cfunc" where
+  "halve_with_parity = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> 
+    u \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero \<and>
+    (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
+
+lemma halve_with_parity_def2:
+  "halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> 
+    halve_with_parity \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero \<and>
+    (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity = halve_with_parity \<circ>\<^sub>c successor"
+  by (unfold halve_with_parity_def, rule theI', typecheck_cfuncs, rule natural_number_object_property2, auto)
+
+lemma halve_with_parity_type[type_rule]:
+  "halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
+  by (simp add: halve_with_parity_def2)
+
+lemma halve_with_parity_zero:
+  "halve_with_parity \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+  by (simp add: halve_with_parity_def2)
+
+lemma halve_with_parity_successor:
+  "(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity = halve_with_parity \<circ>\<^sub>c successor"
+  by (simp add: halve_with_parity_def2)
+
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(\<exists> m. nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. nth_odd \<circ>\<^sub>c m = n)"
