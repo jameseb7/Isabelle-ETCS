@@ -620,6 +620,19 @@ proof -
     using calculation by auto
 qed
 
+
+lemma even_or_odd2:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = successor \<circ>\<^sub>c((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)) \<or> 
+         (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n =              (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m) "
+proof(safe)
+  assume not_even: "\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m"
+  show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = successor \<circ>\<^sub>c (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m"
+  proof(rule ccontr)
+    assume "\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = successor \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)"
+  
+oops
+
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(\<exists> m. nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. nth_odd \<circ>\<^sub>c m = n)"
@@ -658,7 +671,7 @@ proof auto
     next
       fix n
       assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
-      have "(\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n) = (\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n)"
+      have "(\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n) = (\<nexists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c j = n)"
       proof(auto) 
         fix m j
         assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
@@ -672,12 +685,40 @@ proof auto
           by (simp add: n_is_nth_even_j nth_even_m_is)
         then have "n = successor \<circ>\<^sub>c n "
           using \<open>n = nth_even \<circ>\<^sub>c m\<close> by blast
-        then have False
+        then show False
           using n_neq_succ_n n_type by auto
       next
-        assume "\<forall>m. m \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> nth_even \<circ>\<^sub>c m \<noteq> n"
-        oops
+        assume "\<forall>j. j \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> nth_even \<circ>\<^sub>c j \<noteq> n"
+        then have "\<nexists> j. j \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = nth_even \<circ>\<^sub>c j"
+          by (typecheck_cfuncs, blast)
+        then have "n \<noteq> zero"
+          using n_type nth_even_zero by auto          
+        then obtain m where n_def: "m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = successor \<circ>\<^sub>c m"
+          using n_type nonzero_is_succ by blast
+        show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n"
+        proof(cases "m = zero")
+          assume "m = zero"
+          then show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n"
+            by (typecheck_cfuncs, metis (no_types) \<open>m = zero\<close> n_def nth_even_is_times_twoB s0_is_right_id)
+        next 
+          assume "m \<noteq> zero"
+          then obtain k where m_def: "k \<in>\<^sub>c \<nat>\<^sub>c \<and>  m = successor \<circ>\<^sub>c k"
+            using n_def nonzero_is_succ by blast
+          then have n_def2: "n = successor \<circ>\<^sub>c successor \<circ>\<^sub>c k"
+            by (simp add: n_def)
+          then have "\<nexists> j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> n = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j"
+            using \<open>\<nexists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_even \<circ>\<^sub>c j\<close> nth_even_is_times_twoB by (typecheck_cfuncs, auto)
+          then have "is_even \<circ>\<^sub>c n \<noteq> \<t>"
+            using assms apply typecheck_cfuncs
+            oops
+         (* then have "\<exists> j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> n = successor \<circ>\<^sub>c((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j)"
+            oops
+*)
 
+
+        (*then show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n"
+          using assms apply typecheck_cfuncs
+        *)
 
 lemma is_even_def3:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -757,7 +798,9 @@ lemma is_even_def3:
         then show "False"
           using NOT_true_is_false true_false_distinct by auto
       next
-            
+        assume "\<forall>m. m \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> nth_even \<circ>\<^sub>c m \<noteq> x"
+        show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c x"
+          using assms apply typecheck_cfuncs_prems
           
 
 
