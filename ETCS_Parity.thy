@@ -659,6 +659,25 @@ proof auto
       fix n
       assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
       have "(\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n) = (\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n)"
+      proof(auto) 
+        fix m j
+        assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+        assume nth_even_m_is: "nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c nth_even \<circ>\<^sub>c j"
+        assume j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c"
+        assume n_is_nth_even_j: "n = nth_even \<circ>\<^sub>c j"
+       
+        have "n = nth_even \<circ>\<^sub>c m"
+          by (typecheck_cfuncs, smt comp_associative2 false_func_type is_even_def2 is_even_not_is_odd is_even_nth_even_true is_even_nth_odd_false is_odd_def2 is_odd_not_is_even j_type nth_even_is_times_two nth_even_m_is nth_odd_def2 nth_odd_is_succ_times_two successor_type terminal_func_comp terminal_func_type true_false_distinct true_func_type zero_type)
+        have "nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n"
+          by (simp add: n_is_nth_even_j nth_even_m_is)
+        then have "n = successor \<circ>\<^sub>c n "
+          using \<open>n = nth_even \<circ>\<^sub>c m\<close> by blast
+        then have False
+          using n_neq_succ_n n_type by auto
+      next
+        assume "\<forall>m. m \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> nth_even \<circ>\<^sub>c m \<noteq> n"
+        oops
+
 
 lemma is_even_def3:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -770,7 +789,7 @@ proof(rule ccontr)
     oops
 
 (*
-lemma is_even_def3:
+lemma is_even_def4:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(is_even \<circ>\<^sub>c n = \<t>) = (\<exists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = n)"
 proof(auto)  

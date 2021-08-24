@@ -938,6 +938,18 @@ lemma one_plus_one_is_two:
   "(successor  \<circ>\<^sub>c zero) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)"
   using add_commutes add_respects_succ3 add_respects_zero_on_right succ_n_type zero_type by force
 
-
+lemma n_neq_succ_n:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "n \<noteq> successor \<circ>\<^sub>c n"
+proof(rule ccontr, auto)
+  assume BWOC: "n = successor \<circ>\<^sub>c n"
+  have "zero  +\<^sub>\<nat> n = (successor \<circ>\<^sub>c zero) +\<^sub>\<nat> n"
+    using assms BWOC add_respects_succ2 zero_type by (typecheck_cfuncs, fastforce)
+  then have "zero = successor \<circ>\<^sub>c zero"
+    using add_cancellative assms succ_n_type zero_type by auto
+  then show False
+    using zero_is_not_successor zero_type by blast
+qed
+   
 
 end
