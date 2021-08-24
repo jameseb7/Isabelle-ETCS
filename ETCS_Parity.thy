@@ -623,12 +623,12 @@ qed
 definition halve_with_parity :: "cfunc" where
   "halve_with_parity = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> 
     u \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero \<and>
-    (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
+    (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
 
 lemma halve_with_parity_def2:
   "halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> 
     halve_with_parity \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero \<and>
-    (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity = halve_with_parity \<circ>\<^sub>c successor"
+    (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity = halve_with_parity \<circ>\<^sub>c successor"
   by (unfold halve_with_parity_def, rule theI', typecheck_cfuncs, rule natural_number_object_property2, auto)
 
 lemma halve_with_parity_type[type_rule]:
@@ -640,8 +640,127 @@ lemma halve_with_parity_zero:
   by (simp add: halve_with_parity_def2)
 
 lemma halve_with_parity_successor:
-  "(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity = halve_with_parity \<circ>\<^sub>c successor"
+  "(right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity = halve_with_parity \<circ>\<^sub>c successor"
   by (simp add: halve_with_parity_def2)
+
+lemma halve_with_parity_nth_even:
+  "halve_with_parity \<circ>\<^sub>c nth_even = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c"
+proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c", where f="(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)"])
+  show "halve_with_parity \<circ>\<^sub>c nth_even : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "left_coproj \<nat>\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) : \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+
+  show "(halve_with_parity \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+  proof -
+    have "(halve_with_parity \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero = halve_with_parity \<circ>\<^sub>c nth_even \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = halve_with_parity \<circ>\<^sub>c zero"
+      by (simp add: nth_even_zero)
+    also have "... = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      by (simp add: halve_with_parity_zero)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "(halve_with_parity \<circ>\<^sub>c nth_even) \<circ>\<^sub>c successor =
+      ((left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_even"
+  proof -
+    have "(halve_with_parity \<circ>\<^sub>c nth_even) \<circ>\<^sub>c successor = halve_with_parity \<circ>\<^sub>c nth_even \<circ>\<^sub>c successor"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = halve_with_parity \<circ>\<^sub>c (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even"
+      by (simp add: nth_even_successor)
+    also have "... = ((halve_with_parity \<circ>\<^sub>c successor) \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (((right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even"
+      by (simp add: halve_with_parity_def2)
+    also have "... = (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor))
+        \<circ>\<^sub>c (halve_with_parity \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor))
+        \<circ>\<^sub>c ((right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c nth_even"
+      by (simp add: halve_with_parity_def2)
+    also have "... = ((right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor))
+        \<circ>\<^sub>c (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)))
+        \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_even"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = ((left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor))
+        \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_even"
+      by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor =
+    (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c"
+    by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+qed
+
+lemma halve_with_parity_nth_odd:
+  "halve_with_parity \<circ>\<^sub>c nth_odd = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c"
+proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c", where f="(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)"])
+  show "halve_with_parity \<circ>\<^sub>c nth_odd : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "right_coproj \<nat>\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) : \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+
+  show "(halve_with_parity \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+  proof -
+    have "(halve_with_parity \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = halve_with_parity \<circ>\<^sub>c nth_odd \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = halve_with_parity \<circ>\<^sub>c successor \<circ>\<^sub>c zero"
+      by (simp add: nth_odd_def2)
+    also have "... = (halve_with_parity \<circ>\<^sub>c successor) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero"
+      by (simp add: halve_with_parity_def2)
+    also have "... = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      by (simp add: halve_with_parity_def2)
+    also have "... = (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "(halve_with_parity \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c successor =
+      (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_odd"
+  proof -
+    have "(halve_with_parity \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c successor = halve_with_parity \<circ>\<^sub>c nth_odd \<circ>\<^sub>c successor"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = halve_with_parity \<circ>\<^sub>c (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_odd"
+      by (simp add: nth_odd_successor)
+    also have "... = ((halve_with_parity \<circ>\<^sub>c successor) \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_odd"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = ((right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c halve_with_parity) 
+        \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_odd"
+      by (simp add: halve_with_parity_successor)
+    also have "... = (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)
+        \<circ>\<^sub>c (halve_with_parity \<circ>\<^sub>c successor)) \<circ>\<^sub>c nth_odd"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)
+        \<circ>\<^sub>c (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c halve_with_parity)) \<circ>\<^sub>c nth_odd"
+      by (simp add: halve_with_parity_successor)
+    also have "... = (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)
+        \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_odd"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = ((left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_odd"
+      by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor =
+      (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c"
+    by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
+qed
 
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
