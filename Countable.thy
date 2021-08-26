@@ -1,5 +1,5 @@
 theory Countable
-  imports ETCS_Axioms ETCS_Add ETCS_Pred
+  imports ETCS_Axioms ETCS_Add ETCS_Pred ETCS_Parity
 begin
 
 (* Definition 2.6.9 *)
@@ -561,26 +561,14 @@ qed
 
 
 lemma NuN_is_countable:
-  assumes NxN_is_countable: "countable(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
-  shows "countable(\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c)"
-proof -
-  have not_initial: "\<not>(initial_object(\<nat>\<^sub>c))"
-    using initial_iso_empty no_el_iff_iso_0 nonempty_def zero_type by blast
-  have "\<not>(terminal_object(\<nat>\<^sub>c))"
-    using epi_is_surj id_isomorphism id_type is_infinite_def iso_imp_epi_and_monic natural_numbers_are_countably_infinite terminal_object_def by blast
-  then have "(\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c) \<le>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
-    by (simp add: coprod_leq_product not_initial)
-  then show ?thesis
-    using assms smaller_than_countable_is_countable by blast
-qed
-
+  "countable(\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c)"
+  using countable_def epis_give_monos halve_with_parity_iso halve_with_parity_type iso_imp_epi_and_monic by auto
 
 
 
 (*Exercise 2.6.11*)
 lemma coproduct_of_countables_is_countable:
   assumes "countable X" "countable Y"
-  assumes NuN_is_countable: "countable(\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c)"
   shows "countable(X \<Coprod> Y)"
   unfolding countable_def
 proof-

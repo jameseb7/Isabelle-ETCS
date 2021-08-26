@@ -858,6 +858,8 @@ proof (unfold isomorphism_def, rule_tac x="nth_even \<amalg> nth_odd" in exI, au
     by (typecheck_cfuncs, unfold cfunc_type_def, auto simp add: halve_with_parity_nth_even_nth_odd)
 qed
 
+
+
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(\<exists> m. nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. nth_odd \<circ>\<^sub>c m = n)"
@@ -1032,9 +1034,7 @@ lemma is_even_def3:
         thm is_even_successor is_even_nth_even_true
       
 
-      show "((EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
-         (NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c x"
-      
+        oops      
 
 (*shows "OR \<nat>\<^sub>c \<circ>\<^sub>c \<langle>EXISTS \<nat>\<^sub>c \<circ>\<^sub>c  ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>),
                   EXISTS \<nat>\<^sub>c \<circ>\<^sub>c  ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>)\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
@@ -1043,7 +1043,6 @@ lemma is_even_def3:
 
 (*Use the above result to prove that if a number n is_even then in fact there exists k such that n=2k*)
 
-        oops
 lemma add_evens_is_even2:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
   assumes "is_even \<circ>\<^sub>c m = \<t>" "is_even \<circ>\<^sub>c n = \<t>"
