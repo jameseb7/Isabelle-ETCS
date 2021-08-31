@@ -462,35 +462,43 @@ qed
 lemma exp_coprod:
   "A\<^bsup>(B \<Coprod> C)\<^esup> \<cong> A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup> "
 proof -
+  obtain L where L_def: "L = (eval_func A B \<circ>\<^sub>c distribute_left_left B (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>))"
+    by blast
+  obtain R where R_def: "R = (eval_func A C \<circ>\<^sub>c distribute_left_right C (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>))"
+    by blast
   obtain \<phi> where \<phi>_def:
     "\<phi> = 
-    (((eval_func A B \<circ>\<^sub>c distribute_left_left B (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>))
-        \<amalg>
-     (eval_func A C \<circ>\<^sub>c distribute_left_right C (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>)))
+    ((L \<amalg> R)
       \<circ>\<^sub>c dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>))\<^sup>\<sharp>"
     by auto
 
+  have L_type[type_rule]: "L : B \<times>\<^sub>c ((A\<^bsup>B\<^esup>) \<times>\<^sub>c (A\<^bsup>C\<^esup>)) \<rightarrow> A"
+    unfolding L_def by typecheck_cfuncs
+  have R_type[type_rule]: "R : C \<times>\<^sub>c ((A\<^bsup>B\<^esup>) \<times>\<^sub>c (A\<^bsup>C\<^esup>)) \<rightarrow> A"
+    unfolding R_def by typecheck_cfuncs
+  have LuR_type[type_rule]: "(L \<amalg> R) : (B \<times>\<^sub>c ((A\<^bsup>B\<^esup>) \<times>\<^sub>c (A\<^bsup>C\<^esup>))) \<Coprod> (C \<times>\<^sub>c ((A\<^bsup>B\<^esup>) \<times>\<^sub>c (A\<^bsup>C\<^esup>))) \<rightarrow> A"
+    by typecheck_cfuncs
   have \<phi>_type[type_rule]: "\<phi> : A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>(B \<Coprod> C)\<^esup>"
-    unfolding \<phi>_def by typecheck_cfuncs
+    unfolding \<phi>_def L_def R_def  by typecheck_cfuncs
   have "injective(\<phi>)"
     unfolding  injective_def
   proof(safe)
-    fix x y 
-    assume "x \<in>\<^sub>c domain \<phi>" then have x_type[type_rule]: "x \<in>\<^sub>c A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>"
+    fix g h 
+    assume "g \<in>\<^sub>c domain \<phi>" then have g_type[type_rule]: "g \<in>\<^sub>c A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>"
       using \<phi>_type cfunc_type_def by auto
-    assume "y \<in>\<^sub>c domain \<phi>" then have y_type[type_rule]: "y \<in>\<^sub>c A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>"
+    assume "h \<in>\<^sub>c domain \<phi>" then have h_type[type_rule]: "h \<in>\<^sub>c A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>"
       using \<phi>_type cfunc_type_def by auto
-    assume eqn: "\<phi> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c y"
-    obtain ab1 and ac1 where x_def: "ab1 \<in>\<^sub>c A\<^bsup>B\<^esup> \<and> ac1 \<in>\<^sub>c A\<^bsup>C\<^esup> \<and> x = \<langle>ab1,ac1\<rangle>"
-        using cart_prod_decomp x_type by blast
-    obtain ab2 and ac2 where y_def: "ab2 \<in>\<^sub>c A\<^bsup>B\<^esup> \<and> ac2 \<in>\<^sub>c A\<^bsup>C\<^esup> \<and> y = \<langle>ab2,ac2\<rangle>"
-        using cart_prod_decomp y_type by blast
-    have "ab1 = ab2"
+    assume eqn: "\<phi> \<circ>\<^sub>c g = \<phi> \<circ>\<^sub>c h"
+    obtain ab1 and ac1 where f_def: "ab1 \<in>\<^sub>c A\<^bsup>B\<^esup> \<and> ac1 \<in>\<^sub>c A\<^bsup>C\<^esup> \<and> g = \<langle>ab1,ac1\<rangle>"
+        using cart_prod_decomp g_type by blast
+    obtain ab2 and ac2 where g_def: "ab2 \<in>\<^sub>c A\<^bsup>B\<^esup> \<and> ac2 \<in>\<^sub>c A\<^bsup>C\<^esup> \<and> h = \<langle>ab2,ac2\<rangle>"
+        using cart_prod_decomp h_type by blast
+    have left: "ab1 = ab2"
     proof(rule same_evals_equal[where Z = one, where X = A, where A = B])
       show "ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>"
-        by (simp add: x_def)
+        by (simp add: f_def)
       show "ab2 \<in>\<^sub>c A\<^bsup>B\<^esup>"
-        by (simp add: y_def)
+        by (simp add: g_def)
       show "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1 = eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab2"
       proof(rule one_separator[where X = "B\<times>\<^sub>c one", where Y = A])
         show "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1 : B \<times>\<^sub>c one \<rightarrow> A"
@@ -505,31 +513,171 @@ proof -
           assume x_type: "x \<in>\<^sub>c B \<times>\<^sub>c one"
           then obtain b where b_def: "b \<in>\<^sub>c B \<and> x = \<langle>b, id(one)\<rangle>"
             by (typecheck_cfuncs, metis cart_prod_decomp terminal_func_unique)
-
-          have eqn1: "(eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c \<langle>left_coproj B C b), x\<rangle> 
-
-
-
-(*
-
-
-
-          have "(eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1) \<circ>\<^sub>c x = 
-                 eval_func A B \<circ>\<^sub>c ((id\<^sub>c B \<times>\<^sub>f ab1) \<circ>\<^sub>c x)"
+          then have lcoproj_b_type[type_rule]: "(left_coproj B C \<circ>\<^sub>c b) \<in>\<^sub>c (B \<Coprod> C)"
+            using b_def by (typecheck_cfuncs, auto)
+          have "(eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1) \<circ>\<^sub>c x = eval_func A B \<circ>\<^sub>c (id\<^sub>c B \<times>\<^sub>f ab1) \<circ>\<^sub>c x"
             using \<open>ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> comp_associative2 x_type by (typecheck_cfuncs, fastforce)
-          also have "... = eval_func A B \<circ>\<^sub>c \<langle>id\<^sub>c B \<circ>\<^sub>c b, ab1 \<circ>\<^sub>c id(one)\<rangle>"
-            using \<open>ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> b_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, auto)
+          also have "... = eval_func A B \<circ>\<^sub>c (id B \<times>\<^sub>f ab1) \<circ>\<^sub>c \<langle>b, id(one)\<rangle>"
+            using b_def by auto
           also have "... = eval_func A B \<circ>\<^sub>c \<langle>b, ab1\<rangle>"
-            using \<open>ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> b_def id_left_unit2 id_right_unit2 by auto
+            using \<open>ab1 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> b_def cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs,auto)
+          also have "... = eval_func A B \<circ>\<^sub>c distribute_left_left B (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>) \<circ>\<^sub>c \<langle>b,g\<rangle>"
+            using b_def distribute_left_left_ap f_def by auto
+          also have "... = L \<circ>\<^sub>c \<langle>b,g\<rangle>"
+            using L_def b_def comp_associative2 by (typecheck_cfuncs, blast)
+          also have  "... = ((L \<amalg> R) \<circ>\<^sub>c 
+       left_coproj (B \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) (C \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>))) \<circ>\<^sub>c \<langle>b,g\<rangle>"
+            by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+          also have "... = (L \<amalg> R) \<circ>\<^sub>c 
+       left_coproj (B \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) (C \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) \<circ>\<^sub>c \<langle>b,g\<rangle>"
+            using b_def comp_associative2 by (typecheck_cfuncs, fastforce)
+          also have "... =  (L \<amalg> R) \<circ>\<^sub>c
+       dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>) \<circ>\<^sub>c  \<langle>left_coproj B C \<circ>\<^sub>c b, g\<rangle>" 
+            by (typecheck_cfuncs, simp add: b_def dist_prod_coprod_inv2_left_ap)
+          also have "... = ((L \<amalg> R) \<circ>\<^sub>c
+       dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) \<circ>\<^sub>c  \<langle>left_coproj B C \<circ>\<^sub>c b, g\<rangle>"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... = ((eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>)) \<circ>\<^sub>c  \<langle>left_coproj B C \<circ>\<^sub>c b, g\<rangle>"
+            by (typecheck_cfuncs, simp add: \<phi>_def transpose_func_def)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c  \<langle>left_coproj B C \<circ>\<^sub>c b, g\<rangle>"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c  \<langle>(left_coproj B C \<circ>\<^sub>c b) \<circ>\<^sub>c id (one), g \<circ>\<^sub>c id (one)\<rangle>"
+            using id_right_unit2 lcoproj_b_type by (typecheck_cfuncs, auto)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c ((id(B \<Coprod> C) \<circ>\<^sub>c (left_coproj B C \<circ>\<^sub>c b))  \<times>\<^sub>f \<phi> \<circ>\<^sub>c g) \<circ>\<^sub>c  \<langle>id (one), id(one)\<rangle>"
+            using cfunc_cross_prod_comp_cfunc_prod id_right_unit2 lcoproj_b_type by (typecheck_cfuncs, auto)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c ((id(B \<Coprod> C) \<circ>\<^sub>c (left_coproj B C \<circ>\<^sub>c b))  \<times>\<^sub>f \<phi> \<circ>\<^sub>c h) \<circ>\<^sub>c  \<langle>id (one), id(one)\<rangle>"
+            by (simp add: eqn)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c  \<langle>(left_coproj B C \<circ>\<^sub>c b) \<circ>\<^sub>c id (one), h \<circ>\<^sub>c id (one)\<rangle>"
+            using cfunc_cross_prod_comp_cfunc_prod id_right_unit2 lcoproj_b_type by (typecheck_cfuncs, auto)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c  \<langle>left_coproj B C \<circ>\<^sub>c b, h\<rangle>"
+            using id_right_unit2 lcoproj_b_type by (typecheck_cfuncs, auto)
+          also have "... = ((eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>)) \<circ>\<^sub>c  \<langle>left_coproj B C \<circ>\<^sub>c b, h\<rangle>"
+            using comp_associative2 by (typecheck_cfuncs, blast)
+          also have "... = ((L \<amalg> R) \<circ>\<^sub>c
+       dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) \<circ>\<^sub>c  \<langle>left_coproj B C \<circ>\<^sub>c b, h\<rangle>"
+            by (typecheck_cfuncs, simp add: \<phi>_def transpose_func_def)
+          also have "... = (L \<amalg> R) \<circ>\<^sub>c
+       dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>) \<circ>\<^sub>c  \<langle>left_coproj B C \<circ>\<^sub>c b, h\<rangle>" 
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... =  (L \<amalg> R) \<circ>\<^sub>c 
+       left_coproj (B \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) (C \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) \<circ>\<^sub>c \<langle>b,h\<rangle>"
+            by (typecheck_cfuncs, simp add: b_def dist_prod_coprod_inv2_left_ap)
+          also have "... = L \<circ>\<^sub>c \<langle>b,h\<rangle>"
+            by (typecheck_cfuncs, smt b_def comp_associative2 left_coproj_cfunc_coprod)
+          also have "... = eval_func A B \<circ>\<^sub>c distribute_left_left B (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>) \<circ>\<^sub>c \<langle>b,h\<rangle>"
+            using L_def b_def comp_associative2 by (typecheck_cfuncs, fastforce)
           also have "... = eval_func A B \<circ>\<^sub>c \<langle>b, ab2\<rangle>"
-            oops
-*)
-
-      
-      
-      
-        
-
+            using b_def distribute_left_left_ap g_def by auto
+          also have "... = eval_func A B \<circ>\<^sub>c (id B \<times>\<^sub>f ab2) \<circ>\<^sub>c \<langle>b, id(one)\<rangle>"
+            using \<open>ab2 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> b_def cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs,auto)
+          also have "... = eval_func A B \<circ>\<^sub>c (id\<^sub>c B \<times>\<^sub>f ab2) \<circ>\<^sub>c x"
+            using b_def by blast
+          also have "... = (eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab2) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, meson \<open>ab2 \<in>\<^sub>c A\<^bsup>B\<^esup>\<close> comp_associative2 x_type)
+          then show "(eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab1) \<circ>\<^sub>c x = (eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ab2) \<circ>\<^sub>c x" 
+            using calculation by auto
+        qed
+      qed
+    qed
+    have right: "ac1 = ac2"
+    proof(rule same_evals_equal[where Z = one, where X = A, where A = C])
+      show "ac1 \<in>\<^sub>c A\<^bsup>C\<^esup>"
+        by (simp add: f_def)
+      show "ac2 \<in>\<^sub>c A\<^bsup>C\<^esup>"
+        by (simp add: g_def)
+      show "eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac1 = eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac2"
+      proof(rule one_separator[where X = "C\<times>\<^sub>c one", where Y = A])
+        show "eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac1 : C  \<times>\<^sub>c one \<rightarrow> A"
+          using \<open>ac1 \<in>\<^sub>c A\<^bsup>C\<^esup>\<close> flat_type inv_transpose_func_def2 by auto
+        show "eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac2 : C \<times>\<^sub>c one \<rightarrow> A"
+          using \<open>ac2 \<in>\<^sub>c A\<^bsup>C\<^esup>\<close> flat_type inv_transpose_func_def2 by auto
+        show "\<And>x. x \<in>\<^sub>c C \<times>\<^sub>c one \<Longrightarrow>
+         (eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac1) \<circ>\<^sub>c x =
+         (eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac2) \<circ>\<^sub>c x"
+        proof - 
+          fix x 
+          assume x_type: "x \<in>\<^sub>c C \<times>\<^sub>c one"
+          then obtain c where c_def: "c \<in>\<^sub>c C \<and> x = \<langle>c, id(one)\<rangle>"
+            by (typecheck_cfuncs, metis cart_prod_decomp terminal_func_unique)
+          then have rcoproj_c_type[type_rule]: "(right_coproj B C \<circ>\<^sub>c c) \<in>\<^sub>c (B \<Coprod> C)"
+            using c_def by (typecheck_cfuncs, auto)
+          have "(eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac1) \<circ>\<^sub>c x = eval_func A C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f ac1) \<circ>\<^sub>c x"
+            using \<open>ac1 \<in>\<^sub>c A\<^bsup>C\<^esup>\<close> comp_associative2 x_type by (typecheck_cfuncs, fastforce)
+          also have "... = eval_func A C \<circ>\<^sub>c (id C \<times>\<^sub>f ac1) \<circ>\<^sub>c \<langle>c, id(one)\<rangle>"
+            using c_def by auto
+          also have "... = eval_func A C \<circ>\<^sub>c \<langle>c, ac1\<rangle>"
+            using \<open>ac1 \<in>\<^sub>c A\<^bsup>C\<^esup>\<close> c_def cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs,auto)
+          also have "... = eval_func A C \<circ>\<^sub>c distribute_left_right C (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>) \<circ>\<^sub>c \<langle>c,g\<rangle>"
+            using c_def distribute_left_right_ap f_def by auto
+          also have "... = R \<circ>\<^sub>c \<langle>c,g\<rangle>"
+            using R_def c_def comp_associative2 by (typecheck_cfuncs, blast)
+          also have  "... = ((L \<amalg> R) \<circ>\<^sub>c 
+       right_coproj (B \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) (C \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>))) \<circ>\<^sub>c \<langle>c,g\<rangle>"
+            by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
+          also have "... = (L \<amalg> R) \<circ>\<^sub>c 
+       right_coproj (B \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) (C \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) \<circ>\<^sub>c \<langle>c,g\<rangle>"
+            using c_def comp_associative2 by (typecheck_cfuncs, fastforce)
+          also have "... =  (L \<amalg> R) \<circ>\<^sub>c
+       dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>) \<circ>\<^sub>c  \<langle>right_coproj B C \<circ>\<^sub>c c, g\<rangle>" 
+            by (typecheck_cfuncs, simp add: c_def dist_prod_coprod_inv2_right_ap)
+          also have "... = ((L \<amalg> R) \<circ>\<^sub>c
+       dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) \<circ>\<^sub>c  \<langle>right_coproj B C \<circ>\<^sub>c c, g\<rangle>"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... = ((eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>)) \<circ>\<^sub>c  \<langle>right_coproj B C \<circ>\<^sub>c c, g\<rangle>"
+            by (typecheck_cfuncs, simp add: \<phi>_def transpose_func_def)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c  \<langle>right_coproj B C \<circ>\<^sub>c c, g\<rangle>"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c  \<langle>(right_coproj B C \<circ>\<^sub>c c) \<circ>\<^sub>c id (one), g \<circ>\<^sub>c id (one)\<rangle>"
+            using id_right_unit2 rcoproj_c_type by (typecheck_cfuncs, auto)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c ((id(B \<Coprod> C) \<circ>\<^sub>c (right_coproj B C \<circ>\<^sub>c c))  \<times>\<^sub>f \<phi> \<circ>\<^sub>c g) \<circ>\<^sub>c  \<langle>id (one), id(one)\<rangle>"
+            using cfunc_cross_prod_comp_cfunc_prod id_right_unit2 rcoproj_c_type by (typecheck_cfuncs, auto)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c ((id(B \<Coprod> C) \<circ>\<^sub>c (right_coproj B C \<circ>\<^sub>c c))  \<times>\<^sub>f \<phi> \<circ>\<^sub>c h) \<circ>\<^sub>c  \<langle>id (one), id(one)\<rangle>"
+            by (simp add: eqn)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c  \<langle>(right_coproj B C \<circ>\<^sub>c c) \<circ>\<^sub>c id (one), h \<circ>\<^sub>c id (one)\<rangle>"
+            using cfunc_cross_prod_comp_cfunc_prod id_right_unit2 rcoproj_c_type by (typecheck_cfuncs, auto)
+          also have "... = (eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>) \<circ>\<^sub>c  \<langle>right_coproj B C \<circ>\<^sub>c c, h\<rangle>"
+            using id_right_unit2 rcoproj_c_type by (typecheck_cfuncs, auto)
+          also have "... = ((eval_func A (B \<Coprod> C)) \<circ>\<^sub>c (id(B \<Coprod> C) \<times>\<^sub>f \<phi>)) \<circ>\<^sub>c  \<langle>right_coproj B C \<circ>\<^sub>c c, h\<rangle>"
+            using comp_associative2 by (typecheck_cfuncs, blast)
+          also have "... = ((L \<amalg> R) \<circ>\<^sub>c
+       dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) \<circ>\<^sub>c  \<langle>right_coproj B C \<circ>\<^sub>c c, h\<rangle>"
+            by (typecheck_cfuncs, simp add: \<phi>_def transpose_func_def)
+          also have "... = (L \<amalg> R) \<circ>\<^sub>c
+       dist_prod_coprod_inv2 B C (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>) \<circ>\<^sub>c  \<langle>right_coproj B C \<circ>\<^sub>c c, h\<rangle>" 
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... =  (L \<amalg> R) \<circ>\<^sub>c 
+       right_coproj (B \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) (C \<times>\<^sub>c (A\<^bsup>B\<^esup> \<times>\<^sub>c A\<^bsup>C\<^esup>)) \<circ>\<^sub>c \<langle>c,h\<rangle>"
+            by (typecheck_cfuncs, simp add: c_def dist_prod_coprod_inv2_right_ap)
+          also have "... = R \<circ>\<^sub>c \<langle>c,h\<rangle>"
+            by (typecheck_cfuncs, smt c_def comp_associative2 right_coproj_cfunc_coprod)
+          also have "... = eval_func A C \<circ>\<^sub>c distribute_left_right C (A\<^bsup>B\<^esup>) (A\<^bsup>C\<^esup>) \<circ>\<^sub>c \<langle>c,h\<rangle>"
+            using R_def c_def comp_associative2 by (typecheck_cfuncs, fastforce)
+          also have "... = eval_func A C \<circ>\<^sub>c \<langle>c, ac2\<rangle>"
+            using c_def distribute_left_right_ap g_def by auto
+          also have "... = eval_func A C \<circ>\<^sub>c (id C \<times>\<^sub>f ac2) \<circ>\<^sub>c \<langle>c, id(one)\<rangle>"
+            using \<open>ac2 \<in>\<^sub>c A\<^bsup>C\<^esup>\<close> c_def cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs,auto)
+          also have "... = eval_func A C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f ac2) \<circ>\<^sub>c x"
+            using c_def by blast
+          also have "... = (eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac2) \<circ>\<^sub>c x"
+            by (typecheck_cfuncs, meson \<open>ac2 \<in>\<^sub>c A\<^bsup>C\<^esup>\<close> comp_associative2 x_type)
+          then show "(eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac1) \<circ>\<^sub>c x = (eval_func A C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f ac2) \<circ>\<^sub>c x" 
+            using calculation by auto
+        qed
+      qed
+    qed
+    show "g = h"
+      by (simp add: f_def g_def left right)
+  qed
+  then have "monomorphism(\<phi>)"
+    using injective_imp_monomorphism by auto
+  have "surjective(\<phi>)"
+    unfolding  surjective_def
+  proof(safe)
+    fix y 
+    assume "y \<in>\<^sub>c codomain \<phi>" then have y_type[type_rule]: "y \<in>\<^sub>c A\<^bsup>(B \<Coprod> C)\<^esup>"
+      using \<phi>_type cfunc_type_def by auto
+    then show "\<exists>x. x \<in>\<^sub>c domain \<phi> \<and> \<phi> \<circ>\<^sub>c x = y"
+      oops
 
 
 lemma smaller_than_N_finite:
