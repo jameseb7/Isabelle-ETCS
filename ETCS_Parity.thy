@@ -873,10 +873,119 @@ lemma halve_nth_odd:
   "halve \<circ>\<^sub>c nth_odd = id \<nat>\<^sub>c"
   unfolding halve_def by (typecheck_cfuncs, smt comp_associative2 halve_with_parity_nth_odd right_coproj_cfunc_coprod)
 
+lemma is_even_def3:
+  "is_even = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)) \<circ>\<^sub>c halve_with_parity"
+proof (rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT])
+  show "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "NOT : \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+
+  show "is_even \<circ>\<^sub>c zero = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero"
+  proof -
+    have "((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero
+      = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, metis cfunc_type_def comp_associative halve_with_parity_zero)
+    also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod)
+    also have "... = \<t>"
+      using comp_associative2 is_even_def2 is_even_nth_even_true nth_even_def2 by (typecheck_cfuncs, force)
+    also have "... = is_even \<circ>\<^sub>c zero"
+      by (simp add: is_even_zero)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "is_even \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_even"
+    by (simp add: is_even_successor)
+
+  show "((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c successor =
+    NOT \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity"
+  proof -
+    have "((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c successor
+      = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: comp_associative2 halve_with_parity_successor)
+    also have "... = 
+        (((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c)
+          \<amalg> 
+        ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor))
+          \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2)
+    also have "... = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
+    also have "... = ((NOT \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (NOT \<circ>\<^sub>c \<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: NOT_false_is_true NOT_true_is_false comp_associative2)
+    also have "... = NOT \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 terminal_func_unique)
+    then show ?thesis
+      using calculation by auto
+  qed
+qed
+
+lemma is_odd_def3:
+  "is_odd = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)) \<circ>\<^sub>c halve_with_parity"
+proof (rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT])
+  show "is_odd : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "NOT : \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+
+  show "is_odd \<circ>\<^sub>c zero = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero"
+  proof -
+    have "((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero
+      = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, metis cfunc_type_def comp_associative halve_with_parity_zero)
+    also have "... = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod)
+    also have "... = \<f>"
+      using comp_associative2 is_odd_nth_even_false is_odd_type is_odd_zero nth_even_def2 by (typecheck_cfuncs, force)
+    also have "... = is_odd \<circ>\<^sub>c zero"
+      by (simp add: is_odd_def2)
+    then show ?thesis
+      using calculation by auto
+  qed
+
+  show "is_odd \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_odd"
+    by (simp add: is_odd_successor)
+
+  show "((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c successor =
+    NOT \<circ>\<^sub>c (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity"
+  proof -
+    have "((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c successor
+      = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: comp_associative2 halve_with_parity_successor)
+    also have "... = 
+        (((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c)
+          \<amalg> 
+        ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor))
+          \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2)
+    also have "... = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
+    also have "... = ((NOT \<circ>\<^sub>c \<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (NOT \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, simp add: NOT_false_is_true NOT_true_is_false comp_associative2)
+    also have "... = NOT \<circ>\<^sub>c (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity"
+      by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 terminal_func_unique)
+    then show ?thesis
+      using calculation by auto
+  qed
+qed
+
+lemma is_even_nth_even_halve:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c" "is_even \<circ>\<^sub>c n = \<t>"
+  shows "nth_even \<circ>\<^sub>c halve = id \<nat>\<^sub>c"
+  oops
+
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(\<exists> m. nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. nth_odd \<circ>\<^sub>c m = n)"
-proof auto
+proof (cases "is_even \<circ>\<^sub>c n = \<t>")
+  assume "is_even \<circ>\<^sub>c n = \<t>"
+
   have "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp> = NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>"
   proof (rule natural_number_object_func_unique[where f="NOT", where X=\<Omega>])
     show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
@@ -960,7 +1069,7 @@ proof auto
           using assms apply typecheck_cfuncs
         *)
 
-lemma is_even_def3:
+lemma is_even_def4:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "is_even = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>)"
   proof (rule natural_number_object_func_unique[where f="NOT", where X=\<Omega>])
