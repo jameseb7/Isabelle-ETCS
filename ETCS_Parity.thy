@@ -858,7 +858,20 @@ proof (unfold isomorphism_def, rule_tac x="nth_even \<amalg> nth_odd" in exI, au
     by (typecheck_cfuncs, unfold cfunc_type_def, auto simp add: halve_with_parity_nth_even_nth_odd)
 qed
 
+definition halve :: "cfunc" where
+  "halve = (id \<nat>\<^sub>c \<amalg> id \<nat>\<^sub>c) \<circ>\<^sub>c halve_with_parity"
 
+lemma halve_type[type_rule]:
+  "halve : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+  unfolding halve_def by typecheck_cfuncs
+
+lemma halve_nth_even:
+  "halve \<circ>\<^sub>c nth_even = id \<nat>\<^sub>c"
+  unfolding halve_def by (typecheck_cfuncs, smt comp_associative2 halve_with_parity_nth_even left_coproj_cfunc_coprod)
+
+lemma halve_nth_odd:
+  "halve \<circ>\<^sub>c nth_odd = id \<nat>\<^sub>c"
+  unfolding halve_def by (typecheck_cfuncs, smt comp_associative2 halve_with_parity_nth_odd right_coproj_cfunc_coprod)
 
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
