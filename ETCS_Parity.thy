@@ -983,91 +983,35 @@ lemma is_even_nth_even_halve:
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(\<exists> m. nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. nth_odd \<circ>\<^sub>c m = n)"
-proof (cases "is_even \<circ>\<^sub>c n = \<t>")
-  assume "is_even \<circ>\<^sub>c n = \<t>"
+proof -
+  have "(\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> halve_with_parity \<circ>\<^sub>c n = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m)
+      \<or> (\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> halve_with_parity \<circ>\<^sub>c n = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m)"
+    by (rule coprojs_jointly_surj, insert assms, typecheck_cfuncs)
+  then show ?thesis
+  proof auto
+    fix m
+    assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
 
-  have "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp> = NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>"
-  proof (rule natural_number_object_func_unique[where f="NOT", where X=\<Omega>])
-    show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
-    show "NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
-    show "NOT : \<Omega> \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
+    assume "halve_with_parity \<circ>\<^sub>c n = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
+    then have "((nth_even \<amalg> nth_odd) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c n = ((nth_even \<amalg> nth_odd) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c m"
+      by (typecheck_cfuncs, smt assms comp_associative2)
+    then have "n = nth_even \<circ>\<^sub>c m"
+      using assms by (typecheck_cfuncs_prems, smt comp_associative2 halve_with_parity_nth_even id_left_unit2 nth_even_nth_odd_halve_with_parity)
+    then show "\<exists> m. nth_even \<circ>\<^sub>c m = n"
+      by auto
+  next
+    fix m
+    assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
 
-    show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero =
-        (NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero"
-    proof -
-      have  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = \<t>"
-        by (simp add: EXISTS_zero_nth_even)
-      also have "... = NOT \<circ>\<^sub>c \<f>"
-        by (simp add: NOT_false_is_true)
-      also have "... = NOT \<circ>\<^sub>c (EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero"
-        by (simp add: not_EXISTS_zero_nth_odd)
-      also have "... = (NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero"
-        by (typecheck_cfuncs, simp add: comp_associative2)
-      then show ?thesis
-        using calculation by auto
-    qed
-
-    show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c successor =
-        NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
-    proof (rule one_separator[where X="\<nat>\<^sub>c", where Y=\<Omega>])
-      show "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-        by typecheck_cfuncs
-      show "NOT \<circ>\<^sub>c EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_even \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-        by typecheck_cfuncs
-    next
-      fix n
-      assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
-      have "(\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n) = (\<nexists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c j = n)"
-      proof(auto) 
-        fix m j
-        assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
-        assume nth_even_m_is: "nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c nth_even \<circ>\<^sub>c j"
-        assume j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c"
-        assume n_is_nth_even_j: "n = nth_even \<circ>\<^sub>c j"
-       
-        have "n = nth_even \<circ>\<^sub>c m"
-          by (typecheck_cfuncs, smt comp_associative2 false_func_type is_even_def2 is_even_not_is_odd is_even_nth_even_true is_even_nth_odd_false is_odd_def2 is_odd_not_is_even j_type nth_even_is_times_two nth_even_m_is nth_odd_def2 nth_odd_is_succ_times_two successor_type terminal_func_comp terminal_func_type true_false_distinct true_func_type zero_type)
-        have "nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n"
-          by (simp add: n_is_nth_even_j nth_even_m_is)
-        then have "n = successor \<circ>\<^sub>c n "
-          using \<open>n = nth_even \<circ>\<^sub>c m\<close> by blast
-        then show False
-          using n_neq_succ_n n_type by auto
-      next
-        assume "\<forall>j. j \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> nth_even \<circ>\<^sub>c j \<noteq> n"
-        then have "\<nexists> j. j \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = nth_even \<circ>\<^sub>c j"
-          by (typecheck_cfuncs, blast)
-        then have "n \<noteq> zero"
-          using n_type nth_even_zero by auto          
-        then obtain m where n_def: "m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = successor \<circ>\<^sub>c m"
-          using n_type nonzero_is_succ by blast
-        show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n"
-        proof(cases "m = zero")
-          assume "m = zero"
-          then show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n"
-            by (typecheck_cfuncs, metis (no_types) \<open>m = zero\<close> n_def nth_even_is_times_twoB s0_is_right_id)
-        next 
-          assume "m \<noteq> zero"
-          then obtain k where m_def: "k \<in>\<^sub>c \<nat>\<^sub>c \<and>  m = successor \<circ>\<^sub>c k"
-            using n_def nonzero_is_succ by blast
-          then have n_def2: "n = successor \<circ>\<^sub>c successor \<circ>\<^sub>c k"
-            by (simp add: n_def)
-          then have "\<nexists> j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> n = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j"
-            using \<open>\<nexists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_even \<circ>\<^sub>c j\<close> nth_even_is_times_twoB by (typecheck_cfuncs, auto)
-          then have "is_even \<circ>\<^sub>c n \<noteq> \<t>"
-            using assms apply typecheck_cfuncs
-            oops
-         (* then have "\<exists> j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> n = successor \<circ>\<^sub>c((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j)"
-            oops
-*)
-
-
-        (*then show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c n"
-          using assms apply typecheck_cfuncs
-        *)
+    assume "halve_with_parity \<circ>\<^sub>c n = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
+    then have "((nth_even \<amalg> nth_odd) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c n = ((nth_even \<amalg> nth_odd) \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c m"
+      by (typecheck_cfuncs, smt assms comp_associative2)
+    then have "n = nth_odd \<circ>\<^sub>c m"
+      using assms by (typecheck_cfuncs_prems, smt comp_associative2 halve_with_parity_nth_odd id_left_unit2 nth_even_nth_odd_halve_with_parity)
+    then show "\<forall>m. nth_odd \<circ>\<^sub>c m \<noteq> n \<Longrightarrow> \<exists> m. nth_even \<circ>\<^sub>c m = n"
+      by auto
+  qed
+qed
 
 lemma is_even_def4:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
