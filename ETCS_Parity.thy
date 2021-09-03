@@ -620,19 +620,6 @@ proof -
     using calculation by auto
 qed
 
-
-lemma even_or_odd2:
-  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = successor \<circ>\<^sub>c((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)) \<or> 
-         (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n =              (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m) "
-proof(safe)
-  assume not_even: "\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m"
-  show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = successor \<circ>\<^sub>c (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m"
-  proof(rule ccontr)
-    assume "\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = successor \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)"
-  
-    oops
-
 definition halve_with_parity :: "cfunc" where
   "halve_with_parity = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> 
     u \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero \<and>
@@ -982,7 +969,7 @@ lemma is_even_nth_even_halve:
 
 lemma nth_even_or_nth_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(\<exists> m. nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. nth_odd \<circ>\<^sub>c m = n)"
+  shows "(\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_odd \<circ>\<^sub>c m = n)"
 proof -
   have "(\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> halve_with_parity \<circ>\<^sub>c n = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m)
       \<or> (\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> halve_with_parity \<circ>\<^sub>c n = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m)"
@@ -997,8 +984,8 @@ proof -
       by (typecheck_cfuncs, smt assms comp_associative2)
     then have "n = nth_even \<circ>\<^sub>c m"
       using assms by (typecheck_cfuncs_prems, smt comp_associative2 halve_with_parity_nth_even id_left_unit2 nth_even_nth_odd_halve_with_parity)
-    then show "\<exists> m. nth_even \<circ>\<^sub>c m = n"
-      by auto
+    then show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n"
+      using m_type by auto
   next
     fix m
     assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
@@ -1008,8 +995,36 @@ proof -
       by (typecheck_cfuncs, smt assms comp_associative2)
     then have "n = nth_odd \<circ>\<^sub>c m"
       using assms by (typecheck_cfuncs_prems, smt comp_associative2 halve_with_parity_nth_odd id_left_unit2 nth_even_nth_odd_halve_with_parity)
-    then show "\<forall>m. nth_odd \<circ>\<^sub>c m \<noteq> n \<Longrightarrow> \<exists> m. nth_even \<circ>\<^sub>c m = n"
-      by auto
+    then show "\<forall>m. m \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> nth_odd \<circ>\<^sub>c m \<noteq> n \<Longrightarrow> \<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n"
+      using m_type by auto
+  qed
+qed
+
+lemma even_or_odd2:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = successor \<circ>\<^sub>c((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)) \<or> 
+         (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n =              (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m) "
+proof -
+  have "(\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n) \<or> (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_odd \<circ>\<^sub>c m = n)"
+    by (simp add: assms nth_even_or_nth_odd)
+  then show ?thesis
+  proof auto
+    fix m 
+    assume m_type: "m \<in>\<^sub>c \<nat>\<^sub>c"
+
+    have "nth_even \<circ>\<^sub>c m = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m"
+      by (simp add: m_type nth_even_is_times_twoB)
+    then show "\<forall>ma. ma \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> nth_even \<circ>\<^sub>c m \<noteq> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> ma \<Longrightarrow>
+        \<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = successor \<circ>\<^sub>c (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k"
+      using m_type by auto
+  next
+    fix m 
+    assume m_type: "m \<in>\<^sub>c \<nat>\<^sub>c"
+
+    have "nth_odd \<circ>\<^sub>c m = successor \<circ>\<^sub>c (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m"
+      by (simp add: m_type nth_odd_is_succ_times_twoB)
+    then show "\<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_odd \<circ>\<^sub>c m = successor \<circ>\<^sub>c (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k"
+      using m_type by auto
   qed
 qed
 
