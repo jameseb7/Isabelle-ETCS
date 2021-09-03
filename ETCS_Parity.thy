@@ -1028,6 +1028,44 @@ proof -
   qed
 qed
 
+lemma is_even_exists_nth_even:
+  assumes "is_even \<circ>\<^sub>c n = \<t>" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_even \<circ>\<^sub>c m"
+proof (rule ccontr)
+  assume "\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_even \<circ>\<^sub>c m"
+  then obtain m where m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_def: "n = nth_odd \<circ>\<^sub>c m"
+    using n_type nth_even_or_nth_odd by blast
+  then have "is_even \<circ>\<^sub>c nth_odd \<circ>\<^sub>c m = \<t>"
+    using assms(1) by blast
+  then have "is_odd \<circ>\<^sub>c nth_odd \<circ>\<^sub>c m = \<f>"
+    using NOT_true_is_false NOT_type comp_associative2 is_even_def2 is_odd_not_is_even n_def n_type by fastforce
+  then have "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m = \<f>"
+    by (typecheck_cfuncs_prems, smt comp_associative2 is_odd_nth_odd_true terminal_func_type true_func_type)
+  then have "\<t> = \<f>"
+    by (typecheck_cfuncs_prems, metis id_right_unit2 id_type one_unique_element)
+  then show False
+    using true_false_distinct by auto
+qed
+
+lemma is_odd_exists_nth_odd:
+  assumes "is_odd \<circ>\<^sub>c n = \<t>" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_odd \<circ>\<^sub>c m"
+proof (rule ccontr)
+  assume "\<nexists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_odd \<circ>\<^sub>c m"
+  then obtain m where m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_def: "n = nth_even \<circ>\<^sub>c m"
+    using n_type nth_even_or_nth_odd by blast
+  then have "is_odd \<circ>\<^sub>c nth_even \<circ>\<^sub>c m = \<t>"
+    using assms(1) by blast
+  then have "is_even \<circ>\<^sub>c nth_even \<circ>\<^sub>c m = \<f>"
+    using NOT_true_is_false NOT_type comp_associative2 is_even_not_is_odd is_odd_def2 n_def n_type by fastforce
+  then have "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m = \<f>"
+    by (typecheck_cfuncs_prems, smt comp_associative2 is_even_nth_even_true terminal_func_type true_func_type)
+  then have "\<t> = \<f>"
+    by (typecheck_cfuncs_prems, metis id_right_unit2 id_type one_unique_element)
+  then show False
+    using true_false_distinct by auto
+qed
+
 lemma is_even_def4:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "is_even = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f id \<nat>\<^sub>c))\<^sup>\<sharp>)"
