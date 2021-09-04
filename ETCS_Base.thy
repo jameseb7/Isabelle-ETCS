@@ -580,6 +580,7 @@ next
     using calculation by auto
 qed
 
+
 lemma isomorphism_sandwich: 
   assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C" and h_type: "h: C \<rightarrow> D"
   assumes f_iso: "isomorphism(f)"

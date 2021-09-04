@@ -276,7 +276,7 @@ proof (cases "\<exists> x. x \<in>\<^sub>c X")
 
    have B_doppelganger: "B = (B\<^sup>\<flat>)\<^sup>\<sharp>"
         using b_def sharp_cancels_flat by auto
-   have Aflat11eqsBflat11: "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
+   have "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
    proof - 
       have "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = (eval_func X one) \<circ>\<^sub>c (id (one) \<times>\<^sub>f (A\<^sup>\<flat>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
             using A_doppelganger a_def comp_associative2 inv_transpose_func_def2 by (typecheck_cfuncs, fastforce)
@@ -291,8 +291,8 @@ proof (cases "\<exists> x. x \<in>\<^sub>c X")
       then show "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
         using calculation by auto
     qed
-    have "A\<^sup>\<flat> = B\<^sup>\<flat>"
-      by (typecheck_cfuncs, smt ETCS_Cartesian.swap_def Aflat11eqsBflat11 a_def b_def cfunc_prod_comp comp_associative2 diagonal_def diagonal_type id_right_unit2 id_type left_cart_proj_type right_cart_proj_type swap_idempotent swap_type terminal_func_comp terminal_func_unique)
+    then have "A\<^sup>\<flat> = B\<^sup>\<flat>"
+      by (typecheck_cfuncs, smt ETCS_Cartesian.swap_def a_def b_def cfunc_prod_comp comp_associative2 diagonal_def diagonal_type id_right_unit2 id_type left_cart_proj_type right_cart_proj_type swap_idempotent swap_type terminal_func_comp terminal_func_unique)
 
     then have "A = B"
       using A_doppelganger B_doppelganger by auto
