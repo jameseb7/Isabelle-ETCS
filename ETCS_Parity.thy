@@ -1127,11 +1127,57 @@ lemma add_mixed_is_odd2:
   shows "is_odd \<circ>\<^sub>c (m +\<^sub>\<nat> n) = \<t>"
   by (typecheck_cfuncs, smt add_evens_is_even2 add_respects_succ3 assms cfunc_type_def comp_associative comp_type is_even_def2 is_odd_not_is_even successor_type)
 
-lemma is_even_nth_even_halve:
-  assumes "n \<in>\<^sub>c \<nat>\<^sub>c" "is_even \<circ>\<^sub>c n = \<t>"
-  shows "nth_even \<circ>\<^sub>c halve = id \<nat>\<^sub>c"
-  using assms apply typecheck_cfuncs
+lemma mult_evens_is_even2:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "is_even \<circ>\<^sub>c m = \<t>" 
+  shows "is_even \<circ>\<^sub>c (m \<cdot>\<^sub>\<nat> n) = \<t>"
+proof - 
+  obtain p where m_def: "p \<in>\<^sub>c \<nat>\<^sub>c \<and> m = nth_even \<circ>\<^sub>c p"
+    using assms(1) assms(3) is_even_exists_nth_even by blast
+  have m_def2: "m = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p)"
+    by (simp add: m_def nth_even_is_times_twoB)
+  then have mn_def: "m \<cdot>\<^sub>\<nat> n = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (p \<cdot>\<^sub>\<nat> n))"
+    by (simp add: assms(2) m_def mult_associative succ_n_type zero_type)
+  then have "(m \<cdot>\<^sub>\<nat> n) = nth_even \<circ>\<^sub>c (p \<cdot>\<^sub>\<nat> n)"
+    by (simp add: assms(2) m_def mult_closure nth_even_is_times_twoB)
+  then have "is_even \<circ>\<^sub>c (m \<cdot>\<^sub>\<nat> n) = (is_even \<circ>\<^sub>c  nth_even) \<circ>\<^sub>c (p \<cdot>\<^sub>\<nat> n)"
+    by (typecheck_cfuncs, metis assms(2) comp_associative2 m_def)
+  also have "... =  (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c (p \<cdot>\<^sub>\<nat> n)"
+    by (simp add: is_even_nth_even_true)
+  also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c (p \<cdot>\<^sub>\<nat> n)"
+    using assms(2) comp_associative2 m_def by (typecheck_cfuncs, fastforce)
+  also have "... = \<t> \<circ>\<^sub>c id(one)"
+    by (typecheck_cfuncs, metis assms(2) m_def terminal_func_unique)
+  also have "... = \<t>"
+    by (typecheck_cfuncs, simp add: id_right_unit2)
+  then show ?thesis
+    by (simp add: calculation)
+qed
 
+lemma mult_odds_is_odd2:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "is_odd \<circ>\<^sub>c m = \<t>" "is_odd \<circ>\<^sub>c n = \<t>" 
+  shows "is_odd \<circ>\<^sub>c (m \<cdot>\<^sub>\<nat> n) = \<t>"
+proof - 
+  obtain p where m_def: "p \<in>\<^sub>c \<nat>\<^sub>c \<and> m = nth_odd \<circ>\<^sub>c p"
+    using assms(1) assms(3) is_odd_exists_nth_odd by blast
+  obtain q where n_def: "q \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_odd \<circ>\<^sub>c q"
+    using assms(2) assms(4) is_odd_exists_nth_odd by blast
+  have m_def2: "m = successor \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p) "
+    using m_def nth_odd_is_succ_times_twoB by blast
+  then have m_def3: "m = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)"
+    using add_respects_succ1 add_respects_zero_on_right m_def m_def2 by (typecheck_cfuncs, auto)
+  then have m_def4: "\<exists>j. j \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m"
+    using m_def by blast
+  have n_def2: "n = successor \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> q)"
+    using n_def nth_odd_is_succ_times_twoB by blast
+  have n_def3: "n= ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)"
+    using add_respects_succ1 add_respects_zero_on_right n_def n_def2 by (typecheck_cfuncs, auto)
+  then have n_def4: "\<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n"
+    using n_def by blast
+  then have "\<exists>l. l \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m \<cdot>\<^sub>\<nat> n"
+    using assms  apply typecheck_cfuncs
+    (*This should use "mult_odds_is_odd" to find the proof*)
 
   oops
 end
