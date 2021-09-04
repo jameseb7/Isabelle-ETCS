@@ -1179,6 +1179,28 @@ proof -
   
   have "\<exists>l. l \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m \<cdot>\<^sub>\<nat> n"
     by (rule mult_odds_is_odd, simp_all add: assms m_def4 n_def4)
+  then obtain l where mn_def: "l \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m \<cdot>\<^sub>\<nat> n"
+    by blast
+  then have "m \<cdot>\<^sub>\<nat> n = successor \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l)"
+    using add_respects_succ1 add_respects_zero_on_right mn_def by (typecheck_cfuncs, auto)
+  then have "m \<cdot>\<^sub>\<nat> n = nth_odd \<circ>\<^sub>c l"
+    by (simp add: mn_def nth_odd_is_succ_times_twoB)
+  then have "is_odd \<circ>\<^sub>c (m \<cdot>\<^sub>\<nat> n) = (is_odd \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c l"
+    using comp_associative2 mn_def by (typecheck_cfuncs, auto)
+  also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c l"
+    by (simp add: is_odd_nth_odd_true)
+  also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c l"
+    using comp_associative2 mn_def by (typecheck_cfuncs, auto)
+  also have "... = \<t> \<circ>\<^sub>c id(one)"
+    using id_type mn_def one_unique_element terminal_func_comp terminal_func_type by fastforce
+  also have "... = \<t>"
+    by (typecheck_cfuncs, simp add: id_right_unit2)
+  then show ?thesis
+    by (simp add: calculation)
+qed
 
-  oops
+
+
+
+
 end
