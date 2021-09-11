@@ -1033,13 +1033,9 @@ L \<amalg> R \<circ>\<^sub>c right_coproj (B\<times>\<^sub>c (A\<^bsup>B\<^esup>
 qed
 
 
+lemma set_connexity:
+  "(A \<le>\<^sub>c B) \<or> (B \<le>\<^sub>c A)"
+  apply typecheck_cfuncs
 
-lemma smaller_than_N_finite:
-  assumes "X \<le>\<^sub>c \<nat>\<^sub>c"
-  assumes "\<not>(\<exists>s. (s: X \<rightarrow> \<nat>\<^sub>c \<and> surjective(s)))"
-  shows "is_finite(X)"
   oops
-
-
-
 end

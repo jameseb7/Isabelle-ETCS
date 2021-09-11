@@ -37,22 +37,28 @@ lemma smaller_than_countable_is_countable:
   by (smt assms cfunc_type_def comp_type composition_of_monic_pair_is_monic countable_def is_smaller_than_def)
 
 
-lemma finite_ifno_surj_to_N:
-  assumes "\<not>(\<exists>s. (s : X \<rightarrow> \<nat>\<^sub>c) \<and> surjective(s))"
-  shows "is_finite(X)"
-proof(rule ccontr)
-  assume "\<not> is_finite X"
-  then have inf: "is_infinite(X)"
-    using either_finite_or_infinite by blast
-  oops
-
-
-
 lemma iso_pres_finite:
   assumes "X \<cong> Y"
   assumes "is_finite(X)"
   shows "is_finite(Y)"
   using assms is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic isomorphic_is_symmetric smaller_than_finite_is_finite by blast
+
+
+lemma iso_pres_countable:
+  assumes "X \<cong> Y" "countable Y"
+  shows "countable X"
+  using assms(1) assms(2) is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic smaller_than_countable_is_countable by blast
+
+
+lemma not_finite_and_infinite:
+  "\<not>(is_finite(X) \<and> is_infinite(X))"
+  using epi_is_surj is_finite_def is_infinite_def iso_imp_epi_and_monic by blast
+
+lemma iso_pres_infinite:
+  assumes "X \<cong> Y"
+  assumes "is_infinite(X)"
+  shows "is_infinite(Y)"
+  using assms either_finite_or_infinite not_finite_and_infinite iso_pres_finite isomorphic_is_symmetric by blast
 
 
 
@@ -629,15 +635,44 @@ proof-
   then show "\<exists>f. f : X \<Coprod> Y \<rightarrow> \<nat>\<^sub>c \<and> monomorphism f"
     using nxy_type by blast
 qed
-
-    
+   
   
-  
-
 
 lemma finite_is_countable: 
   assumes "is_finite X"
   shows "countable X"
   oops
+
+lemma N_is_smallest_infinite:
+  assumes "is_infinite X"
+  assumes "\<And> A B . (A \<le>\<^sub>c B) \<or> (B \<le>\<^sub>c A)"
+  shows "\<nat>\<^sub>c \<le>\<^sub>c X"
+  oops
+
+
+lemma finite_imp_nosurj_to_N:
+  assumes "is_finite X \<Longrightarrow> countable X"
+  shows "(is_finite(X)) = (\<not>(\<exists>s. (s : X \<rightarrow> \<nat>\<^sub>c) \<and> surjective(s)))"
+proof(auto)
+  fix s 
+  assume X_fin: "is_finite X"
+  assume s_type: "s : X \<rightarrow> \<nat>\<^sub>c"
+  assume s_surj: "surjective s"
+  have "\<exists>g. (g: \<nat>\<^sub>c \<rightarrow> X \<and> monomorphism(g) )"
+    using epis_give_monos s_surj s_type surjective_is_epimorphism by blast
+  then have "is_finite \<nat>\<^sub>c"
+    using X_fin is_smaller_than_def smaller_than_finite_is_finite by blast
+  then have False
+    using natural_numbers_are_countably_infinite not_finite_and_infinite by blast
+next
+  assume "\<forall>s. s : X \<rightarrow> \<nat>\<^sub>c \<longrightarrow> \<not> surjective s"
+  show "is_finite X"
+    oops
+
+
+
+
+
+
 
 end

@@ -24,7 +24,12 @@ lemma epis_give_monos:
   by (typecheck_cfuncs_prems, metis axiom_of_choice cfunc_type_def comp_monic_imp_monic f_epi id_isomorphism iso_imp_epi_and_monic section_of_def)
 
 
-
+lemma monos_give_epis:
+  assumes f_type: "f : X \<rightarrow> Y"
+  assumes f_mono: "monomorphism(f)"
+  shows "\<exists>g. (g: Y \<rightarrow> X \<and> epimorphism(g) )"
+  using assms apply typecheck_cfuncs
+  oops
 
 
 end
