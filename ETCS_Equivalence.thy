@@ -99,8 +99,8 @@ qed
 (* Exercise 2.3.2 *) 
 (*the proof is just dual in every sense to the equalizer is monomorphism proof*)
 lemma coequalizer_is_epimorphism:
-"coequalizer E m f g \<Longrightarrow>  epimorphism(m)"
-unfolding coequalizer_def epimorphism_def
+  "coequalizer E m f g \<Longrightarrow>  epimorphism(m)"
+  unfolding coequalizer_def epimorphism_def
 proof auto
   fix ga h X Y
   assume f_type: "f : Y \<rightarrow> X"
@@ -318,11 +318,7 @@ proof (unfold equiv_rel_on_def, auto)
  qed
 qed
 
-
-
-
-
-
+(*abbreviation "kernel_pair_rel X f \<equiv> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"*)
 
  
  (*shows "coequalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
@@ -395,6 +391,177 @@ next
   show "\<exists>k. k : Y \<rightarrow> F \<and> k \<circ>\<^sub>c f = h"
     oops
 
+
+lemma epi_monic_factorization:
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  shows "\<exists> g m E. g : X \<rightarrow> E \<and> m : E \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f = m \<circ>\<^sub>c g"
+proof -
+  obtain q where q_def: "q = equiv_class (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    by auto
+  obtain E where E_def: "E = quotient_set X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    by auto
+  obtain m where m_def: "m = quotient_func f (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    by auto
+  show "\<exists> g m E. g : X \<rightarrow> E \<and> m : E \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f = m \<circ>\<^sub>c g"
+  proof (rule_tac x="q" in exI, rule_tac x="m" in exI, rule_tac x="E" in exI, auto)
+    show q_type[type_rule]: "q : X \<rightarrow> E"
+      unfolding q_def E_def using kernel_pair_equiv_rel by (typecheck_cfuncs, blast)
+    
+    have f_const: "const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) f"
+      unfolding const_on_rel_def using assms fibered_product_pair_member by auto
+    then show m_type[type_rule]: "m : E \<rightarrow> Y"
+      unfolding m_def E_def using kernel_pair_equiv_rel by (typecheck_cfuncs, blast)
+    
+    show q_epi: "epimorphism q"
+      unfolding q_def using assms canonical_quot_map_is_epi kernel_pair_equiv_rel by blast
+
+    show "monomorphism m"
+    proof -
+      (* (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X equalises the same things as E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E *)
+      have qxq_fpmorph_eq: "(m \<circ>\<^sub>c left_cart_proj E E) \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X
+            = (m \<circ>\<^sub>c right_cart_proj E E) \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X"
+      proof -
+        have "(m \<circ>\<^sub>c left_cart_proj E E) \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X
+            = m \<circ>\<^sub>c (left_cart_proj E E \<circ>\<^sub>c (q \<times>\<^sub>f q)) \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, simp add: comp_associative2)
+        also have "... = m \<circ>\<^sub>c (q \<circ>\<^sub>c left_cart_proj X X) \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, simp add: comp_associative2 left_cart_proj_cfunc_cross_prod)
+        also have "... = (m \<circ>\<^sub>c q) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, smt comp_associative2)
+        also have "... = f \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c fibered_product_morphism X f f X"
+          using f_const kernel_pair_equiv_rel m_def q_def quotient_func_eq by (typecheck_cfuncs, fastforce)
+        also have "... = f \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c fibered_product_morphism X f f X"
+          using f_type fibered_product_left_proj_def fibered_product_proj_eq fibered_product_right_proj_def by auto
+        also have "... = (m \<circ>\<^sub>c q) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c fibered_product_morphism X f f X"
+          using f_const f_type kernel_pair_equiv_rel m_def q_def quotient_func_eq by fastforce
+        also have "... = m \<circ>\<^sub>c (q \<circ>\<^sub>c right_cart_proj X X) \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, smt comp_associative2)
+        also have "... = m \<circ>\<^sub>c right_cart_proj E E \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, simp add: comp_associative2 right_cart_proj_cfunc_cross_prod)
+        also have "... = (m \<circ>\<^sub>c right_cart_proj E E) \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, smt comp_associative2)
+        then show ?thesis
+          using calculation by auto
+      qed
+      have m_equalizer: "equalizer (E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E) (fibered_product_morphism E m m E) (m \<circ>\<^sub>c left_cart_proj E E) (m \<circ>\<^sub>c right_cart_proj E E)"
+        using fibered_product_morphism_equalizer m_type by auto
+      then have "\<forall>h F. h : F \<rightarrow> E \<times>\<^sub>c E \<and> (m \<circ>\<^sub>c left_cart_proj E E) \<circ>\<^sub>c h = (m \<circ>\<^sub>c right_cart_proj E E) \<circ>\<^sub>c h \<longrightarrow>
+               (\<exists>!k. k : F \<rightarrow> E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E \<and> fibered_product_morphism E m m E \<circ>\<^sub>c k = h)"
+        unfolding equalizer_def using cfunc_type_def fibered_product_morphism_type m_type by auto
+      then obtain b where b_type[type_rule]: "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E"
+          and b_eq: "fibered_product_morphism E m m E \<circ>\<^sub>c b = (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X"
+        by (meson cfunc_cross_prod_type comp_type f_type fibered_product_morphism_type q_type qxq_fpmorph_eq)
+      
+      have "is_pullback (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) (X \<times>\<^sub>c X) (E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E) (E \<times>\<^sub>c E)
+          (fibered_product_morphism X f f X) (q \<times>\<^sub>f q) b (fibered_product_morphism E m m E)"
+      proof (insert b_eq, unfold is_pullback_def square_commutes_def, typecheck_cfuncs, clarify)
+        fix Z k h
+
+        assume k_type[type_rule]: "k : Z \<rightarrow> X \<times>\<^sub>c X" and h_type[type_rule]: "h : Z \<rightarrow> E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E"
+
+        assume k_h_eq: "(q \<times>\<^sub>f q) \<circ>\<^sub>c k = fibered_product_morphism E m m E \<circ>\<^sub>c h"
+
+        have left_k_right_k_eq: "f \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c k = f \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c k"
+        proof -
+          have "f \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c k = m \<circ>\<^sub>c q \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c k"
+            by (typecheck_cfuncs, smt comp_associative2 f_const kernel_pair_equiv_rel m_def q_def quotient_func_eq)
+          also have "... = m \<circ>\<^sub>c left_cart_proj E E \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c k"
+            by (typecheck_cfuncs, simp add: comp_associative2 left_cart_proj_cfunc_cross_prod)
+          also have "... = m \<circ>\<^sub>c left_cart_proj E E \<circ>\<^sub>c fibered_product_morphism E m m E \<circ>\<^sub>c h"
+            by (simp add: k_h_eq)
+          also have "... = ((m \<circ>\<^sub>c left_cart_proj E E) \<circ>\<^sub>c fibered_product_morphism E m m E) \<circ>\<^sub>c h"
+            by (typecheck_cfuncs, smt comp_associative2)
+          also have "... = ((m \<circ>\<^sub>c right_cart_proj E E) \<circ>\<^sub>c fibered_product_morphism E m m E) \<circ>\<^sub>c h"
+            using equalizer_def m_equalizer by auto
+          also have "... = m \<circ>\<^sub>c right_cart_proj E E \<circ>\<^sub>c fibered_product_morphism E m m E \<circ>\<^sub>c h"
+            by (typecheck_cfuncs, smt comp_associative2)
+          also have "... = m \<circ>\<^sub>c right_cart_proj E E \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c k"
+            by (simp add: k_h_eq)
+          also have "... = m \<circ>\<^sub>c q \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c k"
+            by (typecheck_cfuncs, simp add: comp_associative2 right_cart_proj_cfunc_cross_prod)
+          also have "... = f \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c k"
+            by (typecheck_cfuncs, smt comp_associative2 f_const kernel_pair_equiv_rel m_def q_def quotient_func_eq)
+          then show ?thesis
+            using calculation by auto
+        qed
+
+        have "is_pullback (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) X X Y
+            (fibered_product_right_proj X f f X) f (fibered_product_left_proj X f f X) f"
+          by (simp add: f_type fibered_product_is_pullback)
+        then have "right_cart_proj X X \<circ>\<^sub>c k : Z \<rightarrow> X \<Longrightarrow> left_cart_proj X X \<circ>\<^sub>c k : Z \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c k = f \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c k \<Longrightarrow>
+          (\<exists>!j. j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and>
+            fibered_product_right_proj X f f X \<circ>\<^sub>c j = right_cart_proj X X \<circ>\<^sub>c k
+            \<and> fibered_product_left_proj X f f X \<circ>\<^sub>c j = left_cart_proj X X \<circ>\<^sub>c k)"
+          unfolding is_pullback_def by auto
+        then obtain z where z_type[type_rule]: "z : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"
+            and k_right_eq: "fibered_product_right_proj X f f X \<circ>\<^sub>c z = right_cart_proj X X \<circ>\<^sub>c k" 
+            and k_left_eq: "fibered_product_left_proj X f f X \<circ>\<^sub>c z = left_cart_proj X X \<circ>\<^sub>c k"
+            and z_unique: "\<And>j. j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X 
+              \<and> fibered_product_right_proj X f f X \<circ>\<^sub>c j = right_cart_proj X X \<circ>\<^sub>c k
+              \<and> fibered_product_left_proj X f f X \<circ>\<^sub>c j = left_cart_proj X X \<circ>\<^sub>c k \<Longrightarrow> z = j"
+          using left_k_right_k_eq by (typecheck_cfuncs, auto)
+
+        have k_eq: "fibered_product_morphism X f f X \<circ>\<^sub>c z = k"
+          using k_right_eq k_left_eq
+          unfolding fibered_product_right_proj_def fibered_product_left_proj_def
+          by (typecheck_cfuncs_prems, smt cfunc_prod_comp cfunc_prod_unique)
+
+        show "\<exists>!j. j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c j = k \<and> b \<circ>\<^sub>c j = h"
+        proof auto
+          show "\<exists>j. j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c j = k \<and> b \<circ>\<^sub>c j = h"
+          proof (rule_tac x=z in exI, auto simp add: k_eq z_type)
+            have "fibered_product_morphism E m m E \<circ>\<^sub>c h = (q \<times>\<^sub>f q) \<circ>\<^sub>c k"
+              by (simp add: k_h_eq)
+            also have "... = (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X \<circ>\<^sub>c z"
+              by (simp add: k_eq)
+            also have "... = fibered_product_morphism E m m E \<circ>\<^sub>c b \<circ>\<^sub>c z"
+              by (typecheck_cfuncs, simp add: b_eq comp_associative2)
+            then show "b \<circ>\<^sub>c z = h"
+              using calculation cfunc_type_def fibered_product_morphism_monomorphism fibered_product_morphism_type m_type monomorphism_def
+              by (typecheck_cfuncs, auto)
+          qed
+        next
+          fix j y
+          assume j_type[type_rule]: "j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" and y_type[type_rule]: "y : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"
+
+          assume "fibered_product_morphism X f f X \<circ>\<^sub>c y = fibered_product_morphism X f f X \<circ>\<^sub>c j"
+          then show "j = y"
+            using fibered_product_morphism_monomorphism fibered_product_morphism_type monomorphism_def cfunc_type_def f_type
+            by (typecheck_cfuncs, auto)
+        qed
+      qed
+      then have b_epi: "epimorphism b"
+        using q_epi cfunc_cross_prod_type product_of_epis_is_epi pullback_of_epi_is_epi q_type by blast
+
+      have "fibered_product_left_proj E m m E \<circ>\<^sub>c b = fibered_product_right_proj E m m E \<circ>\<^sub>c b"
+      proof -
+        have "fibered_product_left_proj E m m E \<circ>\<^sub>c b = left_cart_proj E E \<circ>\<^sub>c fibered_product_morphism E m m E \<circ>\<^sub>c b"
+          by (typecheck_cfuncs, simp add: comp_associative2 fibered_product_left_proj_def)
+        also have "... = left_cart_proj E E \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (simp add: b_eq)
+        also have "... = q \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, simp add: comp_associative2 left_cart_proj_cfunc_cross_prod)
+        also have "... = q \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, metis canonical_quotient_map_is_coequalizer coequalizer_def kernel_pair_equiv_rel q_def)
+        also have "... = right_cart_proj E E \<circ>\<^sub>c (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X"
+          by (typecheck_cfuncs, simp add: comp_associative2 right_cart_proj_cfunc_cross_prod)
+        also have "... = right_cart_proj E E \<circ>\<^sub>c fibered_product_morphism E m m E \<circ>\<^sub>c b"
+          by (simp add: b_eq)
+        also have "... = fibered_product_right_proj E m m E \<circ>\<^sub>c b"
+          by (typecheck_cfuncs, simp add: comp_associative2 fibered_product_right_proj_def)
+        then show ?thesis
+          using calculation by auto
+      qed
+      then have "fibered_product_left_proj E m m E = fibered_product_right_proj E m m E"
+        using b_epi cfunc_type_def epimorphism_def by (typecheck_cfuncs_prems, auto)
+      then show "monomorphism m"
+        using kern_pair_proj_iso_TFAE2 m_type by auto
+    qed
+
+    show "f = m \<circ>\<^sub>c q"
+      using f_const f_type kernel_pair_equiv_rel m_def q_def quotient_func_eq by fastforce
+  qed
+qed
 
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
