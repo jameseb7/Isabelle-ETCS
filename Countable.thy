@@ -643,17 +643,16 @@ lemma finite_is_countable:
   shows "countable X"
   oops
 
-lemma N_is_smallest_infinite:
-  assumes "is_infinite X"
-  assumes "\<And> A B . (A \<le>\<^sub>c B) \<or> (B \<le>\<^sub>c A)"
-  shows "\<nat>\<^sub>c \<le>\<^sub>c X"
-  oops
 
 
-lemma finite_imp_nosurj_to_N:
-  assumes "is_finite X \<Longrightarrow> countable X"
+(*We could add a part 2 to the above that says if they are not isomorphic
+ then an infinite set is necessarily bigger than N.*)
+
+
+
+lemma finite_iff_nosurj_to_N:
   shows "(is_finite(X)) = (\<not>(\<exists>s. (s : X \<rightarrow> \<nat>\<^sub>c) \<and> surjective(s)))"
-proof(auto)
+proof(safe)
   fix s 
   assume X_fin: "is_finite X"
   assume s_type: "s : X \<rightarrow> \<nat>\<^sub>c"
@@ -664,15 +663,21 @@ proof(auto)
     using X_fin is_smaller_than_def smaller_than_finite_is_finite by blast
   then have False
     using natural_numbers_are_countably_infinite not_finite_and_infinite by blast
-next
-  assume "\<forall>s. s : X \<rightarrow> \<nat>\<^sub>c \<longrightarrow> \<not> surjective s"
+next 
+  assume "\<nexists>s. s : X \<rightarrow> \<nat>\<^sub>c \<and> surjective s"
   show "is_finite X"
+    unfolding is_finite_def
+ 
+  proof(rule ccontr)
+    assume "\<not> is_finite X"
+    then have "is_infinite X"
+      using either_finite_or_infinite by blast
+    then obtain m where m_def: "m : X \<rightarrow> X \<and> monomorphism(m) \<and> \<not>surjective(m)"
+      using is_infinite_def by blast
+    
+
+
+
+
     oops
-
-
-
-
-
-
-
 end
