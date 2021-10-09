@@ -178,6 +178,43 @@ proof (rule ccontr)
     using true_false_distinct by auto
 qed
 
+lemma
+  assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
+  assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
+  assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+  shows "\<not> ((P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
+proof -
+
+  obtain z where z_type[type_rule]: "z : X \<times>\<^sub>c Y \<rightarrow> one"
+    and "P \<times>\<^sub>f Q = \<langle>\<f>,\<f>\<rangle> \<circ>\<^sub>c z"
+    using NOR_is_pullback NOR_true unfolding is_pullback_def
+    by (metis P_Q_types cfunc_cross_prod_type terminal_func_type) 
+  then have "P \<times>\<^sub>f Q = \<langle>\<f>,\<f>\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+    using terminal_func_unique by auto
+  then have "P \<times>\<^sub>f Q = \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>, \<f> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>\<rangle>"
+    by (typecheck_cfuncs, simp add: cfunc_prod_comp)
+  then have "P \<times>\<^sub>f Q = \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c left_cart_proj X Y, \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c right_cart_proj X Y\<rangle>"
+    by (typecheck_cfuncs_prems, metis left_cart_proj_type right_cart_proj_type terminal_func_comp)
+  then have "\<langle>P \<circ>\<^sub>c left_cart_proj X Y, Q \<circ>\<^sub>c right_cart_proj X Y\<rangle>
+      = \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c left_cart_proj X Y, \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c right_cart_proj X Y\<rangle>"
+    by (typecheck_cfuncs, unfold cfunc_cross_prod_def2, auto)
+  then have "(P \<circ>\<^sub>c left_cart_proj X Y = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c left_cart_proj X Y)
+      \<and> (Q \<circ>\<^sub>c right_cart_proj X Y = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c right_cart_proj X Y)"
+    using  cart_prod_eq2 by (typecheck_cfuncs, auto simp add: comp_associative2)
+  then have "(P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    using assms epimorphism_def3 nonempty_left_imp_right_proj_epimorphism nonempty_right_imp_left_proj_epimorphism
+    by (typecheck_cfuncs_prems, blast)
+  then have "(P \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+  proof auto
+    show "\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<Longrightarrow> False"
+      by (typecheck_cfuncs_prems, smt X_nonempty comp_associative2 nonempty_def one_separator_contrapos terminal_func_comp terminal_func_unique true_false_distinct)
+    show "\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<Longrightarrow> False"
+      by (typecheck_cfuncs_prems, smt Y_nonempty comp_associative2 nonempty_def one_separator_contrapos terminal_func_comp terminal_func_unique true_false_distinct)
+  qed
+  then show "\<not> (P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<or> Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    by blast
+qed
+
 subsection \<open>OR\<close>
 
 definition OR :: "cfunc" where
@@ -213,6 +250,6 @@ lemma OR_true_implies_one_is_true:
   assumes "q \<in>\<^sub>c \<Omega>"
   assumes "OR \<circ>\<^sub>c \<langle>p,q\<rangle> = \<t>"
   shows "(p = \<t>) \<or> (q = \<t>)"
-  by (metis OR_false_false_is_false assms true_false_only_truth_values) 
+  by (metis OR_false_false_is_false assms true_false_only_truth_values)
 
 end
