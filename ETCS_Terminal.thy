@@ -653,5 +653,114 @@ next
     by auto
 qed
 
+lemma nonempty_cfunc_cross_prod_decomp:
+  assumes f_type: "f : A \<times>\<^sub>c B \<rightarrow> C \<times>\<^sub>c D"
+  assumes A_nonempty: "a \<in>\<^sub>c A" and B_nonempty: "b \<in>\<^sub>c B"
+  assumes "\<And> a b1 b2. a \<in>\<^sub>c A \<Longrightarrow> b1 \<in>\<^sub>c B \<Longrightarrow> b2 \<in>\<^sub>c B \<Longrightarrow> 
+    left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a, b1\<rangle> = left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a, b2\<rangle>"
+  assumes "\<And> a1 a2 b. a1 \<in>\<^sub>c A \<Longrightarrow> a2 \<in>\<^sub>c A \<Longrightarrow> b \<in>\<^sub>c B \<Longrightarrow> 
+    right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a1, b\<rangle> = right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a2, b\<rangle>"
+  shows "\<exists>! g. \<exists>! h. g : A \<rightarrow> C \<and> h : B \<rightarrow> D \<and> f = g \<times>\<^sub>f h"
+proof (rule_tac a="left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>id A, b \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle>" in ex1I)
+  show "\<exists>!h. left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>id\<^sub>c A,b \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle> : A \<rightarrow> C \<and>
+         h : B \<rightarrow> D \<and> f = (left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>id\<^sub>c A,b \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle>) \<times>\<^sub>f h"
+  proof (rule_tac a="right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle> a \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>, id B\<rangle>" in ex1I, auto)
+    show "left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>id\<^sub>c A,b \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle> : A \<rightarrow> C"
+      using assms by typecheck_cfuncs
+    show "right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>,id\<^sub>c B\<rangle> : B \<rightarrow> D"
+      using assms by typecheck_cfuncs
+
+    show "f = (left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>id\<^sub>c A,b \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle>) \<times>\<^sub>f right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>,id\<^sub>c B\<rangle>"
+    proof (subst cart_prod_eq[where Z="A \<times>\<^sub>c B", where X=C, where Y=D], auto)
+      show "f : A \<times>\<^sub>c B \<rightarrow> C \<times>\<^sub>c D"
+        using f_type by auto
+      show "(left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>id\<^sub>c A,b \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle>) \<times>\<^sub>f right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>,id\<^sub>c B\<rangle>
+          : A \<times>\<^sub>c B \<rightarrow> C \<times>\<^sub>c D"
+        using assms by typecheck_cfuncs
+
+      show "left_cart_proj C D \<circ>\<^sub>c f =
+        left_cart_proj C D \<circ>\<^sub>c 
+          (left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>id\<^sub>c A,b \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle>)
+            \<times>\<^sub>f right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>,id\<^sub>c B\<rangle>"
+        (is "left_cart_proj C D \<circ>\<^sub>c f = left_cart_proj C D \<circ>\<^sub>c (?left \<times>\<^sub>f ?right)")
+      proof -
+        have "left_cart_proj C D \<circ>\<^sub>c (?left \<times>\<^sub>f ?right) = ?left \<circ>\<^sub>c left_cart_proj A B"
+          using assms left_cart_proj_cfunc_cross_prod by (typecheck_cfuncs, blast)
+        also have "... = left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>left_cart_proj A B,b \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub>\<rangle>"
+          using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp)
+        also have "... = left_cart_proj C D \<circ>\<^sub>c f"
+        proof (rule one_separator[where X="A \<times>\<^sub>c B", where Y=C])
+          show "left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>left_cart_proj A B,b \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub>\<rangle> : A \<times>\<^sub>c B \<rightarrow> C"
+            using assms by typecheck_cfuncs
+          show "left_cart_proj C D \<circ>\<^sub>c f : A \<times>\<^sub>c B \<rightarrow> C"
+            using assms by typecheck_cfuncs
+        next
+          fix x
+          assume x_type: "x \<in>\<^sub>c A \<times>\<^sub>c B"
+          then obtain xa xb where xa_xb_types: "xa \<in>\<^sub>c A" "xb \<in>\<^sub>c B" and x_def: "x = \<langle>xa, xb\<rangle>"
+            using cart_prod_decomp by blast
+
+          have "(left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>left_cart_proj A B,b \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub>\<rangle>) \<circ>\<^sub>c x
+            = left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>left_cart_proj A B \<circ>\<^sub>c \<langle>xa, xb\<rangle>, b \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub> \<circ>\<^sub>c \<langle>xa, xb\<rangle>\<rangle>"
+            unfolding x_def using assms xa_xb_types
+            by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+          also have "... = left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>xa, b\<rangle>"
+            using assms xa_xb_types
+            by (typecheck_cfuncs, metis id_right_unit2 id_type left_cart_proj_cfunc_prod one_unique_element)
+          also have "... = left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c x"
+            unfolding x_def by (simp add: B_nonempty assms(4) xa_xb_types)
+          also have "... = (left_cart_proj C D \<circ>\<^sub>c f) \<circ>\<^sub>c x"
+            using assms x_type by (typecheck_cfuncs, metis comp_associative2)
+          then show "(left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>left_cart_proj A B,b \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub>\<rangle>) \<circ>\<^sub>c x = (left_cart_proj C D \<circ>\<^sub>c f) \<circ>\<^sub>c x"
+            using calculation by auto
+        qed
+        then show "left_cart_proj C D \<circ>\<^sub>c f = left_cart_proj C D \<circ>\<^sub>c (?left \<times>\<^sub>f ?right)"
+          using calculation by auto
+      qed
+
+
+      show "right_cart_proj C D \<circ>\<^sub>c f =
+        right_cart_proj C D \<circ>\<^sub>c 
+          (left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>id\<^sub>c A,b \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>\<rangle>)
+            \<times>\<^sub>f right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>,id\<^sub>c B\<rangle>"
+        (is "right_cart_proj C D \<circ>\<^sub>c f = right_cart_proj C D \<circ>\<^sub>c (?left \<times>\<^sub>f ?right)")
+      proof -
+        have "right_cart_proj C D \<circ>\<^sub>c (?left \<times>\<^sub>f ?right) = ?right \<circ>\<^sub>c right_cart_proj A B"
+          using assms right_cart_proj_cfunc_cross_prod by (typecheck_cfuncs, blast)
+        also have "... = right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub>, right_cart_proj A B\<rangle>"
+          using assms by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp)
+        also have "... = right_cart_proj C D \<circ>\<^sub>c f"
+        proof (rule one_separator[where X="A \<times>\<^sub>c B", where Y=D])
+          show "right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub>,right_cart_proj A B\<rangle> : A \<times>\<^sub>c B \<rightarrow> D"
+            using assms by typecheck_cfuncs
+          show "right_cart_proj C D \<circ>\<^sub>c f : A \<times>\<^sub>c B \<rightarrow> D"
+            using assms by typecheck_cfuncs
+        next
+          fix x
+          assume x_type: "x \<in>\<^sub>c A \<times>\<^sub>c B"
+          then obtain xa xb where xa_xb_types: "xa \<in>\<^sub>c A" "xb \<in>\<^sub>c B" and x_def: "x = \<langle>xa, xb\<rangle>"
+            using cart_prod_decomp by blast
+
+          have "(right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub>,right_cart_proj A B\<rangle>) \<circ>\<^sub>c x
+            = right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub> \<circ>\<^sub>c \<langle>xa, xb\<rangle>, right_cart_proj A B \<circ>\<^sub>c \<langle>xa, xb\<rangle>\<rangle>"
+            unfolding x_def using assms xa_xb_types
+            by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
+          also have "... = right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a, xb\<rangle>"
+            using assms xa_xb_types
+            by (typecheck_cfuncs, metis id_right_unit2 id_type right_cart_proj_cfunc_prod one_unique_element)
+          also have "... = right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c x"
+            unfolding x_def by (simp add: A_nonempty assms(5) xa_xb_types) 
+          also have "... = (right_cart_proj C D \<circ>\<^sub>c f) \<circ>\<^sub>c x"
+            using assms x_type by (typecheck_cfuncs, metis comp_associative2)
+          then show "(right_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>A \<times>\<^sub>c B\<^esub>,right_cart_proj A B\<rangle>) \<circ>\<^sub>c x = (right_cart_proj C D \<circ>\<^sub>c f) \<circ>\<^sub>c x"
+            using calculation by auto
+        qed
+        then show "right_cart_proj C D \<circ>\<^sub>c f = right_cart_proj C D \<circ>\<^sub>c (?left \<times>\<^sub>f ?right)"
+          using calculation by auto
+      qed
+    qed
+  next
+    fix x
+    oops
 
 end

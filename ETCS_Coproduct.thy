@@ -130,7 +130,7 @@ proof -
   have fact1: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = (left_coproj A (B \<Coprod> C))"
      by (typecheck_cfuncs, smt comp_associative2 comp_type g_prop g_type h_def h_type j_def k_def k_type left_coproj_cfunc_coprod left_proj_type m_def p_type right_proj_type)
    have fact2: "(g \<circ>\<^sub>c k) \<circ>\<^sub>c (left_coproj (A \<Coprod> B) C) = (left_coproj (A \<Coprod> B) C)"
-     by (typecheck_cfuncs, smt cfunc_coprod_comp cfunc_coprod_unique comp_associative2 comp_type f_prop g_prop g_type h_def h_type j_def k_def k_type left_coproj_cfunc_coprod left_proj_type m_def p_def p_type q_def right_proj_type)
+     by (typecheck_cfuncs, smt (verit) cfunc_coprod_comp cfunc_coprod_unique comp_associative2 comp_type f_prop g_prop g_type h_def h_type j_def k_def k_type left_coproj_cfunc_coprod left_proj_type m_def p_def p_type q_def right_proj_type)
    have fact3: "(g \<circ>\<^sub>c k) \<circ>\<^sub>c (right_coproj (A \<Coprod> B) C) = (right_coproj (A \<Coprod> B) C)"
      by (smt comp_associative2 comp_type f_def g_prop g_type h_type j_def k_def k_type q_type right_coproj_cfunc_coprod right_proj_type)
    have fact4: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c (right_coproj A (B \<Coprod> C)) = (right_coproj A (B \<Coprod> C))"
@@ -1008,7 +1008,7 @@ proof-
       have x_type: "x \<in>\<^sub>c A \<Coprod> B"
         using a_def comp_type left_proj_type x_def by blast
       have "\<phi> \<circ>\<^sub>c x = y"
-        using \<phi>_def \<phi>_type a_def c_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_def by force
+        using \<phi>_def \<phi>_type a_def c_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_def by (smt (verit))
       then show "\<exists>x. x \<in>\<^sub>c domain \<phi> \<and> \<phi> \<circ>\<^sub>c x = y"
         using \<phi>_type cfunc_type_def x_type by auto
     next
@@ -1026,7 +1026,7 @@ proof-
       have x_type: "x \<in>\<^sub>c A \<Coprod> B"
         using b_def comp_type right_proj_type x_def by blast
       have "\<phi> \<circ>\<^sub>c x = y"
-        using \<phi>_def \<phi>_type b_def cfunc_type_def comp_associative comp_type d_def f_def g_def left_proj_type right_coproj_cfunc_coprod right_proj_type x_def by force
+        using \<phi>_def \<phi>_type b_def cfunc_type_def comp_associative comp_type d_def f_def g_def left_proj_type right_coproj_cfunc_coprod right_proj_type x_def by (smt (verit))
       then show "\<exists>x. x \<in>\<^sub>c domain \<phi> \<and> \<phi> \<circ>\<^sub>c x = y"
         using \<phi>_type cfunc_type_def x_type by auto
     qed
@@ -1077,7 +1077,7 @@ proof-
         then have "a = a'"
         proof - 
           have "((left_coproj C D) \<circ>\<^sub>c f) \<circ>\<^sub>c a = \<phi> \<circ>\<^sub>c x"
-            using \<phi>_def a_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type by auto
+            using \<phi>_def a_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type by (smt (verit))
           also have "... = \<phi> \<circ>\<^sub>c y"
             by (meson equals)
           also have "... = (\<phi> \<circ>\<^sub>c (left_coproj A B)) \<circ>\<^sub>c a'"
@@ -1100,7 +1100,7 @@ proof-
           have "(left_coproj C D) \<circ>\<^sub>c (f \<circ>\<^sub>c a) = ((left_coproj C D) \<circ>\<^sub>c f) \<circ>\<^sub>c a"
             using a_def cfunc_type_def comp_associative f_def left_proj_type by auto
           also have "...  = \<phi> \<circ>\<^sub>c x"
-              using \<phi>_def a_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type by auto
+              using \<phi>_def a_def cfunc_type_def comp_associative comp_type f_def g_def left_coproj_cfunc_coprod left_proj_type right_proj_type x_type by (smt (verit))
           also have "... = \<phi> \<circ>\<^sub>c y"
             by (meson equals)
           also have "... = (\<phi> \<circ>\<^sub>c (right_coproj A B)) \<circ>\<^sub>c b'"
@@ -2094,7 +2094,7 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, auto)
       by (unfold relative_member_def2, auto, unfold factors_through_def2, auto)
     then show "\<exists>x. x \<in>\<^sub>c domain (into_super m) \<and> into_super m \<circ>\<^sub>c x = y"
       unfolding into_super_def using assms cfunc_type_def comp_associative left_coproj_cfunc_coprod
-      by (rule_tac x="left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x" in exI, typecheck_cfuncs)
+      by (rule_tac x="left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x" in exI, typecheck_cfuncs, metis)
   next
     assume "characteristic_func m \<circ>\<^sub>c y = \<f>"
     then have "\<not> y \<in>\<^bsub>Y\<^esub> (X, m)"
@@ -2105,7 +2105,7 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, auto)
       by (unfold relative_member_def2, auto, unfold factors_through_def2, auto)
     then show "\<exists>x. x \<in>\<^sub>c domain (into_super m) \<and> into_super m \<circ>\<^sub>c x = y"
       unfolding into_super_def using assms cfunc_type_def comp_associative right_coproj_cfunc_coprod
-      by (rule_tac x="right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'" in exI, typecheck_cfuncs)
+      by (rule_tac x="right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'" in exI, typecheck_cfuncs, metis)
   qed
 qed
 

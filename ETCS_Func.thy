@@ -849,7 +849,7 @@ proof -
       have "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g\<^sup>\<sharp>)"
         using fsharp_type gsharp_type identity_distributes_across_composition by auto
       also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g\<^sup>\<sharp>)"
-        using \<psi>_def cfunc_type_def comp_associative f_def f_type gsharp_type transpose_func_def by (typecheck_cfuncs, auto)
+        using \<psi>_def cfunc_type_def comp_associative f_def f_type gsharp_type transpose_func_def by (typecheck_cfuncs, smt)
       also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f g\<^sup>\<sharp>)"
         by (smt \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod gsharp_type id_left_unit2 id_right_unit2 id_type)
       also have "... = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g\<^sup>\<sharp>) \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))"
@@ -877,7 +877,7 @@ proof -
       have "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp>)  \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
         using fsharp_type gsharp_type identity_distributes_across_composition by auto
       also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
-        using \<phi>_def cfunc_type_def comp_associative fsharp_type g_def g_type transpose_func_def by (typecheck_cfuncs, auto)
+        using \<phi>_def cfunc_type_def comp_associative fsharp_type g_def g_type transpose_func_def by (typecheck_cfuncs, smt)
       also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f f\<^sup>\<sharp>)"
         by (smt \<phi>_def cfunc_cross_prod_comp_cfunc_cross_prod fsharp_type id_left_unit2 id_right_unit2 id_type)
       also have "... = eval_func Y A \<circ>\<^sub>c (id(A) \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>))"

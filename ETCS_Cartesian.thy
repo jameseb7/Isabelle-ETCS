@@ -180,12 +180,12 @@ lemma cfunc_cross_prod_type[type_rule]:
 lemma left_cart_proj_cfunc_cross_prod:
   "f : W \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Z \<Longrightarrow> left_cart_proj Y Z \<circ>\<^sub>c f \<times>\<^sub>f g = f \<circ>\<^sub>c left_cart_proj W X"
   unfolding cfunc_cross_prod_def
-  using cfunc_type_def comp_type left_cart_proj_cfunc_prod left_cart_proj_type right_cart_proj_type by auto
+  using cfunc_type_def comp_type left_cart_proj_cfunc_prod left_cart_proj_type right_cart_proj_type by (smt (verit))
 
 lemma right_cart_proj_cfunc_cross_prod:
   "f : W \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Z \<Longrightarrow> right_cart_proj Y Z \<circ>\<^sub>c f \<times>\<^sub>f g = g \<circ>\<^sub>c right_cart_proj W X"
   unfolding cfunc_cross_prod_def
-  using cfunc_type_def comp_type right_cart_proj_cfunc_prod left_cart_proj_type right_cart_proj_type by auto
+  using cfunc_type_def comp_type right_cart_proj_cfunc_prod left_cart_proj_type right_cart_proj_type by (smt (verit))
 
 lemma cfunc_cross_prod_unique: "f : W \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Z \<Longrightarrow> h : W \<times>\<^sub>c X \<rightarrow> Y \<times>\<^sub>c Z \<Longrightarrow>
     left_cart_proj Y Z \<circ>\<^sub>c h = f \<circ>\<^sub>c left_cart_proj W X \<Longrightarrow>

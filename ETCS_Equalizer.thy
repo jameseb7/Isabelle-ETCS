@@ -238,7 +238,7 @@ lemma inverse_image_mapping_eq:
   shows "f \<circ>\<^sub>c left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m
     = m \<circ>\<^sub>c right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m"
   using assms cfunc_type_def comp_associative equalizer_def inverse_image_is_equalizer2
-  by (typecheck_cfuncs, auto)
+  by (typecheck_cfuncs, smt (verit))
 
 lemma inverse_image_mapping_monomorphism:
   assumes "m : B \<rightarrow> Y" "f : X \<rightarrow> Y" "monomorphism m"
@@ -666,7 +666,7 @@ proof (cases "\<exists>x. x\<in>\<^sub>c X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bs
   then have "(f \<circ>\<^sub>c (fibered_product_left_proj X f f X))\<circ>\<^sub>c x = (f\<circ>\<^sub>c (fibered_product_right_proj X f f X))\<circ>\<^sub>c x"
     using assms cfunc_type_def comp_associative equalizer_def fibered_product_morphism_equalizer
     unfolding fibered_product_right_proj_def fibered_product_left_proj_def
-    by (typecheck_cfuncs, auto)
+    by (typecheck_cfuncs, smt (verit))
   then have "f \<circ>\<^sub>c (fibered_product_left_proj X f f X) = f\<circ>\<^sub>c (fibered_product_right_proj X f f X)"
     using assms fibered_product_is_pullback is_pullback_def square_commutes_def by auto
   then show "(fibered_product_left_proj X f f X) = (fibered_product_right_proj X f f X)"
@@ -741,7 +741,7 @@ next
       unfolding fibered_product_right_proj_def
       by (typecheck_cfuncs, auto)
     also have "... = xx \<circ>\<^sub>c a"
-      by (metis a_assms right_cart_proj_cfunc_prod)
+      using a_assms(2) right_cart_proj_cfunc_prod by auto
     also have "... = x"
     proof -
       have f2: "\<forall>c. c : one \<rightarrow> X \<longrightarrow> fibered_product_morphism X f f X \<circ>\<^sub>c xx \<circ>\<^sub>c c = diagonal X \<circ>\<^sub>c c"

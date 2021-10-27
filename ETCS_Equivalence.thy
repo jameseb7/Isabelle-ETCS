@@ -78,17 +78,17 @@ proof -
     by blast
 
   have k''_exists: "\<exists>! k''. k'': F \<rightarrow> F \<and> k'' \<circ>\<^sub>c n =  n"
-    by (typecheck_cfuncs, smt assms(2)  cfunc_type_def coequalizer_def)
+    by (typecheck_cfuncs, smt (verit) assms(2)  cfunc_type_def coequalizer_def)
   then obtain k'' where k''_def: "k'': F \<rightarrow> F \<and> k'' \<circ>\<^sub>c n =  n"
     by blast
   then have k''_def2: "k'' = id F"
     using assms(2) coequalizer_def id_left_unit2 k''_def by (typecheck_cfuncs, blast)
 
   have kk'_idF: "k \<circ>\<^sub>c k' = id F"
-    by (typecheck_cfuncs, smt assms(2) cfunc_type_def coequalizer_def comp_associative k''_def k''_def2 k'_def k_def)
+    by (typecheck_cfuncs, smt (verit) assms(2) cfunc_type_def coequalizer_def comp_associative k''_def k''_def2 k'_def k_def)
 
   have k'k_idE: "k' \<circ>\<^sub>c k = id E"
-    by (typecheck_cfuncs, smt assms(1) coequalizer_def comp_associative2 id_left_unit2 k'_def k_def)
+    by (typecheck_cfuncs, smt (verit) assms(1) coequalizer_def comp_associative2 id_left_unit2 k'_def k_def)
 
   show "E \<cong> F"
     using cfunc_type_def is_isomorphic_def isomorphism_def k'_def k'k_idE k_def kk'_idF by fastforce
@@ -347,9 +347,9 @@ proof -
     using W_def assms(1) assms(3) monomorphism_def2 by blast
   then have "id(X)\<circ>\<^sub>c g = id(X) \<circ>\<^sub>c  h"
     by auto
-   have j_exists: "\<exists>! j. j: Y \<rightarrow> X \<and> j \<circ>\<^sub>c f =  id(X)"
-     by (typecheck_cfuncs, smt \<open>id\<^sub>c X \<circ>\<^sub>c g = id\<^sub>c X \<circ>\<^sub>c h\<close> cfunc_type_def coequalized_fxns coequalizer_def)
-   then obtain j where j_def: "j: Y \<rightarrow> X \<and> j \<circ>\<^sub>c f =  id(X)"
+  then have j_exists: "\<exists>! j. j: Y \<rightarrow> X \<and> j \<circ>\<^sub>c f =  id(X)"
+     by (typecheck_cfuncs, smt (verit) cfunc_type_def coequalized_fxns coequalizer_def)
+  then obtain j where j_def: "j: Y \<rightarrow> X \<and> j \<circ>\<^sub>c f =  id(X)"
      by auto
 
 
@@ -447,7 +447,7 @@ proof -
         using fibered_product_morphism_equalizer m_type by auto
       then have "\<forall>h F. h : F \<rightarrow> E \<times>\<^sub>c E \<and> (m \<circ>\<^sub>c left_cart_proj E E) \<circ>\<^sub>c h = (m \<circ>\<^sub>c right_cart_proj E E) \<circ>\<^sub>c h \<longrightarrow>
                (\<exists>!k. k : F \<rightarrow> E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E \<and> fibered_product_morphism E m m E \<circ>\<^sub>c k = h)"
-        unfolding equalizer_def using cfunc_type_def fibered_product_morphism_type m_type by auto
+        unfolding equalizer_def using cfunc_type_def fibered_product_morphism_type m_type by (smt (verit))
       then obtain b where b_type[type_rule]: "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E"
           and b_eq: "fibered_product_morphism E m m E \<circ>\<^sub>c b = (q \<times>\<^sub>f q) \<circ>\<^sub>c fibered_product_morphism X f f X"
         by (meson cfunc_cross_prod_type comp_type f_type fibered_product_morphism_type q_type qxq_fpmorph_eq)

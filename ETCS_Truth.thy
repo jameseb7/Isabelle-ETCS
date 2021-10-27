@@ -180,7 +180,7 @@ proof -
     have comm: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>domain m\<^esub> = \<chi> \<circ>\<^sub>c m"
       using chi_pullback unfolding is_pullback_def square_commutes_def by auto
     then have "\<beta>\<^bsub>domain m\<^esub> = \<beta>\<^bsub>codomain m\<^esub> \<circ>\<^sub>c m"
-      by (metis (mono_tags, hide_lams) cfunc_type_def codomain_comp domain_comp terminal_func_type terminal_func_unique true_func_type)
+      by (simp add: cfunc_type_def terminal_func_comp)
     then show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>) \<circ>\<^sub>c m = \<chi> \<circ>\<^sub>c m"
       using cfunc_type_def comm comp_associative terminal_func_type true_func_type by auto
   next
@@ -379,7 +379,7 @@ proof -
     then obtain z where z_def: "z \<in>\<^sub>c Y \<and> f \<circ>\<^sub>c z = g \<circ>\<^sub>c y"
       by blast
     then have "\<exists>! k. k: one \<rightarrow> A \<and> q0 \<circ>\<^sub>c k = y \<and> q1 \<circ>\<^sub>c k =z"
-      by (typecheck_cfuncs, smt assms(3) cfunc_type_def is_pullback_def square_commutes_def y_type z_def)
+      by (smt (verit) assms(3) cfunc_type_def is_pullback_def square_commutes_def y_type z_def)
     then show "\<exists>x. x \<in>\<^sub>c domain q0 \<and> q0 \<circ>\<^sub>c x = y"
       using assms(3) cfunc_type_def is_pullback_def square_commutes_def by auto
   qed
@@ -621,7 +621,7 @@ proof
   then have "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c m\<^sup>c \<circ>\<^sub>c x'"
     using assms comp_associative2 by (typecheck_cfuncs, smt terminal_func_comp terminal_func_type)
   then have "\<t> \<circ>\<^sub>c id one = \<f> \<circ>\<^sub>c id one"
-    using assms by (metis cfunc_type_def comp_associative complement_morphism_type id_type one_unique_element terminal_func_comp terminal_func_type)
+    using assms by (smt cfunc_type_def comp_associative complement_morphism_type id_type one_unique_element terminal_func_comp terminal_func_type)
   then have "\<t> = \<f>"
     using false_func_type id_right_unit2 true_func_type by auto
   then show False

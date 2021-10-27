@@ -520,6 +520,10 @@ proof -
   (* seq(5) = (0,2) = seq(2*3/2 + 2) *)
   (* seq(6) = (3,0) = seq(3*4/2 + 0) *)
 
+  have "\<And> m n k. m \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+    seq \<circ>\<^sub>c k = \<langle>m, n\<rangle> \<longleftrightarrow> seq \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>k, m\<rangle> = \<langle>zero, add2 \<circ>\<^sub>c \<langle>m, n\<rangle>\<rangle>"
+    
+
   have "\<And> n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> seq \<circ>\<^sub>c halve \<circ>\<^sub>c (n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)) = \<langle>n, zero\<rangle>"
   proof -
     fix n
@@ -643,7 +647,15 @@ lemma finite_is_countable:
   shows "countable X"
   oops
 
+lemma 
+  assumes "is_infinite X"
+  shows "\<nat>\<^sub>c \<le>\<^sub>c X"
 
+lemma N_is_smallest_infinite:
+  assumes "is_infinite X"
+  assumes "X \<le>\<^sub>c \<nat>\<^sub>c"
+  shows "\<nat>\<^sub>c \<cong> X"
+  oops
 
 (*We could add a part 2 to the above that says if they are not isomorphic
  then an infinite set is necessarily bigger than N.*)

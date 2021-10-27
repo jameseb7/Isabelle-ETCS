@@ -252,4 +252,21 @@ lemma OR_true_implies_one_is_true:
   shows "(p = \<t>) \<or> (q = \<t>)"
   by (metis OR_false_false_is_false assms true_false_only_truth_values)
 
+
+subsection \<open>IMPLIES\<close>
+
+definition IMPLIES :: "cfunc" where
+  "IMPLIES = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id \<Omega>)"
+
+lemma IMPLIES_type[type_rule]:
+  "IMPLIES : \<Omega> \<times>\<^sub>c \<Omega>  \<rightarrow> \<Omega>"
+  unfolding IMPLIES_def by typecheck_cfuncs
+
+lemma
+  assumes "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
+  assumes "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+  shows "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+  using assms unfolding IMPLIES_def apply (typecheck_cfuncs_prems, typecheck_cfuncs)
+  oops
+
 end
