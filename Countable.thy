@@ -650,6 +650,8 @@ lemma finite_is_countable:
 lemma 
   assumes "is_infinite X"
   shows "\<nat>\<^sub>c \<le>\<^sub>c X"
+  oops 
+
 
 lemma N_is_smallest_infinite:
   assumes "is_infinite X"
@@ -686,10 +688,13 @@ next
       using either_finite_or_infinite by blast
     then obtain m where m_def: "m : X \<rightarrow> X \<and> monomorphism(m) \<and> \<not>surjective(m)"
       using is_infinite_def by blast
-    
-
-
-
-
     oops
+
+
+
+
+
+
+
+
 end

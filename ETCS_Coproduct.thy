@@ -315,26 +315,12 @@ proof (rule ccontr, auto)
   assume not_in_left_image: "\<forall>x. x \<in>\<^sub>c X \<longrightarrow> z \<noteq> left_coproj X Y \<circ>\<^sub>c x"
   assume not_in_right_image: "\<forall>y. y \<in>\<^sub>c Y \<longrightarrow> z \<noteq> right_coproj X Y \<circ>\<^sub>c y"
   
-  have fact1: "\<forall>x. x \<in>\<^sub>c X \<longrightarrow>  ((eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x) = \<f>)"
-    proof(auto)
-      fix x
-      assume x_type: "x \<in>\<^sub>c X"
-      show "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x) = \<f>" 
-        using assms by (typecheck_cfuncs, metis cfunc_type_def char_of_singleton2 comp_associative not_in_left_image x_type)
-    qed
-
-  have fact2: "\<forall>x. x \<in>\<^sub>c X \<longrightarrow>  ((eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x) = \<f>)"
-    proof(auto)
-      fix y
-      assume y_type: "y \<in>\<^sub>c X"
-      show "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c y) = \<f>" 
-        using assms by (typecheck_cfuncs, metis cfunc_type_def char_of_singleton2 comp_associative not_in_left_image y_type)
-    qed
+  
 
     obtain h where h_def: "h = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>"
       by simp
 
-    have fact3: "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c
+    have fact1: "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c
                  left_coproj X Y = h \<circ>\<^sub>c left_coproj X Y"
     proof(rule one_separator[where X=X, where Y = \<Omega>])
       show "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>,id\<^sub>c (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c
@@ -369,7 +355,7 @@ proof (rule ccontr, auto)
            qed
      qed
 
-have fact4: "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c
+have fact2: "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c
                  right_coproj X Y = h \<circ>\<^sub>c right_coproj X Y"
  proof(rule one_separator[where X = Y, where Y = \<Omega>])
    show "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>,id\<^sub>c (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c right_coproj X Y : Y \<rightarrow> \<Omega>"
@@ -431,7 +417,7 @@ have fact4: "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c
          z \<in>\<^sub>c X \<Coprod> Y \<Longrightarrow>
          x \<in>\<^sub>c X \<Coprod> Y \<Longrightarrow>
          (eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>,id\<^sub>c (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c x = h \<circ>\<^sub>c x"
-        by (smt cfunc_coprod_unique cfunc_type_def codomain_comp domain_comp fact3 fact4 left_proj_type right_proj_type)
+        by (smt cfunc_coprod_unique cfunc_type_def codomain_comp domain_comp fact1 fact2 left_proj_type right_proj_type)
     qed
 
     have hz_gives_false: "h \<circ>\<^sub>c z = \<f>"

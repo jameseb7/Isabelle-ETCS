@@ -178,13 +178,16 @@ proof (rule ccontr)
     using true_false_distinct by auto
 qed
 
-lemma
+
+
+
+lemma unnamed_special_1:
   assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
   assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
   assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-  shows "\<not> ((P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
+  shows "(\<not> ((P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))) \<and> 
+             ((P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
 proof -
-
   obtain z where z_type[type_rule]: "z : X \<times>\<^sub>c Y \<rightarrow> one"
     and "P \<times>\<^sub>f Q = \<langle>\<f>,\<f>\<rangle> \<circ>\<^sub>c z"
     using NOR_is_pullback NOR_true unfolding is_pullback_def
@@ -201,7 +204,7 @@ proof -
   then have "(P \<circ>\<^sub>c left_cart_proj X Y = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c left_cart_proj X Y)
       \<and> (Q \<circ>\<^sub>c right_cart_proj X Y = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c right_cart_proj X Y)"
     using  cart_prod_eq2 by (typecheck_cfuncs, auto simp add: comp_associative2)
-  then have "(P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+  then have eqs: "(P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
     using assms epimorphism_def3 nonempty_left_imp_right_proj_epimorphism nonempty_right_imp_left_proj_epimorphism
     by (typecheck_cfuncs_prems, blast)
   then have "(P \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
@@ -211,9 +214,21 @@ proof -
     show "\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<Longrightarrow> False"
       by (typecheck_cfuncs_prems, smt Y_nonempty comp_associative2 nonempty_def one_separator_contrapos terminal_func_comp terminal_func_unique true_false_distinct)
   qed
-  then show "\<not> (P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<or> Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
-    by blast
+  then show ?thesis
+    using eqs by linarith
 qed
+
+
+
+lemma unnamed_special_2:
+  assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
+  assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
+  assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+  shows "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)" 
+proof(auto)
+  assume "Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+  
+  
 
 subsection \<open>OR\<close>
 
@@ -253,6 +268,9 @@ lemma OR_true_implies_one_is_true:
   by (metis OR_false_false_is_false assms true_false_only_truth_values)
 
 
+
+
+
 subsection \<open>IMPLIES\<close>
 
 definition IMPLIES :: "cfunc" where
@@ -262,6 +280,8 @@ lemma IMPLIES_type[type_rule]:
   "IMPLIES : \<Omega> \<times>\<^sub>c \<Omega>  \<rightarrow> \<Omega>"
   unfolding IMPLIES_def by typecheck_cfuncs
 
+(*Is the below correct?  Couldn't P also be false-beta with Q equal to true-beta or false-beta.*)
+(*Of course if the IMPLIES is equal to false-beta then P is equal to true-beta and Q is false-beta.*)
 lemma
   assumes "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
   assumes "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
