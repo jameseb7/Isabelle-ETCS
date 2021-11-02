@@ -367,34 +367,89 @@ lemma OR_type[type_rule]:
   by (metis OR_def OR_is_pullback is_pullback_def square_commutes_def) 
 
 
-(*
-lemma NOT_NOR_is_OR:
- "OR = NOT \<circ>\<^sub>c NOR"
-  apply typecheck_cfuncs
-*)
 
+lemma OR_true_left_is_true:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "(OR \<circ>\<^sub>c \<langle>\<t>,p\<rangle> = \<t>)"
+proof - 
+  have "\<exists> j. j \<in>\<^sub>c one\<Coprod>(one\<Coprod>one) \<and> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j  = \<langle>\<t>,p\<rangle>"
+    by (typecheck_cfuncs, smt (z3) assms comp_associative2 comp_type left_coproj_cfunc_coprod left_proj_type right_coproj_cfunc_coprod right_proj_type true_false_only_truth_values)
+  then show ?thesis 
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG)  NOT_false_is_true NOT_is_pullback OR_is_pullback  comp_associative2 is_pullback_def square_commutes_def terminal_func_comp)
+qed
+
+
+
+lemma OR_true_right_is_true:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>p,\<t>\<rangle> = \<t>"
+proof - 
+  have "\<exists> j. j \<in>\<^sub>c one\<Coprod>(one\<Coprod>one) \<and> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j  = \<langle>p,\<t>\<rangle>"
+    by (typecheck_cfuncs, smt (z3) assms comp_associative2 comp_type left_coproj_cfunc_coprod left_proj_type right_coproj_cfunc_coprod right_proj_type true_false_only_truth_values)
+  then show ?thesis 
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG) NOT_false_is_true NOT_is_pullback OR_is_pullback  comp_associative2 is_pullback_def square_commutes_def terminal_func_comp)
+qed
 
 
 
 lemma OR_false_false_is_false:
   "OR \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle> = \<f>"
-  unfolding OR_def 
-  using NOR_false_false_is_true NOT_true_is_false comp_associative2 
-  by (typecheck_cfuncs, force)
-
-lemma OR_true_left_is_true:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  shows "OR \<circ>\<^sub>c \<langle>\<t>,p\<rangle> = \<t>"
-  unfolding OR_def 
-  using assms NOR_left_true_is_false NOT_false_is_true comp_associative2
-  by (typecheck_cfuncs, force)
-
-lemma OR_true_right_is_true:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  shows "OR \<circ>\<^sub>c \<langle>p,\<t>\<rangle> = \<t>"
-  unfolding OR_def 
-  using assms NOR_right_true_is_false NOT_false_is_true comp_associative2
-  by (typecheck_cfuncs, force)
+proof(rule ccontr)
+  assume "OR \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle> \<noteq> \<f>"
+  then have "OR \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle> = \<t>"
+    using  true_false_only_truth_values by (typecheck_cfuncs, blast)
+  then obtain j where j_def:  "j \<in>\<^sub>c one\<Coprod>(one\<Coprod>one) \<and> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j  = \<langle>\<f>,\<f>\<rangle>"
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG) OR_is_pullback  cfunc_type_def id_right_unit id_type is_pullback_def)
+  then have trichotomy: "(\<langle>\<t>, \<t>\<rangle> = \<langle>\<f>,\<f>\<rangle>) \<or> ((\<langle>\<t>, \<f>\<rangle> = \<langle>\<f>,\<f>\<rangle>) \<or> (\<langle>\<f>, \<t>\<rangle> = \<langle>\<f>,\<f>\<rangle>))"
+  proof(cases "j = left_coproj one (one \<Coprod> one)")
+    assume case1: "j = left_coproj one (one \<Coprod> one)"
+    then show ?thesis
+      by (metis cfunc_coprod_type cfunc_prod_type false_func_type j_def left_coproj_cfunc_coprod true_func_type)
+  next
+    assume not_case1: "j \<noteq> left_coproj one (one \<Coprod> one)"
+    then have case2_or_3: "j = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)\<or> 
+               j = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+      by (metis coprojs_jointly_surj id_right_unit2 id_type j_def left_proj_type maps_into_1u1 one_unique_element)
+    show ?thesis
+    proof(cases "j = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)")
+      assume case2: "j = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      have "\<langle>\<t>, \<f>\<rangle> = \<langle>\<f>,\<f>\<rangle>"
+      proof - 
+        have "(\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j = ((\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c right_coproj one (one \<Coprod> one)) \<circ>\<^sub>c left_coproj one one"
+          by (typecheck_cfuncs, simp add: case2 comp_associative2)
+        also have "... = (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) \<circ>\<^sub>c left_coproj one one"
+          using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+        also have "... = \<langle>\<t>, \<f>\<rangle>"
+          by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+        then show ?thesis
+          using calculation j_def by presburger
+      qed
+      then show ?thesis
+        by blast
+    next
+      assume not_case2: "j \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      then have case3: "j = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+        using case2_or_3 by blast
+      have "\<langle>\<f>, \<t>\<rangle> = \<langle>\<f>,\<f>\<rangle>"
+      proof - 
+        have "(\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j = ((\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c right_coproj one (one \<Coprod> one)) \<circ>\<^sub>c right_coproj one one"
+          by (typecheck_cfuncs, simp add: case3 comp_associative2)
+        also have "... = (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) \<circ>\<^sub>c right_coproj one one"
+          using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+        also have "... = \<langle>\<f>, \<t>\<rangle>"
+          by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
+        then show ?thesis
+          using calculation j_def by presburger
+      qed
+      then show ?thesis
+        by blast
+    qed
+  qed
+    then have "\<t> = \<f>"
+      using trichotomy cart_prod_eq2 by (typecheck_cfuncs, force)
+    then show False
+      using true_false_distinct by smt
+qed
 
 
 lemma OR_true_implies_one_is_true:
@@ -405,6 +460,41 @@ lemma OR_true_implies_one_is_true:
   by (metis OR_false_false_is_false assms true_false_only_truth_values)
 
 
+lemma NOT_NOR_is_OR:
+ "OR = NOT \<circ>\<^sub>c NOR"
+proof(rule one_separator[ where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y = "\<Omega>"])
+  show "OR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "NOT \<circ>\<^sub>c NOR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega> \<Longrightarrow> OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
+  proof-
+    fix x 
+    assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
+    then obtain p q where x_def: "p \<in>\<^sub>c \<Omega> \<and> q \<in>\<^sub>c \<Omega> \<and> x = \<langle>p,q\<rangle>"
+      by (meson cart_prod_decomp)
+    show "OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
+    proof(cases "p = \<t>")
+      show "p = \<t> \<Longrightarrow> OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
+        by (typecheck_cfuncs, metis NOR_left_true_is_false NOT_false_is_true OR_true_left_is_true cfunc_type_def comp_associative x_def x_type)
+    next
+      assume "p \<noteq> \<t>"
+      then have "p = \<f>"
+        using \<open>p \<noteq> \<t>\<close> true_false_only_truth_values x_def by blast
+      show "OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
+      proof(cases "q = \<t>")
+        show "q = \<t> \<Longrightarrow> OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
+          by (typecheck_cfuncs, metis NOR_right_true_is_false NOT_false_is_true OR_true_right_is_true comp_associative2 x_def x_type)
+      next
+        assume "q \<noteq> \<t>"
+        then have "q = \<f>"
+          using \<open>q \<noteq> \<t>\<close> true_false_only_truth_values x_def by blast
+        then show ?thesis
+          by (metis NOR_false_false_is_true NOR_type NOT_true_is_false NOT_type OR_false_false_is_false \<open>p = \<f>\<close> cfunc_type_def comp_associative x_def x_type)
+      qed
+    qed
+  qed
+qed
 
 
 
