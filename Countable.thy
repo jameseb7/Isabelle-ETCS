@@ -60,7 +60,7 @@ lemma iso_pres_infinite:
   shows "is_infinite(Y)"
   using assms either_finite_or_infinite not_finite_and_infinite iso_pres_finite isomorphic_is_symmetric by blast
 
-
+(*Consider moving the result below*)
 
 lemma coprod_leq_product:
   assumes X_not_init: "\<not>(initial_object(X))" 
@@ -333,6 +333,10 @@ proof -
   then show ?thesis
     using is_smaller_than_def m_type by blast
 qed
+
+
+
+
 
 lemma prod_finite_with_self_finite:
   assumes "is_finite(Y)"

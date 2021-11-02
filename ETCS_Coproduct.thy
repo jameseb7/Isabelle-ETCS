@@ -190,9 +190,8 @@ qed
 
 (* Proposition 2.4.1 *)
 lemma coproducts_disjoint:
-  "\<forall>x y. (x\<in>\<^sub>c X \<and> y \<in>\<^sub>c Y)  \<longrightarrow>  ((left_coproj X Y) \<circ>\<^sub>c x \<noteq> (right_coproj X Y) \<circ>\<^sub>c y)"
+  " x\<in>\<^sub>c X \<Longrightarrow>  y \<in>\<^sub>c Y \<Longrightarrow>  (left_coproj X Y) \<circ>\<^sub>c x \<noteq> (right_coproj X Y) \<circ>\<^sub>c y"
 proof (rule ccontr, auto)
-  fix x y
   assume x_type: "x\<in>\<^sub>c X" 
   assume y_type: "y \<in>\<^sub>c Y"
   assume BWOC: "((left_coproj X Y) \<circ>\<^sub>c x = (right_coproj X Y) \<circ>\<^sub>c y)"
@@ -526,9 +525,32 @@ lemma oneUone_iso_\<Omega>:
   "(one \<Coprod> one) \<cong> \<Omega>"
   using cfunc_coprod_type false_func_type is_isomorphic_def true_func_type truth_value_set_iso_1u1 by blast
 
-lemma Omega_iso_oneUone: 
-  "\<Omega> \<cong> (one \<Coprod> one)"
-  by (simp add: isomorphic_is_symmetric oneUone_iso_\<Omega>)
+(*This result below *may* want to use 
+"coprod_leq_product"(in Countable.thy) to prove it*)
+
+(* Dual to Proposition 2.2.2 *)
+lemma "card {x. x \<in>\<^sub>c \<Omega> \<Coprod> \<Omega>} = 4"
+proof -
+  (*Distinctness*)
+  have f1: "(left_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<t> \<noteq> (right_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<t>"
+    by (typecheck_cfuncs, simp add: coproducts_disjoint)
+  have f2: "(left_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<t> \<noteq> (left_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<f>"
+    by (typecheck_cfuncs, metis cfunc_type_def left_coproj_are_monomorphisms monomorphism_def true_false_distinct)
+  have f3: "(left_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<t> \<noteq> (right_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<f>"
+    by (typecheck_cfuncs, simp add: coproducts_disjoint)
+  have f4: "(right_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<t> \<noteq> (left_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<f>"
+    by (typecheck_cfuncs, metis (no_types) coproducts_disjoint)
+  have f5: "(right_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<t> \<noteq> (right_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<f>"
+    by (typecheck_cfuncs, metis cfunc_type_def monomorphism_def right_coproj_are_monomorphisms true_false_distinct)
+  have f6: "(left_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<f> \<noteq> (right_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<f>"
+    by (typecheck_cfuncs, simp add: coproducts_disjoint)
+  (*Upper limit*)
+  have "{x. x \<in>\<^sub>c \<Omega> \<Coprod> \<Omega>} = {(left_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<t> , (right_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<t>, (left_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<f>, (right_coproj \<Omega> \<Omega>) \<circ>\<^sub>c \<f>}"
+    using coprojs_jointly_surj true_false_only_truth_values 
+    by (typecheck_cfuncs, auto) 
+  then show "card {x. x \<in>\<^sub>c \<Omega> \<Coprod> \<Omega>} = 4"
+    by (simp add: f1 f2 f3 f4 f5 f6)
+qed
 
 
 

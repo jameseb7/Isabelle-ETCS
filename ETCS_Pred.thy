@@ -1,5 +1,5 @@
 theory ETCS_Pred
-  imports ETCS_Truth
+  imports ETCS_Truth ETCS_Coproduct
 begin
 
 section \<open>Predicate logic functions\<close>
@@ -185,8 +185,7 @@ lemma unnamed_special_1:
   assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
   assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
   assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-  shows "(\<not> ((P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))) \<and> 
-             ((P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
+  shows "((P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
 proof -
   obtain z where z_type[type_rule]: "z : X \<times>\<^sub>c Y \<rightarrow> one"
     and "P \<times>\<^sub>f Q = \<langle>\<f>,\<f>\<rangle> \<circ>\<^sub>c z"
@@ -218,26 +217,164 @@ proof -
     using eqs by linarith
 qed
 
-
-
 lemma unnamed_special_2:
+  assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
+  assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
+  assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+  shows "\<not> ((P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
+  by (smt (verit, ccfv_SIG) NOR_true NOT_false_is_true NOT_true_is_false NOT_type X_nonempty Y_nonempty assms(3) assms(4) comp_associative2 comp_type nonempty_def terminal_func_type true_false_distinct true_false_only_truth_values unnamed_special_1)
+
+
+(*
+lemma unnamed_special_3:
   assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
   assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
   assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
   shows "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)" 
-proof(auto)
-  assume "Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-  
+proof(rule ccontr, auto)
+  oops
+*)  
   
 
 subsection \<open>OR\<close>
 
 definition OR :: "cfunc" where
-  "OR = NOT \<circ>\<^sub>c NOR"
- 
+  "OR = (THE \<chi>. is_pullback (one\<Coprod>(one\<Coprod>one)) one (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>(one\<Coprod>(one\<Coprod>one))\<^esub>) \<t> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<chi>)"
+
+lemma pre_OR_type[type_rule]: 
+  "\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) : (one\<Coprod>(one\<Coprod>one)) \<rightarrow> \<Omega>\<times>\<^sub>c\<Omega>"
+  by typecheck_cfuncs
+
+lemma set_three: 
+  "{x. x \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))} = {
+(left_coproj one (one\<Coprod>one)) , 
+(  right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one), 
+  right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)}"
+proof(auto)
+  show "left_coproj one (one \<Coprod> one) \<in>\<^sub>c one \<Coprod> one \<Coprod> one"
+    by (simp add: left_proj_type)
+  show "right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one \<in>\<^sub>c one \<Coprod> one \<Coprod> one"
+    by (meson comp_type left_proj_type right_proj_type)
+  show "right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one \<in>\<^sub>c one \<Coprod> one \<Coprod> one"
+    by (meson comp_type right_proj_type)
+  show "\<And>x. x \<noteq> left_coproj one (one \<Coprod> one) \<Longrightarrow>
+         x \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one \<Longrightarrow>
+         x \<in>\<^sub>c one \<Coprod> one \<Coprod> one \<Longrightarrow>
+         x = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one"
+    by (typecheck_cfuncs, smt (z3) comp_associative2 coprojs_jointly_surj one_unique_element)
+qed
+
+lemma set_three_card: 
+ "card {x. x \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))} = 3"
+proof - 
+  have f1: "left_coproj one (one \<Coprod> one) \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+    by (typecheck_cfuncs, metis cfunc_type_def coproducts_disjoint id_right_unit id_type)
+  have f2: "left_coproj one (one \<Coprod> one) \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one"
+    by (typecheck_cfuncs, metis cfunc_type_def coproducts_disjoint id_right_unit id_type)
+  have f3: "right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one"
+    by (typecheck_cfuncs, metis cfunc_type_def coproducts_disjoint monomorphism_def one_unique_element right_coproj_are_monomorphisms)
+  show ?thesis
+    by (simp add: f1 f2 f3 set_three)
+qed
+
+lemma pre_OR_injective:
+  "injective(\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>))"
+  unfolding injective_def
+proof(auto)
+  fix x y 
+  assume "x \<in>\<^sub>c domain (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)" 
+  then have x_type: "x \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))"  
+    using cfunc_type_def pre_OR_type by force
+  then have x_form: "(\<exists> w. (w \<in>\<^sub>c one \<and> x = (left_coproj one (one\<Coprod>one)) \<circ>\<^sub>c w))
+      \<or>  (\<exists> w. (w \<in>\<^sub>c (one\<Coprod>one) \<and> x = (right_coproj one (one\<Coprod>one)) \<circ>\<^sub>c w))"
+    using coprojs_jointly_surj by auto
+
+  assume "y \<in>\<^sub>c domain (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)" 
+  then have y_type: "y \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))"  
+    using cfunc_type_def pre_OR_type by force
+  then have y_form: "(\<exists> w. (w \<in>\<^sub>c one \<and> y = (left_coproj one (one\<Coprod>one)) \<circ>\<^sub>c w))
+      \<or>  (\<exists> w. (w \<in>\<^sub>c (one\<Coprod>one) \<and> y = (right_coproj one (one\<Coprod>one)) \<circ>\<^sub>c w))"
+    using coprojs_jointly_surj by auto
+
+  assume mx_eqs_my: "\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c x = \<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c y"
+
+  have f1: "\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c left_coproj one (one \<Coprod> one) = \<langle>\<t>,\<t>\<rangle>"
+    by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+  have f2: "\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one) = \<langle>\<t>,\<f>\<rangle>"
+  proof- 
+    have "\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one) = 
+          (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c right_coproj one (one\<Coprod>one) )\<circ>\<^sub>c left_coproj one one"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c left_coproj one one"
+      using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
+    also have "... = \<langle>\<t>,\<f>\<rangle>"
+      by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+    then show ?thesis
+      by (simp add: calculation)
+  qed
+  have f3: "\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c right_coproj one one) = \<langle>\<f>,\<t>\<rangle>"
+  proof- 
+    have "\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c right_coproj one one) = 
+          (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c right_coproj one (one\<Coprod>one) )\<circ>\<^sub>c right_coproj one one"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c right_coproj one one"
+      using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
+    also have "... = \<langle>\<f>,\<t>\<rangle>"
+      by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
+    then show ?thesis
+      by (simp add: calculation)
+  qed
+
+
+  show "x = y"
+  proof(cases "x = left_coproj one (one \<Coprod> one)")
+    assume case1: "x = left_coproj one (one \<Coprod> one)"
+    then show "x = y"
+      by (typecheck_cfuncs, smt (z3) mx_eqs_my element_pair_eq f1 f2 f3 false_func_type maps_into_1u1 terminal_func_unique true_false_distinct true_func_type x_form y_form)
+  next
+    assume not_case1: "x \<noteq> left_coproj one (one \<Coprod> one)"
+    then have case2_or_3: "x = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)\<or> 
+               x = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+      by (metis id_right_unit2 id_type left_proj_type maps_into_1u1 terminal_func_unique x_form)
+    show "x = y"
+    proof(cases "x = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)")
+      assume case2: "x = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      then show "x = y"
+        by (smt (verit) AND_false_right_is_false AND_true_true_is_true AND_type NOT_false_is_true NOT_is_pullback cart_prod_eq2 cfunc_type_def codomain_comp comp_associative domain_comp f1 f2 f3 is_pullback_def left_proj_type maps_into_1u1 mx_eqs_my pre_OR_type square_commutes_def terminal_func_unique true_false_distinct y_form)
+    next
+      assume not_case2: "x \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      then have case3: "x = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+        using case2_or_3 by blast
+      then show "x = y"
+        by (smt (verit, ccfv_threshold) AND_false_left_is_false AND_true_true_is_true AND_type NOT_false_is_true NOT_is_pullback comp_associative2 comp_type element_pair_eq f1 f2 f3 is_pullback_def left_proj_type maps_into_1u1 mx_eqs_my pre_OR_type square_commutes_def terminal_func_unique true_false_distinct y_form)
+    qed
+  qed
+qed
+
+lemma OR_is_pullback:
+  "is_pullback (one\<Coprod>(one\<Coprod>one)) one (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>(one\<Coprod>(one\<Coprod>one))\<^esub>) \<t> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) OR"
+  unfolding OR_def
+  using element_monomorphism characteristic_function_exists
+  by (typecheck_cfuncs, rule_tac the1I2, metis injective_imp_monomorphism mem_Collect_eq pre_OR_injective)
+      
+
+
+
+
 lemma OR_type[type_rule]:
   "OR : (\<Omega>\<times>\<^sub>c\<Omega>) \<rightarrow> \<Omega>"
-  unfolding OR_def by typecheck_cfuncs
+  unfolding OR_def
+  by (metis OR_def OR_is_pullback is_pullback_def square_commutes_def) 
+
+
+(*
+lemma NOT_NOR_is_OR:
+ "OR = NOT \<circ>\<^sub>c NOR"
+  apply typecheck_cfuncs
+*)
+
+
+
 
 lemma OR_false_false_is_false:
   "OR \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle> = \<f>"

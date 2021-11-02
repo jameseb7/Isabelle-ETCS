@@ -271,7 +271,7 @@ subsection \<open>Basic Category Theory Definitions\<close>
 (*
   A
   |\c
- av \
+ av \|
   B\<rightarrow>C
    b
 *)
@@ -288,6 +288,7 @@ definition triangle_commutes :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Ri
  |          |
  \<or>   cd     \<or>
  C -------> D
+
 *)
 
 definition square_commutes :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
