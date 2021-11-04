@@ -1238,7 +1238,93 @@ qed
 
             
 
-
+lemma IMPLIES_is_OR_NOT_id:
+  "IMPLIES = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id(\<Omega>))"
+proof(rule one_separator[ where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y = "\<Omega>"])
+  show "IMPLIES : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega> : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega> \<Longrightarrow> IMPLIES \<circ>\<^sub>c x = (OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+  proof - 
+    fix x 
+    assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
+    then obtain u v where x_form: "u \<in>\<^sub>c \<Omega> \<and> v \<in>\<^sub>c \<Omega> \<and> x = \<langle>u, v\<rangle>"
+      using cart_prod_decomp by blast
+    show "IMPLIES \<circ>\<^sub>c x = (OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+    proof(cases "u = \<t>")
+      assume "u = \<t>"
+      show ?thesis
+      proof(cases "v = \<t>")
+        assume "v = \<t>"
+        have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<t>\<rangle>"
+          by (typecheck_cfuncs, simp add: \<open>u = \<t>\<close> \<open>v = \<t>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
+        also have "... = OR \<circ>\<^sub>c \<langle>\<f>, \<t>\<rangle>"
+          by (typecheck_cfuncs, simp add: NOT_true_is_false id_left_unit2)
+        also have "... = \<t>"
+          by (simp add: OR_true_right_is_true false_func_type)
+        also have "... = IMPLIES \<circ>\<^sub>c x"
+          by (simp add: IMPLIES_true_true_is_true \<open>u = \<t>\<close> \<open>v = \<t>\<close> x_form)
+        then show ?thesis
+          by (simp add: calculation)
+      next
+        assume "v \<noteq> \<t>"
+        then have "v = \<f>"
+          by (metis true_false_only_truth_values x_form)
+        have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<f>\<rangle>"
+          by (typecheck_cfuncs, simp add: \<open>u = \<t>\<close> \<open>v = \<f>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
+        also have "... = OR \<circ>\<^sub>c \<langle>\<f>, \<f>\<rangle>"
+          by (typecheck_cfuncs, simp add: NOT_true_is_false id_left_unit2)
+        also have "... = \<f>"
+          by (simp add: OR_false_false_is_false false_func_type)
+        also have "... = IMPLIES \<circ>\<^sub>c x"
+          by (simp add: IMPLIES_true_false_is_false \<open>u = \<t>\<close> \<open>v = \<f>\<close> x_form)
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+    next
+      assume "u \<noteq> \<t>"
+      then have "u = \<f>"
+          by (metis true_false_only_truth_values x_form)
+      show ?thesis 
+      proof(cases "v = \<t>")
+        assume "v = \<t>"
+        have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<f>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<t>\<rangle>"
+          by (typecheck_cfuncs, simp add: \<open>u = \<f>\<close> \<open>v = \<t>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
+        also have "... = OR \<circ>\<^sub>c \<langle>\<t>, \<t>\<rangle>"
+          using NOT_false_is_true id_left_unit2 true_func_type by smt
+        also have "... = \<t>"
+          by (simp add: OR_true_right_is_true true_func_type)
+        also have "... = IMPLIES \<circ>\<^sub>c x"
+          by (simp add: IMPLIES_false_true_is_true \<open>u = \<f>\<close> \<open>v = \<t>\<close> x_form)
+        then show ?thesis
+          by (simp add: calculation)
+      next
+        assume "v \<noteq> \<t>"
+        then have "v = \<f>"
+          by (metis true_false_only_truth_values x_form)
+        have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<f>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<f>\<rangle>"
+          by (typecheck_cfuncs, simp add: \<open>u = \<f>\<close> \<open>v = \<f>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
+        also have "... = OR \<circ>\<^sub>c \<langle>\<t>, \<f>\<rangle>"
+          using NOT_false_is_true false_func_type id_left_unit2 by presburger
+        also have "... = \<t>"
+          by (simp add: OR_true_left_is_true false_func_type)
+        also have "... = IMPLIES \<circ>\<^sub>c x"
+          by (simp add: IMPLIES_false_false_is_true \<open>u = \<f>\<close> \<open>v = \<f>\<close> x_form)
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+    qed
+  qed
+qed
 
 
 
@@ -1248,7 +1334,6 @@ lemma
   shows "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
   using assms unfolding IMPLIES_def apply (typecheck_cfuncs_prems, typecheck_cfuncs)
   oops
-
 
 
 
