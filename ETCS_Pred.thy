@@ -1329,23 +1329,81 @@ qed
 
 
 lemma
-  assumes "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
-  assumes "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+  assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"
+  assumes X_nonempty: "\<exists>x. x \<in>\<^sub>c X"
+  assumes IMPLIES_true: "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
   shows "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
-  using assms unfolding IMPLIES_def apply (typecheck_cfuncs_prems, typecheck_cfuncs)
-  oops
+proof -
+  obtain z where z_type[type_rule]: "z : X \<times>\<^sub>c Y \<rightarrow> one \<Coprod> one \<Coprod> one"
+    and z_eq: "(P \<times>\<^sub>f Q) = (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c z"
+    using IMPLIES_is_pullback unfolding is_pullback_def
+    by (auto, typecheck_cfuncs, metis IMPLIES_true terminal_func_type)
+  
+  assume P_true: "P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>"
+  
+  have "left_cart_proj \<Omega> \<Omega> \<circ>\<^sub>c (P \<times>\<^sub>f Q) = left_cart_proj \<Omega> \<Omega> \<circ>\<^sub>c (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c z"
+    using z_eq by simp
+  then have "P \<circ>\<^sub>c left_cart_proj X Y = (left_cart_proj \<Omega> \<Omega> \<circ>\<^sub>c (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)) \<circ>\<^sub>c z"
+    using Q_type comp_associative2 left_cart_proj_cfunc_cross_prod by (typecheck_cfuncs, force)
+  then have "P \<circ>\<^sub>c left_cart_proj X Y
+    = ((left_cart_proj \<Omega> \<Omega> \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle>) \<amalg> (left_cart_proj \<Omega> \<Omega> \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle>) \<amalg> (left_cart_proj \<Omega> \<Omega> \<circ>\<^sub>c \<langle>\<f>,\<t>\<rangle>)) \<circ>\<^sub>c z"
+    by (typecheck_cfuncs_prems, simp add: cfunc_coprod_comp)
+  then have "P \<circ>\<^sub>c left_cart_proj X Y = (\<t> \<amalg> \<f> \<amalg> \<f>) \<circ>\<^sub>c z"
+    by (typecheck_cfuncs_prems, smt left_cart_proj_cfunc_prod)
 
+  show "Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+  proof (typecheck_cfuncs, rule one_separator[where X=Y, where Y=\<Omega>], auto)
+    fix y
+    assume y_in_Y[type_rule]: "y \<in>\<^sub>c Y"
 
+    obtain x where x_in_X[type_rule]: "x \<in>\<^sub>c X"
+      using X_nonempty by blast
 
-
-
-
-
-
-
-
-
-
-
+    have "(z \<circ>\<^sub>c \<langle>x,y\<rangle> = left_coproj one (one \<Coprod> one))
+        \<or> (z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one)
+        \<or> (z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one)"
+      by (typecheck_cfuncs, smt comp_associative2 coprojs_jointly_surj one_unique_element)
+    then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
+    proof auto
+      assume "z \<circ>\<^sub>c \<langle>x,y\<rangle> = left_coproj one (one \<Coprod> one)"
+      then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c left_coproj one (one \<Coprod> one)"
+        by (typecheck_cfuncs, typecheck_cfuncs_prems, smt comp_associative2 z_eq)
+      then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = \<langle>\<t>,\<t>\<rangle>"
+        by (typecheck_cfuncs_prems, smt left_coproj_cfunc_coprod)
+      then have "Q \<circ>\<^sub>c y = \<t>"
+        by (typecheck_cfuncs_prems, smt (verit, ccfv_SIG) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 right_cart_proj_cfunc_prod)
+      then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
+        by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+    next
+      assume "z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+        by (typecheck_cfuncs, typecheck_cfuncs_prems, smt comp_associative2 z_eq)
+      then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = (\<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c left_coproj one one"
+        by (typecheck_cfuncs_prems, smt right_coproj_cfunc_coprod comp_associative2)
+      then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = \<langle>\<f>,\<f>\<rangle>"
+        by (typecheck_cfuncs_prems, smt left_coproj_cfunc_coprod)
+      then have "P \<circ>\<^sub>c x = \<f>"
+        by (typecheck_cfuncs_prems, smt (verit, ccfv_SIG) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 left_cart_proj_cfunc_prod)
+      also have "P \<circ>\<^sub>c x = \<t>"
+        using P_true by (typecheck_cfuncs_prems, smt (z3) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type x_in_X)
+      then have False
+        using calculation true_false_distinct by auto
+      then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
+        by simp
+    next
+      assume "z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one"
+      then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one"
+        by (typecheck_cfuncs, typecheck_cfuncs_prems, smt comp_associative2 z_eq)
+      then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = (\<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c right_coproj one one"
+        by (typecheck_cfuncs_prems, smt right_coproj_cfunc_coprod comp_associative2)
+      then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = \<langle>\<f>,\<t>\<rangle>"
+        by (typecheck_cfuncs_prems, smt right_coproj_cfunc_coprod)
+      then have "Q \<circ>\<^sub>c y = \<t>"
+        by (typecheck_cfuncs_prems, smt (verit, ccfv_SIG) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 right_cart_proj_cfunc_prod)
+      then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
+        by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+    qed
+  qed
+qed
 
 end
