@@ -685,17 +685,31 @@ next
   assume "\<nexists>s. s : X \<rightarrow> \<nat>\<^sub>c \<and> surjective s"
   show "is_finite X"
     unfolding is_finite_def
- 
-  proof(rule ccontr)
+ proof(rule ccontr)
     assume "\<not> is_finite X"
     then have "is_infinite X"
       using either_finite_or_infinite by blast
-    then obtain m where m_def: "m : X \<rightarrow> X \<and> monomorphism(m) \<and> \<not>surjective(m)"
+    then obtain m where m_type[type_rule]: "m : X \<rightarrow> X" and  m_mono: "monomorphism(m)" and 
+     m_not_surj:  "\<not>surjective(m)"
       using is_infinite_def by blast
-    oops
+    obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and 
+      x_def: "\<And> y.  y \<in>\<^sub>c X \<Longrightarrow>  m \<circ>\<^sub>c y \<noteq> x"
+      using m_not_surj m_type surjective_def2 by auto
 
+    obtain i where 
+      i_type[type_rule]: "i : \<nat>\<^sub>c \<rightarrow> X" and ibase: "i \<circ>\<^sub>c zero = x" and i_induct: "m \<circ>\<^sub>c i = i \<circ>\<^sub>c successor"
+      using m_type natural_number_object_property2 x_type by blast
+    
+    have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) ,
+                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f id \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+    proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
 
-
+      show "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
 
 
 
