@@ -53,6 +53,11 @@ lemma NOT_is_false_implies_true:
   shows "NOT \<circ>\<^sub>c p = \<f> \<Longrightarrow> p = \<t>"
   using NOT_false_is_true assms true_false_only_truth_values by fastforce
 
+lemma double_negation:
+  "NOT \<circ>\<^sub>c NOT =  id \<Omega>"
+  by (typecheck_cfuncs, smt (verit, del_insts) NOT_false_is_true NOT_true_is_false cfunc_type_def comp_associative id_left_unit2 one_separator true_false_only_truth_values)
+
+
 subsection \<open>AND\<close>
 
 definition AND :: "cfunc" where
@@ -700,6 +705,210 @@ proof(rule ccontr)
   qed
 qed
 
+subsection \<open>NAND\<close>
+definition NAND :: "cfunc" where
+  "NAND = (THE \<chi>. is_pullback (one\<Coprod>(one\<Coprod>one)) one (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>(one\<Coprod>(one\<Coprod>one))\<^esub>) \<t> (\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<chi>)"
+
+lemma pre_NAND_type[type_rule]: 
+  "\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) : (one\<Coprod>(one\<Coprod>one)) \<rightarrow> \<Omega>\<times>\<^sub>c\<Omega>"
+  by typecheck_cfuncs
+
+
+lemma pre_NAND_injective:
+  "injective(\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>))"
+  unfolding injective_def
+proof(auto)
+  fix x y 
+  assume "x \<in>\<^sub>c domain (\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)" 
+  then have x_type: "x \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))"  
+    using cfunc_type_def pre_NAND_type by force
+  then have x_form: "(\<exists> w. (w \<in>\<^sub>c one \<and> x = (left_coproj one (one\<Coprod>one)) \<circ>\<^sub>c w))
+      \<or>  (\<exists> w. (w \<in>\<^sub>c (one\<Coprod>one) \<and> x = (right_coproj one (one\<Coprod>one)) \<circ>\<^sub>c w))"
+    using coprojs_jointly_surj by auto
+
+  assume "y \<in>\<^sub>c domain (\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)" 
+  then have y_type: "y \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))"  
+    using cfunc_type_def pre_NAND_type by force
+  then have y_form: "(\<exists> w. (w \<in>\<^sub>c one \<and> y = (left_coproj one (one\<Coprod>one)) \<circ>\<^sub>c w))
+      \<or>  (\<exists> w. (w \<in>\<^sub>c (one\<Coprod>one) \<and> y = (right_coproj one (one\<Coprod>one)) \<circ>\<^sub>c w))"
+    using coprojs_jointly_surj by auto
+
+  assume mx_eqs_my: "\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c x = \<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c y"
+
+  have f1: "\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c left_coproj one (one \<Coprod> one) = \<langle>\<f>, \<f>\<rangle>"
+    by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+  have f2: "\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one) = \<langle>\<t>,\<f>\<rangle>"
+  proof- 
+    have "\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one) = 
+          (\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c right_coproj one (one\<Coprod>one) )\<circ>\<^sub>c left_coproj one one"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c left_coproj one one"
+      using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
+    also have "... = \<langle>\<t>,\<f>\<rangle>"
+      by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+    then show ?thesis
+      by (simp add: calculation)
+  qed
+  have f3: "\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c right_coproj one one) = \<langle>\<f>,\<t>\<rangle>"
+  proof- 
+    have "\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c right_coproj one one) = 
+          (\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c right_coproj one (one\<Coprod>one) )\<circ>\<^sub>c right_coproj one one"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c right_coproj one one"
+      using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
+    also have "... = \<langle>\<f>,\<t>\<rangle>"
+      by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
+    then show ?thesis
+      by (simp add: calculation)
+  qed
+
+
+  show "x = y"
+  proof(cases "x = left_coproj one (one \<Coprod> one)")
+    assume case1: "x = left_coproj one (one \<Coprod> one)"
+    then show "x = y"
+      by (typecheck_cfuncs, smt (z3) mx_eqs_my element_pair_eq f1 f2 f3 false_func_type maps_into_1u1 terminal_func_unique true_false_distinct true_func_type x_form y_form)
+  next
+    assume not_case1: "x \<noteq> left_coproj one (one \<Coprod> one)"
+    then have case2_or_3: "x = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)\<or> 
+               x = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+      by (metis id_right_unit2 id_type left_proj_type maps_into_1u1 terminal_func_unique x_form)
+    show "x = y"
+    proof(cases "x = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)")
+      assume case2: "x = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      then show "x = y"
+        by (smt (z3) NOT_false_is_true NOT_is_pullback NOT_true_is_false NOT_type \<open>x \<in>\<^sub>c domain (\<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)\<close> cart_prod_eq2 case2 cfunc_type_def characteristic_func_eq characteristic_func_is_pullback characteristic_function_exists comp_associative diag_on_elements diagonal_type element_monomorphism f1 f2 f3 false_func_type left_proj_type maps_into_1u1 mx_eqs_my terminal_func_unique true_false_distinct true_func_type x_type y_form)
+    next
+      assume not_case2: "x \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      then have case3: "x = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+        using case2_or_3 by blast
+      then show "x = y"
+        by (smt (z3) NOT_false_is_true NOT_is_pullback NOT_true_is_false NOT_type \<open>x \<in>\<^sub>c domain (\<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)\<close> cart_prod_eq2 case3 cfunc_type_def characteristic_func_eq characteristic_func_is_pullback characteristic_function_exists comp_associative diag_on_elements diagonal_type element_monomorphism f1 f2 f3 false_func_type left_proj_type maps_into_1u1 mx_eqs_my terminal_func_unique true_false_distinct true_func_type x_type y_form)
+    qed
+  qed
+qed
+
+lemma NAND_is_pullback:
+  "is_pullback (one\<Coprod>(one\<Coprod>one)) one (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>(one\<Coprod>(one\<Coprod>one))\<^esub>) \<t> (\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) NAND"
+  unfolding NAND_def
+  using element_monomorphism characteristic_function_exists
+  by (typecheck_cfuncs, rule_tac the1I2, metis injective_imp_monomorphism mem_Collect_eq pre_NAND_injective)
+      
+lemma NAND_type[type_rule]:
+  "NAND : (\<Omega>\<times>\<^sub>c\<Omega>) \<rightarrow> \<Omega>"
+  unfolding NAND_def
+  by (metis NAND_def NAND_is_pullback is_pullback_def square_commutes_def) 
+
+
+lemma NAND_left_false_is_true:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "(NAND \<circ>\<^sub>c \<langle>\<f>,p\<rangle> = \<t>)"
+proof - 
+  have "\<exists> j. j \<in>\<^sub>c one\<Coprod>(one\<Coprod>one) \<and> (\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j  = \<langle>\<f>,p\<rangle>"
+    by (typecheck_cfuncs, smt (z3) assms comp_associative2 comp_type left_coproj_cfunc_coprod left_proj_type right_coproj_cfunc_coprod right_proj_type true_false_only_truth_values)
+  then show ?thesis 
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG) NAND_is_pullback NOT_false_is_true NOT_is_pullback  comp_associative2 is_pullback_def square_commutes_def terminal_func_comp)
+qed
+
+
+lemma NAND_right_false_is_true:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "(NAND \<circ>\<^sub>c \<langle>p,\<f>\<rangle> = \<t>)"
+proof - 
+  have "\<exists> j. j \<in>\<^sub>c one\<Coprod>(one\<Coprod>one) \<and> (\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j  = \<langle>p,\<f>\<rangle>"
+    by (typecheck_cfuncs, smt (z3) assms comp_associative2 comp_type left_coproj_cfunc_coprod left_proj_type right_coproj_cfunc_coprod right_proj_type true_false_only_truth_values)
+  then show ?thesis 
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG) NAND_is_pullback NOT_false_is_true NOT_is_pullback  comp_associative2 is_pullback_def square_commutes_def terminal_func_comp)
+qed
+
+lemma NAND_true_true_is_false:
+ "NAND \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle> = \<f>"
+proof(rule ccontr)
+  assume "NAND \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle> \<noteq> \<f>"
+  then have "NAND \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle> = \<t>"
+    using  true_false_only_truth_values by (typecheck_cfuncs, blast)
+  then obtain j where j_def:  "j \<in>\<^sub>c one\<Coprod>(one\<Coprod>one) \<and> (\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j  = \<langle>\<t>,\<t>\<rangle>"
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG) NAND_is_pullback  cfunc_type_def id_right_unit id_type is_pullback_def)
+  then have trichotomy: "(\<langle>\<f>,\<f>\<rangle> = \<langle>\<t>,\<t>\<rangle>) \<or> ((\<langle>\<t>, \<f>\<rangle> = \<langle>\<t>,\<t>\<rangle>) \<or> (\<langle>\<f>, \<t>\<rangle> = \<langle>\<t>,\<t>\<rangle>))"
+  proof(cases "j = left_coproj one (one \<Coprod> one)")
+    assume case1: "j = left_coproj one (one \<Coprod> one)"
+    then show ?thesis
+      by (metis cfunc_coprod_type cfunc_prod_type false_func_type j_def left_coproj_cfunc_coprod true_func_type)
+  next
+    assume not_case1: "j \<noteq> left_coproj one (one \<Coprod> one)"
+    then have case2_or_3: "j = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)\<or> 
+               j = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+      by (metis coprojs_jointly_surj id_right_unit2 id_type j_def left_proj_type maps_into_1u1 one_unique_element)
+    show ?thesis
+    proof(cases "j = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)")
+      assume case2: "j = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      have "\<langle>\<t>, \<f>\<rangle> = \<langle>\<t>,\<t>\<rangle>"
+      proof - 
+        have "(\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j = ((\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c right_coproj one (one \<Coprod> one)) \<circ>\<^sub>c left_coproj one one"
+          by (typecheck_cfuncs, simp add: case2 comp_associative2)
+        also have "... = (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) \<circ>\<^sub>c left_coproj one one"
+          using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+        also have "... = \<langle>\<t>, \<f>\<rangle>"
+          by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+        then show ?thesis
+          using calculation j_def by presburger
+      qed
+      then show ?thesis
+        by blast
+    next
+      assume not_case2: "j \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
+      then have case3: "j = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+        using case2_or_3 by blast
+      have "\<langle>\<f>, \<t>\<rangle> = \<langle>\<t>,\<t>\<rangle>"
+      proof - 
+        have "(\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j = ((\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c right_coproj one (one \<Coprod> one)) \<circ>\<^sub>c right_coproj one one"
+          by (typecheck_cfuncs, simp add: case3 comp_associative2)
+        also have "... = (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) \<circ>\<^sub>c right_coproj one one"
+          using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+        also have "... = \<langle>\<f>, \<t>\<rangle>"
+          by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
+        then show ?thesis
+          using calculation j_def by presburger
+      qed
+      then show ?thesis
+        by blast
+    qed
+  qed
+    then have "\<t> = \<f>"
+      using trichotomy cart_prod_eq2 by (typecheck_cfuncs, force)
+    then show False
+      using true_false_distinct by auto  
+qed
+
+
+lemma NAND_true_implies_one_is_false:
+  assumes "p \<in>\<^sub>c \<Omega>" 
+  assumes "q \<in>\<^sub>c \<Omega>"
+  assumes "NAND \<circ>\<^sub>c \<langle>p,q\<rangle> = \<t>"
+  shows "(p = \<f>) \<or> (q = \<f>)"
+  by (metis (no_types) NAND_true_true_is_false assms true_false_only_truth_values)
+
+lemma NOT_AND_is_NAND:
+ "NAND = NOT \<circ>\<^sub>c AND"
+proof(rule one_separator[ where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y = "\<Omega>"])
+  show "NAND : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "NOT \<circ>\<^sub>c AND : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega> \<Longrightarrow> NAND \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c AND) \<circ>\<^sub>c x"
+  proof-
+    fix x 
+    assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
+    then obtain p q where x_def: "p \<in>\<^sub>c \<Omega> \<and> q \<in>\<^sub>c \<Omega> \<and> x = \<langle>p,q\<rangle>"
+      by (meson cart_prod_decomp)
+    show "NAND \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c AND) \<circ>\<^sub>c x"
+      by (typecheck_cfuncs, metis AND_false_left_is_false AND_false_right_is_false AND_true_true_is_true NAND_left_false_is_true NAND_right_false_is_true NAND_true_implies_one_is_false NOT_false_is_true NOT_true_is_false comp_associative2 true_false_only_truth_values x_def x_type)
+  qed
+qed
+
+
+
+
 subsection \<open>IFF\<close>
 
 definition IFF :: "cfunc" where
@@ -1328,7 +1537,7 @@ qed
 
 
 
-lemma
+lemma IMPLIES_implies_implies:
   assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"
   assumes X_nonempty: "\<exists>x. x \<in>\<^sub>c X"
   assumes IMPLIES_true: "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
@@ -1405,5 +1614,102 @@ proof -
     qed
   qed
 qed
+ 
+
+subsection \<open>OTHER BOOLEAN IDENTITIES\<close>
+
+
+
+lemma AND_commutative:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle>p,q\<rangle> = AND \<circ>\<^sub>c \<langle>q,p\<rangle>"
+  by (metis AND_false_left_is_false AND_false_right_is_false assms true_false_only_truth_values)
+
+lemma AND_idempotent:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle>p,p\<rangle> = p"
+  using AND_false_right_is_false AND_true_true_is_true assms true_false_only_truth_values by blast
+
+lemma OR_commutative:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>p,q\<rangle> = OR \<circ>\<^sub>c \<langle>q,p\<rangle>"
+  by (metis OR_true_left_is_true OR_true_right_is_true assms true_false_only_truth_values)
+
+lemma OR_idempotent:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>p,p\<rangle> = p"
+  using OR_false_false_is_false OR_true_left_is_true assms true_false_only_truth_values by blast
+
+lemma AND_associative:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  assumes "r \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle> AND \<circ>\<^sub>c \<langle>p,q\<rangle>, r\<rangle> = AND \<circ>\<^sub>c \<langle>p, AND \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle>"
+  by (metis AND_commutative AND_false_left_is_false AND_true_true_is_true assms true_false_only_truth_values)
+
+lemma OR_associative:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  assumes "r \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle> OR \<circ>\<^sub>c \<langle>p,q\<rangle>, r\<rangle> = OR \<circ>\<^sub>c \<langle>p, OR \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle>"
+  by (metis OR_commutative OR_false_false_is_false OR_true_right_is_true assms true_false_only_truth_values)
+
+lemma AND_OR_distributive:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  assumes "r \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle> p, OR \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle> = OR \<circ>\<^sub>c \<langle> AND \<circ>\<^sub>c \<langle>p,q\<rangle>, AND \<circ>\<^sub>c \<langle>p,r\<rangle> \<rangle>"
+  by (metis AND_commutative AND_false_right_is_false AND_true_true_is_true OR_false_false_is_false OR_true_left_is_true OR_true_right_is_true assms true_false_only_truth_values)
+
+lemma OR_AND_distributive:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  assumes "r \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle> p, AND \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle> = AND \<circ>\<^sub>c \<langle> OR \<circ>\<^sub>c \<langle>p,q\<rangle>, OR \<circ>\<^sub>c \<langle>p,r\<rangle> \<rangle>"
+  by (smt (z3) AND_commutative AND_false_right_is_false AND_true_true_is_true OR_commutative OR_false_false_is_false OR_true_right_is_true assms true_false_only_truth_values)
+
+lemma OR_complementary:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>p, NOT \<circ>\<^sub>c p\<rangle> =  \<t>"
+  by (metis NOT_false_is_true NOT_true_is_false OR_true_left_is_true OR_true_right_is_true assms false_func_type true_false_only_truth_values)
+
+lemma AND_complementary:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle>p, NOT \<circ>\<^sub>c p\<rangle> =  \<f>"
+  by (metis AND_false_left_is_false AND_false_right_is_false NOT_false_is_true NOT_true_is_false assms true_false_only_truth_values true_func_type)
+
+lemma OR_AND_absorption:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>p, AND \<circ>\<^sub>c \<langle>p,q\<rangle> \<rangle> = p"
+  by (metis AND_commutative AND_complementary AND_idempotent NOT_true_is_false OR_false_false_is_false OR_true_left_is_true assms true_false_only_truth_values)
+
+lemma AND_OR_absorption:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle>p, OR \<circ>\<^sub>c \<langle>p,q\<rangle> \<rangle> = p"
+  by (metis AND_commutative AND_complementary AND_idempotent NOT_true_is_false OR_AND_absorption OR_commutative assms true_false_only_truth_values)
+
+lemma deMorgan_Law1:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  shows "NOT \<circ>\<^sub>c OR \<circ>\<^sub>c \<langle>p,q\<rangle> = AND \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c p, NOT \<circ>\<^sub>c q\<rangle>"
+  by (metis AND_OR_absorption AND_complementary AND_true_true_is_true NOT_false_is_true NOT_true_is_false OR_AND_absorption OR_commutative OR_idempotent assms false_func_type true_false_only_truth_values)
+
+lemma deMorgan_Law2:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  shows "NOT \<circ>\<^sub>c AND \<circ>\<^sub>c \<langle>p,q\<rangle> = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c p, NOT \<circ>\<^sub>c q\<rangle>"
+  by (metis AND_complementary AND_idempotent NOT_false_is_true NOT_true_is_false OR_complementary OR_false_false_is_false OR_idempotent assms true_false_only_truth_values true_func_type)
+ 
+lemma NAND_not_idempotent:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "NAND \<circ>\<^sub>c \<langle>p,p\<rangle> = NOT \<circ>\<^sub>c p"
+  using NAND_right_false_is_true NAND_true_true_is_false NOT_false_is_true NOT_true_is_false assms true_false_only_truth_values by fastforce
+
+
+
 
 end
