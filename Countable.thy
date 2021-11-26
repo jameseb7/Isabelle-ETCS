@@ -711,7 +711,73 @@ next
       show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
         by typecheck_cfuncs
 
+      show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c zero
+          = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+      proof -
+        have "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero
+            = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>c one\<^esub>)\<^sup>\<sharp>"
+        proof (rule same_evals_equal[where Z=one, where X=\<Omega>, where A="\<nat>\<^sub>c"])
+          show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero \<in>\<^sub>c \<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>"
+            by typecheck_cfuncs
+          show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>)\<^sup>\<sharp> \<in>\<^sub>c \<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>"
+            by typecheck_cfuncs
+          show "eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero
+              = eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>)\<^sup>\<sharp>"
+            (is "?lhs = ?rhs")
+          proof -
+            have "?lhs = eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)"
+              by (typecheck_cfuncs, metis identity_distributes_across_composition)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i, NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)"
+              by (typecheck_cfuncs, smt (z3) comp_associative2 flat_cancels_sharp inv_transpose_func_def2)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero), (NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)\<rangle>"
+              by (typecheck_cfuncs, simp add: cfunc_prod_comp)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero), NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)\<rangle>"
+              by (typecheck_cfuncs, smt comp_associative2)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f (i \<circ>\<^sub>c zero)), NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)\<rangle>"
+              by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x), NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)\<rangle>"
+              by (simp add: ibase)
+            also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>c one\<^esub>"
+            proof -
+              have "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x), NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f zero)\<rangle> \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+              proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
+                show "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero
+                    = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+                proof -
+                  have "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero
+                      = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero\<rangle> \<circ>\<^sub>c \<langle>zero, id one\<rangle>"
+                    by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp terminal_func_unique)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x) \<circ>\<^sub>c \<langle>zero, id one\<rangle>, NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>zero, id one\<rangle>\<rangle>"
+                    by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c zero, x\<rangle>, NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, zero\<rangle>\<rangle>"
+                    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>x, x\<rangle>, NOT \<circ>\<^sub>c \<t>\<rangle>"
+                    using eq_pred_iff_eq ibase zero_type by fastforce
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, NOT \<circ>\<^sub>c \<t>\<rangle>"
+                    by (metis eq_pred_iff_eq x_type)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>\<f>, \<f>\<rangle>"
+                    by (simp add: NOT_true_is_false)
+                  also have "... = \<t>"
+                    by (simp add: IMPLIES_false_false_is_true)
+                  also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+                    by (typecheck_cfuncs, smt comp_associative2 is_even_def2 is_even_nth_even_true nth_even_def2)
+                  then show ?thesis
+                    using calculation by auto
+                qed
+              
+                    
 
+        have "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c zero
+            = \<t>"
+          
+        have "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c zero
+            = (FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c zero"
 
 
 
