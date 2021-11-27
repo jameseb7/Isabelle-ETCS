@@ -1330,6 +1330,15 @@ proof(rule ccontr)
 qed
 
 
+lemma IMPLIES_false_is_true_false:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"  
+  assumes "IMPLIES \<circ>\<^sub>c  \<langle>p,q\<rangle> = \<f>"
+  shows "p = \<t> \<and> q = \<f>"
+  by (metis IMPLIES_false_false_is_true IMPLIES_false_true_is_true IMPLIES_true_true_is_true assms true_false_only_truth_values)
+
+
+
 
 (*ETCS analog to (A iff  B) == (A \<Longrightarrow> B) \<and> (B \<Longrightarrow> A) *)
 lemma iff_is_and_implies_implies_swap:
@@ -1614,7 +1623,43 @@ proof -
     qed
   qed
 qed
- 
+
+
+
+lemma implies_implies_IMPLIES:
+  assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"
+  shows  "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<Longrightarrow> IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+proof(rule ccontr)
+  assume "P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>"
+  assume "Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+  assume "IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+  then obtain xy where xy_type[type_rule]: "xy \<in>\<^sub>c X \<times>\<^sub>c Y" and 
+                        xy_def: "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy \<noteq> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c xy"
+    using \<open>IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>\<close> one_separator by (typecheck_cfuncs, blast)
+  then obtain x y where xy_form: "xy = \<langle>x, y\<rangle>" and  
+                  x_type[type_rule]:"x \<in>\<^sub>c X" and
+                  y_type[type_rule]:"y \<in>\<^sub>c Y"
+    using cart_prod_decomp by blast 
+  have "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy \<noteq> \<t>"
+    by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type xy_def)
+  then have "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy = \<f>"
+    using  true_false_only_truth_values by (typecheck_cfuncs, blast)
+  then have "\<f> = (IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x, y\<rangle>"
+    by (metis xy_form)
+  also have "... = IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x, y\<rangle>"
+    by (typecheck_cfuncs, simp add: comp_associative2)
+  also have "... = IMPLIES \<circ>\<^sub>c \<langle>P \<circ>\<^sub>c x, Q \<circ>\<^sub>c y\<rangle>"
+    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+  then have "P \<circ>\<^sub>c x = \<t> \<and> Q \<circ>\<^sub>c y = \<f>"
+    using IMPLIES_false_is_true_false calculation by (typecheck_cfuncs, presburger)
+  then have "Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+    by (metis \<open>P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<close> cfunc_type_def comp_associative terminal_func_comp terminal_func_type true_false_distinct true_func_type x_type y_type)
+  then show False
+    by (simp add: \<open>Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<close>)
+qed
+
+
+
 
 subsection \<open>OTHER BOOLEAN IDENTITIES\<close>
 
