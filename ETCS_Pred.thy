@@ -1589,7 +1589,7 @@ proof -
       then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = \<langle>\<t>,\<t>\<rangle>"
         by (typecheck_cfuncs_prems, smt left_coproj_cfunc_coprod)
       then have "Q \<circ>\<^sub>c y = \<t>"
-        by (typecheck_cfuncs_prems, smt (verit, ccfv_SIG) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 right_cart_proj_cfunc_prod)
+        by (typecheck_cfuncs_prems, smt (verit, best) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 right_cart_proj_cfunc_prod)
       then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
         by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
     next
@@ -1601,7 +1601,7 @@ proof -
       then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = \<langle>\<f>,\<f>\<rangle>"
         by (typecheck_cfuncs_prems, smt left_coproj_cfunc_coprod)
       then have "P \<circ>\<^sub>c x = \<f>"
-        by (typecheck_cfuncs_prems, smt (verit, ccfv_SIG) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 left_cart_proj_cfunc_prod)
+        by (typecheck_cfuncs_prems, smt (verit, best) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 left_cart_proj_cfunc_prod)
       also have "P \<circ>\<^sub>c x = \<t>"
         using P_true by (typecheck_cfuncs_prems, smt (z3) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type x_in_X)
       then have False
@@ -1617,7 +1617,7 @@ proof -
       then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = \<langle>\<f>,\<t>\<rangle>"
         by (typecheck_cfuncs_prems, smt right_coproj_cfunc_coprod)
       then have "Q \<circ>\<^sub>c y = \<t>"
-        by (typecheck_cfuncs_prems, smt (verit, ccfv_SIG) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 right_cart_proj_cfunc_prod)
+        by (typecheck_cfuncs_prems, smt (verit, best) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 right_cart_proj_cfunc_prod)
       then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
         by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
     qed
@@ -1628,36 +1628,77 @@ qed
 
 lemma implies_implies_IMPLIES:
   assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"
-  shows  "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<Longrightarrow> IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-proof(rule ccontr)
+  shows  "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<Longrightarrow> (IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>)"
+proof(auto)
   assume "P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>"
   assume "Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-  assume "IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-  then obtain xy where xy_type[type_rule]: "xy \<in>\<^sub>c X \<times>\<^sub>c Y" and 
-                        xy_def: "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy \<noteq> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c xy"
-    using \<open>IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>\<close> one_separator by (typecheck_cfuncs, blast)
-  then obtain x y where xy_form: "xy = \<langle>x, y\<rangle>" and  
-                  x_type[type_rule]:"x \<in>\<^sub>c X" and
-                  y_type[type_rule]:"y \<in>\<^sub>c Y"
-    using cart_prod_decomp by blast 
-  have "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy \<noteq> \<t>"
-    by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type xy_def)
-  then have "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy = \<f>"
-    using  true_false_only_truth_values by (typecheck_cfuncs, blast)
-  then have "\<f> = (IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x, y\<rangle>"
-    by (metis xy_form)
-  also have "... = IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x, y\<rangle>"
-    by (typecheck_cfuncs, simp add: comp_associative2)
-  also have "... = IMPLIES \<circ>\<^sub>c \<langle>P \<circ>\<^sub>c x, Q \<circ>\<^sub>c y\<rangle>"
-    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-  then have "P \<circ>\<^sub>c x = \<t> \<and> Q \<circ>\<^sub>c y = \<f>"
-    using IMPLIES_false_is_true_false calculation by (typecheck_cfuncs, presburger)
-  then have "Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-    by (metis \<open>P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<close> cfunc_type_def comp_associative terminal_func_comp terminal_func_type true_false_distinct true_func_type x_type y_type)
-  then show False
-    by (simp add: \<open>Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<close>)
+  show "IMPLIES \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<times>\<^sub>f \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+    by (typecheck_cfuncs, smt (z3) IMPLIES_true_true_is_true NOT_false_is_true NOT_is_pullback cfunc_cross_prod_def cfunc_prod_comp cfunc_type_def comp_associative2 is_pullback_def left_cart_proj_type one_separator right_cart_proj_type square_commutes_def terminal_func_comp)
 qed
 
+
+(*
+lemma implies_implies_IMPLIES2:
+  assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"
+  assumes X_nonempty: "\<exists>x. x \<in>\<^sub>c X"
+  assumes  "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+  shows "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+proof(cases "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>)", auto)
+  show "P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<times>\<^sub>f Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+    using assms(4) implies_implies_IMPLIES by (typecheck_cfuncs, blast)
+next
+  assume "P \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>"  
+  show ?thesis
+  proof(rule one_separator[where X = "X \<times>\<^sub>c Y", where Y = "\<Omega>"])
+    show "IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q : X \<times>\<^sub>c Y \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub> : X \<times>\<^sub>c Y \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "\<And>x. x \<in>\<^sub>c X \<times>\<^sub>c Y \<Longrightarrow> (IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c x = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c x"
+    proof - 
+      fix xy 
+      assume "xy \<in>\<^sub>c X \<times>\<^sub>c Y"
+      then obtain x y where x_type[type_rule]: "x \<in>\<^sub>c X"
+                        and y_type[type_rule]: "y \<in>\<^sub>c Y"
+                        and xy_def: "xy = \<langle>x,y\<rangle>"
+        using cart_prod_decomp by blast
+      show "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c xy"
+      proof(cases "P \<circ>\<^sub>c x = \<f>")
+        assume "P \<circ>\<^sub>c x = \<f>"
+        have "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy = IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) \<circ>\<^sub>c xy"
+          using \<open>xy \<in>\<^sub>c X \<times>\<^sub>c Y\<close> comp_associative2 by (typecheck_cfuncs, auto)
+        also have "... = IMPLIES \<circ>\<^sub>c \<langle>P \<circ>\<^sub>c x,Q \<circ>\<^sub>c y\<rangle>"
+          by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod xy_def)
+        also have "... = \<t>"
+          by (typecheck_cfuncs, metis IMPLIES_false_is_true_false \<open>P \<circ>\<^sub>c x = \<f>\<close> true_false_only_truth_values)
+        also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c xy"
+          by (typecheck_cfuncs, smt (z3) \<open>xy \<in>\<^sub>c X \<times>\<^sub>c Y\<close> comp_associative2 id_right_unit2 id_type terminal_func_comp terminal_func_unique)
+        then show ?thesis
+          using calculation by auto
+      next
+        assume "P \<circ>\<^sub>c x \<noteq> \<f>"
+        then have "P \<circ>\<^sub>c x = \<t>"
+          using \<open>P \<circ>\<^sub>c x \<noteq> \<f>\<close> true_false_only_truth_values by (typecheck_cfuncs, blast)
+        show ?thesis
+        proof(cases "Q \<circ>\<^sub>c y = \<t>")
+          assume "Q \<circ>\<^sub>c y = \<t>"
+          have "(IMPLIES \<circ>\<^sub>c P \<times>\<^sub>f Q) \<circ>\<^sub>c xy = IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) \<circ>\<^sub>c xy"
+            using \<open>xy \<in>\<^sub>c X \<times>\<^sub>c Y\<close> comp_associative2 by (typecheck_cfuncs, auto)
+          also have "... = IMPLIES \<circ>\<^sub>c \<langle>P \<circ>\<^sub>c x,Q \<circ>\<^sub>c y\<rangle>"
+            by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod xy_def)
+          also have "... = \<t>"
+            using IMPLIES_true_true_is_true \<open>P \<circ>\<^sub>c x = \<t>\<close> \<open>Q \<circ>\<^sub>c y = \<t>\<close> by presburger
+          also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c xy"
+            by (typecheck_cfuncs, smt (z3) \<open>xy \<in>\<^sub>c X \<times>\<^sub>c Y\<close> comp_associative2 id_right_unit2 id_type terminal_func_comp terminal_func_unique)
+          then show ?thesis
+            using calculation by auto
+        next
+          assume "Q \<circ>\<^sub>c y \<noteq> \<t>"
+          then have "Q \<circ>\<^sub>c y = \<f>"
+            using \<open>Q \<circ>\<^sub>c y \<noteq> \<t>\<close> true_false_only_truth_values by (typecheck_cfuncs, blast)
+          oops
+This above is in all likelihood just wrong
+*)
 
 
 
