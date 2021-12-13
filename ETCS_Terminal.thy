@@ -292,6 +292,24 @@ lemma one_x_A_iso_A:
   "one \<times>\<^sub>c X \<cong> X"
   by (meson A_x_one_iso_A isomorphic_is_transitive product_commutes)
 
+(* concrete examples of above isomorphisms *)
+
+lemma left_cart_proj_one_left_inverse:
+  "\<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X one = id (X \<times>\<^sub>c one)"
+  by (typecheck_cfuncs, smt (z3) cfunc_prod_comp cfunc_prod_unique id_left_unit2 id_right_unit2 right_cart_proj_type terminal_func_comp terminal_func_unique)
+
+lemma left_cart_proj_one_right_inverse:
+  "left_cart_proj X one \<circ>\<^sub>c \<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> = id X"
+  using left_cart_proj_cfunc_prod by (typecheck_cfuncs, blast)
+
+lemma right_cart_proj_one_left_inverse:
+  "\<langle>\<beta>\<^bsub>X\<^esub>,id X\<rangle> \<circ>\<^sub>c right_cart_proj one X = id (one \<times>\<^sub>c X)"
+  by (typecheck_cfuncs, smt (z3) cart_prod_decomp cfunc_prod_comp id_left_unit2 id_right_unit2 right_cart_proj_cfunc_prod terminal_func_comp terminal_func_unique)
+
+lemma right_cart_proj_one_right_inverse:
+  "right_cart_proj one X \<circ>\<^sub>c \<langle>\<beta>\<^bsub>X\<^esub>,id X\<rangle> = id X"
+  using right_cart_proj_cfunc_prod by (typecheck_cfuncs, blast)
+
 (* Proposition 2.1.21 *)
 lemma cart_prod_elem_eq:
   assumes "a \<in>\<^sub>c X \<times>\<^sub>c Y" "b \<in>\<^sub>c X \<times>\<^sub>c Y"
