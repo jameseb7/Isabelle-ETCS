@@ -1637,6 +1637,8 @@ proof(auto)
 qed
 
 
+
+
 (*
 lemma implies_implies_IMPLIES2:
   assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"

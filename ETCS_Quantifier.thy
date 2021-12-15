@@ -146,6 +146,9 @@ proof -
 qed
 
 
+
+
+(*
 lemma forall_equals:
 
 
@@ -187,6 +190,8 @@ next
   then have "\<exists> x. x \<in>\<^sub>c X \<and> p \<circ>\<^sub>c x = \<f>"
     apply typecheck_cfuncs
     by (smt (verit, best) \<open>FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<f>\<close> all_true_implies_FORALL_true comp_type true_false_distinct true_false_only_truth_values)
+*)
+
 *)
 
 

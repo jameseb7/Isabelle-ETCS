@@ -683,7 +683,6 @@ proof(safe)
 next 
   assume "\<nexists>s. s : X \<rightarrow> \<nat>\<^sub>c \<and> surjective s"
   show "is_finite X"
-    unfolding is_finite_def
  proof(rule ccontr)
     assume "\<not> is_finite X"
     then have "is_infinite X"
@@ -698,7 +697,616 @@ next
     obtain i where 
       i_type[type_rule]: "i : \<nat>\<^sub>c \<rightarrow> X" and ibase: "i \<circ>\<^sub>c zero = x" and i_induct: "m \<circ>\<^sub>c i = i \<circ>\<^sub>c successor"
       using m_type natural_number_object_property2 x_type by blast
-    
+
+    have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f id \<nat>\<^sub>c) ,
+                                    NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i)\<rangle>)\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+    proof (rule natural_number_object_func_unique[where X="\<Omega>", where f="id \<Omega>"])
+
+      show "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+
+      show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+      proof -
+        have "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero
+            = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>c one\<^esub>)\<^sup>\<sharp>"
+        proof (rule same_evals_equal[where Z=one, where X=\<Omega>, where A="\<nat>\<^sub>c"])
+          show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero \<in>\<^sub>c \<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>"
+            by typecheck_cfuncs
+          show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>)\<^sup>\<sharp> \<in>\<^sub>c \<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>"
+            by typecheck_cfuncs
+          show "eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c
+    id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f
+    (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c
+    zero =
+    eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>)\<^sup>\<sharp>"
+            (is "?lhs = ?rhs")
+          proof -
+            have "?lhs = eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)"
+              by (typecheck_cfuncs, metis identity_distributes_across_composition)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle> \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)"
+              by (typecheck_cfuncs, smt (z3) comp_associative2 flat_cancels_sharp inv_transpose_func_def2)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero),NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)\<rangle>"
+              by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero),NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  (i \<times>\<^sub>f x)\<rangle>"
+              using cfunc_cross_prod_comp_cfunc_cross_prod ibase id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
+            also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>c one\<^esub>"
+            proof -
+              have "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero),NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  (i \<times>\<^sub>f x)\<rangle> \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+              proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
+                show "IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c
+    \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                      by typecheck_cfuncs             
+                show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "(IMPLIES \<circ>\<^sub>c
+     \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
+    zero =
+    (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+                proof -
+                  have "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c   zero 
+                      = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c   zero"
+                    by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp terminal_func_unique)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>zero, id one\<rangle>"
+                    by (typecheck_cfuncs, metis cart_prod_extract_left id_left_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>zero, id one\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x) \<circ>\<^sub>c \<langle>zero, id one\<rangle>\<rangle> "
+                    by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>zero, zero\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>x, x\<rangle>\<rangle> "
+                    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod ibase id_left_unit2 id_right_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>x, x\<rangle> \<rangle>"
+                    using eq_pred_iff_eq ibase zero_type by fastforce
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, NOT \<circ>\<^sub>c \<t>\<rangle>"
+                    by (metis eq_pred_iff_eq x_type)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>\<f>, \<f>\<rangle>"
+                    by (simp add: NOT_true_is_false)
+                  also have "... = \<t>"
+                    by (simp add: IMPLIES_false_false_is_true)
+                  also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+                    by (typecheck_cfuncs, smt comp_associative2 is_even_def2 is_even_nth_even_true nth_even_def2)
+                  then show ?thesis
+                    using calculation by auto
+                qed
+                show "(IMPLIES \<circ>\<^sub>c
+     \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
+    successor =
+    id\<^sub>c \<Omega> \<circ>\<^sub>c
+    IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
+              proof(rule one_separator[where X = "\<nat>\<^sub>c", where Y = "\<Omega>"])
+
+                show "(IMPLIES \<circ>\<^sub>c
+     \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
+    successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+
+                show "id\<^sub>c \<Omega> \<circ>\<^sub>c
+    IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c
+    \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+
+                show "\<And>xa. xa \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+          ((IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c
+            \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c xa =
+          (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c
+           \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c
+           \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c xa"
+                proof - 
+                  fix p
+                  assume p_type[type_rule]: "p \<in>\<^sub>c \<nat>\<^sub>c"
+
+                  have "((IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,
+            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  successor) \<circ>\<^sub>c  p
+                      = IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,
+            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c  successor \<circ>\<^sub>c  p"
+                    by (typecheck_cfuncs, smt (z3) comp_associative2)
+                  also have "... = IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,
+            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c  p,id one\<rangle>"
+                    by (typecheck_cfuncs, metis cart_prod_extract_left id_left_unit2)
+                  
+                  also have "... = IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c  p,id one\<rangle>,
+            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x) \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c  p,id one\<rangle> \<rangle> "
+                    using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, auto)
+                  also have "... = IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>successor \<circ>\<^sub>c  p,zero\<rangle>,
+            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c  p,x\<rangle> \<rangle> "
+                    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+                also have "... = IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c \<f>,
+            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c  p,x\<rangle> \<rangle> "
+                  by (typecheck_cfuncs, metis eq_pred_iff_eq true_false_only_truth_values zero_is_not_successor)
+              also have "... = IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c \<f>,
+            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>m \<circ>\<^sub>c i \<circ>\<^sub>c  p,x\<rangle> \<rangle> "
+                by (typecheck_cfuncs, metis cfunc_type_def comp_associative i_induct)     
+              also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<f>, NOT \<circ>\<^sub>c \<f> \<rangle> "
+                by (typecheck_cfuncs, metis eq_pred_iff_eq true_false_only_truth_values x_def)
+              also have "... = \<t>"
+                using IMPLIES_true_true_is_true NOT_false_is_true by presburger
+              also have "... = IMPLIES \<circ>\<^sub>c
+           \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>p ,zero \<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i  \<circ>\<^sub>c p ,x\<rangle> \<rangle>"
+                    proof(cases "p = zero")
+                      assume "p = zero"
+                      then show ?thesis
+                        by (typecheck_cfuncs, metis IMPLIES_false_false_is_true NOT_true_is_false  eq_pred_iff_eq ibase)
+                    next
+                      assume "p \<noteq> zero"
+                      then  obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "p = successor \<circ>\<^sub>c k"
+                        using \<open>p \<noteq> zero\<close> nonzero_is_succ by (typecheck_cfuncs, blast)
+                      then show ?thesis
+                      proof - 
+                        have "IMPLIES \<circ>\<^sub>c
+           \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>p ,zero \<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i  \<circ>\<^sub>c p ,x\<rangle> \<rangle> = 
+                              IMPLIES \<circ>\<^sub>c
+           \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>p ,zero \<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>m  \<circ>\<^sub>c i \<circ>\<^sub>c k ,x\<rangle> \<rangle>"
+                          using comp_associative2 i_induct k_def successor_type by (typecheck_cfuncs, force)
+                        also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>p ,zero \<rangle>, \<t> \<rangle>"
+                          by (typecheck_cfuncs, metis NOT_false_is_true eq_pred_iff_eq true_false_only_truth_values x_def)
+                        then show ?thesis
+                          by (metis IMPLIES_true_true_is_true NOT_false_is_true \<open>p \<noteq> zero\<close> calculation cart_prod_extract_right char_of_singleton2 p_type zero_type)
+                      qed
+                    qed
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>p ,id one\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x) \<circ>\<^sub>c \<langle>p ,id one\<rangle>\<rangle>"
+                      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero), NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x)\<rangle> \<circ>\<^sub>c \<langle>p ,id one\<rangle>"
+                      by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero), NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x)\<rangle>  \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c p ,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c p\<rangle>"
+                      by (typecheck_cfuncs, metis id_left_unit2 one_unique_element)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero), NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x)\<rangle>  \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c p"
+                      using cfunc_prod_comp by (typecheck_cfuncs, force)
+                    also have "... = (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero), NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x)\<rangle>  \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c p"
+                   using comp_associative2 id_left_unit2 by (typecheck_cfuncs, force)
+                 then show " ((IMPLIES \<circ>\<^sub>c
+            \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c
+            \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c p =
+          (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c
+           \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c
+           \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c p"
+                   using calculation by presburger
+               qed
+             qed
+             show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+               by (typecheck_cfuncs, smt (verit, best) comp_associative2 id_left_unit2 terminal_func_comp)
+           qed
+           show "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>"
+              proof(rule one_separator[where X = "\<nat>\<^sub>c \<times>\<^sub>c one", where Y = "\<Omega>"])
+                show "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub> : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "\<And>xa. xa \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c one \<Longrightarrow>
+          (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle>) \<circ>\<^sub>c xa =
+          (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>) \<circ>\<^sub>c xa"
+                proof - 
+                  fix qone 
+                  assume qone_type[type_rule]: "qone \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c one"
+                  obtain q where q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and q_def: "qone = \<langle>q, id one\<rangle>"
+                    by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)
+
+                  have "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle>) \<circ>\<^sub>c qone =
+                         (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle>)   \<circ>\<^sub>c \<langle>q, id one\<rangle>"
+                    by (typecheck_cfuncs, simp add: comp_associative2 q_def)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle> \<circ>\<^sub>c \<langle>q, id one\<rangle>"
+                    using comp_associative2 by (typecheck_cfuncs, auto)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>q, id one\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f x) \<circ>\<^sub>c \<langle>q, id one\<rangle>\<rangle>"
+                    using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>q, zero\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c q, x\<rangle>\<rangle>"
+                    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c q, zero \<circ>\<^sub>c id one\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c q, x \<circ>\<^sub>c id one\<rangle>\<rangle>"
+                    by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>q, zero\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c q, x \<rangle>\<rangle>"
+                    by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2)
+                  also have "... = \<t>"
+                    proof(cases "q = zero")
+                      assume "q = zero"
+                      then show ?thesis
+                        by (typecheck_cfuncs, metis IMPLIES_false_false_is_true NOT_true_is_false \<open>q = zero\<close> eq_pred_iff_eq ibase)
+                    next
+                      assume "q \<noteq> zero"
+                      then  obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "q = successor \<circ>\<^sub>c k"
+                        using \<open>q \<noteq> zero\<close> nonzero_is_succ by (typecheck_cfuncs, blast)
+                      then show ?thesis
+                      proof - 
+                        have "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>q, zero\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c q, x \<rangle>\<rangle> = 
+                              IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>q ,zero \<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>m  \<circ>\<^sub>c i \<circ>\<^sub>c k ,x\<rangle> \<rangle>"  
+                          using comp_associative2 i_induct k_def successor_type by (typecheck_cfuncs, auto)
+                        also have "... = \<t>"
+                          by (typecheck_cfuncs, meson IMPLIES_false_is_true_false NOT_is_false_implies_true eq_pred_iff_eq true_false_only_truth_values x_def)
+                        then show ?thesis 
+                          using  calculation by presburger
+                      qed
+                    qed
+                      also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>) \<circ>\<^sub>c qone"
+                        by (typecheck_cfuncs, smt (verit, best) comp_associative2 id_right_unit2 id_type terminal_func_comp terminal_func_unique)
+                      then show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f x\<rangle>) \<circ>\<^sub>c qone =
+          (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>) \<circ>\<^sub>c qone"
+                    using calculation by auto
+                qed
+              qed
+            qed
+            then show ?thesis
+              using  calculation transpose_func_def by (typecheck_cfuncs, presburger)
+            qed
+        qed
+        then show ?thesis
+          by (typecheck_cfuncs, metis FORALL_is_pullback  cfunc_type_def comp_associative is_pullback_def square_commutes_def terminal_func_comp)
+      qed
+
+      show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor =
+    id\<^sub>c \<Omega> \<circ>\<^sub>c FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp>"
+      proof (rule one_separator[where X="\<nat>\<^sub>c", where Y=\<Omega>])
+        show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+          by typecheck_cfuncs
+        show "id\<^sub>c \<Omega> \<circ>\<^sub>c FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+          by typecheck_cfuncs
+      next
+
+
+
+        fix n
+        assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  
+        have "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor \<circ>\<^sub>c n
+          = (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n"
+        proof (rule same_evals_equal[where Z="one", where X=\<Omega>, where A="\<nat>\<^sub>c"])
+          show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor \<circ>\<^sub>c n \<in>\<^sub>c \<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>"
+            by typecheck_cfuncs
+          show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n \<in>\<^sub>c \<Omega>\<^bsup>\<nat>\<^sub>c\<^esup>"
+            by typecheck_cfuncs
+          show "eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c
+    id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor \<circ>\<^sub>c n =
+    eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n"
+          proof -
+            have "eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c
+    id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor \<circ>\<^sub>c n
+              = eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))"
+              by (typecheck_cfuncs, metis identity_distributes_across_composition)
+
+            also have "... = (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))"
+              by (typecheck_cfuncs, smt (z3) comp_associative2 flat_cancels_sharp inv_transpose_func_def2)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) ,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))\<rangle> "
+              by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+
+            
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n), (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n) \<rangle>"
+            proof -
+              have "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) ,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))\<rangle> \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>
+                = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n) ,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n)\<rangle>  \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
+              proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
+                show "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "IMPLIES \<circ>\<^sub>c  \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+                show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+                  by typecheck_cfuncs
+
+                show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  zero = 
+    (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  zero"
+                proof -
+                  have "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  zero =
+                         IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>zero,id one \<rangle>"                   
+                    by (typecheck_cfuncs, smt (z3) cart_prod_extract_left cfunc_type_def comp_associative id_left_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>zero, id one\<rangle>, (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>zero, id one\<rangle>\<rangle>"
+                   by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2 id_cross_prod id_right_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c n\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c n\<rangle>\<rangle>"
+                    by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 id_right_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c n\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>x, m \<circ>\<^sub>c i \<circ>\<^sub>c n\<rangle>\<rangle>"
+                    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod comp_associative2 i_induct ibase)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c n\<rangle>, \<t> \<rangle>"
+                    by (typecheck_cfuncs, metis NOT_false_is_true eq_pred_iff_eq true_false_only_truth_values x_def)
+                  also have "... = \<t>"
+                    by (typecheck_cfuncs, metis IMPLIES_false_is_true_false true_false_only_truth_values)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>zero, n\<rangle> \<rangle>"
+                  proof(cases "n = zero", auto) 
+                    assume "n = zero"
+                    then have "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>zero, n\<rangle> \<rangle> = IMPLIES \<circ>\<^sub>c \<langle>\<f>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>zero, n\<rangle> \<rangle>"
+                      by (typecheck_cfuncs, metis NOT_true_is_false \<open>n = zero\<close> eq_pred_iff_eq)
+                    then show "\<t> = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero,zero\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>zero,zero\<rangle>\<rangle>"
+                      by (typecheck_cfuncs, metis IMPLIES_false_is_true_false  \<open>n = zero\<close> true_false_only_truth_values)
+                  next
+                    assume "n \<noteq> zero"
+                    then  obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "n = successor \<circ>\<^sub>c k"
+                      using \<open>n \<noteq> zero\<close> nonzero_is_succ by (typecheck_cfuncs, blast)
+                    then have "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>zero, n\<rangle> \<rangle> = 
+                               IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>x, i \<circ>\<^sub>c successor \<circ>\<^sub>c k\<rangle> \<rangle>"
+                      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod ibase k_def)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle>, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>x,m  \<circ>\<^sub>c  i  \<circ>\<^sub>c  k\<rangle> \<rangle>"
+                      using comp_associative2 i_induct by (typecheck_cfuncs, force)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle>, \<t>\<rangle>"
+                      by (typecheck_cfuncs, metis NOT_false_is_true eq_pred_iff_eq true_false_only_truth_values x_def)
+                    then show ?thesis
+                      by (typecheck_cfuncs, metis IMPLIES_false_true_is_true IMPLIES_true_true_is_true calculation true_false_only_truth_values)
+                  qed
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n) \<circ>\<^sub>c \<langle>zero, id one\<rangle>, (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n) \<circ>\<^sub>c \<langle>zero, id one\<rangle>\<rangle>"
+                    by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 id_right_unit2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n), (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n)\<rangle> \<circ>\<^sub>c \<langle>zero, id one\<rangle>"
+                    by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+                  also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n), (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n)\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero, \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero\<rangle>"
+                    by (typecheck_cfuncs, metis id_left_unit2 one_unique_element)
+                  also have "... = (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n, (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
+                    by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+                  also have "... = (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  zero"
+                    by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative id_cross_prod id_right_unit2)
+                  then show ?thesis
+                    using calculation by presburger
+                qed
+  
+                show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  successor =
+    id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
+                proof(rule one_separator[where X = "\<nat>\<^sub>c", where Y = "\<Omega>"])
+                  show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
+                          successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                    by typecheck_cfuncs
+                  show "id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c  \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> 
+                        : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                    by typecheck_cfuncs
+                  show "\<And>q. q \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+                    ((IMPLIES \<circ>\<^sub>c  \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q =
+ (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n, NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
+                  proof - 
+                    fix q 
+                    assume q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c"
+
+                    have "((IMPLIES \<circ>\<^sub>c  
+                                        \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
+                                        NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q
+                        = IMPLIES \<circ>\<^sub>c  
+                                        \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
+                                        NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c q)"
+                      by (typecheck_cfuncs, smt (z3) comp_associative2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
+                        NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))
+                            \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (successor \<circ>\<^sub>c q) ,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c (successor \<circ>\<^sub>c q)\<rangle>"
+                      using cfunc_prod_comp id_cross_prod id_left_unit2 by (typecheck_cfuncs, auto)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)),
+                             (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))
+                            \<rangle> \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,id one\<rangle>"
+                      by (typecheck_cfuncs, smt (z3) beta_N_succ_mEqs_Id1 cfunc_type_def comp_associative id_left_unit2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,id one\<rangle>,
+                             (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,id one\<rangle>
+                            \<rangle>"
+                      using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs,force)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c id one\<rangle>,
+                             (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c id one\<rangle>
+                            \<rangle>"
+                      using cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n)\<rangle>,
+                             (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n)\<rangle>
+                            \<rangle>"
+                      using id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n)\<rangle>,
+                              (NOT \<circ>\<^sub>c eq_pred X) \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c (successor \<circ>\<^sub>c q) ,i \<circ>\<^sub>c (successor \<circ>\<^sub>c n)\<rangle>
+                            \<rangle>"
+                      by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n)\<rangle>,
+                              NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c (successor \<circ>\<^sub>c q) ,i \<circ>\<^sub>c (successor \<circ>\<^sub>c n)\<rangle>
+                            \<rangle>"
+                      using comp_associative2 by (typecheck_cfuncs, force)
+                    also have "... = \<t>"
+                    proof(cases "n = q", auto)
+                      assume "n = q"
+                      have "IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c q\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c q\<rangle>\<rangle> = 
+                            IMPLIES \<circ>\<^sub>c
+    \<langle>\<f>,                                                  NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c q\<rangle>\<rangle>"
+                        by (typecheck_cfuncs, metis NOT_true_is_false eq_pred_iff_eq)
+                      then show "IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c q\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c q\<rangle>\<rangle> = \<t>"
+                        by (typecheck_cfuncs, metis IMPLIES_false_false_is_true NOT_true_is_false eq_pred_iff_eq)
+                    next 
+                      assume "n \<noteq> q"
+                      have "IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>  = \<t>"
+                      proof(rule ccontr) 
+                        assume "IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>  \<noteq> \<t>"
+                        then have "IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle> = \<f>"
+                          using true_false_only_truth_values by (typecheck_cfuncs, blast)
+                        then have "(NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle> = \<t>) \<and> 
+                                   (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle> = \<f>)"
+                          using IMPLIES_false_is_true_false by (typecheck_cfuncs, presburger)
+                        then have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle> = \<f>) \<and> 
+                                   (eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle> = \<t>)"
+                          by (typecheck_cfuncs, metis NOT_true_is_false true_false_only_truth_values)
+                        then have "(successor \<circ>\<^sub>c q \<noteq> successor \<circ>\<^sub>c n) \<and> 
+                                    (i \<circ>\<^sub>c successor \<circ>\<^sub>c q = i \<circ>\<^sub>c successor \<circ>\<^sub>c n)"
+                          by (typecheck_cfuncs, metis  \<open>n \<noteq> q\<close> eq_pred_iff_eq succ_inject)
+                         
+                        then have "(q \<noteq> n) \<and> (i \<circ>\<^sub>c q = i \<circ>\<^sub>c n)"
+                          by (typecheck_cfuncs, smt (verit, ccfv_SIG)  comp_associative2 i_induct m_mono m_type monomorphism_def2 successor_type)
+                          oops
+
+(*Notice this is true for any choice of q and n, which means that i \<circ>\<^sub>c k  is constant for all k; in particular,
+if k = zero, then i \<circ>\<^sub>c k = x, which shows us that it always is equal to x. Does this lead to a contradiction?*)
+
+
+                      then show "IMPLIES \<circ>\<^sub>c
+    \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle> =  \<t>"
+                        apply typecheck_cfuncs
+
+
+
+
+                      also have "... =   IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c   \<langle>i  \<circ>\<^sub>c q, i  \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>,
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>q, successor \<circ>\<^sub>c n\<rangle>
+                            \<rangle>"
+                      by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_is_true_implies_false eq_pred_iff_eq true_false_only_truth_values)
+                    thm monomorphism_def
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c  \<langle>q, successor \<circ>\<^sub>c n\<rangle>,
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>q, successor \<circ>\<^sub>c n\<rangle>
+                            \<rangle>"
+                      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>q, id one\<rangle>,
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>q, id one\<rangle>
+                            \<rangle>"
+                      by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 id_right_unit2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n
+                            \<rangle> \<circ>\<^sub>c \<langle>q, id one\<rangle>"
+                      using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                              (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n
+                            \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c q"
+                      using cart_prod_extract_left id_left_unit2 by (typecheck_cfuncs, force)
+                    also have "... = (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>
+                              (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
+                              NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n
+                            \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
+                      by (typecheck_cfuncs, simp add: comp_associative2 id_left_unit2)
+                    then show "((IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q = (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
+                      using calculation by presburger
+                  qed
+                qed
+                show "(IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor
+                  = id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
+                proof(rule one_separator[where X = "\<nat>\<^sub>c", where Y = "\<Omega>"])
+                  show "(IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor
+                      : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                    by typecheck_cfuncs
+                  show "id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>
+                      : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+                    by typecheck_cfuncs
+                  show "\<And>q. q \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+                    ((IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q
+                      = (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
+                  proof - 
+                    fix q
+                    assume q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c"
+
+                    have "((IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n
+                          \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q
+                        = IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n
+                          \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c (successor  \<circ>\<^sub>c q)"
+                      by (typecheck_cfuncs, smt (z3) comp_associative2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n
+                          \<rangle> \<circ>\<^sub>c \<langle>successor  \<circ>\<^sub>c q, id one\<rangle>"
+                      by (typecheck_cfuncs, metis cart_prod_extract_left id_left_unit2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n) \<circ>\<^sub>c \<langle>successor  \<circ>\<^sub>c q, id one\<rangle>,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n) \<circ>\<^sub>c \<langle>successor  \<circ>\<^sub>c q, id one\<rangle>
+                          \<rangle>"
+                      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c  \<langle>successor  \<circ>\<^sub>c q, n\<rangle>,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>successor  \<circ>\<^sub>c q, n\<rangle>
+                          \<rangle>"
+                      using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c successor  \<circ>\<^sub>c q, i \<circ>\<^sub>c n\<rangle>,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>successor  \<circ>\<^sub>c q, n\<rangle>
+                          \<rangle>"
+                      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+                    also have "... = \<t>"  
+                      by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_false_is_true eq_pred_iff_eq true_false_only_truth_values)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c   \<langle>i \<circ>\<^sub>c q,i \<circ>\<^sub>c n\<rangle>, 
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>q, n\<rangle>
+                          \<rangle>"
+                      by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_false_is_true eq_pred_iff_eq true_false_only_truth_values)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c  \<langle>q,n\<rangle>, 
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>q, n\<rangle>
+                          \<rangle>"
+                      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n) \<circ>\<^sub>c \<langle>q,id one\<rangle>, 
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n) \<circ>\<^sub>c \<langle>q,id one\<rangle>
+                          \<rangle>"
+                      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n),
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n)
+                          \<rangle> \<circ>\<^sub>c \<langle>q,id one\<rangle>"
+                      using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
+                    also have "... = IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n
+                          \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c q"
+                      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp terminal_func_unique)
+                    also have "... = (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n
+                          \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
+                      by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative id_left_unit2)
+                    then show "((IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q = (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
+                      using calculation by presburger
+                  qed
+                qed
+              qed
+              then have "IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n
+                          \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one
+                        = IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n
+                          \<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one"
+                by (typecheck_cfuncs_prems, smt (z3) comp_associative2 left_cart_proj_type)
+              then show "IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n
+                          \<rangle>
+                        = IMPLIES \<circ>\<^sub>c \<langle>
+                            (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,
+                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n
+                          \<rangle>"
+                by (typecheck_cfuncs_prems, metis  id_right_unit2 left_cart_proj_one_left_inverse)
+            qed
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i), NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n)"
+              by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+            also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i), NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<rangle> \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n)"
+              by (typecheck_cfuncs, simp add: id_cross_prod id_right_unit2)
+            also have "... = eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i), NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n)"
+              by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
+            also have "... = eval_func \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n"
+              by (typecheck_cfuncs, metis identity_distributes_across_composition)
+            then show ?thesis
+              using calculation by auto
+          qed
+        qed
+        then show "((FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor) \<circ>\<^sub>c n
+            = (id\<^sub>c \<Omega> \<circ>\<^sub>c FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c n"
+          by (typecheck_cfuncs, smt (z3) cfunc_type_def comp_associative id_left_unit2 succ_n_type)
+      qed
+
+      show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+        by (typecheck_cfuncs, smt (z3) comp_associative2 id_left_unit2 terminal_func_comp)
+    qed
+
+
+
+
+(*
     have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) ,
                       NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f id \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
     proof (rule natural_number_object_func_unique[where X="\<Omega>", where f="id \<Omega>"])
@@ -1190,424 +1798,10 @@ next
       show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
         by (typecheck_cfuncs, smt (z3) comp_associative2 id_left_unit2 terminal_func_comp)
     qed
+*)
+ 
 
 
-            (* proof - 
-                have "IMPLIES \<circ>\<^sub>c
-    \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> =  
-                      IMPLIES \<circ>\<^sub>c
-    \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)),
-      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))\<rangle>"
-                  using comp_associative2 by (typecheck_cfuncs, auto)
-                also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>c one\<^esub>"
-            proof -
-              have "IMPLIES \<circ>\<^sub>c
-    \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)),
-    NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))\<rangle> \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
-              proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
-                show "IMPLIES \<circ>\<^sub>c
-    \<langle>NOT \<circ>\<^sub>c
-     eq_pred X \<circ>\<^sub>c
-     (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-    \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                  by typecheck_cfuncs
-                show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                  by typecheck_cfuncs
-                show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-                  by typecheck_cfuncs
-                show "(IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-     NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  zero =
-          (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
-                proof - 
-                  have "(IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-     NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  zero = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)),
-     NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))\<rangle> \<circ>\<^sub>c \<langle>zero, id one\<rangle>"
-                    by (typecheck_cfuncs, metis cart_prod_extract_left cfunc_type_def comp_associative id_left_unit2)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>zero, id one\<rangle>,
-     NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>zero, id one\<rangle> \<rangle>"
-                    using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c  \<langle>zero, (successor \<circ>\<^sub>c n)\<rangle>,
-     NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c            \<circ>\<^sub>c \<langle>zero, (successor \<circ>\<^sub>c n)\<rangle> \<rangle>"
-                    using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c            \<langle>i \<circ>\<^sub>c zero, i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>,
-     NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c            \<circ>\<^sub>c \<langle>zero, (successor \<circ>\<^sub>c n)\<rangle> \<rangle>"
-                    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c            \<langle>x, m \<circ>\<^sub>c i \<circ>\<^sub>c n\<rangle>,
-     NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c            \<circ>\<^sub>c \<langle>zero, (successor \<circ>\<^sub>c n)\<rangle> \<rangle>"
-                    by (typecheck_cfuncs, metis cfunc_type_def comp_associative i_induct ibase)
-                  also have "... = \<t>" 
-                    by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_false_is_true eq_pred_iff_eq true_false_only_truth_values zero_is_not_successor)
-                  also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
-                    using comp_associative2 is_even_def2 is_even_nth_even_true nth_even_def2 zero_type by fastforce
-                  then show ?thesis
-                    using calculation by presburger
-                qed
-                show "(IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c
-      eq_pred X \<circ>\<^sub>c
-      (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-    successor =
-    id\<^sub>c \<Omega> \<circ>\<^sub>c
-    IMPLIES \<circ>\<^sub>c
-    \<langle>NOT \<circ>\<^sub>c
-     eq_pred X \<circ>\<^sub>c
-     (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-    \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-                proof - 
-                  have "(IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c
-      eq_pred X \<circ>\<^sub>c
-      (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-    successor = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c
-      eq_pred X \<circ>\<^sub>c
-      (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c successor"
-                    by (typecheck_cfuncs, metis cfunc_type_def comp_associative)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>successor,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-                    using cfunc_prod_comp id_left_unit2 terminal_func_comp by (typecheck_cfuncs, force)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>successor,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,
-      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>successor,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<rangle>"
-                    using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
-                   also have "... = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c    \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,
-      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<rangle>"
-                     using cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)                   
-                   also have "... = IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c    \<langle>successor, (successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,
-      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<rangle>"
-                     using id_left_unit2 by (typecheck_cfuncs, presburger)
-                   also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
-                   proof(rule one_separator[where X = "\<nat>\<^sub>c", where Y = \<Omega>])            
-                     show "IMPLIES \<circ>\<^sub>c
-    \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>successor, (successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,
-     NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                       by typecheck_cfuncs
-                     show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                       by typecheck_cfuncs
-                     show "\<And>q. q \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
-         (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c(i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,
-                     NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c  q = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c q"
-                     proof - 
-                       fix q 
-                       assume q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c"
-                       have "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c(i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,
-                     NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c  q = 
-                            IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c(i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,
-                                               NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle> \<circ>\<^sub>c  q"
-                         using comp_associative2 by (typecheck_cfuncs, force)
-                       also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c(i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c  q,
-                                               NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>  \<circ>\<^sub>c  q \<rangle>"
-                         by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-                       also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c(i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c  q,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c  q\<rangle> ,
-                                               NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor \<circ>\<^sub>c  q,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c  q\<rangle>\<rangle>"
-                         using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
-                      also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c(i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c  q, successor \<circ>\<^sub>c n\<rangle> ,
-                                               NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c  q, successor \<circ>\<^sub>c n\<rangle>\<rangle>"
-                        by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 id_type one_unique_element)
-                      also have "... = IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c  q, i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle> ,
-                                               NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c  q, successor \<circ>\<^sub>c n\<rangle>\<rangle>"
-                        using cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, auto)
-                      also have "... = \<t>"
-                        by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_is_true_implies_false eq_pred_iff_eq true_false_only_truth_values)
-                      also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c q"
-                        by (typecheck_cfuncs, smt (z3) beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 successor_type terminal_func_comp)
-                      then show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c(i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>,
-                     NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c  q = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c q"
-                        using calculation by presburger
-                    qed
-                  qed
-                  show "(IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-    successor =
-    id\<^sub>c \<Omega> \<circ>\<^sub>c
-    IMPLIES \<circ>\<^sub>c
-    \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-    \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-                  proof(rule one_separator[where X = "\<nat>\<^sub>c", where Y = \<Omega>])
-                    show "(IMPLIES \<circ>\<^sub>c
-     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-    successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                      by typecheck_cfuncs
-                    show "id\<^sub>c \<Omega> \<circ>\<^sub>c
-    IMPLIES \<circ>\<^sub>c
-    \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-    \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                      by typecheck_cfuncs
-                    show "\<And>q. q \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
-         ((IMPLIES \<circ>\<^sub>c
-           \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-           \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-          successor) \<circ>\<^sub>c q =
-         (id\<^sub>c \<Omega> \<circ>\<^sub>c
-          IMPLIES \<circ>\<^sub>c
-          \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-          \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
-                    proof -
-                      fix q 
-                      assume q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c"
-
-                      have "((IMPLIES \<circ>\<^sub>c
-           \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-           \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-          successor) \<circ>\<^sub>c q = IMPLIES \<circ>\<^sub>c
-           \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-           \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c q)"
-                        by (typecheck_cfuncs, smt (z3) comp_associative2)
-                      also have "... = IMPLIES \<circ>\<^sub>c
-           \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-           \<langle>successor \<circ>\<^sub>c q, id one\<rangle>"
-                        using cart_prod_extract_left id_left_unit2 by (typecheck_cfuncs, force)
-                      also have "... = IMPLIES \<circ>\<^sub>c
-           \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q, id one\<rangle> ,
-            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q, id one\<rangle> \<rangle>"
-                        using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
-                      also have "... = IMPLIES \<circ>\<^sub>c
-           \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c  \<langle>successor \<circ>\<^sub>c q, successor \<circ>\<^sub>c n\<rangle> ,
-            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q, successor \<circ>\<^sub>c n\<rangle> \<rangle>"
-                        using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-                      also have "... = IMPLIES \<circ>\<^sub>c
-           \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q, i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle> ,
-            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q, successor \<circ>\<^sub>c n\<rangle> \<rangle>"
-                        by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-                      also have "... = \<t>"
-                        by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_true_is_false eq_pred_iff_eq true_false_only_truth_values)
-                     also have "... = IMPLIES \<circ>\<^sub>c
-                              \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n \<rangle>,
-                               NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>q, successor \<circ>\<^sub>c n \<rangle>\<rangle>"
-                       by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_is_false_implies_true eq_pred_iff_eq true_false_only_truth_values)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                              \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>q,successor \<circ>\<^sub>c n \<rangle>,
-                               NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>q, successor \<circ>\<^sub>c n \<rangle>\<rangle>"
-                      using cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                              \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>q,id one \<rangle>,
-                               NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>q,id one \<rangle>\<rangle>"
-                      using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                              \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)),NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))\<rangle> \<circ>\<^sub>c \<langle>q,id one \<rangle>"
-                      using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                              \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-                              \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c q"
-                      using cart_prod_extract_left id_left_unit2 by (typecheck_cfuncs, force)
-                    also have "... = (id\<^sub>c \<Omega> \<circ>\<^sub>c
-                              IMPLIES \<circ>\<^sub>c
-                              \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-                              \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
-                      by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative id_left_unit2)
-                    then show "((IMPLIES \<circ>\<^sub>c  \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c  \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q = (id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
-                      using calculation by presburger
-                  qed
-                qed
-              qed
-              show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
-                by (typecheck_cfuncs, smt (verit, best) comp_associative2 id_left_unit2 terminal_func_comp)
-            qed
-            show "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> =
-    \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>"
-            proof(rule one_separator[where X = "\<nat>\<^sub>c \<times>\<^sub>c one", where Y = "\<Omega>"])
-              show "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c
-     eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<Omega>"
-                by typecheck_cfuncs
-              show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub> : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<Omega>"
-                by typecheck_cfuncs
-              show "\<And>qone. qone \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c one \<Longrightarrow>
-         (IMPLIES \<circ>\<^sub>c
-          \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle>) \<circ>\<^sub>c
-        qone =
-         (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>) \<circ>\<^sub>c qone"
-              proof - 
-                fix qone
-                assume qone_type[type_rule]: "qone \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c one"
-                then obtain q where q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and q_def: "qone = \<langle>q, id one\<rangle>"
-                  by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)
-
-                have "(IMPLIES \<circ>\<^sub>c
-          \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle>) \<circ>\<^sub>c qone = 
-                      IMPLIES \<circ>\<^sub>c
-          \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle>  \<circ>\<^sub>c  \<langle>q, id one\<rangle>"
-                  using comp_associative2 q_def by (typecheck_cfuncs, force)
-                also have "... = IMPLIES \<circ>\<^sub>c
-          \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c  \<langle>q, id one\<rangle>,
-          NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c  \<langle>q, id one\<rangle>\<rangle>"
-                  using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
-                also have "... = IMPLIES \<circ>\<^sub>c
-          \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c \<langle>q, successor \<circ>\<^sub>c n\<rangle>,
-          NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c    \<langle>q, successor \<circ>\<^sub>c n\<rangle>\<rangle>"
-                  using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-            also have "... = IMPLIES \<circ>\<^sub>c
-          \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c q, i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>,
-          NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c    \<langle>q, successor \<circ>\<^sub>c n\<rangle>\<rangle>"
-              by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-            also have "... = \<t>"
-              by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_is_true_implies_false eq_pred_iff_eq true_false_only_truth_values)
-            also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>) \<circ>\<^sub>c qone"
-              by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type terminal_func_comp terminal_func_unique)
-            then show "(IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle>) \<circ>\<^sub>c qone = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>) \<circ>\<^sub>c qone"
-              using  calculation by (typecheck_cfuncs, presburger)
-          qed
-        qed
-      qed
-      show "IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> =
-            IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle>"
-      proof - 
-        have "IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> =
-             \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>c one\<^esub>"
-            proof -
-              have "IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-                                NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle>
-                                \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
-              proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
-                show "IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-                        \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                  by typecheck_cfuncs
-                show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                  by typecheck_cfuncs
-                show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-                  by typecheck_cfuncs
-                show "(IMPLIES \<circ>\<^sub>c
-                     \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-                      \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
-                proof - 
-                  have "(IMPLIES \<circ>\<^sub>c
-                     \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-                      \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = IMPLIES \<circ>\<^sub>c
-                     \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-                      \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero"
-                    using comp_associative2 by (typecheck_cfuncs, force)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-                     \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)),
-                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n))\<rangle> \<circ>\<^sub>c \<langle>zero, id one\<rangle>"
-                    using cart_prod_extract_left id_left_unit2 by (typecheck_cfuncs, force)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-                     \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>zero, id one\<rangle> ,
-                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>zero, id one\<rangle>  \<rangle>"
-                    using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-                     \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c   \<langle>zero, successor \<circ>\<^sub>c n\<rangle> ,
-                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>zero, successor \<circ>\<^sub>c n\<rangle>  \<rangle>"
-                    using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-                     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c   \<langle>zero, successor \<circ>\<^sub>c n\<rangle> ,
-                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>zero, successor \<circ>\<^sub>c n\<rangle>  \<rangle>"
-                    by (typecheck_cfuncs, metis (full_types) IMPLIES_false_is_true_false NOT_is_false_implies_true eq_pred_iff_eq true_false_only_truth_values zero_is_not_successor)
-                  also have "... = IMPLIES \<circ>\<^sub>c
-                     \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c zero, i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle> ,
-                      NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c   \<langle>zero, successor \<circ>\<^sub>c n\<rangle>  \<rangle>"
-                    by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-                  also have "... = \<t>"
-                    by (typecheck_cfuncs, metis IMPLIES_false_is_true_false NOT_false_is_true eq_pred_iff_eq true_false_only_truth_values)
-                  also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
-                    using comp_associative2 is_even_def2 is_even_nth_even_true nth_even_def2 by (typecheck_cfuncs, force)
-                  then show ?thesis
-                    using calculation by presburger
-                qed
-                show "(IMPLIES \<circ>\<^sub>c
-     \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-     \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-    successor =
-    id\<^sub>c \<Omega> \<circ>\<^sub>c
-    IMPLIES \<circ>\<^sub>c
-    \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-    \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-                proof(rule one_separator[where X ="\<nat>\<^sub>c", where Y = \<Omega>])
-                  show "(IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-                            successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                    by typecheck_cfuncs
-                  show "id\<^sub>c \<Omega> \<circ>\<^sub>c IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>
-                                       : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-                    by typecheck_cfuncs
-                  show "\<And>q. q \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
-        ((IMPLIES \<circ>\<^sub>c
-           \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-           \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-          successor) \<circ>\<^sub>c
-         q =
-         (id\<^sub>c \<Omega> \<circ>\<^sub>c
-          IMPLIES \<circ>\<^sub>c
-          \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-          \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
-         q"
-                  proof - 
-                    fix q 
-                    assume q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c"
-                    have "((IMPLIES \<circ>\<^sub>c
-                          \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q  = 
-                          IMPLIES \<circ>\<^sub>c
-                          \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c q)"
-                      by (typecheck_cfuncs, smt (z3) comp_associative2)
-                    also have  "... = IMPLIES \<circ>\<^sub>c
-                          \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,
-                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,id one\<rangle>"
-                      by (typecheck_cfuncs, metis cart_prod_extract_left cfunc_type_def id_left_unit)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                          \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,id one\<rangle>,
-                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,id one\<rangle> \<rangle>"
-                      by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                          \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c  \<langle>(successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n)\<rangle>,
-                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n)\<rangle> \<rangle>"
-                      using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                          \<langle> NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c  \<langle>i \<circ>\<^sub>c (successor \<circ>\<^sub>c q) ,i \<circ>\<^sub>c (successor \<circ>\<^sub>c n)\<rangle>,
-                            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c q) ,(successor \<circ>\<^sub>c n)\<rangle> \<rangle>"
-                      by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-          \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c  \<langle>q,successor \<circ>\<^sub>c n\<rangle>,
-            NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>q,successor \<circ>\<^sub>c n\<rangle> \<rangle>"
-                      by (typecheck_cfuncs, smt (z3) IMPLIES_false_false_is_true IMPLIES_false_true_is_true IMPLIES_true_true_is_true NOT_is_false_implies_true cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_associative eq_pred_iff_eq true_false_only_truth_values)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                              \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>q,id one\<rangle>,
-                                NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)) \<circ>\<^sub>c \<langle>q,id one\<rangle>\<rangle>"
-                      using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-                    also have "... = IMPLIES \<circ>\<^sub>c
-                            \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-                            \<langle>q,id one\<rangle>"
-                      using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
-                    also have "... = (id\<^sub>c \<Omega> \<circ>\<^sub>c
-                            IMPLIES \<circ>\<^sub>c
-                            \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c
-                            \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q" 
-                      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp terminal_func_unique)
-                    then show "((IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c   successor) \<circ>\<^sub>c  q =  (id\<^sub>c \<Omega> \<circ>\<^sub>c   IMPLIES \<circ>\<^sub>c  \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c  \<langle>id\<^sub>c \<nat>\<^sub>c,\<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c q"
-                      using calculation by presburger
-                  qed
-                qed
-                show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
-                  by (typecheck_cfuncs, smt (z3) comp_associative2 id_left_unit2 terminal_func_comp)
-              qed
-              show "IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> =
-    \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>"
-                using \<open>IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c (i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>\<close> calculation by presburger
-            qed
-            show "IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c n\<rangle> =
-    IMPLIES \<circ>\<^sub>c \<langle>(NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n,NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f n\<rangle>
-" *)
-(* This seems to be on line 932 as well.... Are we going in circles?*)
-              oops             
+    oops
 
 end
