@@ -563,6 +563,20 @@ proof -
   qed
 qed
 
+(* Definition 2.3.7 *)
+definition image_of :: "cset \<times> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" where
+  "image_of A f Y = (SOME B. \<exists>g m. g : fst A \<rightarrow> B \<and> m : B \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f \<circ>\<^sub>c (snd A) = m \<circ>\<^sub>c g)"
+
+lemma image_of_def2:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "\<exists>g m. g : A \<rightarrow> (image_of (A,n) f Y) \<and> m : (image_of (A,n) f Y) \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g"
+proof -
+  have "\<exists>g m. g : fst (A,n) \<rightarrow> (image_of (A,n) f Y) \<and> m : (image_of (A,n) f Y) \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f \<circ>\<^sub>c (snd (A,n)) = m \<circ>\<^sub>c g"
+    by (unfold image_of_def, rule_tac someI_ex, smt (verit, ccfv_SIG) comp_type epi_monic_factorization fst_conv assms snd_conv)
+  then show "\<exists>g m. g : A \<rightarrow> (image_of (A,n) f Y) \<and> m : (image_of (A,n) f Y) \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g"
+    by auto
+qed
+  
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
   shows "(Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z)) \<subseteq>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z)"
