@@ -433,7 +433,6 @@ have fact2: "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c
 
     then show False
       using true_false_distinct by auto
-
 qed
 
 lemma maps_into_1u1:

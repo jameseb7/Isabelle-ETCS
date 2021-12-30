@@ -1,5 +1,5 @@
 theory Countable
-  imports ETCS_Axioms ETCS_Add ETCS_Mult ETCS_Pred ETCS_Parity
+  imports ETCS_Axioms ETCS_Add ETCS_Mult ETCS_Pred ETCS_Parity ETCS_Comparison
 begin
 
 (* Definition 2.6.9 *)
@@ -1055,6 +1055,47 @@ next
                             \<rangle>"
                         using comp_associative2 by (typecheck_cfuncs, force)
                       also have "... = \<t>"
+
+                      proof(rule ccontr)
+                        assume "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>
+                               \<noteq>  \<t>"
+                        then have "IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>
+                               = \<f>"
+                          using  true_false_only_truth_values by (typecheck_cfuncs, blast)
+                        then have "(NOT \<circ>\<^sub>c  eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle> = \<t>)\<and> 
+                                   (NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>) = \<f>"
+                          using IMPLIES_false_is_true_false  by (typecheck_cfuncs, blast)
+                        then have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c n\<rangle> = \<f>)\<and> 
+                                   (eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>) = \<t>"
+                          by (typecheck_cfuncs, metis NOT_false_is_true true_false_only_truth_values)
+                        then have "(n \<noteq> q) \<and> (i \<circ>\<^sub>c successor \<circ>\<^sub>c q = i \<circ>\<^sub>c successor \<circ>\<^sub>c n)" 
+                          by (typecheck_cfuncs, metis  eq_pred_iff_eq true_false_distinct)
+                        then have "m \<circ>\<^sub>c i \<circ>\<^sub>c q = m \<circ>\<^sub>c i \<circ>\<^sub>c n"
+                          using  comp_associative2 i_induct successor_type by (typecheck_cfuncs, force)
+                        then have "i \<circ>\<^sub>c q = i \<circ>\<^sub>c n" 
+                          using  m_mono m_type monomorphism_def3 by (typecheck_cfuncs, blast)
+                        show False
+                        proof(cases "leq \<circ>\<^sub>c \<langle>n, q\<rangle> = \<t>")
+                          assume "leq \<circ>\<^sub>c \<langle>n, q\<rangle> = \<t>"
+                          then obtain v where v_type[type_rule]: "v \<in>\<^sub>c \<nat>\<^sub>c" and v_def: "v +\<^sub>\<nat> n = q"
+                            by (typecheck_cfuncs, meson leq_true_implies_exists)
+                          show False
+                          proof(cases "v = zero")
+                            assume "v = zero"
+                            then show False
+                              using \<open>n \<noteq> q \<and> i \<circ>\<^sub>c successor \<circ>\<^sub>c q = i \<circ>\<^sub>c successor \<circ>\<^sub>c n\<close>  add_respects_zero_on_left n_type v_def by presburger
+                          next  
+                            assume "v \<noteq> zero"
+                            then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "v = successor \<circ>\<^sub>c k"
+                              using  nonzero_is_succ by (typecheck_cfuncs, blast)
+                            
+
+
+
+
+
+(*
+
                       proof(cases "n = q", auto)
                         assume "n = q"
                         have "IMPLIES \<circ>\<^sub>c\<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c q,successor \<circ>\<^sub>c q\<rangle>,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c \<langle>i \<circ>\<^sub>c successor \<circ>\<^sub>c q,i \<circ>\<^sub>c successor \<circ>\<^sub>c q\<rangle>\<rangle>
@@ -1088,7 +1129,7 @@ next
                           
                           thm i_induct
                           oops
-
+*)
                      
 
 (*Notice this is true for any choice of q and n, which means that i \<circ>\<^sub>c k  is constant for all k; in particular,

@@ -565,7 +565,12 @@ qed
 
 (* Definition 2.3.7 *)
 definition image_of :: "cset \<times> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" where
-  "image_of A f Y = (SOME B. \<exists>g m. g : fst A \<rightarrow> B \<and> m : B \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f \<circ>\<^sub>c (snd A) = m \<circ>\<^sub>c g)"
+  "image_of An f Y = (SOME fA. \<exists>g m. g : fst An \<rightarrow> fA \<and> m : fA \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f \<circ>\<^sub>c (snd An) = m \<circ>\<^sub>c g)"
+
+(*An above is (A,n) below 
+so that fst An is just the set A 
+while snd An is just n, and fA corresponds to f(A) or \<exists>\<^sub>f(f) in the text.*)
+
 
 lemma image_of_def2:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
@@ -576,7 +581,19 @@ proof -
   then show "\<exists>g m. g : A \<rightarrow> (image_of (A,n) f Y) \<and> m : (image_of (A,n) f Y) \<rightarrow> Y \<and> epimorphism g \<and> monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g"
     by auto
 qed
+
+(*Now we show that f(A) is the smallest subobject of Y through which f factors (in the sense of epi-monic factorization)*)
+(*Proposition 2.3.8*)
+
+lemma image_of_def3: 
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X" "monomorphism n"   (* A is a subobject of X *)                                              
+  assumes "e : X \<rightarrow> Q" "m : Q \<rightarrow> Y" "epimorphism e" "monomorphism m" "f = m \<circ>\<^sub>c e"(* Now we consider an arbitrary subobject of Y which factors thru f*)
+  shows   "\<exists> i. i : Q  \<rightarrow>  (image_of (A,n) f Y) \<and> monomorphism i "  (*We want to show that (image_of (A,n) f Y) is the smallest such set.*)
+                      
   
+
+
+
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
   shows "(Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z)) \<subseteq>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z)"
