@@ -586,9 +586,9 @@ qed
 (*Proposition 2.3.8*)
 
 lemma image_of_def3: 
-  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X" "monomorphism n"   (* A is a subobject of X *)                                              
-  assumes "e : X \<rightarrow> Q" "m : Q \<rightarrow> Y" "epimorphism e" "monomorphism m" "f = m \<circ>\<^sub>c e"(* Now we consider an arbitrary subobject of Y which factors thru f*)
-  shows   "\<exists> i. i : Q  \<rightarrow>  (image_of (A,n) f Y) \<and> monomorphism i "  (*We want to show that (image_of (A,n) f Y) is the smallest such set.*)
+  assumes "f : X \<rightarrow> Y" "a : A \<rightarrow> X" "monomorphism a"   (* A is a subobject of X *)                                              
+  assumes "g : X \<rightarrow> B" "n : B \<rightarrow> Y" "epimorphism g" "monomorphism n" "f = n \<circ>\<^sub>c g"(* Now we consider an arbitrary subobject of Y which factors thru f*)
+  shows   "\<exists> i. i : (image_of (A,n) f Y)  \<rightarrow> B  \<and> monomorphism i "  (*We want to show that (image_of (A,n) f Y) is the smallest such set.*)
                       
   
 
