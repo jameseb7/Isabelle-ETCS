@@ -589,9 +589,12 @@ lemma image_of_def3:
   assumes "f : X \<rightarrow> Y" "a : A \<rightarrow> X" "monomorphism a"   (* A is a subobject of X *)                                              
   assumes "g : X \<rightarrow> B" "n : B \<rightarrow> Y" "epimorphism g" "monomorphism n" "f = n \<circ>\<^sub>c g"(* Now we consider an arbitrary subobject of Y which factors thru f*)
   shows   "\<exists> i. i : (image_of (A,n) f Y)  \<rightarrow> B  \<and> monomorphism i "  (*We want to show that (image_of (A,n) f Y) is the smallest such set.*)
-                      
+  oops              
   
-
+lemma image_of_def3:
+  assumes "f : X \<rightarrow> Y" "a : A \<rightarrow> X"
+  shows "(B, n) \<subseteq>\<^sub>c Y \<Longrightarrow> f factorsthru n \<Longrightarrow> \<exists>i. (image_of (A,n) f Y, i) \<subseteq>\<^sub>c B"
+  oops
 
 
 lemma left_pair_subset:
