@@ -1011,6 +1011,8 @@ lemma either_finite_or_infinite:
 
 
 
+
+
 (* Definition 2.6.2 *)
 definition is_smaller_than :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<le>\<^sub>c" 50) where
    "X \<le>\<^sub>c Y \<longleftrightarrow> (\<exists> m. m : X \<rightarrow> Y \<and> monomorphism(m))"
@@ -1137,11 +1139,33 @@ qed
 
 
 
+lemma truth_set_is_finite:
+  "is_finite(\<Omega>)"
+  unfolding is_finite_def
+proof(auto)
+  fix m 
+  assume m_type[type_rule]: "m : \<Omega> \<rightarrow> \<Omega>"
+  assume m_mono: "monomorphism(m)"
+  have "surjective(m)"
+    unfolding surjective_def
+  proof(auto)
+    fix y
+    assume "y \<in>\<^sub>c codomain m" 
+    then have "y \<in>\<^sub>c \<Omega>"
+      using cfunc_type_def m_type by force
+    show "\<exists>x. x \<in>\<^sub>c domain m \<and> m \<circ>\<^sub>c x = y"
+      by (smt (verit, del_insts) \<open>y \<in>\<^sub>c \<Omega>\<close> cfunc_type_def codomain_comp domain_comp injective_def m_mono m_type monomorphism_imp_injective true_false_only_truth_values)
+  qed
+  then show "isomorphism m"
+    by (simp add: epi_mon_is_iso m_mono surjective_is_epimorphism)
+qed
+
+
 
 lemma smaller_than_finite_is_finite:
   assumes "X \<le>\<^sub>c Y" "is_finite(Y)" 
   shows "is_finite(X)"
-  unfolding _is_finite_def
+  unfolding is_finite_def
 proof(auto)
   fix x
   assume x_type: "x : X \<rightarrow> X"

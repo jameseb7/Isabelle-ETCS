@@ -37,6 +37,7 @@ lemma smaller_than_countable_is_countable:
   by (smt assms cfunc_type_def comp_type composition_of_monic_pair_is_monic countable_def is_smaller_than_def)
 
 
+
 lemma iso_pres_finite:
   assumes "X \<cong> Y"
   assumes "is_finite(X)"
@@ -416,24 +417,34 @@ next
 
 lemma coprod_finite_with_self_finite:
   assumes "is_finite(Y)"
+  assumes "is_finite(Y \<times>\<^sub>c Y)"
   shows "is_finite(Y \<Coprod> Y)"
-  unfolding is_finite_def
-proof(safe)
-  fix m 
-  assume m_type: " m : Y \<Coprod> Y \<rightarrow> Y \<Coprod> Y"
-  assume m_mono: "monomorphism m"
-  obtain x y where m_def: "m = (x \<amalg> y) \<and> x : Y \<rightarrow> Y \<Coprod> Y \<and> y : Y \<rightarrow> Y \<Coprod> Y"
-    using m_type coprod_decomp by blast
-  show "isomorphism m"
-    using assms m_def m_type m_mono apply typecheck_cfuncs
-    oops
-
+proof(cases "initial_object Y")
+  assume "initial_object Y"
+  then show ?thesis
+    using  assms coprod_with_init_obj2 either_finite_or_infinite iso_pres_infinite not_finite_and_infinite by blast
+next
+  assume "\<not> initial_object Y"
+  show ?thesis
+  proof(cases "terminal_object Y")
+    assume "terminal_object Y"
+    then have "Y \<Coprod> Y \<cong> \<Omega>"
+      by (meson coprod_pres_iso isomorphic_is_transitive oneUone_iso_\<Omega> one_terminal_object terminal_objects_isomorphic)
+    then show ?thesis
+      using either_finite_or_infinite iso_pres_infinite not_finite_and_infinite truth_set_is_finite by blast
+  next
+    assume "\<not> terminal_object Y"
+    then have "(Y \<Coprod> Y) \<le>\<^sub>c (Y \<times>\<^sub>c Y)"
+      by (simp add: \<open>\<not> initial_object Y\<close> coprod_leq_product)
+    then show ?thesis
+      using assms(2) smaller_than_finite_is_finite by blast
+  qed
+qed
+ 
 
 
 lemma coproduct_of_finite_is_finite:
   assumes "is_finite(X)" "is_finite(Y)"
-  assumes "is_finite(X \<Coprod> X)"
-  assumes "is_finite(Y \<Coprod> Y)"
   assumes "is_finite(X \<times>\<^sub>c Y)"
   shows "is_finite(X \<Coprod> Y)"
 proof(cases "initial_object(X)")
@@ -495,6 +506,7 @@ next
     qed
   qed
 qed
+
 
 
 
