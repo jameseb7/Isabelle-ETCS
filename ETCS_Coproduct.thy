@@ -562,6 +562,176 @@ qed
 
 
 
+lemma coproduct_with_self_iso:
+  "X \<Coprod> X \<cong> X \<times>\<^sub>c \<Omega>"
+proof - 
+  obtain \<rho> where \<rho>_def: "\<rho> = \<langle>id X, \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> \<langle>id X, \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>"
+    by simp
+  then have \<rho>_type[type_rule]: "\<rho> : X \<Coprod> X \<rightarrow> X \<times>\<^sub>c \<Omega>"
+    by (smt (z3) \<rho>_def cfunc_coprod_type cfunc_prod_type comp_type false_func_type id_type terminal_func_type true_func_type)
+  have \<rho>_inj: "injective \<rho>"
+    unfolding injective_def
+  proof(auto)
+    fix x y 
+    assume "x \<in>\<^sub>c domain \<rho>" then have[type_rule]: "x \<in>\<^sub>c X \<Coprod> X"
+      using \<rho>_type cfunc_type_def by auto
+    assume "y \<in>\<^sub>c domain \<rho>" then have[type_rule]: "y \<in>\<^sub>c X \<Coprod> X"
+      using \<rho>_type cfunc_type_def by auto
+    assume equals: "\<rho> \<circ>\<^sub>c x = \<rho> \<circ>\<^sub>c y"
+    show "x = y"
+    proof(cases "\<exists> lx. x = left_coproj X X \<circ>\<^sub>c lx \<and> lx \<in>\<^sub>c X")
+      assume "\<exists>lx. x = left_coproj X X \<circ>\<^sub>c lx \<and> lx \<in>\<^sub>c X"
+      then obtain lx where lx_def: "x = left_coproj X X \<circ>\<^sub>c lx \<and> lx \<in>\<^sub>c X"
+        by blast
+      have "\<rho> \<circ>\<^sub>c x = \<langle>lx, \<t>\<rangle>"
+      proof - 
+        have "\<rho> \<circ>\<^sub>c x = (\<rho> \<circ>\<^sub>c left_coproj X X) \<circ>\<^sub>c lx"
+          using comp_associative2 lx_def by (typecheck_cfuncs, blast)
+        also have "... = \<langle>id X, \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c lx"
+          unfolding \<rho>_def  using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+        also have "... = \<langle>lx, \<t>\<rangle>"
+          by (typecheck_cfuncs, metis cart_prod_extract_left lx_def)
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+      show "x = y"
+      proof(cases "\<exists> ly. y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X")
+        assume "\<exists>ly. y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X"
+        then obtain ly where ly_def: "y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X"
+          by blast
+        have "\<rho> \<circ>\<^sub>c y = \<langle>ly, \<t>\<rangle>"
+        proof - 
+          have "\<rho> \<circ>\<^sub>c y = (\<rho> \<circ>\<^sub>c left_coproj X X) \<circ>\<^sub>c ly"
+            using comp_associative2 ly_def by (typecheck_cfuncs, blast)
+          also have "... = \<langle>id X, \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c ly"
+            unfolding \<rho>_def  using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+          also have "... = \<langle>ly, \<t>\<rangle>"
+            by (typecheck_cfuncs, metis cart_prod_extract_left ly_def)
+          then show ?thesis
+            by (simp add: calculation)
+        qed
+        then show "x = y"
+          using \<open>\<rho> \<circ>\<^sub>c x = \<langle>lx,\<t>\<rangle>\<close> cart_prod_eq2 equals lx_def ly_def true_func_type by auto
+      next
+        assume "\<nexists>ly. y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X"
+        then obtain ry where ry_def: "y = right_coproj X X \<circ>\<^sub>c ry \<and> ry \<in>\<^sub>c X"
+          by (meson \<open>y \<in>\<^sub>c X \<Coprod> X\<close> coprojs_jointly_surj)
+        have "\<rho> \<circ>\<^sub>c y = \<langle>ry, \<f>\<rangle>"
+        proof - 
+          have "\<rho> \<circ>\<^sub>c y = (\<rho> \<circ>\<^sub>c right_coproj X X) \<circ>\<^sub>c ry"
+            using comp_associative2 ry_def by (typecheck_cfuncs, blast)
+          also have "... = \<langle>id X, \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c ry"
+            unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+          also have "... = \<langle>ry, \<f>\<rangle>"
+            by (typecheck_cfuncs, metis cart_prod_extract_left ry_def)
+          then show ?thesis
+            by (simp add: calculation)
+        qed
+        then show ?thesis
+          using \<open>\<rho> \<circ>\<^sub>c x = \<langle>lx,\<t>\<rangle>\<close> cart_prod_eq2 equals false_func_type lx_def ry_def true_false_distinct true_func_type by force
+      qed
+    next
+      assume "\<nexists>lx. x = left_coproj X X \<circ>\<^sub>c lx \<and> lx \<in>\<^sub>c X"
+      then obtain rx where rx_def: "x = right_coproj X X \<circ>\<^sub>c rx \<and> rx \<in>\<^sub>c X"
+        by (typecheck_cfuncs, meson coprojs_jointly_surj)
+      have "\<rho> \<circ>\<^sub>c x = \<langle>rx, \<f>\<rangle>"
+      proof - 
+        have "\<rho> \<circ>\<^sub>c x = (\<rho> \<circ>\<^sub>c right_coproj X X) \<circ>\<^sub>c rx"
+          using comp_associative2 rx_def by (typecheck_cfuncs, blast)
+        also have "... = \<langle>id X, \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c rx"
+          unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+        also have "... = \<langle>rx, \<f>\<rangle>"
+          by (typecheck_cfuncs, metis cart_prod_extract_left rx_def)
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+      show "x = y"
+      proof(cases "\<exists> ly. y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X")
+        assume "\<exists>ly. y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X"
+        then obtain ly where ly_def: "y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X"
+          by blast
+        have "\<rho> \<circ>\<^sub>c y = \<langle>ly, \<t>\<rangle>"
+        proof - 
+          have "\<rho> \<circ>\<^sub>c y = (\<rho> \<circ>\<^sub>c left_coproj X X) \<circ>\<^sub>c ly"
+            using comp_associative2 ly_def by (typecheck_cfuncs, blast)
+          also have "... = \<langle>id X, \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c ly"
+            unfolding \<rho>_def  using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+          also have "... = \<langle>ly, \<t>\<rangle>"
+            by (typecheck_cfuncs, metis cart_prod_extract_left ly_def)
+          then show ?thesis
+            by (simp add: calculation)
+        qed
+        then show "x = y"
+          using \<open>\<rho> \<circ>\<^sub>c x = \<langle>rx,\<f>\<rangle>\<close> cart_prod_eq2 equals false_func_type ly_def rx_def true_false_distinct true_func_type by force
+      next
+        assume "\<nexists>ly. y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X"
+        then obtain ry where ry_def: "y = right_coproj X X \<circ>\<^sub>c ry \<and> ry \<in>\<^sub>c X"
+          using  coprojs_jointly_surj by (typecheck_cfuncs, blast)
+        have "\<rho> \<circ>\<^sub>c y = \<langle>ry, \<f>\<rangle>"
+        proof - 
+          have "\<rho> \<circ>\<^sub>c y = (\<rho> \<circ>\<^sub>c right_coproj X X) \<circ>\<^sub>c ry"
+            using comp_associative2 ry_def by (typecheck_cfuncs, blast)
+          also have "... = \<langle>id X, \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c ry"
+            unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+          also have "... = \<langle>ry, \<f>\<rangle>"
+            by (typecheck_cfuncs, metis cart_prod_extract_left ry_def)
+          then show ?thesis
+            by (simp add: calculation)
+        qed
+        show "x = y"
+          using \<open>\<rho> \<circ>\<^sub>c x = \<langle>rx,\<f>\<rangle>\<close> \<open>\<rho> \<circ>\<^sub>c y = \<langle>ry,\<f>\<rangle>\<close> cart_prod_eq2 equals false_func_type rx_def ry_def by auto
+      qed
+    qed
+  qed
+  have "surjective \<rho>"
+    unfolding surjective_def
+  proof(auto)
+    fix y
+    assume "y \<in>\<^sub>c codomain \<rho>" then have y_type[type_rule]: "y \<in>\<^sub>c X \<times>\<^sub>c \<Omega>"
+      using \<rho>_type cfunc_type_def by fastforce
+    then obtain x w where y_def: "y = \<langle>x,w\<rangle> \<and> x \<in>\<^sub>c X \<and> w \<in>\<^sub>c \<Omega>"
+      using cart_prod_decomp by fastforce
+    show "\<exists>x. x \<in>\<^sub>c domain \<rho> \<and> \<rho> \<circ>\<^sub>c x = y"
+    proof(cases "w = \<t>")
+      assume "w = \<t>"
+      obtain z where z_def: "z = left_coproj X X \<circ>\<^sub>c x"
+        by simp
+      have "\<rho> \<circ>\<^sub>c z = y"
+      proof - 
+        have "\<rho> \<circ>\<^sub>c z = (\<rho> \<circ>\<^sub>c left_coproj X X) \<circ>\<^sub>c x"
+          using comp_associative2 y_def z_def by (typecheck_cfuncs, blast)
+        also have "... = \<langle>id X, \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c x"
+          unfolding \<rho>_def  using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)        
+        also have "... = y"
+          using \<open>w = \<t>\<close> cart_prod_extract_left y_def by auto
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+      then show ?thesis
+        by (metis \<rho>_type cfunc_type_def codomain_comp domain_comp left_proj_type y_def z_def)
+    next
+      assume "w \<noteq> \<t>" then have "w = \<f>"  
+        by (typecheck_cfuncs, meson \<open>w \<noteq> \<t>\<close> true_false_only_truth_values y_def)
+      obtain z where z_def: "z = right_coproj X X \<circ>\<^sub>c x"
+        by simp
+      have "\<rho> \<circ>\<^sub>c z = y"
+      proof - 
+        have "\<rho> \<circ>\<^sub>c z = (\<rho> \<circ>\<^sub>c right_coproj X X) \<circ>\<^sub>c x"
+          using comp_associative2 y_def z_def by (typecheck_cfuncs, blast)
+        also have "... = \<langle>id X, \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c x"
+          unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)        
+        also have "... = y"
+          using \<open>w = \<f>\<close> cart_prod_extract_left y_def by auto
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+      then show ?thesis
+        by (metis \<rho>_type cfunc_type_def codomain_comp domain_comp right_proj_type y_def z_def)
+    qed
+  qed
+  then show ?thesis
+    by (metis \<rho>_inj \<rho>_type epi_mon_is_iso injective_imp_monomorphism is_isomorphic_def mem_Collect_eq surjective_is_epimorphism)
+qed
 
 definition dist_prod_coprod :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "dist_prod_coprod A B C = (id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C))"
