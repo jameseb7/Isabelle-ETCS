@@ -11,7 +11,7 @@ lemma kernel_pair_connection:
   assumes h_g_eq_f: "h \<circ>\<^sub>c g = f"
   assumes g_eq: "g \<circ>\<^sub>c fibered_product_left_proj X f f X = g \<circ>\<^sub>c fibered_product_right_proj X f f X "
   assumes h_type[type_rule]: "h : E \<rightarrow> Y"
-  shows "\<exists> b. b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E \<and>
+  shows "\<exists>! b. b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E \<and>
     fibered_product_left_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
     fibered_product_right_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
     epimorphism b"
@@ -135,7 +135,7 @@ proof -
     using g_epi g_type cfunc_cross_prod_type product_of_epis_is_epi pullback_of_epi_is_epi h_type
     by blast
 
-  show "\<exists>b. b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E \<and>
+  have existence: "\<exists>b. b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E \<and>
         fibered_product_left_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
         fibered_product_right_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
         epimorphism b"
@@ -175,6 +175,11 @@ proof -
     show "epimorphism b"
       by (simp add: b_epi)
   qed  
+  show "\<exists>!b. b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E \<and>
+         fibered_product_left_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
+         fibered_product_right_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
+         epimorphism b"
+    by (typecheck_cfuncs, metis epimorphism_def2 existence g_eq iso_imp_epi_and_monic kern_pair_proj_iso_TFAE2 monomorphism_def3)
 qed
 
 definition reflexive :: "cset \<times> cfunc \<Rightarrow> bool" where
