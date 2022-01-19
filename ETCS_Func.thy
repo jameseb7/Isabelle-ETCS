@@ -1216,6 +1216,6 @@ lemma larger_than_infinite_is_infinite:
   using assms either_finite_or_infinite epi_is_surj is_finite_def is_infinite_def
     iso_imp_epi_and_monic smaller_than_finite_is_finite by blast
 
-  
-  
+
+
 end

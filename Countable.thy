@@ -2,6 +2,10 @@ theory Countable
   imports ETCS_Axioms ETCS_Add ETCS_Mult ETCS_Pred ETCS_Parity ETCS_Comparison
 begin
 
+
+
+
+
 (* Definition 2.6.9 *)
 definition epi_countable :: "cset \<Rightarrow> bool" where
   "epi_countable X \<longleftrightarrow> (\<exists> f. f : \<nat>\<^sub>c \<rightarrow> X \<and> epimorphism f)"

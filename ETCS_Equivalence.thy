@@ -236,6 +236,7 @@ where
     h : quotient_set X R \<rightarrow> Y \<Longrightarrow> h \<circ>\<^sub>c equiv_class R = f \<Longrightarrow> h = quotient_func f R"
 (*Note that quotient_func f R is just f_bar *)
 
+
 definition coequalizer :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
   "coequalizer E m f g \<longleftrightarrow> (\<exists> X Y. (f : Y \<rightarrow> X) \<and> (g : Y \<rightarrow> X) \<and> (m : X \<rightarrow> E)
     \<and> (m \<circ>\<^sub>c f = m \<circ>\<^sub>c g)
@@ -572,8 +573,15 @@ next
     
   obtain f_bar where f_bar_type[type_rule]: "f_bar = quotient_func f (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
     by auto
+  have f_bar_type[type_rule]: "f_bar : F \<rightarrow> Y" 
+      using F_def assms(1) const_on_rel_def f_bar_type fibered_product_pair_member kernel_pair_equiv_rel quotient_func_type by auto
+  have fibr_proj_left_type[type_rule]: "fibered_product_left_proj F (f_bar) (f_bar) F : F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F \<rightarrow> F"
+    by typecheck_cfuncs
+  have fibr_proj_right_type[type_rule]: "fibered_product_right_proj F (f_bar) (f_bar) F : F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F \<rightarrow> F"
+    by typecheck_cfuncs
 
-  (* show f_bar is iso using argument from the bottom of page 43, with g = q and m = f_bar *)
+  (*Outline*)
+  (* show f_bar is iso using argument from the bottom of page 43, with g = q (axiom 6's q) and m = f_bar *)
     (* b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> F \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> F exists because fibered_product_morphism X f f X is an equalizer *)
     (* b exists and is an epimorphism by kernel_pair_connection *)
     (* also have "fibered_product_left_proj E m m E \<circ>\<^sub>c b = fibered_product_right_proj E m m E \<circ>\<^sub>c b" *)
@@ -583,9 +591,87 @@ next
     (* so m = f_bar is an isomorphism by epi_mon_is_iso *)
   (* take g_bar : F \<rightarrow> E and the inverse of f_bar to satisfy the required thesis *)
 
+  have "\<exists>! b. b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F \<and>
+    fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
+    fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
+    epimorphism b"
+  proof(rule kernel_pair_connection[where Y = Y])
+    show "f : X \<rightarrow> Y"
+      using assms by typecheck_cfuncs
+    show "q : X \<rightarrow> F"
+      by typecheck_cfuncs
+    show "epimorphism q"
+      using assms(1) canonical_quot_map_is_epi kernel_pair_equiv_rel q_def by blast
+    show "f_bar \<circ>\<^sub>c q = f"
+    proof - 
+      have fact1: "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+        by (meson assms(1) kernel_pair_equiv_rel)
+      have fact2: "f : X \<rightarrow> Y"
+        by (simp add: assms(1))
+      have fact3: "const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) f"
+        using assms(1) const_on_rel_def fibered_product_pair_member by presburger
+      show ?thesis
+        oops
+    qed
+    show "q \<circ>\<^sub>c fibered_product_left_proj X f f X = q \<circ>\<^sub>c fibered_product_right_proj X f f X"
+      by (metis assms(1) canonical_quotient_map_is_coequalizer coequalizer_def fibered_product_left_proj_def fibered_product_right_proj_def kernel_pair_equiv_rel q_def)
+    show "f_bar : F \<rightarrow> Y" 
+      by typecheck_cfuncs
+  qed
+
+  (* b exists and is an epimorphism by kernel_pair_connection *)
+  (* also have "fibered_product_left_proj E m m E \<circ>\<^sub>c b = fibered_product_right_proj E m m E \<circ>\<^sub>c b" *)
+  then obtain b where b_type[type_rule]: "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F" and
+   left_b_eqs: "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X" and
+   right_b_eqs:  "fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_right_proj X f f X" and
+   epi_b: "epimorphism b"
+    by auto
+  
+
+ (* then "fibered_product_left_proj E m m E = fibered_product_right_proj E m m E", since b is epi *)
+  have "fibered_product_left_proj F (f_bar) (f_bar) F = fibered_product_right_proj F (f_bar) (f_bar) F"
+  proof - 
+    have "(fibered_product_left_proj F (f_bar) (f_bar) F) \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X"
+      by (simp add: left_b_eqs)
+    also have "... = q \<circ>\<^sub>c fibered_product_right_proj X f f X"
+      using assms(1) canonical_quotient_map_is_coequalizer coequalizer_def fibered_product_left_proj_def fibered_product_right_proj_def kernel_pair_equiv_rel q_def by fastforce
+    also have "... = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b"
+      by (simp add: right_b_eqs)
+    then have "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b"
+      by (simp add: calculation)
+    then show ?thesis
+      using b_type epi_b epimorphism_def2 fibr_proj_left_type fibr_proj_right_type by blast
+  qed
+
+  
+  (* b exists and is an epimorphism by kernel_pair_connection *)
+  (* also have "fibered_product_left_proj E m m E \<circ>\<^sub>c b = fibered_product_right_proj E m m E \<circ>\<^sub>c b" *)
+  then obtain b where b_type[type_rule]: "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F" and
+   left_b_eqs: "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X" and
+   right_b_eqs:  "fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_right_proj X f f X" and
+   epi_b: "epimorphism b"
+    by auto
+  
+
+ (* then "fibered_product_left_proj E m m E = fibered_product_right_proj E m m E", since b is epi *)
+  have "fibered_product_left_proj F (f_bar) (f_bar) F = fibered_product_right_proj F (f_bar) (f_bar) F"
+  proof - 
+    have "(fibered_product_left_proj F (f_bar) (f_bar) F) \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X"
+      by (simp add: left_b_eqs)
+    also have "... = q \<circ>\<^sub>c fibered_product_right_proj X f f X"
+      using assms(1) canonical_quotient_map_is_coequalizer coequalizer_def fibered_product_left_proj_def fibered_product_right_proj_def kernel_pair_equiv_rel q_def by fastforce
+    also have "... = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b"
+      by (simp add: right_b_eqs)
+    then have "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b"
+      by (simp add: calculation)
+    then show ?thesis
+      using b_type epi_b epimorphism_def2 fibr_proj_left_type fibr_proj_right_type by blast
+  qed
+  (* then m is a monomorphism by kern_pair_proj_iso_TFAE2 *)
+  have "monomorphism(m)"
+
   show "\<exists>k. k : Y \<rightarrow> E \<and> k \<circ>\<^sub>c f = g"
     oops
-
 
 lemma epi_monic_factorization:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"
