@@ -571,10 +571,10 @@ next
   have q_type[type_rule]: "q : X \<rightarrow> F"
     using F_def assms(1) equiv_class_type kernel_pair_equiv_rel q_def by blast
     
-  obtain f_bar where f_bar_type[type_rule]: "f_bar = quotient_func f (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+  obtain f_bar where f_bar_def: "f_bar = quotient_func f (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
     by auto
   have f_bar_type[type_rule]: "f_bar : F \<rightarrow> Y" 
-      using F_def assms(1) const_on_rel_def f_bar_type fibered_product_pair_member kernel_pair_equiv_rel quotient_func_type by auto
+      using F_def assms(1) const_on_rel_def f_bar_def fibered_product_pair_member kernel_pair_equiv_rel quotient_func_type by auto
   have fibr_proj_left_type[type_rule]: "fibered_product_left_proj F (f_bar) (f_bar) F : F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F \<rightarrow> F"
     by typecheck_cfuncs
   have fibr_proj_right_type[type_rule]: "fibered_product_right_proj F (f_bar) (f_bar) F : F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F \<rightarrow> F"
@@ -611,7 +611,7 @@ next
       have fact3: "const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) f"
         using assms(1) const_on_rel_def fibered_product_pair_member by presburger
       show ?thesis
-        oops
+        using f_bar_def fact1 fact2 fact3 q_def quotient_func_eq by blast
     qed
     show "q \<circ>\<^sub>c fibered_product_left_proj X f f X = q \<circ>\<^sub>c fibered_product_right_proj X f f X"
       by (metis assms(1) canonical_quotient_map_is_coequalizer coequalizer_def fibered_product_left_proj_def fibered_product_right_proj_def kernel_pair_equiv_rel q_def)
@@ -650,7 +650,7 @@ next
    left_b_eqs: "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X" and
    right_b_eqs:  "fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_right_proj X f f X" and
    epi_b: "epimorphism b"
-    by auto
+    using b_type epi_b left_b_eqs right_b_eqs by blast
   
 
  (* then "fibered_product_left_proj E m m E = fibered_product_right_proj E m m E", since b is epi *)
