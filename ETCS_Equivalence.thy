@@ -564,6 +564,8 @@ next
 
   assume g_eq: "g \<circ>\<^sub>c fibered_product_left_proj X f f X = g \<circ>\<^sub>c fibered_product_right_proj X f f X"
 
+  
+
   obtain F where F_def: "F = quotient_set X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
     by auto
   obtain q where q_def: "q = equiv_class (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
@@ -591,6 +593,18 @@ next
     (* so m = f_bar is an isomorphism by epi_mon_is_iso *)
   (* take g_bar : F \<rightarrow> E and the inverse of f_bar to satisfy the required thesis *)
 
+  have f_eqs: "f_bar \<circ>\<^sub>c q = f"
+    proof - 
+      have fact1: "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+        by (meson assms(1) kernel_pair_equiv_rel)
+
+      have fact2: "const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) f"
+        using assms(1) const_on_rel_def fibered_product_pair_member by presburger
+      show ?thesis
+        using assms(1) f_bar_def fact1 fact2 q_def quotient_func_eq by blast
+    qed
+
+
   have "\<exists>! b. b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F \<and>
     fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
     fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
@@ -603,16 +617,7 @@ next
     show "epimorphism q"
       using assms(1) canonical_quot_map_is_epi kernel_pair_equiv_rel q_def by blast
     show "f_bar \<circ>\<^sub>c q = f"
-    proof - 
-      have fact1: "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-        by (meson assms(1) kernel_pair_equiv_rel)
-      have fact2: "f : X \<rightarrow> Y"
-        by (simp add: assms(1))
-      have fact3: "const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) f"
-        using assms(1) const_on_rel_def fibered_product_pair_member by presburger
-      show ?thesis
-        using f_bar_def fact1 fact2 fact3 q_def quotient_func_eq by blast
-    qed
+      by (simp add: f_eqs)
     show "q \<circ>\<^sub>c fibered_product_left_proj X f f X = q \<circ>\<^sub>c fibered_product_right_proj X f f X"
       by (metis assms(1) canonical_quotient_map_is_coequalizer coequalizer_def fibered_product_left_proj_def fibered_product_right_proj_def kernel_pair_equiv_rel q_def)
     show "f_bar : F \<rightarrow> Y" 
@@ -667,11 +672,48 @@ next
     then show ?thesis
       using b_type epi_b epimorphism_def2 fibr_proj_left_type fibr_proj_right_type by blast
   qed
-  (* then m is a monomorphism by kern_pair_proj_iso_TFAE2 *)
-  have "monomorphism(m)"
+  (* then m = f_bar is a monomorphism by kern_pair_proj_iso_TFAE2 *)
+  then have mono_fbar: "monomorphism(f_bar)"
+    by (typecheck_cfuncs, simp add:  kern_pair_proj_iso_TFAE2)
+  (* but m = f_bar is also an epimorphism since f = m \<circ>\<^sub>c g and f and g = q are epi, by comp_epi_imp_epi *)
+  have "epimorphism(f_bar)"
+    by (typecheck_cfuncs, metis assms(2) cfunc_type_def comp_epi_imp_epi f_eqs q_type)
+  (* so m = f_bar is an isomorphism by epi_mon_is_iso *)
+  then have "isomorphism(f_bar)"
+    by (simp add: epi_mon_is_iso mono_fbar)
 
-  show "\<exists>k. k : Y \<rightarrow> E \<and> k \<circ>\<^sub>c f = g"
-    oops
+  (* take  g_bar : F \<rightarrow> E and the inverse of f_bar to satisfy the required thesis *)
+  (* Recall that f_bar : F \<rightarrow> Y"*)
+
+  obtain f_bar_inv where f_bar_inv_type[type_rule]: "f_bar_inv: Y \<rightarrow> F" and
+                            f_bar_inv_eq1: "f_bar_inv \<circ>\<^sub>c f_bar = id(F)" and  
+                            f_bar_inv_eq2: "f_bar \<circ>\<^sub>c f_bar_inv = id(Y)"
+    using \<open>isomorphism f_bar\<close> cfunc_type_def isomorphism_def by (typecheck_cfuncs, force)
+  
+  obtain g_bar where g_bar_def: "g_bar = quotient_func g (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    by auto
+  have "const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) g"
+    unfolding const_on_rel_def 
+    by (meson assms(1) fibered_product_pair_member2 g_eq g_type)
+  then have g_bar_type[type_rule]: "g_bar : F \<rightarrow> E"
+    using F_def assms(1) g_bar_def g_type kernel_pair_equiv_rel quotient_func_type by blast
+  obtain k where k_def: "k = g_bar \<circ>\<^sub>c f_bar_inv" and k_type[type_rule]: "k : Y \<rightarrow> E"
+    by typecheck_cfuncs   
+  then show "\<exists>k. k : Y \<rightarrow> E \<and> k \<circ>\<^sub>c f = g"
+    by (smt (z3) \<open>const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) g\<close> assms(1) comp_associative2 f_bar_inv_eq1 f_bar_inv_type f_bar_type f_eqs g_bar_def g_bar_type g_type id_left_unit2 kernel_pair_equiv_rel q_def q_type quotient_func_eq)
+next
+  show "\<And>F k y.
+       k \<circ>\<^sub>c f : X \<rightarrow> F \<Longrightarrow>
+       (k \<circ>\<^sub>c f) \<circ>\<^sub>c fibered_product_left_proj X f f X = (k \<circ>\<^sub>c f) \<circ>\<^sub>c fibered_product_right_proj X f f X \<Longrightarrow>
+       k : Y \<rightarrow> F \<Longrightarrow> y : Y \<rightarrow> F \<Longrightarrow> y \<circ>\<^sub>c f = k \<circ>\<^sub>c f \<Longrightarrow> k = y"
+    using assms epimorphism_def2 by blast
+qed
+
+(* Proposition 2.3.6b *)
+lemma epimorphism_are_regular:
+  assumes "f : X \<rightarrow> Y" "epimorphism f"
+  shows "regular_epimorphism f"
+  by (meson assms(2) cfunc_type_def epimorphism_coequalizer_kernel_pair regular_epimorphism_def)
 
 lemma epi_monic_factorization:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"

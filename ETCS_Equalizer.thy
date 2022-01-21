@@ -651,6 +651,36 @@ next
   qed
 qed
 
+lemma fibered_product_pair_member2:
+  assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> E" "x \<in>\<^sub>c X" "y \<in>\<^sub>c X"
+  assumes "g \<circ>\<^sub>c fibered_product_left_proj X f f X = g \<circ>\<^sub>c fibered_product_right_proj X f f X"
+  shows "\<forall>x y. x \<in>\<^sub>c X \<longrightarrow> y \<in>\<^sub>c X \<longrightarrow> \<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<longrightarrow> g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
+proof(auto)
+  fix x y  
+  assume x_type[type_rule]: "x \<in>\<^sub>c X"
+  assume y_type[type_rule]: "y \<in>\<^sub>c X"
+  assume a3: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+
+  then obtain h where
+    h_type: "h \<in>\<^sub>c X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub>X" and h_eq: "fibered_product_morphism X f f X \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
+    by (meson factors_through_def2 relative_member_def2)
+
+
+  have left_eq: "fibered_product_left_proj X f f X \<circ>\<^sub>c h = x"
+      unfolding fibered_product_left_proj_def
+      by (typecheck_cfuncs, smt (z3) assms(1) comp_associative2 h_eq h_type left_cart_proj_cfunc_prod y_type)
+    
+
+  have right_eq: "fibered_product_right_proj X f f X \<circ>\<^sub>c h = y"
+    unfolding fibered_product_right_proj_def
+    by (typecheck_cfuncs, metis (full_types) a3 comp_associative2 h_eq h_type relative_member_def2 right_cart_proj_cfunc_prod x_type)
+
+  then show "g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
+    using assms(1) assms(2) assms(5) cfunc_type_def comp_associative fibered_product_left_proj_type fibered_product_right_proj_type h_type left_eq right_eq by fastforce
+qed
+
+
+
 lemma kernel_pair_subset:
   assumes "f: X \<rightarrow> Y"
   shows "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
