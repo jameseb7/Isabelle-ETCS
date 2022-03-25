@@ -9,6 +9,12 @@ definition equalizer :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarr
     \<and> (f \<circ>\<^sub>c m = g \<circ>\<^sub>c m)
     \<and> (\<forall> h F. ((h : F \<rightarrow> X) \<and> (f \<circ>\<^sub>c h = g \<circ>\<^sub>c h)) \<longrightarrow> (\<exists>! k. (k : F \<rightarrow> E) \<and> m \<circ>\<^sub>c k = h)))"
 
+lemma equalizer_def2:
+  assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> Y" "m : E \<rightarrow> X"
+  shows "equalizer E m f g \<longleftrightarrow> ((f \<circ>\<^sub>c m = g \<circ>\<^sub>c m)
+    \<and> (\<forall> h F. ((h : F \<rightarrow> X) \<and> (f \<circ>\<^sub>c h = g \<circ>\<^sub>c h)) \<longrightarrow> (\<exists>! k. (k : F \<rightarrow> E) \<and> m \<circ>\<^sub>c k = h)))"
+  using assms unfolding equalizer_def by (auto simp add: cfunc_type_def)
+
 axiomatization where
   equalizer_exists: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> \<exists> E m. equalizer E m f g"
 
@@ -42,9 +48,9 @@ proof -
 qed 
 
 (*Exercise 2.1.31*)
-lemma
+lemma equalizers_isomorphic:
   assumes "equalizer E m f g" "equalizer E' m' f g"
-  shows "\<exists> k. k : E \<rightarrow> E' \<and> isomorphism k"
+  shows "\<exists> k. k : E \<rightarrow> E' \<and> isomorphism k \<and> m = m' \<circ>\<^sub>c k"
 proof -
   have fm_eq_gm: "f \<circ>\<^sub>c m = g \<circ>\<^sub>c m"
     using assms(1) equalizer_def by blast
@@ -72,9 +78,9 @@ proof -
   then have k'k_eq_id: "k' \<circ>\<^sub>c k = id E'"
     using assms(2) equalizer_def id_right_unit2 id_type by blast
 
-  show "\<exists>k. k : E \<rightarrow> E' \<and> isomorphism k"
+  show "\<exists>k. k : E \<rightarrow> E' \<and> isomorphism k \<and> m = m' \<circ>\<^sub>c k"
     apply (rule_tac x="k'" in exI)
-    using cfunc_type_def isomorphism_def k'_type k'k_eq_id k_type kk'_eq_id by auto
+    using cfunc_type_def isomorphism_def k'_type k'k_eq_id k_type kk'_eq_id m'k_eq_m by auto
 qed
 
 (*What do we name this lemma?*)
