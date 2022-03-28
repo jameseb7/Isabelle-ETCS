@@ -216,14 +216,14 @@ lemma fiber_morphism_type[type_rule]:
   shows "fiber_morphism f y : f\<^sup>-\<^sup>1{y} \<rightarrow> X"
   unfolding fiber_def fiber_morphism_def
   using assms cfunc_type_def element_monomorphism inverse_image_subobject subobject_of_def2
-  by auto
+  by (typecheck_cfuncs, auto)
 
 lemma fiber_subset: 
   assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
   shows "(f\<^sup>-\<^sup>1{y}, fiber_morphism f y) \<subseteq>\<^sub>c X"
   unfolding fiber_def fiber_morphism_def
-  using assms cfunc_type_def element_monomorphism inverse_image_subobject
-  by auto
+  using assms cfunc_type_def element_monomorphism inverse_image_subobject inverse_image_subobject_mapping_def
+  by (typecheck_cfuncs, auto)
 
 lemma fiber_morphism_monomorphism:
   assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
@@ -248,23 +248,23 @@ qed
 
 (* Proposition 2.2.7 *)
 lemma not_surjective_has_some_empty_preimage:
-  assumes "p: X \<rightarrow> Y" "\<not>surjective(p)"
+  assumes p_type[type_rule]: "p: X \<rightarrow> Y" and p_not_surj: "\<not>surjective(p)"
   shows "\<exists> y. (y\<in>\<^sub>c Y \<and>  \<not>nonempty(p\<^sup>-\<^sup>1{y}))"
 proof -
   have nonempty: "nonempty(Y)"
     using assms(1) assms(2) cfunc_type_def nonempty_def surjective_def by auto
-  obtain y0 where y0_type: "(y0\<in>\<^sub>c Y)\<and>(\<forall> x. (x\<in>\<^sub>c X \<longrightarrow> p\<circ>\<^sub>c x \<noteq> y0))"
+  obtain y0 where y0_type[type_rule]: "y0 \<in>\<^sub>c Y" "\<forall> x. x \<in>\<^sub>c X \<longrightarrow> p\<circ>\<^sub>c x \<noteq> y0"
     using assms(1) assms(2) cfunc_type_def surjective_def by auto
   (* then have "is_pullback (p\<^sup>-\<^sup>1{y0}) one X Y (\<beta>\<^bsub>p\<^sup>-\<^sup>1{y0}\<^esub>) (y0) m p" *)
   have "\<not>nonempty(p\<^sup>-\<^sup>1{y0})"
   proof (rule ccontr,auto)
     assume a1: "nonempty(p\<^sup>-\<^sup>1{y0})"
-    obtain z where z_type: "z \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}"
+    obtain z where z_type[type_rule]: "z \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}"
       using a1 nonempty_def by blast
     have fiber_z_type: "fiber_morphism p y0 \<circ>\<^sub>c z \<in>\<^sub>c X"
       using assms(1) comp_type fiber_morphism_type y0_type z_type by auto
     have contradiction: "p \<circ>\<^sub>c (fiber_morphism p y0 \<circ>\<^sub>c z) = y0"
-      by (smt assms(1) cfunc_type_def comp_associative2 element_monomorphism fiber_morphism_def fiber_morphism_eq id_right_unit2 id_type inverse_image_subobject subobject_of_def2 terminal_func_comp terminal_func_type terminal_func_unique y0_type z_type)
+      by (typecheck_cfuncs, smt (z3) comp_associative2 fiber_morphism_eq id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
     have "p \<circ>\<^sub>c (fiber_morphism p y0 \<circ>\<^sub>c z) \<noteq> y0"
       by (simp add: fiber_z_type y0_type)
     then show False
@@ -273,7 +273,6 @@ proof -
   then show ?thesis
     using y0_type by blast
 qed
-
 
 lemma char_of_singleton1: 
     assumes "x \<in>\<^sub>c X" 

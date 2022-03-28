@@ -199,7 +199,7 @@ lemma subobject_is_relative_subset: "(B,m) \<subseteq>\<^sub>c A \<longleftright
   unfolding relative_subset_def2 subobject_of_def2
   using cfunc_type_def id_isomorphism id_left_unit id_type iso_imp_epi_and_monic by auto
 
-definition inverse_image :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>" 100) where
+definition inverse_image :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>" [101,100,100]100) where
   "inverse_image f B m = (SOME A. \<exists> X Y k. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer A k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B))"
 
@@ -217,7 +217,7 @@ proof -
     using assms(2) cfunc_type_def by auto
 qed
 
-definition inverse_image_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" where
+definition inverse_image_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc"  where
   "inverse_image_mapping f B m = (SOME k. \<exists> X Y. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer (inverse_image f B m) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B))"
 
@@ -281,11 +281,14 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by blast
 qed
 
+definition inverse_image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>]map" [101,100,100]100) where
+  "[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map = left_cart_proj (domain f) B \<circ>\<^sub>c inverse_image_mapping f B m"
+
 lemma inverse_image_subobject:
   assumes "m : B \<rightarrow> Y" "f : X \<rightarrow> Y" "monomorphism m"
-  shows "(inverse_image f B m, left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<subseteq>\<^sub>c X"
+  shows "(f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map) \<subseteq>\<^sub>c X"
   using assms cfunc_type_def codomain_comp domain_comp inverse_image_mapping_type
-    inverse_image_monomorphism left_cart_proj_type subobject_of_def2 
+    inverse_image_monomorphism left_cart_proj_type subobject_of_def2 inverse_image_subobject_mapping_def
   by auto
 
 lemma inverse_image_pullback:
@@ -299,7 +302,7 @@ proof auto
     using assms cfunc_type_def codomain_comp domain_comp inverse_image_mapping_type
       right_cart_proj_type by auto
   show left_type: "left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> X"
-    using assms fst_conv inverse_image_subobject subobject_of_def by auto
+    using assms fst_conv inverse_image_subobject subobject_of_def by (typecheck_cfuncs)
 
   show "m \<circ>\<^sub>c right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m =
       f \<circ>\<^sub>c left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m"
@@ -349,8 +352,8 @@ next
   assume "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c y =
        (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j"
   then show "j = y"
-    using assms j_type y_type
-    by (metis fst_conv inverse_image_subobject monomorphism_def2 snd_conv subobject_of_def)
+    using assms j_type y_type inverse_image_mapping_type comp_type
+    by (smt (verit, ccfv_threshold) inverse_image_monomorphism left_cart_proj_type monomorphism_def3)
 qed
 
 
