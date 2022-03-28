@@ -798,11 +798,11 @@ lemma epi_monic_factorization2:
 thm epi_monic_factorization[where f = "f \<circ>\<^sub>c n", where X=A, where Y=Y]
 (* Definition 2.3.7 *)
 definition image_of :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_[_]\<^bsub>_\<^esub>" [101,100,100]100) where
-  "image_of f A n = (SOME fA. \<exists>g m Y.
+  "image_of f A n = (SOME fA. \<exists>g m.
    g : A \<rightarrow> fA \<and>
-   m : fA \<rightarrow> Y \<and>
+   m : fA \<rightarrow> codomain f \<and>
    coequalizer fA g (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
-   monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : fA \<rightarrow> Y \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m))"
+   monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : fA \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m))"
 
 (*An above is (A,n) below 
 so that fst An is just the set A 
@@ -816,15 +816,57 @@ lemma image_of_def2:
     coequalizer (f[A]\<^bsub>n\<^esub>) g (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
     monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m)"
 proof -
-  have "\<exists>g m Y.
+  have "\<exists>g m.
     g : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and>
-    m : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<and>
+    m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
     coequalizer (f[A]\<^bsub>n\<^esub>) g (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
-    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m)"
-    using assms comp_type epi_monic_factorization by (unfold image_of_def, rule_tac someI_ex, smt (verit, ccfv_SIG))
+    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m)"
+    using assms cfunc_type_def comp_type epi_monic_factorization[where f="f \<circ>\<^sub>c n", where X=A, where Y="codomain f"] 
+    by (unfold image_of_def, rule_tac someI_ex, auto)
   then show ?thesis
-    by (metis assms cfunc_type_def codomain_comp)
+    using assms(1) cfunc_type_def by auto
 qed
+
+definition image_restriction_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<restriction>\<^bsub>'(_, _')\<^esub>" [101,100,100]100) where
+  "image_restriction_mapping f A n = (SOME g. \<exists> m. g : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
+    coequalizer (f[A]\<^bsub>n\<^esub>) g (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
+    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m))"
+
+lemma image_restriction_mapping_def2:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "\<exists> m. f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> m : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<and>
+    coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
+    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m)"
+proof -
+  have codom_f: "codomain f = Y"
+    using assms(1) cfunc_type_def by auto
+  have "\<exists> m. f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
+    coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
+    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m)"
+    unfolding image_restriction_mapping_def by (rule someI_ex, insert assms image_of_def2 codom_f, auto)
+  then show ?thesis
+    using codom_f by fastforce
+qed
+
+definition image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_[_]\<^bsub>_\<^esub>]map" [101,100,100]100) where
+  "[f[A]\<^bsub>n\<^esub>]map = (THE m. m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
+   coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
+   monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : (f[A]\<^bsub>n\<^esub>) \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m))"
+
+lemma image_restriction_mapping_def2:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> [f[A]\<^bsub>n\<^esub>]map : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<and>
+    coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
+    monomorphism ([f[A]\<^bsub>n\<^esub>]map) \<and> f \<circ>\<^sub>c n = [f[A]\<^bsub>n\<^esub>]map \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m)"
+proof -
+  have codom_f: "codomain f = Y"
+    using assms(1) cfunc_type_def by auto
+  have "m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
+   coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
+   monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : (f[A]\<^bsub>n\<^esub>) \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m)"
+    unfolding image_subobject_mapping_def apply (rule theI')
+    oops
+
 
 (*Now we show that f(A) is the smallest subobject of Y through which f factors (in the sense of epi-monic factorization)*)
 (*Proposition 2.3.8*)
