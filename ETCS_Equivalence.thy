@@ -849,24 +849,37 @@ proof -
 qed
 
 definition image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_[_]\<^bsub>_\<^esub>]map" [101,100,100]100) where
-  "[f[A]\<^bsub>n\<^esub>]map = (THE m. m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
+  "[f[A]\<^bsub>n\<^esub>]map = (THE m. f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
    coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : (f[A]\<^bsub>n\<^esub>) \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m))"
 
-lemma image_restriction_mapping_def2:
+lemma image_subobject_mapping_def2:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
   shows "f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> [f[A]\<^bsub>n\<^esub>]map : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<and>
     coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
-    monomorphism ([f[A]\<^bsub>n\<^esub>]map) \<and> f \<circ>\<^sub>c n = [f[A]\<^bsub>n\<^esub>]map \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m)"
+    monomorphism ([f[A]\<^bsub>n\<^esub>]map) \<and> f \<circ>\<^sub>c n = [f[A]\<^bsub>n\<^esub>]map \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = [f[A]\<^bsub>n\<^esub>]map)"
 proof -
   have codom_f: "codomain f = Y"
     using assms(1) cfunc_type_def by auto
-  have "m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
+  have "f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> ([f[A]\<^bsub>n\<^esub>]map) : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
    coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
-   monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : (f[A]\<^bsub>n\<^esub>) \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m)"
-    unfolding image_subobject_mapping_def apply (rule theI')
-    oops
+   monomorphism ([f[A]\<^bsub>n\<^esub>]map) \<and> f \<circ>\<^sub>c n = ([f[A]\<^bsub>n\<^esub>]map) \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> 
+   (\<forall>x. x : (f[A]\<^bsub>n\<^esub>) \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = ([f[A]\<^bsub>n\<^esub>]map))"
+    unfolding image_subobject_mapping_def
+    by (rule theI', insert assms codom_f image_restriction_mapping_def2, blast)
+  then show ?thesis
+    using codom_f by fastforce
+qed
 
+lemma image_restriction_mapping_type[type_rule]:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub>"
+  using assms image_restriction_mapping_def2 by blast
+
+lemma image_subobject_mapping_type[type_rule]:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "[f[A]\<^bsub>n\<^esub>]map : f[A]\<^bsub>n\<^esub> \<rightarrow> Y"
+  using assms image_subobject_mapping_def2 by blast
 
 (*Now we show that f(A) is the smallest subobject of Y through which f factors (in the sense of epi-monic factorization)*)
 (*Proposition 2.3.8*)
