@@ -284,6 +284,16 @@ qed
 definition inverse_image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>]map" [101,100,100]100) where
   "[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map = left_cart_proj (domain f) B \<circ>\<^sub>c inverse_image_mapping f B m"
 
+lemma inverse_image_subobject_mapping_def2:
+  assumes "f : X \<rightarrow> Y"
+  shows "[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map = left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m"
+  using assms unfolding inverse_image_subobject_mapping_def cfunc_type_def by auto
+
+lemma inverse_image_subobject_mapping_type[type_rule]:
+  assumes "f : X \<rightarrow> Y" "m : B \<rightarrow> Y" "monomorphism m"
+  shows "[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> X"
+  using assms by (unfold inverse_image_subobject_mapping_def2, typecheck_cfuncs)
+
 lemma inverse_image_subobject:
   assumes "m : B \<rightarrow> Y" "f : X \<rightarrow> Y" "monomorphism m"
   shows "(f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map) \<subseteq>\<^sub>c X"
