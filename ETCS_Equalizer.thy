@@ -368,7 +368,7 @@ qed
 
 
 (* Definition 2.1.39 *)
-definition relative_member :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" ("_ \<in>\<^bsub>_\<^esub> _" [51,50,51]50) where
+definition relative_member :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" ("_ \<in>\<^bsub>_\<^esub> _" [52,50,51]50) where
   "x \<in>\<^bsub>X\<^esub> B \<longleftrightarrow> (x \<in>\<^sub>c X \<and> monomorphism (snd B) \<and> snd B : fst B \<rightarrow> X \<and> x factorsthru (snd B))"
 
 lemma relative_member_def2:
@@ -448,7 +448,7 @@ next
 qed
 
 (* Definition 2.1.42 *)
-definition fibered_product :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" ("_ \<^bsub>_\<^esub>\<times>\<^sub>c\<^bsub>_\<^esub> _" [66,66,65,65]65) where
+definition fibered_product :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" ("_ \<^bsub>_\<^esub>\<times>\<^sub>c\<^bsub>_\<^esub> _" [66,50,50,65]65) where
   "X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y = (SOME E. \<exists> Z m. f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z \<and>
     equalizer E m (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y))"
 
