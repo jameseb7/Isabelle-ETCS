@@ -901,7 +901,7 @@ proof -
     by auto
   obtain p1 where p1_def[simp]: "p1 = fibered_product_right_proj A (f\<circ>\<^sub>ca) (f\<circ>\<^sub>ca) A"
     by auto
-  obtain E where E_def[simp]: "E = A \<^bsub>(f\<circ>\<^sub>ca)\<^esub>\<times>\<^sub>c\<^bsub>(f\<circ>\<^sub>ca)\<^esub> A"
+  obtain E where E_def[simp]: "E = A \<^bsub>f \<circ>\<^sub>c a\<^esub>\<times>\<^sub>c\<^bsub>f \<circ>\<^sub>c a\<^esub> A"
     by auto
 
   obtain e m where 
@@ -1121,6 +1121,14 @@ proof (unfold reflexive_on_def, auto)
   qed
 qed
 
+(* Proposition 2.3.9 *)
+lemma subset_inv_image_iff_image_subset:
+  assumes "(A,a) \<subseteq>\<^sub>c X" "(B,b) \<subseteq>\<^sub>c Y" 
+  assumes "f : X \<rightarrow> Y"
+  shows "(\<exists> m. (A, m) \<subseteq>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>a\<^esub>)) = (\<exists> m. (f[A]\<^bsub>b\<^esub>, m) \<subseteq>\<^sub>c B)"
+proof auto
+  oops
+
 
 lemma left_pair_symmetric:
   assumes "symmetric_on X (Y, m)"
@@ -1144,7 +1152,9 @@ next
   obtain tx tz where t_def[type_rule]: "tx \<in>\<^sub>c X" "tz \<in>\<^sub>c Z" "t =  \<langle>tx,tz\<rangle>"
     using cart_prod_decomp t_type by blast 
 
-  show "\<langle>t,s\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z)\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))" 
+  term "\<lambda> X Y Z. X \<in>\<^bsub>Y\<^esub> Z"
+  term "(\<times>\<^sub>c)"
+  show "\<langle>t,s\<rangle> \<in>\<^bsub>((X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z))\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))" 
     using s_def t_def m_def
   proof (simp, typecheck_cfuncs, auto, unfold relative_member_def2, auto)
     show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
