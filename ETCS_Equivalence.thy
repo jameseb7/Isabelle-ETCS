@@ -827,10 +827,10 @@ proof -
     using assms(1) cfunc_type_def by auto
 qed
 
-definition image_restriction_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<restriction>\<^bsub>'(_, _')\<^esub>" [101,100,100]100) where
-  "image_restriction_mapping f A n = (SOME g. \<exists> m. g : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
-    coequalizer (f[A]\<^bsub>n\<^esub>) g (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
-    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m))"
+definition image_restriction_mapping :: "cfunc \<Rightarrow> cset \<times> cfunc \<Rightarrow> cfunc" ("_\<restriction>\<^bsub>_\<^esub>" [101,100]100) where
+  "image_restriction_mapping f An = (SOME g. \<exists> m. g : fst An \<rightarrow> f[fst An]\<^bsub>snd An\<^esub> \<and> m : f[fst An]\<^bsub>snd An\<^esub> \<rightarrow> codomain f \<and>
+    coequalizer (f[fst An]\<^bsub>snd An\<^esub>) g (fibered_product_left_proj (fst An) (f \<circ>\<^sub>c snd An) (f \<circ>\<^sub>c snd An) (fst An)) (fibered_product_right_proj (fst An) (f \<circ>\<^sub>c snd An) (f \<circ>\<^sub>c snd An) (fst An)) \<and>
+    monomorphism m \<and> f \<circ>\<^sub>c snd An = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f[fst An]\<^bsub>snd An\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c snd An = x \<circ>\<^sub>c g \<longrightarrow> x = m))"
 
 lemma image_restriction_mapping_def2:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
@@ -840,12 +840,13 @@ lemma image_restriction_mapping_def2:
 proof -
   have codom_f: "codomain f = Y"
     using assms(1) cfunc_type_def by auto
-  have "\<exists> m. f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
-    coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
-    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m)"
+  have "\<exists> m. f\<restriction>\<^bsub>(A, n)\<^esub> : fst (A, n) \<rightarrow> f[fst (A, n)]\<^bsub>snd (A, n)\<^esub> \<and> m : f[fst (A, n)]\<^bsub>snd (A, n)\<^esub> \<rightarrow> codomain f \<and>
+    coequalizer (f[fst (A, n)]\<^bsub>snd (A, n)\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj (fst (A, n)) (f \<circ>\<^sub>c snd (A, n)) (f \<circ>\<^sub>c snd (A, n)) (fst (A, n))) (fibered_product_right_proj (fst (A, n)) (f \<circ>\<^sub>c snd (A, n)) (f \<circ>\<^sub>c snd (A, n)) (fst (A, n))) \<and>
+    monomorphism m \<and> f \<circ>\<^sub>c snd (A, n) = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : f[fst (A, n)]\<^bsub>snd (A, n)\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c snd (A, n) = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m)"
     unfolding image_restriction_mapping_def by (rule someI_ex, insert assms image_of_def2 codom_f, auto)
   then show ?thesis
-    using codom_f by fastforce
+    using codom_f
+    by simp 
 qed
 
 definition image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_[_]\<^bsub>_\<^esub>]map" [101,100,100]100) where
@@ -1227,9 +1228,7 @@ next
   obtain tx tz where t_def[type_rule]: "tx \<in>\<^sub>c X" "tz \<in>\<^sub>c Z" "t =  \<langle>tx,tz\<rangle>"
     using cart_prod_decomp t_type by blast 
 
-  term "\<lambda> X Y Z. X \<in>\<^bsub>Y\<^esub> Z"
-  term "(\<times>\<^sub>c)"
-  show "\<langle>t,s\<rangle> \<in>\<^bsub>((X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z))\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))" 
+  show "\<langle>t,s\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z)\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))" 
     using s_def t_def m_def
   proof (simp, typecheck_cfuncs, auto, unfold relative_member_def2, auto)
     show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
