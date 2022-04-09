@@ -32,7 +32,7 @@ lemma monos_give_epis:
 proof -
   obtain g m E where g_type[type_rule]: "g : X \<rightarrow> E" and m_type[type_rule]: "m : E \<rightarrow> Y" and
       g_epi: "epimorphism g" and m_mono[type_rule]: "monomorphism m" and f_eq: "f = m \<circ>\<^sub>c g"
-    using epi_monic_factorization f_type by blast
+    using epi_monic_factorization2 f_type by blast
 
   have g_mono: "monomorphism g"
   proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
