@@ -199,7 +199,7 @@ lemma subobject_is_relative_subset: "(B,m) \<subseteq>\<^sub>c A \<longleftright
   unfolding relative_subset_def2 subobject_of_def2
   using cfunc_type_def id_isomorphism id_left_unit id_type iso_imp_epi_and_monic by auto
 
-definition inverse_image :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>" [101,100,100]100) where
+definition inverse_image :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>" [101,0,0]100) where
   "inverse_image f B m = (SOME A. \<exists> X Y k. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer A k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B))"
 
@@ -281,7 +281,7 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by blast
 qed
 
-definition inverse_image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>]map" [101,100,100]100) where
+definition inverse_image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>]map" [101,0,0]100) where
   "[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map = left_cart_proj (domain f) B \<circ>\<^sub>c inverse_image_mapping f B m"
 
 lemma inverse_image_subobject_mapping_def2:

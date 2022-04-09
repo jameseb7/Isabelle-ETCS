@@ -827,10 +827,12 @@ proof -
     using assms(1) cfunc_type_def by auto
 qed
 
-definition image_restriction_mapping :: "cfunc \<Rightarrow> cset \<times> cfunc \<Rightarrow> cfunc" ("_\<restriction>\<^bsub>_\<^esub>" [101,100]100) where
+definition image_restriction_mapping :: "cfunc \<Rightarrow> cset \<times> cfunc \<Rightarrow> cfunc" ("_\<restriction>\<^bsub>_\<^esub>" [101,0]100) where
   "image_restriction_mapping f An = (SOME g. \<exists> m. g : fst An \<rightarrow> f[fst An]\<^bsub>snd An\<^esub> \<and> m : f[fst An]\<^bsub>snd An\<^esub> \<rightarrow> codomain f \<and>
     coequalizer (f[fst An]\<^bsub>snd An\<^esub>) g (fibered_product_left_proj (fst An) (f \<circ>\<^sub>c snd An) (f \<circ>\<^sub>c snd An) (fst An)) (fibered_product_right_proj (fst An) (f \<circ>\<^sub>c snd An) (f \<circ>\<^sub>c snd An) (fst An)) \<and>
     monomorphism m \<and> f \<circ>\<^sub>c snd An = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f[fst An]\<^bsub>snd An\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c snd An = x \<circ>\<^sub>c g \<longrightarrow> x = m))"
+
+term "f\<restriction>\<^bsub>(A, n \<circ>\<^sub>c m)\<^esub>"
 
 lemma image_restriction_mapping_def2:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
@@ -849,10 +851,12 @@ proof -
     by simp 
 qed
 
-definition image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_[_]\<^bsub>_\<^esub>]map" [101,100,100]100) where
+definition image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" ("[_[_]\<^bsub>_\<^esub>]map" [101,0,0]100) where
   "[f[A]\<^bsub>n\<^esub>]map = (THE m. f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> m : f[A]\<^bsub>n\<^esub> \<rightarrow> codomain f \<and>
    coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : (f[A]\<^bsub>n\<^esub>) \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m))"
+
+term "[(f \<circ>\<^sub>c g)[A \<times>\<^sub>c B]\<^bsub>n \<circ>\<^sub>c m\<^esub>]map"
 
 lemma image_subobject_mapping_def2:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
