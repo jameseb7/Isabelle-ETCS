@@ -797,7 +797,7 @@ lemma epi_monic_factorization2:
 
 thm epi_monic_factorization[where f = "f \<circ>\<^sub>c n", where X=A, where Y=Y]
 (* Definition 2.3.7 *)
-definition image_of :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_[_]\<^bsub>_\<^esub>" [101,100,100]100) where
+definition image_of :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_[_]\<^bsub>_\<^esub>" [101,0,0]100) where
   "image_of f A n = (SOME fA. \<exists>g m.
    g : A \<rightarrow> fA \<and>
    m : fA \<rightarrow> codomain f \<and>
@@ -1126,9 +1126,11 @@ proof (unfold reflexive_on_def, auto)
   qed
 qed
 
-lemma equal_images: 
-  assumes "((f \<circ>\<^sub>c a)[A]\<^bsub>b\<^esub>, i ) \<subseteq>\<^sub>c B"
-  shows "(f[A] \<^bsub>(a \<circ>\<^sub>c b)\<^esub>, j) \<subseteq>\<^sub>c B"
+lemma image_subset_conv:
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
+  shows "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B \<Longrightarrow> \<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
+  oops
 
 (* Proposition 2.3.9 *)
 lemma subset_inv_image_iff_image_subset:
