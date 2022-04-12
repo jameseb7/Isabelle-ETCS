@@ -1130,7 +1130,36 @@ lemma image_subset_conv:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"
   assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
   shows "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B \<Longrightarrow> \<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
-  oops
+proof -
+  assume "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B"
+  then obtain i where
+    i_type[type_rule]: "i : (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<rightarrow> B" and
+    i_mono: "monomorphism i"
+    unfolding subobject_of_def by force
+
+  have f_m_image_coequalizer:
+    "coequalizer ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>) ((f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub>) 
+      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
+      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
+    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
+
+  have f_image_coequalizer:
+    "coequalizer (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>) (f\<restriction>\<^bsub>(A, m \<circ>\<^sub>c n)\<^esub>) 
+      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
+      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
+    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
+
+  from f_m_image_coequalizer f_image_coequalizer
+  have "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
+    by (meson coequalizer_unique)
+  then obtain k where
+    k_type[type_rule]: "k : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>" and
+    k_mono: "monomorphism k"
+    by (meson is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric)
+  then show "\<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
+    unfolding subobject_of_def using composition_of_monic_pair_is_monic i_mono
+    by (rule_tac x="i \<circ>\<^sub>c k" in exI, typecheck_cfuncs, simp add: cfunc_type_def)
+qed
 
 (* Proposition 2.3.9 *)
 lemma subset_inv_image_iff_image_subset:
