@@ -1121,14 +1121,89 @@ proof (unfold reflexive_on_def, auto)
   qed
 qed
 
+lemma equal_images: 
+  assumes "((f \<circ>\<^sub>c a)[A]\<^bsub>b\<^esub>, i ) \<subseteq>\<^sub>c B"
+  shows "(f[A] \<^bsub>(a \<circ>\<^sub>c b)\<^esub>, j) \<subseteq>\<^sub>c B"
+
 (* Proposition 2.3.9 *)
 lemma subset_inv_image_iff_image_subset:
-  assumes "(A,a) \<subseteq>\<^sub>c X" "(B,b) \<subseteq>\<^sub>c Y" 
-  assumes "f : X \<rightarrow> Y"
-  shows "(\<exists> m. (A, m) \<subseteq>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>a\<^esub>)) = (\<exists> m. (f[A]\<^bsub>b\<^esub>, m) \<subseteq>\<^sub>c B)"
+  assumes "(A,a) \<subseteq>\<^sub>c X" "(B,m) \<subseteq>\<^sub>c Y" 
+  assumes[type_rule]: "f : X \<rightarrow> Y"
+  shows "(\<exists> k. (A, k) \<subseteq>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)) = (\<exists> j. (f[A]\<^bsub>a\<^esub>, j) \<subseteq>\<^sub>c B)"
 proof auto
-  oops
 
+    (*Facts about m_star, denoted m' *)
+    thm inverse_image_subobject_mapping_type[where f=f, where X = X, where Y=Y,where m=m, where B=B]
+    have b_mono: "monomorphism(m)"
+      using assms(2) subobject_of_def2 by blast
+    have b_type[type_rule]: "m : B  \<rightarrow> Y"
+      using assms(2) subobject_of_def2 by blast
+    obtain m' where m'_def: "m' = [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map"
+      by blast
+    then have m'_type[type_rule]: "m' : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> X"
+      using assms(3) b_mono inverse_image_subobject_mapping_type m'_def by (typecheck_cfuncs, force)
+
+
+
+
+   
+ 
+
+  show "\<And>k. (A, k) \<subseteq>\<^sub>c f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<Longrightarrow> \<exists>j. (f[A]\<^bsub>a\<^esub>, j) \<subseteq>\<^sub>c B"
+  proof - 
+    fix k 
+    assume "(A, k) \<subseteq>\<^sub>c f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>"
+    then have k_type[type_rule]: "k : A \<rightarrow> f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>"
+      using  subobject_of_def2 by blast
+
+    obtain d where d_def: "d = m' \<circ>\<^sub>c k"
+      by simp
+
+    (*Facts about j *)
+    obtain j where j_def: "j = [f[A]\<^bsub>d\<^esub>]map"
+      by simp
+    then have j_type[type_rule]: "j : f[A]\<^bsub>d\<^esub> \<rightarrow> Y"
+      using assms(3) comp_type d_def m'_type image_subobject_mapping_type k_type by presburger
+
+
+
+
+    (*Facts about e*)
+    obtain e where e_def: "e = f\<restriction>\<^bsub>(A, d)\<^esub>"
+      by simp
+    then have e_type[type_rule]: "e : A \<rightarrow> f[A]\<^bsub>d\<^esub>"
+      using assms(3) comp_type d_def image_restriction_mapping_type k_type m'_type by blast
+
+    have je_equals: "j \<circ>\<^sub>c e = f \<circ>\<^sub>c m' \<circ>\<^sub>c k"
+      by (typecheck_cfuncs, metis assms(3) d_def e_def image_subobject_mapping_def2 j_def)
+
+    have "(f \<circ>\<^sub>c m' \<circ>\<^sub>c k) factorsthru m"
+    proof(typecheck_cfuncs, unfold factors_through_def2) 
+
+      obtain middle_arrow where middle_arrow_def: 
+        "middle_arrow = (right_cart_proj X B) \<circ>\<^sub>c (inverse_image_mapping f B m)"
+        by simp
+
+      then have middle_arrow_type[type_rule]: "middle_arrow : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> B"
+        unfolding middle_arrow_def using b_mono by (typecheck_cfuncs)
+
+      show "\<exists>h. h : A \<rightarrow> B \<and> m \<circ>\<^sub>c h = f \<circ>\<^sub>c m' \<circ>\<^sub>c k"
+        by (rule_tac x="middle_arrow \<circ>\<^sub>c k" in exI, typecheck_cfuncs, 
+            simp add: b_mono cfunc_type_def comp_associative2 inverse_image_mapping_eq inverse_image_subobject_mapping_def m'_def middle_arrow_def)
+    qed
+
+    have "\<exists>i. ((f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>id A\<^esub>, i) \<subseteq>\<^sub>c B"
+      by (metis \<open>(f \<circ>\<^sub>c m' \<circ>\<^sub>c k) factorsthru m\<close> assms(2) assms(3) cfunc_type_def codomain_comp domain_comp id_type image_smallest_subobject k_type m'_type)
+
+    then show "\<exists>j. (f[A]\<^bsub>a\<^esub>, j) \<subseteq>\<^sub>c B"
+      apply typecheck_cfuncs
+     
+
+      thm image_smallest_subobject[where f = "f \<circ>\<^sub>c m' \<circ>\<^sub>c k", where X = "(f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>a\<^esub>", where Y = Y, where a=a, where A = A,
+          where B = B, where n = m]
+      
+      
+oops
 
 lemma left_pair_symmetric:
   assumes "symmetric_on X (Y, m)"
