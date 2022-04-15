@@ -856,8 +856,6 @@ definition image_subobject_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cf
    coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<and> (\<forall>x. x : (f[A]\<^bsub>n\<^esub>) \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<longrightarrow> x = m))"
 
-term "[(f \<circ>\<^sub>c g)[A \<times>\<^sub>c B]\<^bsub>n \<circ>\<^sub>c m\<^esub>]map"
-
 lemma image_subobject_mapping_def2:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
   shows "f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub> \<and> [f[A]\<^bsub>n\<^esub>]map : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<and>
@@ -876,21 +874,46 @@ proof -
     using codom_f by fastforce
 qed
 
-lemma image_restriction_mapping_type[type_rule]:
+lemma image_rest_map_type[type_rule]:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
   shows "f\<restriction>\<^bsub>(A, n)\<^esub> : A \<rightarrow> f[A]\<^bsub>n\<^esub>"
   using assms image_restriction_mapping_def2 by blast
 
-lemma image_subobject_mapping_type[type_rule]:
+lemma image_rest_map_coequalizer:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "coequalizer (f[A]\<^bsub>n\<^esub>) (f\<restriction>\<^bsub>(A, n)\<^esub>) (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A)"
+  using assms image_restriction_mapping_def2 by blast
+
+lemma image_rest_map_epi:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "epimorphism (f\<restriction>\<^bsub>(A, n)\<^esub>)"
+  using assms image_rest_map_coequalizer coequalizer_is_epimorphism by blast 
+
+lemma image_subobj_map_type[type_rule]:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
   shows "[f[A]\<^bsub>n\<^esub>]map : f[A]\<^bsub>n\<^esub> \<rightarrow> Y"
+  using assms image_subobject_mapping_def2 by blast
+
+lemma image_subobj_map_mono:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "monomorphism ([f[A]\<^bsub>n\<^esub>]map)"
+  using assms image_subobject_mapping_def2 by blast
+
+lemma image_subobj_comp_image_rest:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "[f[A]\<^bsub>n\<^esub>]map \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) = f \<circ>\<^sub>c n"
+  using assms image_subobject_mapping_def2 by auto
+
+lemma image_subobj_map_unique:
+  assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
+  shows "x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<Longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<Longrightarrow> x = [f[A]\<^bsub>n\<^esub>]map"
   using assms image_subobject_mapping_def2 by blast
 
 (*Now we show that f(A) is the smallest subobject of Y through which f factors (in the sense of epi-monic factorization)*)
 (*Proposition 2.3.8*)
 lemma image_smallest_subobject:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y" and a_type[type_rule]: "a : A \<rightarrow> X"
-  shows "(B, n) \<subseteq>\<^sub>c Y \<Longrightarrow> f factorsthru n \<Longrightarrow> \<exists>i. (f[A]\<^bsub>a\<^esub>, i) \<subseteq>\<^sub>c B"
+  shows "(B, n) \<subseteq>\<^sub>c Y \<Longrightarrow> f factorsthru n \<Longrightarrow> (f[A]\<^bsub>a\<^esub>, [f[A]\<^bsub>a\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B, n)"
 proof -
   assume "(B, n) \<subseteq>\<^sub>c Y"
   then have n_type[type_rule]: "n : B \<rightarrow> Y" and n_mono: "monomorphism n"
@@ -909,13 +932,6 @@ proof -
   obtain E where E_def[simp]: "E = A \<^bsub>f \<circ>\<^sub>c a\<^esub>\<times>\<^sub>c\<^bsub>f \<circ>\<^sub>c a\<^esub> A"
     by auto
 
-  obtain e m where 
-    e_type[type_rule]: "e : A \<rightarrow> f[A]\<^bsub>a\<^esub>" and m_type[type_rule]: "m : f[A]\<^bsub>a\<^esub> \<rightarrow> Y" and
-    e_coequalizer: "coequalizer (f[A]\<^bsub>a\<^esub>) e p0 p1" and 
-    m_mono: "monomorphism m" and f_eq_me: "f \<circ>\<^sub>c a = m \<circ>\<^sub>c e" and 
-    m_unique: "\<And>x. x : f[A]\<^bsub>a\<^esub> \<rightarrow> Y \<Longrightarrow> f \<circ>\<^sub>c a = x \<circ>\<^sub>c e \<Longrightarrow> x = m"
-    using image_of_def2 assms unfolding p0_def p1_def by blast
-
   have fa_coequalizes: "(f \<circ>\<^sub>c a) \<circ>\<^sub>c p0 = (f \<circ>\<^sub>c a) \<circ>\<^sub>c p1"
     using fa_type fibered_product_proj_eq by auto
   have ga_coequalizes: "(g \<circ>\<^sub>c a) \<circ>\<^sub>c p0 = (g \<circ>\<^sub>c a) \<circ>\<^sub>c p1"
@@ -927,17 +943,19 @@ proof -
       by (auto, typecheck_cfuncs_prems, meson)
   qed
 
-  have "(\<forall>h F. h : A \<rightarrow> F \<and> h \<circ>\<^sub>c p0 = h \<circ>\<^sub>c p1 \<longrightarrow> (\<exists>!k. k : f[A]\<^bsub>a\<^esub> \<rightarrow> F \<and> k \<circ>\<^sub>c e = h))"
-    using e_coequalizer cfunc_type_def e_type unfolding coequalizer_def by auto
-  then obtain k where k_type[type_rule]: "k : f[A]\<^bsub>a\<^esub> \<rightarrow> B" and k_e_eq_g: "k \<circ>\<^sub>c e = g \<circ>\<^sub>c a"
+  thm image_rest_map_coequalizer[where A=A, where n=a, where f=f, where X=X, where Y=Y]
+
+  have "(\<forall>h F. h : A \<rightarrow> F \<and> h \<circ>\<^sub>c p0 = h \<circ>\<^sub>c p1 \<longrightarrow> (\<exists>!k. k : f[A]\<^bsub>a\<^esub> \<rightarrow> F \<and> k \<circ>\<^sub>c f\<restriction>\<^bsub>(A, a)\<^esub> = h))"
+    using image_rest_map_coequalizer[where n=a] unfolding coequalizer_def 
+    by (simp, typecheck_cfuncs, auto simp add: cfunc_type_def)
+  then obtain k where k_type[type_rule]: "k : f[A]\<^bsub>a\<^esub> \<rightarrow> B" and k_e_eq_g: "k \<circ>\<^sub>c f\<restriction>\<^bsub>(A, a)\<^esub> = g \<circ>\<^sub>c a"
     using ga_coequalizes by (typecheck_cfuncs, blast)
 
-  then have "n \<circ>\<^sub>c k = m"
-    by (typecheck_cfuncs, smt a_type comp_associative2 e_type f_eq_ng g_type m_unique)
-
-  then show "\<exists>i. (f[A]\<^bsub>a\<^esub>, i) \<subseteq>\<^sub>c B"
-    unfolding subobject_of_def2 
-    by (rule_tac x=k in exI, typecheck_cfuncs, metis cfunc_type_def comp_monic_imp_monic m_mono)
+  then have "n \<circ>\<^sub>c k = [f[A]\<^bsub>a\<^esub>]map"
+    by (typecheck_cfuncs, smt (z3) comp_associative2 f_eq_ng g_type image_rest_map_type image_subobj_map_unique k_e_eq_g)
+  then show "(f[A]\<^bsub>a\<^esub>, [f[A]\<^bsub>a\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B, n)"
+    unfolding relative_subset_def2 using n_mono image_subobj_map_mono
+    by (typecheck_cfuncs, auto, rule_tac x=k in exI, typecheck_cfuncs)
 qed
 
 lemma left_pair_subset:
