@@ -1126,6 +1126,7 @@ proof (unfold reflexive_on_def, auto)
   qed
 qed
 
+
 lemma image_subset_conv:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"
   assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
@@ -1161,6 +1162,14 @@ proof -
     by (rule_tac x="i \<circ>\<^sub>c k" in exI, typecheck_cfuncs, simp add: cfunc_type_def)
 qed
 
+lemma subsets_off_by_iso:
+  assumes "(A,a) \<subseteq>\<^sub>c X" "(A,b) \<subseteq>\<^sub>c X"
+  shows "\<exists> i. isomorphism(i) \<and> i \<circ>\<^sub>c a = b"
+  oops
+
+
+(*We might be able to upgrade the lemma below by getting rid of i on the RHS below.*)
+
 (* Proposition 2.3.9 *)
 lemma subset_inv_image_iff_image_subset:
   assumes "(A,a) \<subseteq>\<^sub>c X" "(B,m) \<subseteq>\<^sub>c Y" 
@@ -1179,12 +1188,6 @@ proof auto
     then have m'_type[type_rule]: "m' : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> X"
       using assms(3) b_mono inverse_image_subobject_mapping_type m'_def by (typecheck_cfuncs, force)
 
-
-
-
-   
- 
-
   show "\<And>k. (A, k) \<subseteq>\<^sub>c f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<Longrightarrow> \<exists>j. (f[A]\<^bsub>a\<^esub>, j) \<subseteq>\<^sub>c B"
   proof - 
     fix k 
@@ -1200,7 +1203,6 @@ proof auto
       by simp
     then have j_type[type_rule]: "j : f[A]\<^bsub>d\<^esub> \<rightarrow> Y"
       using assms(3) comp_type d_def m'_type image_subobject_mapping_type k_type by presburger
-
 
 
 
@@ -1228,18 +1230,26 @@ proof auto
             simp add: b_mono cfunc_type_def comp_associative2 inverse_image_mapping_eq inverse_image_subobject_mapping_def m'_def middle_arrow_def)
     qed
 
-    have "\<exists>i. ((f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>id A\<^esub>, i) \<subseteq>\<^sub>c B"
+    have "\<exists>i. ((f \<circ>\<^sub>c (m' \<circ>\<^sub>c k))[A]\<^bsub>id A\<^esub>, i) \<subseteq>\<^sub>c B"
       by (metis \<open>(f \<circ>\<^sub>c m' \<circ>\<^sub>c k) factorsthru m\<close> assms(2) assms(3) cfunc_type_def codomain_comp domain_comp id_type image_smallest_subobject k_type m'_type)
 
-    then show "\<exists>j. (f[A]\<^bsub>a\<^esub>, j) \<subseteq>\<^sub>c B"
-      apply typecheck_cfuncs
-     
+    then have "\<exists>j. (f[A]\<^bsub> m' \<circ>\<^sub>c k\<^esub>, j) \<subseteq>\<^sub>c B"
+      by (typecheck_cfuncs, metis id_right_unit2 id_type image_subset_conv)
+
+    then show "\<exists>i j. (f[A]\<^bsub>i\<^esub>, j) \<subseteq>\<^sub>c B"
+      by blast
+  next
+    show "\<And>i j. (f[A]\<^bsub>i\<^esub>, j) \<subseteq>\<^sub>c B \<Longrightarrow> \<exists>k. (A, k) \<subseteq>\<^sub>c f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>"
+      oops
+
+
+
+
 
       thm image_smallest_subobject[where f = "f \<circ>\<^sub>c m' \<circ>\<^sub>c k", where X = "(f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>a\<^esub>", where Y = Y, where a=a, where A = A,
           where B = B, where n = m]
       
       
-oops
 
 lemma left_pair_symmetric:
   assumes "symmetric_on X (Y, m)"
