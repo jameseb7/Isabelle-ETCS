@@ -242,6 +242,13 @@ definition coequalizer :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Righta
     \<and> (m \<circ>\<^sub>c f = m \<circ>\<^sub>c g)
     \<and> (\<forall> h F. ((h : X \<rightarrow> F) \<and> (h \<circ>\<^sub>c f = h \<circ>\<^sub>c g)) \<longrightarrow> (\<exists>! k. (k : E \<rightarrow> F) \<and> k \<circ>\<^sub>c m = h)))"
 
+lemma coequalizer_def2:
+  assumes "f : Y \<rightarrow> X" "g : Y \<rightarrow> X" "m : X \<rightarrow> E"
+  shows "coequalizer E m f g \<longleftrightarrow>
+    (m \<circ>\<^sub>c f = m \<circ>\<^sub>c g)
+      \<and> (\<forall> h F. ((h : X \<rightarrow> F) \<and> (h \<circ>\<^sub>c f = h \<circ>\<^sub>c g)) \<longrightarrow> (\<exists>! k. (k : E \<rightarrow> F) \<and> k \<circ>\<^sub>c m = h))"
+  using assms unfolding coequalizer_def cfunc_type_def by auto
+
 (* Exercise 2.3.1 *)
 lemma coequalizer_unique:
   assumes "coequalizer E m f g" "coequalizer F n f g"
@@ -957,6 +964,191 @@ proof -
     unfolding relative_subset_def2 using n_mono image_subobj_map_mono
     by (typecheck_cfuncs, auto, rule_tac x=k in exI, typecheck_cfuncs)
 qed
+lemma images_iso:
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
+  shows "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
+proof -
+  have f_m_image_coequalizer:
+    "coequalizer ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>) ((f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub>) 
+      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
+      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
+    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
+
+  have f_image_coequalizer:
+    "coequalizer (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>) (f\<restriction>\<^bsub>(A, m \<circ>\<^sub>c n)\<^esub>) 
+      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
+      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
+    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
+
+  from f_m_image_coequalizer f_image_coequalizer
+  show "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
+    by (meson coequalizer_unique)
+qed
+
+lemma image_subset_conv:
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
+  shows "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B \<Longrightarrow> \<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
+proof -
+  assume "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B"
+  then obtain i where
+    i_type[type_rule]: "i : (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<rightarrow> B" and
+    i_mono: "monomorphism i"
+    unfolding subobject_of_def by force
+
+  have "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
+    using f_type images_iso m_type n_type by blast
+  then obtain k where
+    k_type[type_rule]: "k : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>" and
+    k_mono: "monomorphism k"
+    by (meson is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric)
+  then show "\<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
+    unfolding subobject_of_def using composition_of_monic_pair_is_monic i_mono
+    by (rule_tac x="i \<circ>\<^sub>c k" in exI, typecheck_cfuncs, simp add: cfunc_type_def)
+qed
+
+lemma 
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z"
+  shows "\<exists>i. i : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<and> [(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>]map \<circ>\<^sub>c i = [f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>]map"
+  oops
+  
+
+lemma image_rel_subset_conv:
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z"
+  assumes rel_sub1: "((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, [(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B,b)"
+  shows "(f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, [f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B,b)"
+  using rel_sub1 image_subobj_map_mono
+  unfolding relative_subset_def2
+proof (typecheck_cfuncs, auto)
+  fix k
+  assume k_type[type_rule]: "k : (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<rightarrow> B"
+  assume b_type[type_rule]: "b : B \<rightarrow> Y"
+  assume b_mono: "monomorphism b"
+  assume b_k_eq_map: "b \<circ>\<^sub>c k = [(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>]map"
+
+  have f_m_image_coequalizer:
+    "coequalizer ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>) ((f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub>) 
+      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
+      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
+    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
+  then have f_m_image_coequalises: 
+      "(f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub> \<circ>\<^sub>c fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A
+        = (f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub> \<circ>\<^sub>c fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A"
+    by (typecheck_cfuncs_prems, unfold coequalizer_def2, auto)
+
+  have f_image_coequalizer:
+    "coequalizer (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>) (f\<restriction>\<^bsub>(A, m \<circ>\<^sub>c n)\<^esub>) 
+      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
+      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
+    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
+  then have "\<And> h F. h : A \<rightarrow> F \<Longrightarrow>
+           h \<circ>\<^sub>c fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A =
+           h \<circ>\<^sub>c fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A \<Longrightarrow>
+           (\<exists>!k. k : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> F \<and> k \<circ>\<^sub>c f\<restriction>\<^bsub>(A, m \<circ>\<^sub>c n)\<^esub> = h)"
+    by (typecheck_cfuncs_prems, unfold coequalizer_def2, auto)
+  then have "\<exists>!k. k : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<and> k \<circ>\<^sub>c f\<restriction>\<^bsub>(A, m \<circ>\<^sub>c n)\<^esub> = (f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub>"
+    using f_m_image_coequalises by (typecheck_cfuncs, presburger)
+  then obtain k' where 
+    k'_type[type_rule]: "k' : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>" and
+    k'_eq: "k' \<circ>\<^sub>c f\<restriction>\<^bsub>(A, m \<circ>\<^sub>c n)\<^esub> = (f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub>"
+    by auto
+
+  have k'_maps_eq: "[f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>]map = [(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>]map \<circ>\<^sub>c k'"
+    by (typecheck_cfuncs, smt (z3) comp_associative2 image_subobject_mapping_def2 k'_eq)
+
+  
+  have k_mono: "monomorphism k"
+    by (metis b_k_eq_map cfunc_type_def comp_monic_imp_monic k_type rel_sub1 relative_subset_def2)
+  have k'_mono: "monomorphism k'"
+    by (smt (verit, ccfv_SIG) cfunc_type_def comp_monic_imp_monic comp_type f_type image_subobject_mapping_def2 k'_maps_eq k'_type m_type n_type)
+
+  show "\<exists>k. k : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> B \<and> b \<circ>\<^sub>c k = [f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>]map"
+    by (rule_tac x="k \<circ>\<^sub>c k'" in exI, typecheck_cfuncs, simp add: b_k_eq_map comp_associative2 k'_maps_eq)
+qed
+
+lemma subsets_off_by_iso:
+  assumes "(A,a) \<subseteq>\<^sub>c X" "(A,b) \<subseteq>\<^sub>c X"
+  shows "\<exists> i. isomorphism(i) \<and> i \<circ>\<^sub>c a = b"
+  oops
+
+
+(*We might be able to upgrade the lemma below by getting rid of i on the RHS below.*)
+
+(* Proposition 2.3.9 *)
+lemma subset_inv_image_iff_image_subset:
+  assumes "(A,a) \<subseteq>\<^sub>c X" "(B,m) \<subseteq>\<^sub>c Y" 
+  assumes[type_rule]: "f : X \<rightarrow> Y"
+  shows "((A, a) \<subseteq>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>,[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map)) = ((f[A]\<^bsub>a\<^esub>, [f[A]\<^bsub>a\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B,m))"
+proof auto
+
+  (*Facts about m_star, denoted m' *)
+  thm inverse_image_subobject_mapping_type[where f=f, where X = X, where Y=Y,where m=m, where B=B]
+  have b_mono: "monomorphism(m)"
+    using assms(2) subobject_of_def2 by blast
+  have b_type[type_rule]: "m : B  \<rightarrow> Y"
+    using assms(2) subobject_of_def2 by blast
+  obtain m' where m'_def: "m' = [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map"
+    by blast
+  then have m'_type[type_rule]: "m' : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> X"
+    using assms(3) b_mono inverse_image_subobject_mapping_type m'_def by (typecheck_cfuncs, force)
+
+  assume "(A, a) \<subseteq>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map)"
+  then have a_type[type_rule]: "a : A \<rightarrow> X" and
+    a_mono: "monomorphism a" and
+    k_exists: "\<exists>k. k : A \<rightarrow> f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<and> [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map \<circ>\<^sub>c k = a"
+    unfolding relative_subset_def2 by auto
+  then obtain k where k_type[type_rule]: "k : A \<rightarrow> f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>" and k_a_eq: "[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map \<circ>\<^sub>c k = a"
+    by auto
+
+  obtain d where d_def: "d = m' \<circ>\<^sub>c k"
+    by simp
+
+  (*Facts about j *)
+  obtain j where j_def: "j = [f[A]\<^bsub>d\<^esub>]map"
+    by simp
+  then have j_type[type_rule]: "j : f[A]\<^bsub>d\<^esub> \<rightarrow> Y"
+    using assms(3) comp_type d_def m'_type image_subobj_map_type k_type by presburger
+
+
+
+  (*Facts about e*)
+  obtain e where e_def: "e = f\<restriction>\<^bsub>(A, d)\<^esub>"
+    by simp
+  then have e_type[type_rule]: "e : A \<rightarrow> f[A]\<^bsub>d\<^esub>"
+    using assms(3) comp_type d_def image_rest_map_type k_type m'_type by blast
+
+  have je_equals: "j \<circ>\<^sub>c e = f \<circ>\<^sub>c m' \<circ>\<^sub>c k"
+    by (typecheck_cfuncs, simp add: d_def e_def image_subobj_comp_image_rest j_def)
+
+  have "(f \<circ>\<^sub>c m' \<circ>\<^sub>c k) factorsthru m"
+  proof(typecheck_cfuncs, unfold factors_through_def2) 
+
+    obtain middle_arrow where middle_arrow_def: 
+      "middle_arrow = (right_cart_proj X B) \<circ>\<^sub>c (inverse_image_mapping f B m)"
+      by simp
+
+    then have middle_arrow_type[type_rule]: "middle_arrow : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> B"
+      unfolding middle_arrow_def using b_mono by (typecheck_cfuncs)
+
+    show "\<exists>h. h : A \<rightarrow> B \<and> m \<circ>\<^sub>c h = f \<circ>\<^sub>c m' \<circ>\<^sub>c k"
+      by (rule_tac x="middle_arrow \<circ>\<^sub>c k" in exI, typecheck_cfuncs, 
+          simp add: b_mono cfunc_type_def comp_associative2 inverse_image_mapping_eq inverse_image_subobject_mapping_def m'_def middle_arrow_def)
+  qed
+
+  thm image_smallest_subobject[where f="f \<circ>\<^sub>c (m' \<circ>\<^sub>c k)", where n=m, where X=A, where Y=Y,
+      where A=A, where a="id A", where B=B]
+  then have "((f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>id\<^sub>c A\<^esub>, [(f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>id\<^sub>c A\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B, m)"
+    by (typecheck_cfuncs, meson assms(2) image_smallest_subobject)
+  then have "((f \<circ>\<^sub>c a)[A]\<^bsub>id\<^sub>c A\<^esub>, [(f \<circ>\<^sub>c a)[A]\<^bsub>id\<^sub>c A\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B, m)"
+    by (simp add: k_a_eq m'_def)   
+  then show "(f[A]\<^bsub>a\<^esub>, [f[A]\<^bsub>a\<^esub>]map)\<subseteq>\<^bsub>Y\<^esub>(B, m)"
+    by (typecheck_cfuncs, metis id_right_unit2 id_type image_rel_subset_conv)
+next
+  oops
+      
 
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
@@ -1143,187 +1335,6 @@ proof (unfold reflexive_on_def, auto)
       using z_type distribute_left_ap x_type calculation dist_mid_type factors_through_def2 yz_type zxzx_type by auto
   qed
 qed
-
-lemma images_iso:
-  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
-  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
-  shows "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
-proof -
-  have f_m_image_coequalizer:
-    "coequalizer ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>) ((f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub>) 
-      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
-      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
-    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
-
-  have f_image_coequalizer:
-    "coequalizer (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>) (f\<restriction>\<^bsub>(A, m \<circ>\<^sub>c n)\<^esub>) 
-      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
-      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
-    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
-
-  from f_m_image_coequalizer f_image_coequalizer
-  show "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
-    by (meson coequalizer_unique)
-qed
-
-lemma image_subset_conv:
-  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
-  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
-  shows "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B \<Longrightarrow> \<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
-proof -
-  assume "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B"
-  then obtain i where
-    i_type[type_rule]: "i : (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<rightarrow> B" and
-    i_mono: "monomorphism i"
-    unfolding subobject_of_def by force
-
-  have "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
-    using f_type images_iso m_type n_type by blast
-  then obtain k where
-    k_type[type_rule]: "k : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>" and
-    k_mono: "monomorphism k"
-    by (meson is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric)
-  then show "\<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
-    unfolding subobject_of_def using composition_of_monic_pair_is_monic i_mono
-    by (rule_tac x="i \<circ>\<^sub>c k" in exI, typecheck_cfuncs, simp add: cfunc_type_def)
-qed
-
-lemma 
-  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
-  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z"
-  shows "\<exists>i. i : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<and> [(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>]map \<circ>\<^sub>c i = [f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>]map"
-  oops
-  
-
-lemma image_rel_subset_conv:
-  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
-  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z"
-  assumes rel_sub1: "((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, [(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B,b)"
-  shows "(f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, [f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B,b)"
-  using rel_sub1 image_subobj_map_mono
-  unfolding relative_subset_def2
-proof (typecheck_cfuncs, auto)
-  fix k
-  assume k_type[type_rule]: "k : (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<rightarrow> B"
-  assume b_type[type_rule]: "b : B \<rightarrow> Y"
-  assume b_mono: "monomorphism b"
-  assume b_k_eq_map: "b \<circ>\<^sub>c k = [(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>]map"
-  
-  have "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
-    using f_type images_iso m_type n_type by blast
-  then obtain i where
-    i_type[type_rule]: "i : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>" and
-    i_mono: "monomorphism i"
-    by (meson is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric)
-  then show "\<exists>k. k : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> B \<and> b \<circ>\<^sub>c k = [f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>]map"
-    apply (rule_tac x="k \<circ>\<^sub>c i" in exI, auto)
-    apply (simp add: comp_type k_type)
-  
-  (*have k_mono: "monomorphism k"
-    by (metis cfunc_type_def comp_monic_imp_monic k_type rel_sub1 relative_subset_def2)
-  
-  
-  then have "((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, k) \<subseteq>\<^sub>c B"
-    by (simp add: k_type subobject_of_def2)
-  
-
-  then obtain j where "(f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
-    using f_type image_subset_conv m_type n_type by blast
-  then have j_type[type_rule]: "j : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> B" and j_mono: "monomorphism j"
-    by (auto simp add: subobject_of_def2)
-  then have "b \<circ>\<^sub>c j = [f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>]map"*)
-
-lemma subsets_off_by_iso:
-  assumes "(A,a) \<subseteq>\<^sub>c X" "(A,b) \<subseteq>\<^sub>c X"
-  shows "\<exists> i. isomorphism(i) \<and> i \<circ>\<^sub>c a = b"
-  oops
-
-
-(*We might be able to upgrade the lemma below by getting rid of i on the RHS below.*)
-
-(* Proposition 2.3.9 *)
-lemma subset_inv_image_iff_image_subset:
-  assumes "(A,a) \<subseteq>\<^sub>c X" "(B,m) \<subseteq>\<^sub>c Y" 
-  assumes[type_rule]: "f : X \<rightarrow> Y"
-  shows "((A, a) \<subseteq>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>,[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map)) = ((f[A]\<^bsub>a\<^esub>, [f[A]\<^bsub>a\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B,m))"
-proof auto
-
-  (*Facts about m_star, denoted m' *)
-  thm inverse_image_subobject_mapping_type[where f=f, where X = X, where Y=Y,where m=m, where B=B]
-  have b_mono: "monomorphism(m)"
-    using assms(2) subobject_of_def2 by blast
-  have b_type[type_rule]: "m : B  \<rightarrow> Y"
-    using assms(2) subobject_of_def2 by blast
-  obtain m' where m'_def: "m' = [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map"
-    by blast
-  then have m'_type[type_rule]: "m' : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> X"
-    using assms(3) b_mono inverse_image_subobject_mapping_type m'_def by (typecheck_cfuncs, force)
-
-  assume "(A, a)\<subseteq>\<^bsub>X\<^esub>(f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map)"
-  then have a_type[type_rule]: "a : A \<rightarrow> X" and
-    a_mono: "monomorphism a" and
-    k_exists: "\<exists>k. k : A \<rightarrow> f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<and> [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map \<circ>\<^sub>c k = a"
-    unfolding relative_subset_def2 by auto
-  then obtain k where k_type[type_rule]: "k : A \<rightarrow> f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>" and k_a_eq: "[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map \<circ>\<^sub>c k = a"
-    by auto
-
-  obtain d where d_def: "d = m' \<circ>\<^sub>c k"
-    by simp
-
-  (*Facts about j *)
-  obtain j where j_def: "j = [f[A]\<^bsub>d\<^esub>]map"
-    by simp
-  then have j_type[type_rule]: "j : f[A]\<^bsub>d\<^esub> \<rightarrow> Y"
-    using assms(3) comp_type d_def m'_type image_subobject_mapping_type k_type by presburger
-
-
-
-  (*Facts about e*)
-  obtain e where e_def: "e = f\<restriction>\<^bsub>(A, d)\<^esub>"
-    by simp
-  then have e_type[type_rule]: "e : A \<rightarrow> f[A]\<^bsub>d\<^esub>"
-    using assms(3) comp_type d_def image_restriction_mapping_type k_type m'_type by blast
-
-  have je_equals: "j \<circ>\<^sub>c e = f \<circ>\<^sub>c m' \<circ>\<^sub>c k"
-    by (typecheck_cfuncs, metis assms(3) d_def e_def image_subobject_mapping_def2 j_def)
-
-  have "(f \<circ>\<^sub>c m' \<circ>\<^sub>c k) factorsthru m"
-  proof(typecheck_cfuncs, unfold factors_through_def2) 
-
-    obtain middle_arrow where middle_arrow_def: 
-      "middle_arrow = (right_cart_proj X B) \<circ>\<^sub>c (inverse_image_mapping f B m)"
-      by simp
-
-    then have middle_arrow_type[type_rule]: "middle_arrow : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> B"
-      unfolding middle_arrow_def using b_mono by (typecheck_cfuncs)
-
-    show "\<exists>h. h : A \<rightarrow> B \<and> m \<circ>\<^sub>c h = f \<circ>\<^sub>c m' \<circ>\<^sub>c k"
-      by (rule_tac x="middle_arrow \<circ>\<^sub>c k" in exI, typecheck_cfuncs, 
-          simp add: b_mono cfunc_type_def comp_associative2 inverse_image_mapping_eq inverse_image_subobject_mapping_def m'_def middle_arrow_def)
-  qed
-
-  thm image_smallest_subobject[where f="f \<circ>\<^sub>c (m' \<circ>\<^sub>c k)", where n=m, where X=A, where Y=Y,
-      where A=A, where a="id A", where B=B]
-  then have "((f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>id\<^sub>c A\<^esub>, [(f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>id\<^sub>c A\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B, m)"
-    by (metis assms(2) assms(3) cfunc_type_def codomain_comp domain_comp id_type image_smallest_subobject k_type m'_type)
-
-  then have "\<exists>j. (f[A]\<^bsub> m' \<circ>\<^sub>c k\<^esub>, j) \<subseteq>\<^sub>c B"
-    (*by (typecheck_cfuncs, metis id_right_unit2 id_type image_subset_conv)*)
-
-    then show "\<exists>i j. (f[A]\<^bsub>i\<^esub>, j) \<subseteq>\<^sub>c B"
-      by blast
-  next
-    show "\<And>i j. (f[A]\<^bsub>i\<^esub>, j) \<subseteq>\<^sub>c B \<Longrightarrow> \<exists>k. (A, k) \<subseteq>\<^sub>c f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>"
-      oops
-
-
-
-
-
-      thm image_smallest_subobject[where f = "f \<circ>\<^sub>c m' \<circ>\<^sub>c k", where X = "(f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>a\<^esub>", where Y = Y, where a=a, where A = A,
-          where B = B, where n = m]
-      
-      
 
 lemma left_pair_symmetric:
   assumes "symmetric_on X (Y, m)"
