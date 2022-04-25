@@ -1251,6 +1251,47 @@ proof auto
       
       
 
+(*Definition 2.3.11*)
+(*
+definition functional :: "cset  \<times> cfunc \<Rightarrow> bool" where
+  "functional R = (\<exists> X Y. R \<subseteq>\<^sub>c (X\<times>\<^sub>c Y) \<and> 
+    (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (\<exists> y. (y \<in>\<^sub>c Y \<and> (\<langle>x,y\<rangle> \<in> R)))))"
+
+Not sure how to define the above! *)
+
+definition functional_on :: "cset \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" where
+  "functional_on X Y R = (R  \<subseteq>\<^sub>c X \<times>\<^sub>c Y \<and>
+    (\<forall>x. \<exists>! y.  x \<in>\<^sub>c X \<longrightarrow>  y \<in>\<^sub>c Y \<and>  
+      (\<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> R)))" 
+
+
+(*Definition 2.3.12*)
+
+definition graph :: "cfunc \<Rightarrow> cset" where
+ "graph f = (SOME ProdSet. \<exists> X Y.  
+  f : X \<rightarrow> Y \<and>
+ ( \<forall> x y.( x \<in>\<^sub>c X \<and> y \<in>\<^sub>c Y \<and> f \<circ>\<^sub>c x = y
+  \<longrightarrow> \<langle>x, y\<rangle> \<in>\<^sub>c ProdSet)))"
+
+lemma graph_subobject:
+  assumes "f : X \<rightarrow> Y"
+  shows "(graph f, id(X)\<times>\<^sub>f f)  \<subseteq>\<^sub>c (X\<times>\<^sub>c Y)"
+  unfolding subobject_of_def2
+proof(auto)
+  show "id\<^sub>c X \<times>\<^sub>f f : graph f \<rightarrow> X \<times>\<^sub>c Y"
+    using assms apply typecheck_cfuncs
+    oops
+
+
+(*Exercise 2.3.13*)
+lemma graphs_are_functional:
+  assumes "f : X \<rightarrow> Y"
+  shows "functional_on X Y (graph f)"
+  oops
+
+
+
+
 lemma left_pair_symmetric:
   assumes "symmetric_on X (Y, m)"
   shows "symmetric_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))"

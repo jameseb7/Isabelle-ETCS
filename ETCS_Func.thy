@@ -166,6 +166,8 @@ proof -
     using f_type uniqueness by auto
 qed
 
+
+
 lemma same_evals_equal:
   assumes "f : Z \<rightarrow> X\<^bsup>A\<^esup>" "g: Z \<rightarrow> X\<^bsup>A\<^esup>"
   shows "eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f f) = eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f g) \<Longrightarrow> f = g"
@@ -190,6 +192,118 @@ proof (rule same_evals_equal[where Z=W, where X=X, where A=A])
   then show "eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c g)) = eval_func X A \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f (f \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g))\<^sup>\<sharp>)"
     using calculation by auto
 qed
+
+(*Meta-function Definition *)
+definition metafunc :: "cfunc \<Rightarrow> cfunc" where
+  "metafunc f \<equiv> (f \<circ>\<^sub>c (left_cart_proj (domain f) one))\<^sup>\<sharp>"
+
+lemma metafunc_def2:
+  assumes "f : X \<rightarrow> Y"
+  shows "metafunc f = (f \<circ>\<^sub>c (left_cart_proj X one))\<^sup>\<sharp>"
+  using assms unfolding metafunc_def cfunc_type_def by auto
+
+
+
+lemma metafunc_type[type_rule]:
+  assumes "f : X \<rightarrow> Y"
+  shows "metafunc f \<in>\<^sub>c Y\<^bsup>X\<^esup>"
+  using assms by (unfold metafunc_def2, typecheck_cfuncs)
+
+lemma eval_lemma:
+  assumes "f : X \<rightarrow> Y"
+  assumes "x  \<in>\<^sub>c X"
+  shows "eval_func Y X \<circ>\<^sub>c \<langle>x, metafunc f\<rangle> = f \<circ>\<^sub>c x"
+proof - 
+  have "eval_func Y X \<circ>\<^sub>c \<langle>x, metafunc f\<rangle> = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f \<circ>\<^sub>c (left_cart_proj X one))\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x, id one\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 metafunc_def2)
+  also have "... = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f \<circ>\<^sub>c (left_cart_proj X one))\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>x, id one\<rangle>"
+    using assms comp_associative2 by (typecheck_cfuncs, blast)
+  also have "... =   (f \<circ>\<^sub>c (left_cart_proj X one)) \<circ>\<^sub>c \<langle>x, id one\<rangle>"
+    using assms by (typecheck_cfuncs, metis transpose_func_def)
+  also have "... = f \<circ>\<^sub>c x"
+    by (typecheck_cfuncs, metis assms cfunc_type_def comp_associative left_cart_proj_cfunc_prod)
+  then show "eval_func Y X \<circ>\<^sub>c \<langle>x, metafunc f\<rangle> = f \<circ>\<^sub>c x"
+    by (simp add: calculation)
+qed
+    
+
+(*Parameterized Functions*)
+
+definition left_param :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsub>'(_,-')\<^esub>" [100,0]100) where
+  "left_param k p \<equiv> (THE f.  \<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> f = k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>)"
+
+  
+
+lemma left_param_def2:
+  assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
+  shows "k\<^bsub>(p,-)\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
+proof - 
+  have "\<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> left_param k p = k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
+    unfolding left_param_def apply (rule theI', auto)
+    using assms by (blast, metis cfunc_type_def transpose_func_type)
+  then show "k\<^bsub>(p,-)\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
+    by (smt (z3) assms cfunc_type_def transpose_func_type)
+qed
+
+
+lemma left_param_type[type_rule]:
+  assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
+  assumes "p \<in>\<^sub>c P"
+  shows "k\<^bsub>(p,-)\<^esub> : Q \<rightarrow> R"
+  using assms by (unfold left_param_def2, typecheck_cfuncs)
+
+lemma left_param_on_el:
+  assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
+  assumes "p \<in>\<^sub>c P"
+  assumes "q \<in>\<^sub>c Q"
+  shows  "k\<^bsub>(p,-)\<^esub> \<circ>\<^sub>c q = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
+proof - 
+  have "k\<^bsub>(p,-)\<^esub> \<circ>\<^sub>c q = k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>  \<circ>\<^sub>c q"
+    using assms cfunc_type_def comp_associative left_param_def2 by (typecheck_cfuncs, force)
+  also have "... = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
+    using  assms(2) assms(3) cart_prod_extract_right by force
+  then show ?thesis
+    by (simp add: calculation)
+qed
+
+
+
+definition right_param :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsub>'(-,_')\<^esub>" [100,0]100) where
+  "right_param k q \<equiv> (THE f.  \<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> f = k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>)"
+
+
+lemma right_param_def2:
+  assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
+  shows "k\<^bsub>(-,q)\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
+proof - 
+  have "\<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> right_param k q = k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
+    unfolding right_param_def apply (rule theI', auto)
+    using assms by (blast, metis cfunc_type_def exp_set_inj transpose_func_type) 
+  then show "k\<^bsub>(-,q)\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>id\<^sub>c P,q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
+    by (smt (z3) assms cfunc_type_def exp_set_inj transpose_func_type)
+qed
+
+lemma right_param_type[type_rule]:
+  assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
+  assumes "q \<in>\<^sub>c Q"
+  shows "k\<^bsub>(-,q)\<^esub> : P \<rightarrow> R"
+  using assms by (unfold right_param_def2, typecheck_cfuncs)
+  
+
+lemma right_param_on_el:
+  assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
+  assumes "p \<in>\<^sub>c P"
+  assumes "q \<in>\<^sub>c Q"
+  shows  "k\<^bsub>(-,q)\<^esub> \<circ>\<^sub>c p = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
+proof - 
+  have "k\<^bsub>(-,q)\<^esub> \<circ>\<^sub>c p = k \<circ>\<^sub>c  \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>  \<circ>\<^sub>c p"
+    using assms cfunc_type_def comp_associative right_param_def2 by (typecheck_cfuncs, force)
+  also have "... = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
+    using assms(2) assms(3) cart_prod_extract_left by force
+  then show ?thesis
+    by (simp add: calculation)
+qed
+
 
 
 lemma exponential_object_identity2: 
@@ -1016,6 +1130,15 @@ lemma either_finite_or_infinite:
 (* Definition 2.6.2 *)
 definition is_smaller_than :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<le>\<^sub>c" 50) where
    "X \<le>\<^sub>c Y \<longleftrightarrow> (\<exists> m. m : X \<rightarrow> Y \<and> monomorphism(m))"
+
+
+
+(*The point of the following lemma is simply to unify the two notations used in the book.*)
+lemma subobject_iff_smaller_than:
+  "(X \<le>\<^sub>c Y) = (\<exists>m. (X,m) \<subseteq>\<^sub>c Y)"
+  using is_smaller_than_def subobject_of_def2 by auto
+
+
 
 (*Proposition 2.6.3*)
 

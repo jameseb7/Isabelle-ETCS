@@ -35,11 +35,12 @@ lemma natural_numbers_are_countably_infinite:
   by (meson CollectI Peano's_Axioms countable_def injective_imp_monomorphism is_infinite_def successor_type)
 
 
+
+
 lemma smaller_than_countable_is_countable:
   assumes "X \<le>\<^sub>c Y" "countable Y"
   shows "countable X"
   by (smt assms cfunc_type_def comp_type composition_of_monic_pair_is_monic countable_def is_smaller_than_def)
-
 
 
 lemma iso_pres_finite:
@@ -513,7 +514,7 @@ qed
 
 
 
-
+(*Proposition 2.6.10*)
 lemma NxN_is_countable:
   "countable(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
 proof -
@@ -1816,5 +1817,155 @@ if k = zero, then i \<circ>\<^sub>c k = x, which shows us that it always is equa
 
 
     oops
+
+
+(* Definition 2.6.12 *)
+definition fixed_point :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool " (infix "is'_fixed'_point'_of" 50) where 
+  "fixed_point a g = (\<exists> A. g : A \<rightarrow> A \<and> a \<in>\<^sub>c A \<and> g \<circ>\<^sub>c a = a)"
+
+lemma fixed_point_def2: 
+  assumes "g : A \<rightarrow> A" "a \<in>\<^sub>c A"
+  shows "fixed_point a g = (g \<circ>\<^sub>c a = a)"
+  unfolding fixed_point_def using assms by blast
+  
+(*Definition 2.6.12b*)
+definition fixed_point_property :: "cset \<Rightarrow> bool" where
+  "fixed_point_property A = (\<forall> g. g : A \<rightarrow> A \<longrightarrow> (\<exists> a . fixed_point a g \<and> a \<in>\<^sub>c A))"
+
+(*Theorem 2.6.13*)
+lemma Lawveres_fixed_point_theorem:
+  assumes p_type[type_rule]: "p : X \<rightarrow> A\<^bsup>X\<^esup>"
+  assumes p_surj: "surjective p"
+  shows "fixed_point_property A"
+proof(unfold fixed_point_property_def,auto) 
+  fix g 
+  assume g_type[type_rule]: "g : A \<rightarrow> A"
+  obtain \<phi> where \<phi>_def: "\<phi> = p\<^sup>\<flat>"
+    by auto
+  then have \<phi>_type[type_rule]: "\<phi> : X \<times>\<^sub>c X \<rightarrow> A"
+    by (simp add: flat_type p_type)
+  obtain f where f_def: "f = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c diagonal(X)"
+    by auto
+  then have f_type[type_rule]:"f : X \<rightarrow> A"
+    using \<phi>_type comp_type diagonal_type f_def g_type by blast
+  obtain x_f where x_f: "metafunc f = p \<circ>\<^sub>c x_f \<and> x_f \<in>\<^sub>c X"
+    using assms by (typecheck_cfuncs, metis p_surj surjective_def2)
+  have "\<phi>\<^bsub>(-,x_f)\<^esub> = f"
+  proof(rule one_separator[where X = "X", where Y = A])
+    show "\<phi>\<^bsub>(-,x_f)\<^esub> : X \<rightarrow> A"
+      using assms by (typecheck_cfuncs, simp add: x_f)
+    show "f : X \<rightarrow> A"
+      by (simp add: f_type)
+    show "\<And>x. x \<in>\<^sub>c X \<Longrightarrow> \<phi>\<^bsub>(-,x_f)\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
+    proof - 
+      fix x 
+      assume x_type[type_rule]: "x \<in>\<^sub>c X"
+      have "\<phi>\<^bsub>(-,x_f)\<^esub> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
+        using assms by (typecheck_cfuncs, meson right_param_on_el x_f)
+      also have "... = ((eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f p)) \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
+        using assms \<phi>_def inv_transpose_func_def2 by auto
+      also have "... = (eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f p) \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
+        by (typecheck_cfuncs, metis comp_associative2 x_f)
+      also have "... = (eval_func A X) \<circ>\<^sub>c \<langle>id X  \<circ>\<^sub>c  x, p \<circ>\<^sub>c x_f\<rangle>"
+        using cfunc_cross_prod_comp_cfunc_prod x_f by (typecheck_cfuncs, force)
+      also have "... = (eval_func A X) \<circ>\<^sub>c \<langle>x, metafunc f\<rangle>"
+        using id_left_unit2 x_f by (typecheck_cfuncs, auto)
+      also have "... = f \<circ>\<^sub>c x"
+        by (simp add: eval_lemma f_type x_type)
+      then show "\<phi>\<^bsub>(-,x_f)\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
+        by (simp add: calculation)
+    qed
+  qed
+  then have "\<phi>\<^bsub>(-,x_f)\<^esub> \<circ>\<^sub>c x_f = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c diagonal(X) \<circ>\<^sub>c x_f"
+    by (typecheck_cfuncs, smt (z3) cfunc_type_def comp_associative domain_comp f_def x_f)
+  then have "\<phi> \<circ>\<^sub>c \<langle>x_f, x_f\<rangle> = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c \<langle>x_f, x_f\<rangle>"
+    using  diag_on_elements right_param_on_el x_f by (typecheck_cfuncs, auto)
+  then have "(\<phi> \<circ>\<^sub>c \<langle>x_f, x_f\<rangle>) is_fixed_point_of g"
+    by (metis \<open>\<phi>\<^bsub>(-,x_f)\<^esub> = f\<close> \<open>\<phi>\<^bsub>(-,x_f)\<^esub> \<circ>\<^sub>c x_f = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c diagonal X \<circ>\<^sub>c x_f\<close> comp_type diag_on_elements f_type fixed_point_def2 g_type x_f)
+  then show "\<exists>a. a is_fixed_point_of g \<and> a \<in>\<^sub>c A"
+    using fixed_point_def cfunc_type_def g_type by auto
+qed
+
+(*Theorem 2.6.14*)
+lemma Cantors_Negative_Theorem:
+  "\<nexists> s. s : X \<rightarrow> \<P> X \<and> surjective(s)"
+proof(rule ccontr, auto)
+  fix s 
+  assume s_type: "s : X \<rightarrow> \<P> X"
+  assume s_surj: "surjective s"
+  then have Omega_has_ffp: "fixed_point_property \<Omega>"
+    using Lawveres_fixed_point_theorem powerset_def s_type by auto
+  have Omega_doesnt_have_ffp: "\<not>(fixed_point_property \<Omega>)"
+    unfolding fixed_point_property_def
+  proof(unfold fixed_point_def, auto)   
+    have  "NOT : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. (\<forall>A. a \<in>\<^sub>c A \<longrightarrow> NOT : A \<rightarrow> A \<longrightarrow> NOT \<circ>\<^sub>c a \<noteq> a) \<or> \<not> a \<in>\<^sub>c \<Omega>)"
+      by (typecheck_cfuncs, metis AND_complementary AND_idempotent OR_complementary OR_idempotent true_false_distinct)
+    then show "\<exists>g. g : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. (\<forall>A. a \<in>\<^sub>c A \<longrightarrow> g : A \<rightarrow> A \<longrightarrow> g \<circ>\<^sub>c a \<noteq> a) \<or> \<not> a \<in>\<^sub>c \<Omega>)"
+      by auto
+  qed
+  show False
+    using Omega_doesnt_have_ffp Omega_has_ffp by auto
+qed
+
+lemma generalized_Cantors_Negative_Theorem:
+  assumes "\<Omega> \<le>\<^sub>c Y"
+  shows "\<nexists> s. s : X \<rightarrow> Y\<^bsup>X\<^esup> \<and> surjective(s)"
+proof(rule ccontr, auto)
+  fix s 
+  assume s_type: "s : X \<rightarrow> Y\<^bsup>X\<^esup>"
+  assume s_surj: "surjective s"
+  obtain m where m_def: "m : Y\<^bsup>X\<^esup> \<rightarrow> X" and m_mono: "monomorphism(m)"
+    using epis_give_monos s_surj s_type surjective_is_epimorphism by blast
+  have "\<Omega>\<^bsup>X\<^esup> \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+    oops
+
+
+(*Exercise 2.6.15*)
+lemma Cantors_Positive_Theorem:
+  "\<exists>m. m : X \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> injective m"
+proof - 
+  have eq_pred_sharp_type[type_rule]: "(eq_pred X)\<^sup>\<sharp> : X \<rightarrow>  \<Omega>\<^bsup>X\<^esup>"
+    by (typecheck_cfuncs)
+  have "injective((eq_pred X)\<^sup>\<sharp>)"
+    unfolding injective_def
+  proof(auto)
+    fix x y 
+    assume "x \<in>\<^sub>c domain (eq_pred X\<^sup>\<sharp>)" then have x_type[type_rule]: "x \<in>\<^sub>c X"
+      using cfunc_type_def eq_pred_sharp_type by auto
+    assume "y \<in>\<^sub>c domain (eq_pred X\<^sup>\<sharp>)" then have y_type[type_rule]:"y \<in>\<^sub>c X"
+      using cfunc_type_def eq_pred_sharp_type by auto
+    assume eq: "eq_pred X\<^sup>\<sharp> \<circ>\<^sub>c x = eq_pred X\<^sup>\<sharp> \<circ>\<^sub>c y"
+    have "eq_pred X \<circ>\<^sub>c \<langle>x, x\<rangle> = eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle>"
+    proof - 
+      have "eq_pred X \<circ>\<^sub>c \<langle>x, x\<rangle> = ((eval_func \<Omega> X) \<circ>\<^sub>c (id X \<times>\<^sub>f (eq_pred X\<^sup>\<sharp>)) ) \<circ>\<^sub>c \<langle>x, x\<rangle>"
+        using transpose_func_def by (typecheck_cfuncs, presburger)
+      also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c (id X \<times>\<^sub>f (eq_pred X\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>x, x\<rangle>"
+        by (typecheck_cfuncs, simp add: comp_associative2)
+      also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x, (eq_pred X\<^sup>\<sharp>) \<circ>\<^sub>c x\<rangle>"
+        using cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
+      also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x, (eq_pred X\<^sup>\<sharp>) \<circ>\<^sub>c y\<rangle>"
+        by (simp add: eq)
+      also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c (id X \<times>\<^sub>f (eq_pred X\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>x, y\<rangle>"
+        by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+      also have "... = ((eval_func \<Omega> X) \<circ>\<^sub>c (id X \<times>\<^sub>f (eq_pred X\<^sup>\<sharp>)) ) \<circ>\<^sub>c \<langle>x, y\<rangle>"
+        using comp_associative2 by (typecheck_cfuncs, blast)
+      also have "... = eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle>"
+        using transpose_func_def by (typecheck_cfuncs, presburger)
+      then show ?thesis
+        by (simp add: calculation)
+    qed
+    then show "x = y"
+      by (metis eq_pred_iff_eq x_type y_type)
+  qed
+  then show "\<exists>m. m : X \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> injective m"
+    using eq_pred_sharp_type injective_imp_monomorphism by blast
+qed
+
+
+(*Corollary 2.6.15*)
+(*This is only a note: For any set X, the set \<P>X of its subsets is strictly larger than X*)
+
+
+
 
 end

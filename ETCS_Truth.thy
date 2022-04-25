@@ -138,6 +138,20 @@ next
     using assms element_pair_eq j_type by auto
 qed
 
+lemma eq_pred_iff_eq_conv:
+  assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
+  shows "(x \<noteq> y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> = \<f>)"
+proof(auto)
+  assume "x \<noteq> y"
+  show "eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<f>"
+    using assms \<open>x \<noteq> y\<close> eq_pred_iff_eq true_false_only_truth_values by (typecheck_cfuncs, blast)
+next
+  show "eq_pred X \<circ>\<^sub>c \<langle>y,y\<rangle> = \<f> \<Longrightarrow> x = y \<Longrightarrow> False"
+    by (metis assms(1) eq_pred_iff_eq true_false_distinct)
+qed
+
+
+
 (* Proposition 2.2.1: see under Axiom 8 *)
 
 (* Proposition 2.2.2 *)

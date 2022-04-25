@@ -58,7 +58,12 @@ lemma double_negation:
   by (typecheck_cfuncs, smt (verit, del_insts) NOT_false_is_true NOT_true_is_false cfunc_type_def comp_associative id_left_unit2 one_separator true_false_only_truth_values)
 
 
+
+
+
 subsection \<open>AND\<close>
+
+
 
 definition AND :: "cfunc" where
   "AND = (THE \<chi>. is_pullback one one (\<Omega> \<times>\<^sub>c \<Omega>) \<Omega> (\<beta>\<^bsub>one\<^esub>) \<t> \<langle>\<t>,\<t>\<rangle> \<chi>)"
