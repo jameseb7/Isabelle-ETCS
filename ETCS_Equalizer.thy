@@ -83,7 +83,7 @@ proof -
     using cfunc_type_def isomorphism_def k'_type k'k_eq_id k_type kk'_eq_id m'k_eq_m by auto
 qed
 
-(*What do we name this lemma?*)
+(*What do we name this lemma?  Equalizers exist3?*)
 lemma 
   assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> Y"
   shows "\<exists> E m. (m : E \<rightarrow> X) \<and> (f \<circ>\<^sub>c m = g \<circ>\<^sub>c m)"
@@ -704,6 +704,49 @@ lemma kernel_pair_subset:
   assumes "f: X \<rightarrow> Y"
   shows "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
   using assms fibered_product_morphism_monomorphism fibered_product_morphism_type subobject_of_def2 by auto
+
+
+
+
+(*
+  Below is yet to be proved.
+lemma terminal_pullback_iso_to_product:
+  assumes "f : X \<rightarrow> T"
+  assumes "g : Y \<rightarrow> T"
+  assumes "terminal_object(T)"
+  shows "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) \<cong> (X \<times>\<^sub>c Y)"
+proof(unfold fibered_product_def)  (*Is it possible to get better than isomorphic?  
+In particular, can we force the SOME to just be the same set and force the m to be the identity?
+It seems like according to our definition there is not a unique fibered product so we cannot! :/*)
+  have "is_cart_prod (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) (fibered_product_left_proj X f g Y) (fibered_product_right_proj X f g Y) X Y"
+  proof(unfold is_cart_prod_def, auto)
+    show "fibered_product_left_proj X f g Y : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<rightarrow> X"
+      using assms by typecheck_cfuncs
+    show "fibered_product_right_proj X f g Y : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<rightarrow> Y"
+      using assms by typecheck_cfuncs
+    show "\<And>fa ga Z.
+       fa : Z \<rightarrow> X \<Longrightarrow>
+       ga : Z \<rightarrow> Y \<Longrightarrow>
+       \<exists>h. h : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
+           fibered_product_left_proj X f g Y  \<circ>\<^sub>c h = fa \<and>
+           fibered_product_right_proj X f g Y \<circ>\<^sub>c h = ga \<and>
+           (\<forall>h2. h2 : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
+                 fibered_product_left_proj X f g Y \<circ>\<^sub>c h2 = fa \<and> fibered_product_right_proj X f g Y \<circ>\<^sub>c h2 = ga \<longrightarrow>
+                 h2 = h)"
+    proof - 
+      fix fa ga Z
+      assume fa_type[type_rule]: "fa : Z \<rightarrow> X"
+      assume ga_type[type_rule]: "ga : Z \<rightarrow> Y"
+      show "\<exists>h. h : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
+           fibered_product_left_proj X f g Y  \<circ>\<^sub>c h = fa \<and>
+           fibered_product_right_proj X f g Y \<circ>\<^sub>c h = ga \<and>
+           (\<forall>h2. h2 : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
+                 fibered_product_left_proj X f g Y \<circ>\<^sub>c h2 = fa \<and> fibered_product_right_proj X f g Y \<circ>\<^sub>c h2 = ga \<longrightarrow>
+                 h2 = h)"
+        oops
+*)
+
+
 
 (* Exercise 2.1.44 Part 1 *)
 lemma kern_pair_proj_iso_TFAE1:

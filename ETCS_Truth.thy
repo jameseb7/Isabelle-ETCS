@@ -374,9 +374,9 @@ qed
 
 
 (* Proposition 2.2.9 *)
-lemma pullback_of_epi_is_epi:
+lemma pullback_of_epi_is_epi1:
 assumes "f: Y \<rightarrow> Z" "epimorphism f" "is_pullback A Y X Z (q1) f (q0) g "
-shows "epimorphism (q0)"
+shows "epimorphism (q0)" 
 proof - 
   have surj_f: "surjective f"
     using assms(1) assms(2) epi_is_surj by auto
@@ -396,9 +396,180 @@ proof -
     then show "\<exists>x. x \<in>\<^sub>c domain q0 \<and> q0 \<circ>\<^sub>c x = y"
       using assms(3) cfunc_type_def is_pullback_def square_commutes_def by auto
   qed
+ 
   then show ?thesis
     using surjective_is_epimorphism by blast
 qed
+
+
+
+(* Proposition 2.2.9b *)
+lemma pullback_of_epi_is_epi2:
+assumes "g: X \<rightarrow> Z" "epimorphism g" "is_pullback A Y X Z (q1) f (q0) g "
+shows "epimorphism (q1)" 
+proof - 
+  have surj_g: "surjective g"
+    using assms(1) assms(2) epi_is_surj by auto
+  have "surjective (q1)"
+    unfolding surjective_def
+  proof(auto)
+    fix y
+    assume y_type: "y \<in>\<^sub>c codomain q1"
+    then have codomain_gy: "f \<circ>\<^sub>c y \<in>\<^sub>c Z"
+      using assms(3) cfunc_type_def comp_type is_pullback_def square_commutes_def by auto
+    then have z_exists: "\<exists> z. z \<in>\<^sub>c X \<and> g \<circ>\<^sub>c z = f \<circ>\<^sub>c y"
+      using assms(1) cfunc_type_def surj_g surjective_def by auto
+    then obtain z where z_def: "z \<in>\<^sub>c X \<and> g \<circ>\<^sub>c z = f \<circ>\<^sub>c y"
+      by blast
+    then have "\<exists>! k. k: one \<rightarrow> A \<and> q0 \<circ>\<^sub>c k = z \<and> q1 \<circ>\<^sub>c k =y"
+      by (smt (verit, ccfv_threshold) assms(3) cfunc_type_def is_pullback_def square_commutes_def y_type)      
+    then show "\<exists>x. x \<in>\<^sub>c domain q1 \<and> q1 \<circ>\<^sub>c x = y"
+      using assms(3) cfunc_type_def is_pullback_def square_commutes_def by auto
+  qed
+  then show ?thesis
+    using surjective_is_epimorphism by blast
+qed
+
+
+(* Proposition 2.2.9c *)
+lemma pullback_of_mono_is_mono1:
+assumes "g: X \<rightarrow> Z" "monomorphism f" "is_pullback A Y X Z (q1) f (q0) g "
+shows "monomorphism (q0)" 
+proof(unfold monomorphism_def2, auto)
+  fix u v Q a x
+  assume u_type: "u : Q \<rightarrow> a"  (*Q is arbitrary while "a" is actually just A, and we will establish this soon.*)
+  assume v_type: "v : Q \<rightarrow> a"
+  assume q0_type: "q0 :  a \<rightarrow> x" (* y is actually just Y*)
+  assume equals: "q0 \<circ>\<^sub>c u = q0 \<circ>\<^sub>c v" 
+
+  have a_is_A: "a = A"
+    using assms(3) cfunc_type_def is_pullback_def q0_type square_commutes_def by force
+  have y_is_Y: "x = X"
+    using assms(3) cfunc_type_def is_pullback_def q0_type square_commutes_def by fastforce
+  have u_type2[type_rule]: "u : Q \<rightarrow> A"
+    using a_is_A u_type by blast
+  have v_type2[type_rule]: "v : Q \<rightarrow> A"
+    using a_is_A v_type by blast
+  have q1_type2[type_rule]: "q0 : A \<rightarrow> X"
+    using a_is_A q0_type y_is_Y by blast
+
+  have eqn1: "g \<circ>\<^sub>c (q0 \<circ>\<^sub>c u) = f \<circ>\<^sub>c (q1 \<circ>\<^sub>c v)"
+  proof - 
+    have "g \<circ>\<^sub>c (q0 \<circ>\<^sub>c u) = g \<circ>\<^sub>c q0 \<circ>\<^sub>c v"
+      by (simp add: equals)
+    also have "... = f \<circ>\<^sub>c (q1 \<circ>\<^sub>c v)"
+      using assms(3) cfunc_type_def comp_associative is_pullback_def square_commutes_def by (typecheck_cfuncs, force)
+    then show ?thesis
+      by (simp add: calculation)
+  qed 
+
+  have eqn2: "q1 \<circ>\<^sub>c u =  q1  \<circ>\<^sub>c v"
+  proof - 
+    have f1: "f \<circ>\<^sub>c q1 \<circ>\<^sub>c u = g \<circ>\<^sub>c q0 \<circ>\<^sub>c u"
+      using assms(3) comp_associative2 is_pullback_def square_commutes_def by (typecheck_cfuncs, auto)
+    also have "... = g \<circ>\<^sub>c q0 \<circ>\<^sub>c v"
+      by (simp add: equals)
+    also have "... = f \<circ>\<^sub>c q1 \<circ>\<^sub>c v"
+      using eqn1 equals by fastforce
+    then show ?thesis
+      by (typecheck_cfuncs, smt (verit, ccfv_threshold) f1 assms(2) assms(3) eqn1 is_pullback_def monomorphism_def3 square_commutes_def)
+  qed
+
+  have uniqueness: "\<exists>! j. (j : Q \<rightarrow> A \<and> q1 \<circ>\<^sub>c j = q1 \<circ>\<^sub>c v \<and> q0 \<circ>\<^sub>c j = q0 \<circ>\<^sub>c u)"
+   by (typecheck_cfuncs, smt (verit, ccfv_threshold) assms(3) eqn1 is_pullback_def square_commutes_def)
+  then show "u = v"
+    using eqn2 equals uniqueness by (typecheck_cfuncs, auto)
+qed
+
+
+(* Proposition 2.2.9d *)
+lemma pullback_of_mono_is_mono2:
+assumes "g: X \<rightarrow> Z" "monomorphism g" "is_pullback A Y X Z (q1) f (q0) g "
+shows "monomorphism (q1)" 
+proof(unfold monomorphism_def2, auto)
+  fix u v Q a y
+  assume u_type: "u : Q \<rightarrow> a"  (*Q is arbitrary while "a" is actually just A, and we will establish this soon.*)
+  assume v_type: "v : Q \<rightarrow> a"
+  assume q1_type: "q1 :  a \<rightarrow> y" (* y is actually just Y*)
+  assume equals: "q1 \<circ>\<^sub>c u = q1 \<circ>\<^sub>c v" 
+
+  have a_is_A: "a = A"
+    using assms(3) cfunc_type_def is_pullback_def q1_type square_commutes_def by force
+  have y_is_Y: "y = Y"
+    using assms(3) cfunc_type_def is_pullback_def q1_type square_commutes_def by fastforce
+  have u_type2[type_rule]: "u : Q \<rightarrow> A"
+    using a_is_A u_type by blast
+  have v_type2[type_rule]: "v : Q \<rightarrow> A"
+    using a_is_A v_type by blast
+  have q1_type2[type_rule]: "q1 : A \<rightarrow> Y"
+    using a_is_A q1_type y_is_Y by blast
+
+  have eqn1: "f \<circ>\<^sub>c (q1 \<circ>\<^sub>c u) = g \<circ>\<^sub>c (q0 \<circ>\<^sub>c v)"
+  proof - 
+    have "f \<circ>\<^sub>c (q1 \<circ>\<^sub>c u) = f \<circ>\<^sub>c q1 \<circ>\<^sub>c v"
+      by (simp add: equals)
+    also have "... = g \<circ>\<^sub>c (q0 \<circ>\<^sub>c v)"
+      using assms(3) cfunc_type_def comp_associative is_pullback_def square_commutes_def by (typecheck_cfuncs, force)
+    then show ?thesis
+      by (simp add: calculation)
+  qed 
+
+
+  have eqn2: "q0 \<circ>\<^sub>c u =  q0  \<circ>\<^sub>c v"
+  proof - 
+    have f1: "g \<circ>\<^sub>c q0 \<circ>\<^sub>c u = f \<circ>\<^sub>c q1 \<circ>\<^sub>c u"
+      using assms(3) comp_associative2 is_pullback_def square_commutes_def by (typecheck_cfuncs, auto)
+    also have "... = f \<circ>\<^sub>c q1 \<circ>\<^sub>c v"
+      by (simp add: equals)
+    also have "... = g \<circ>\<^sub>c q0 \<circ>\<^sub>c v"
+      using eqn1 equals by fastforce
+    then show ?thesis
+      by (typecheck_cfuncs, smt (verit, ccfv_threshold) f1 assms(2) assms(3) eqn1 is_pullback_def monomorphism_def3 square_commutes_def)
+  qed
+
+  have uniqueness: "\<exists>! j. (j : Q \<rightarrow> A \<and> q0 \<circ>\<^sub>c j = q0 \<circ>\<^sub>c v \<and> q1 \<circ>\<^sub>c j = q1 \<circ>\<^sub>c u)"
+   by (typecheck_cfuncs, smt (verit, ccfv_threshold) assms(3) eqn1 is_pullback_def square_commutes_def)
+
+  then show "u = v"
+    using eqn2 equals uniqueness by (typecheck_cfuncs, auto)
+qed
+
+
+
+lemma fib_prod_left_id_iso:
+  assumes "g : Y \<rightarrow> X"
+  shows  "(X \<^bsub>id(X)\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) \<cong> Y"
+proof - 
+  have is_pullback: "is_pullback (X \<^bsub>id(X)\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) Y X X (fibered_product_right_proj X (id(X)) g Y) g (fibered_product_left_proj X (id(X)) g Y) (id(X)) "
+    using assms fibered_product_is_pullback by (typecheck_cfuncs, blast)
+  then have mono: "monomorphism(fibered_product_right_proj X (id(X)) g Y)"
+    using assms by (typecheck_cfuncs, meson id_isomorphism iso_imp_epi_and_monic pullback_of_mono_is_mono2)
+  have "epimorphism(fibered_product_right_proj X (id(X)) g Y)"
+    by (meson id_isomorphism id_type is_pullback iso_imp_epi_and_monic pullback_of_epi_is_epi2)
+  then have "isomorphism(fibered_product_right_proj X (id(X)) g Y)"
+    by (simp add: epi_mon_is_iso mono)
+  then show ?thesis
+    using assms fibered_product_right_proj_type id_type is_isomorphic_def by blast
+qed
+
+lemma fib_prod_right_id_iso:
+  assumes "f : X \<rightarrow> Y"
+  shows  "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>id(Y)\<^esub> Y) \<cong> X"
+proof - 
+  have is_pullback: "is_pullback (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>id(Y)\<^esub> Y) Y X Y (fibered_product_right_proj X f (id(Y)) Y) (id(Y)) (fibered_product_left_proj X f (id(Y)) Y) f "
+    using assms fibered_product_is_pullback by (typecheck_cfuncs, blast)
+    
+  then have mono: "monomorphism(fibered_product_left_proj X f (id(Y)) Y)"
+    using assms by (typecheck_cfuncs, meson id_isomorphism is_pullback iso_imp_epi_and_monic pullback_of_mono_is_mono1)
+  have "epimorphism(fibered_product_left_proj X f (id(Y)) Y)"
+    by (meson id_isomorphism id_type is_pullback iso_imp_epi_and_monic pullback_of_epi_is_epi1)
+  then have "isomorphism(fibered_product_left_proj X f (id(Y)) Y)"
+    by (simp add: epi_mon_is_iso mono)
+  then show ?thesis
+    using assms fibered_product_left_proj_type id_type is_isomorphic_def by blast
+qed
+
+
 
 (*This is essentially a duplicate of cfunc_cross_prod_surj from the Terminal
 Theory file.  If differs in style by proving the product of epis is epi rather
@@ -462,7 +633,7 @@ proof - (*there are serious errors in the diagram in the book!*)
          by (smt cart_prod_decomp cart_prod_eq2 cfunc_cross_prod_comp_cfunc_prod f_type id_left_unit2 id_type left_cart_proj_cfunc_prod)
      qed
      then have fid_epi: "epimorphism(f\<times>\<^sub>f id(Z))"
-       using f_epi f_type pullback_of_epi_is_epi by blast
+       using f_epi f_type pullback_of_epi_is_epi1 by blast
 
 (*Second half proving (id(X)\<times>\<^sub>f g) is an epimorphism.*)
 
@@ -516,7 +687,7 @@ proof - (*there are serious errors in the diagram in the book!*)
        by (smt cart_prod_decomp cart_prod_eq2 cfunc_cross_prod_comp_cfunc_prod g_type id_left_unit2 id_type right_cart_proj_cfunc_prod)
    qed
    then have "epimorphism(id(X)\<times>\<^sub>f g)"
-     using g_epi g_type pullback_of_epi_is_epi by blast
+     using g_epi g_type pullback_of_epi_is_epi1 by blast
    then show ?thesis
      using fid_epi cfunc_type_def composition_of_epi_pair_is_epi decompose_fxg is_pullback_def pullback pullback2 square_commutes_def by auto
  qed
