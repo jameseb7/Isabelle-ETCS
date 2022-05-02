@@ -569,7 +569,12 @@ proof -
     using assms fibered_product_left_proj_type id_type is_isomorphic_def by blast
 qed
 
-
+lemma terminal_fib_prod_iso:
+  "(X \<^bsub>\<beta>\<^bsub>X\<^esub>\<^esub>\<times>\<^sub>c\<^bsub>\<beta>\<^bsub>Y\<^esub>\<^esub> Y) \<cong> X \<times>\<^sub>c Y"
+proof -
+  have "is_cart_prod (X \<^bsub>\<beta>\<^bsub>X\<^esub>\<^esub>\<times>\<^sub>c\<^bsub>\<beta>\<^bsub>Y\<^esub>\<^esub> Y) 
+    (fibered_product_left_proj X (\<beta>\<^bsub>X\<^esub>) (\<beta>\<^bsub>Y\<^esub>) Y) (fibered_product_right_proj X (\<beta>\<^bsub>X\<^esub>) (\<beta>\<^bsub>Y\<^esub>) Y) X Y"
+    unfolding is_cart_prod_def apply auto
 
 (*This is essentially a duplicate of cfunc_cross_prod_surj from the Terminal
 Theory file.  If differs in style by proving the product of epis is epi rather
