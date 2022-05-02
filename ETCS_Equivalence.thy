@@ -1193,6 +1193,24 @@ next
   qed
 qed
 
+(* Exercise 2.3.10 *)
+lemma in_inv_image_of_image:
+  assumes "(A,m) \<subseteq>\<^sub>c X" 
+  assumes[type_rule]: "f : X \<rightarrow> Y"
+  shows "(A,m) \<subseteq>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[f[A]\<^bsub>m\<^esub>]\<^bsub>[f[A]\<^bsub>m\<^esub>]map\<^esub>, [f\<^sup>-\<^sup>1[f[A]\<^bsub>m\<^esub>]\<^bsub>[f[A]\<^bsub>m\<^esub>]map\<^esub>]map)"
+proof -
+  have m_type[type_rule]: "m : A \<rightarrow> X"
+    using assms(1) unfolding subobject_of_def2 by auto
+  have m_mono: "monomorphism m"
+    using assms(1) unfolding subobject_of_def2 by auto
+
+  have "((f[A]\<^bsub>m\<^esub>, [f[A]\<^bsub>m\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (f[A]\<^bsub>m\<^esub>, [f[A]\<^bsub>m\<^esub>]map))"
+    unfolding relative_subset_def2
+    using m_mono image_subobj_map_mono id_right_unit2 id_type by (typecheck_cfuncs, blast)
+  then show "(A,m) \<subseteq>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[f[A]\<^bsub>m\<^esub>]\<^bsub>[f[A]\<^bsub>m\<^esub>]map\<^esub>, [f\<^sup>-\<^sup>1[f[A]\<^bsub>m\<^esub>]\<^bsub>[f[A]\<^bsub>m\<^esub>]map\<^esub>]map)"
+    by (meson assms relative_subset_def2 subobject_of_def2 subset_inv_image_iff_image_subset)
+qed
+
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
   shows "(Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z)) \<subseteq>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z)"
