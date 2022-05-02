@@ -1147,8 +1147,51 @@ proof auto
   then show "(f[A]\<^bsub>a\<^esub>, [f[A]\<^bsub>a\<^esub>]map)\<subseteq>\<^bsub>Y\<^esub>(B, m)"
     by (typecheck_cfuncs, metis id_right_unit2 id_type image_rel_subset_conv)
 next
-  oops
-      
+  have m_mono: "monomorphism(m)"
+    using assms(2) subobject_of_def2 by blast
+  have m_type[type_rule]: "m : B  \<rightarrow> Y"
+    using assms(2) subobject_of_def2 by blast
+
+  assume "(f[A]\<^bsub>a\<^esub>, [f[A]\<^bsub>a\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B, m)"
+  then obtain s where 
+      s_type[type_rule]: "s : f[A]\<^bsub>a\<^esub> \<rightarrow> B" and
+      m_s_eq_subobj_map: "m \<circ>\<^sub>c s = [f[A]\<^bsub>a\<^esub>]map"
+    unfolding relative_subset_def2 by auto
+
+  have a_mono: "monomorphism a"
+    using assms(1) unfolding subobject_of_def2 by auto
+
+  have pullback_map1_type[type_rule]: "s \<circ>\<^sub>c f\<restriction>\<^bsub>(A, a)\<^esub> : A \<rightarrow> B"
+    using assms(1) unfolding subobject_of_def2 by (auto, typecheck_cfuncs)
+  have pullback_map2_type[type_rule]: "a : A \<rightarrow> X"
+    using assms(1) unfolding subobject_of_def2 by auto
+  have pullback_maps_commute: "m \<circ>\<^sub>c s \<circ>\<^sub>c f\<restriction>\<^bsub>(A, a)\<^esub> = f \<circ>\<^sub>c a"
+    by (typecheck_cfuncs, simp add: comp_associative2 image_subobj_comp_image_rest m_s_eq_subobj_map)
+
+  have "\<And>Z k h. k : Z \<rightarrow> B \<Longrightarrow> h : Z \<rightarrow> X \<Longrightarrow> m \<circ>\<^sub>c k = f \<circ>\<^sub>c h \<Longrightarrow>
+     (\<exists>!j. j : Z \<rightarrow> f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<and>
+           (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = k \<and>
+           (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h)"
+    using inverse_image_pullback assms(3) m_mono m_type unfolding is_pullback_def by simp
+  then obtain k where k_type[type_rule]: "k : A \<rightarrow> f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>" and
+    k_right_eq: "(right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c k = s \<circ>\<^sub>c f\<restriction>\<^bsub>(A, a)\<^esub>" and
+    k_left_eq: "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c k = a"
+    using pullback_map1_type pullback_map2_type pullback_maps_commute by blast
+
+  have "monomorphism ((left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c k) \<Longrightarrow> monomorphism k"
+    using comp_monic_imp_monic' m_mono by (typecheck_cfuncs, blast)
+  then have "monomorphism k"
+    by (simp add: a_mono k_left_eq)
+  then show "(A, a)\<subseteq>\<^bsub>X\<^esub>(f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map)"
+    unfolding relative_subset_def2 
+    using assms a_mono m_mono inverse_image_subobject_mapping_mono
+  proof (typecheck_cfuncs, auto)
+    assume "monomorphism k"
+    then show "\<exists>k. k : A \<rightarrow> f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<and> [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map \<circ>\<^sub>c k = a"
+      using assms(3) inverse_image_subobject_mapping_def2 k_left_eq k_type 
+      by (rule_tac x=k in exI, force)
+  qed
+qed
 
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
