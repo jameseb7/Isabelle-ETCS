@@ -294,12 +294,17 @@ lemma inverse_image_subobject_mapping_type[type_rule]:
   shows "[f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map : f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub> \<rightarrow> X"
   using assms by (unfold inverse_image_subobject_mapping_def2, typecheck_cfuncs)
 
+lemma inverse_image_subobject_mapping_mono:
+  assumes "f : X \<rightarrow> Y" "m : B \<rightarrow> Y" "monomorphism m"
+  shows "monomorphism ([f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map)"
+  using assms cfunc_type_def inverse_image_monomorphism inverse_image_subobject_mapping_def by fastforce
+
 lemma inverse_image_subobject:
   assumes "m : B \<rightarrow> Y" "f : X \<rightarrow> Y" "monomorphism m"
   shows "(f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, [f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>]map) \<subseteq>\<^sub>c X"
-  using assms cfunc_type_def codomain_comp domain_comp inverse_image_mapping_type
-    inverse_image_monomorphism left_cart_proj_type subobject_of_def2 inverse_image_subobject_mapping_def
-  by auto
+  unfolding subobject_of_def2
+  using assms inverse_image_subobject_mapping_mono inverse_image_subobject_mapping_type
+  by force
 
 lemma inverse_image_pullback:
   assumes "m : B \<rightarrow> Y" "f : X \<rightarrow> Y" "monomorphism m"
