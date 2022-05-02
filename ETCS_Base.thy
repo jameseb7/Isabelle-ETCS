@@ -219,6 +219,16 @@ method_setup typecheck_cfuncs =
   \<open>Scan.succeed typecheck_cfuncs_method\<close>
   "Check types of cfuncs in current goal and add as assumptions of the current goal"
 
+(* typecheck_cfuncs_all_method lifts typecheck_cfuncs_tac to a proof method that
+  generates cfunc type facts for the first goal *)
+ML \<open>fun typecheck_cfuncs_all_method ctxt = 
+         CONTEXT_METHOD (fn thms => CONTEXT_TACTIC (ALLGOALS (typecheck_cfuncs_tac ctxt thms)))\<close>
+
+(* setup typecheck_cfuncs_method as a proof method in the theory *)
+method_setup typecheck_cfuncs_all =
+  \<open>Scan.succeed typecheck_cfuncs_all_method\<close>
+  "Check types of cfuncs in all subgoals and add as assumptions of the current goal"
+
 (* typecheck_cfuncs_prems_subproof implements a tactic that generates cfunc type facts as assumptions of a goal,
   in the right format to be passed to the Subgoal.FOCUS combinator *)
 ML \<open>fun typecheck_cfuncs_prems_subproof ctxt assms _ n (focus : Subgoal.focus) = 
@@ -442,6 +452,11 @@ proof auto
   then show "s = t"
     using gf_monic codomain_s codomain_t domain_comp by (simp add: assms)
 qed      
+
+lemma comp_monic_imp_monic':
+  assumes "f : X \<rightarrow> Y" "g : Y \<rightarrow> Z"
+  shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
+  by (metis assms cfunc_type_def comp_monic_imp_monic)
 
 (*Exercise 2.1.7b*)
 lemma comp_epi_imp_epi:
