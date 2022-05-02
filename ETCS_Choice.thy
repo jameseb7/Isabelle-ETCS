@@ -23,7 +23,7 @@ lemma epis_give_monos:
   using assms  
   by (typecheck_cfuncs_prems, metis axiom_of_choice cfunc_type_def comp_monic_imp_monic f_epi id_isomorphism iso_imp_epi_and_monic section_of_def)
 
-
+(* Proposition 2.6.8 *)
 lemma monos_give_epis:
   assumes f_type: "f : X \<rightarrow> Y"
   assumes f_mono: "monomorphism(f)"
