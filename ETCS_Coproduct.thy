@@ -1602,6 +1602,36 @@ lemma case_bool_false:
   "case_bool \<circ>\<^sub>c \<f> = right_coproj one one"
   by (simp add: case_bool_true_and_false)
 
+lemma coprod_case_bool_true:
+  assumes "x1 \<in>\<^sub>c X"
+  assumes "x2 \<in>\<^sub>c X"
+  shows   "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<t> = x1"
+proof - 
+  have "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<t> = (x1 \<amalg> x2) \<circ>\<^sub>c case_bool \<circ>\<^sub>c \<t>"
+    using assms by (typecheck_cfuncs , simp add: comp_associative2)
+  also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c  (left_coproj one one)"
+    using assms case_bool_true by presburger
+  also have "... = x1"
+    using assms left_coproj_cfunc_coprod by force
+  then show ?thesis
+    by (simp add: calculation)
+qed
+
+lemma coprod_case_bool_false:
+  assumes "x1 \<in>\<^sub>c X"
+  assumes "x2 \<in>\<^sub>c X"
+  shows   "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<f> = x2"
+proof - 
+  have "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<f> = (x1 \<amalg> x2) \<circ>\<^sub>c case_bool \<circ>\<^sub>c \<f>"
+    using assms by (typecheck_cfuncs , simp add: comp_associative2)
+  also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c  (right_coproj one one)"
+    using assms case_bool_false by presburger
+  also have "... = x2"
+    using assms right_coproj_cfunc_coprod by force
+  then show ?thesis
+    by (simp add: calculation)
+qed
+
 
 
 

@@ -623,6 +623,8 @@ next
   qed
 qed
 
+(*Now we use the previous lemma together with the fact that a Cartesian product of X and Y is 
+  isomorphic to X \<times>\<^sub>c Y  to prove the next two lemmas*)
 
 lemma terminal_fib_prod_iso:
   "(X \<^bsub>\<beta>\<^bsub>X\<^esub>\<^esub>\<times>\<^sub>c\<^bsub>\<beta>\<^bsub>Y\<^esub>\<^esub> Y) \<cong> X \<times>\<^sub>c Y"

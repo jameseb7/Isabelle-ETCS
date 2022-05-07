@@ -1,9 +1,75 @@
 theory Cardinality
-  imports ETCS_Axioms
+  imports ETCS_Axioms Countable
 begin
 
-  
 
+
+
+lemma non_init_non_ter_sets:
+  assumes "\<not>(terminal_object X)"
+  assumes "\<not>(initial_object X)"
+  shows "\<Omega> \<le>\<^sub>c X" 
+proof - 
+  obtain x1 and x2 where x1_type[type_rule]: "x1 \<in>\<^sub>c X" and 
+                         x2_type[type_rule]: "x2 \<in>\<^sub>c X" and
+                                   distinct: "x1 \<noteq> x2"
+    by (metis assms iso_empty_initial iso_to1_is_term no_el_iff_iso_0 nonempty_def single_elem_iso_one)
+  then have map_type[type_rule]: "(x1 \<amalg> x2) \<circ>\<^sub>c case_bool   : \<Omega> \<rightarrow> X"
+    by typecheck_cfuncs
+  have injective: "injective((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
+  proof(unfold injective_def, auto)
+    fix \<omega>1 \<omega>2 
+    assume "\<omega>1 \<in>\<^sub>c domain (x1 \<amalg> x2 \<circ>\<^sub>c case_bool)"
+    then have \<omega>1_type[type_rule]: "\<omega>1 \<in>\<^sub>c \<Omega>"
+      using cfunc_type_def map_type by auto
+    assume "\<omega>2 \<in>\<^sub>c domain (x1 \<amalg> x2 \<circ>\<^sub>c case_bool)"
+    then have \<omega>2_type[type_rule]: "\<omega>2 \<in>\<^sub>c \<Omega>"
+      using cfunc_type_def map_type by auto
+    
+    assume equals: "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<omega>1 = (x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<omega>2"
+    show "\<omega>1 = \<omega>2"
+    proof(cases "\<omega>1 = \<t>", auto)
+      assume "\<omega>1 = \<t>"
+      show "\<t> = \<omega>2"
+      proof(rule ccontr)
+        assume " \<t> \<noteq> \<omega>2"
+        then have "\<f> = \<omega>2"
+          using \<open>\<t> \<noteq> \<omega>2\<close> true_false_only_truth_values by (typecheck_cfuncs, blast)
+        then have RHS: "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<omega>2 = x2"
+          by (meson coprod_case_bool_false x1_type x2_type)
+        have "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<omega>1 = x1"
+          using \<open>\<omega>1 = \<t>\<close> coprod_case_bool_true x1_type x2_type by blast
+        then show False
+          using RHS distinct equals by force
+      qed
+    next
+      assume "\<omega>1 \<noteq> \<t>"
+      then have "\<omega>1 = \<f>"
+        using  true_false_only_truth_values by (typecheck_cfuncs, blast)
+      have "\<omega>2 = \<f>"
+      proof(rule ccontr)
+        assume "\<omega>2 \<noteq> \<f>"
+        then have "\<omega>2 = \<t>"
+          using  true_false_only_truth_values by (typecheck_cfuncs, blast)
+        then have RHS: "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<omega>2 = x2"
+          using \<open>\<omega>1 = \<f>\<close> coprod_case_bool_false equals x1_type x2_type by auto
+        have "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<omega>1 = x1"
+          using \<open>\<omega>2 = \<t>\<close> coprod_case_bool_true equals x1_type x2_type by presburger
+        then show False
+          using RHS distinct equals by auto
+      qed
+      show "\<omega>1 = \<omega>2"
+        by (simp add: \<open>\<omega>1 = \<f>\<close> \<open>\<omega>2 = \<f>\<close>)
+    qed
+  qed
+  then have "monomorphism((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
+    using injective_imp_monomorphism by auto
+  then show "\<Omega> \<le>\<^sub>c X"
+    using  is_smaller_than_def map_type by blast
+qed
+
+
+(*
 
 lemma exp_set_smaller_than1:
   assumes "A \<le>\<^sub>c B"
@@ -167,6 +233,8 @@ lemma exp_set_smaller_than1:
   qed
 qed
 
+*)
+
 
 lemma exp_set_smaller_than2:
   assumes "A \<le>\<^sub>c B"
@@ -211,9 +279,62 @@ lemma leq_transitive:
   shows   "A \<le>\<^sub>c C"
   by (typecheck_cfuncs, metis (full_types) assms cfunc_type_def comp_type composition_of_monic_pair_is_monic is_smaller_than_def)
 
+lemma "Generalized_Cantors_Positive_Theorem":
+  assumes "\<not>(terminal_object Y)"
+  assumes "\<not>(initial_object Y)"
+  shows "X  \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+proof - 
+  have "\<Omega> \<le>\<^sub>c Y"
+    by (simp add: assms non_init_non_ter_sets)
+  then have fact: "\<Omega>\<^bsup>X\<^esup> \<le>\<^sub>c  Y\<^bsup>X\<^esup>"
+    by (simp add: exp_set_smaller_than2)
+  have "X \<le>\<^sub>c \<Omega>\<^bsup>X\<^esup>"
+    by (meson Cantors_Positive_Theorem CollectI injective_imp_monomorphism is_smaller_than_def)
+  then show ?thesis
+    using fact leq_transitive by blast
+qed
+
+
+lemma Generalized_Cantors_Negative_Theorem:
+  assumes "\<not>(initial_object X)"
+  assumes "\<not>(terminal_object Y)"
+  shows "\<nexists> s. s : X \<rightarrow> Y\<^bsup>X\<^esup> \<and> surjective(s)"
+proof(rule ccontr, auto)
+  fix s 
+  assume s_type[type_rule]: "s : X \<rightarrow> Y\<^bsup>X\<^esup>"
+  assume s_surj: "surjective(s)"
+  obtain m where m_type[type_rule]: "m : Y\<^bsup>X\<^esup> \<rightarrow> X" and m_mono: "monomorphism(m)"
+    by (meson epis_give_monos s_surj s_type surjective_is_epimorphism)
+  have "nonempty X"
+    using assms(1) iso_empty_initial no_el_iff_iso_0 by blast
+  then have nonempty: "nonempty (\<Omega>\<^bsup>X\<^esup>)"
+    using nonempty_def nonempty_to_nonempty true_func_type by blast
+  show False
+  proof(cases "initial_object Y")
+    assume "initial_object Y"
+    then have "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
+      by (meson empty_to_nonempty initial_iso_empty no_el_iff_iso_0 nonempty_def s_surj s_type surjective_def2)
+    then show False
+      by (metis comp_type empty_to_nonempty_converse no_el_iff_iso_0 nonempty_def s_type)
+  next
+    assume "\<not> initial_object Y"
+    then have "\<Omega> \<le>\<^sub>c Y"
+      by (simp add: assms(2) non_init_non_ter_sets)
+    then obtain n where n_type[type_rule]: "n : \<Omega>\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>" and n_mono: "monomorphism(n)"
+      by (meson exp_set_smaller_than2 is_smaller_than_def)
+    then have mn_type[type_rule]: "m \<circ>\<^sub>c n :  \<Omega>\<^bsup>X\<^esup> \<rightarrow> X"
+      by (meson comp_type m_type)
+    have mn_mono: "monomorphism(m \<circ>\<^sub>c n)"
+      using cfunc_type_def composition_of_monic_pair_is_monic m_mono m_type n_mono n_type by presburger
+    then have "\<exists>g. g: X  \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> epimorphism(g) \<and> g \<circ>\<^sub>c (m \<circ>\<^sub>c n) = id (\<Omega>\<^bsup>X\<^esup>)"
+    (*We can finish this lemma as soon as we resolve the subscript notation, since
+      monos_give_epis is required to prove this step! ! ! *)
+
+      oops
 
 
 
+(*
 lemma exp_set_smaller_than3:
   assumes "A \<le>\<^sub>c B"
   assumes "X \<le>\<^sub>c Y"
@@ -227,7 +348,7 @@ proof -
   show "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
     using leq1 leq2 leq_transitive by blast
 qed
-
+*)
 
 lemma sets_squared:
   "A\<^bsup>\<Omega>\<^esup> \<cong> A \<times>\<^sub>c A "
@@ -1038,6 +1159,9 @@ lemma set_connexity:
   apply typecheck_cfuncs
 
   oops
+
+
+
 
 
 end
