@@ -1397,42 +1397,6 @@ proof (unfold reflexive_on_def, auto)
   qed
 qed
 
-
-lemma image_subset_conv:
-  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
-  assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
-  shows "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B \<Longrightarrow> \<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
-proof -
-  assume "\<exists>i. ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>, i) \<subseteq>\<^sub>c B"
-  then obtain i where
-    i_type[type_rule]: "i : (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<rightarrow> B" and
-    i_mono: "monomorphism i"
-    unfolding subobject_of_def by force
-
-  have f_m_image_coequalizer:
-    "coequalizer ((f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>) ((f \<circ>\<^sub>c m)\<restriction>\<^bsub>(A, n)\<^esub>) 
-      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
-      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
-    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
-
-  have f_image_coequalizer:
-    "coequalizer (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>) (f\<restriction>\<^bsub>(A, m \<circ>\<^sub>c n)\<^esub>) 
-      (fibered_product_left_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A) 
-      (fibered_product_right_proj A (f \<circ>\<^sub>c m \<circ>\<^sub>c n) (f \<circ>\<^sub>c m \<circ>\<^sub>c n) A)"
-    by (typecheck_cfuncs, smt comp_associative2 image_restriction_mapping_def2)
-
-  from f_m_image_coequalizer f_image_coequalizer
-  have "(f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub> \<cong> f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>"
-    by (meson coequalizer_unique)
-  then obtain k where
-    k_type[type_rule]: "k : f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> (f \<circ>\<^sub>c m)[A]\<^bsub>n\<^esub>" and
-    k_mono: "monomorphism k"
-    by (meson is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric)
-  then show "\<exists>j. (f[A]\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
-    unfolding subobject_of_def using composition_of_monic_pair_is_monic i_mono
-    by (rule_tac x="i \<circ>\<^sub>c k" in exI, typecheck_cfuncs, simp add: cfunc_type_def)
-qed
-
 lemma subsets_off_by_iso:
   assumes "(A,a) \<subseteq>\<^sub>c X" "(A,b) \<subseteq>\<^sub>c X"
   shows "\<exists> i. isomorphism(i) \<and> i \<circ>\<^sub>c a = b"
@@ -1520,19 +1484,6 @@ proof auto
       thm image_smallest_subobject[where f = "f \<circ>\<^sub>c m' \<circ>\<^sub>c k", where X = "(f \<circ>\<^sub>c m' \<circ>\<^sub>c k)[A]\<^bsub>a\<^esub>", where Y = Y, where a=a, where A = A,
           where B = B, where n = m]
 *)
-
-(* Proposition 2.3.9 *)
-lemma prop2310:
-  assumes "(A,a) \<subseteq>\<^sub>c X"  
-  assumes[type_rule]: "f : X \<rightarrow> Y"
-  assumes "\<And> B m. (B,m) \<subseteq>\<^sub>c Y \<longrightarrow>(\<exists> k. (A, k) \<subseteq>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)) = (\<exists> j. (f[A]\<^bsub>a\<^esub>, j) \<subseteq>\<^sub>c B)"
-  shows "(\<exists> k. (A, k) \<subseteq>\<^sub>c (f\<^sup>-\<^sup>1[f[A]\<^bsub>a\<^esub>]\<^bsub>k\<^esub>))"
-proof - 
-  obtain B where B_def: "B = f[A]\<^bsub>a\<^esub>"
-    by auto
-  then have "(f[A]\<^bsub>a\<^esub>, id (B)) \<subseteq>\<^sub>c B"
-    by (simp add: id_isomorphism id_type iso_imp_epi_and_monic subobject_of_def2)
-  then have "(\<exists> k. (A, k) \<subseteq>\<^sub>c (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>))"
 
 
 
@@ -1646,7 +1597,7 @@ lemma functional_relations_are_graphs:
   assumes "functional_on X Y (R,m)"
   shows "\<exists>! f. (f : X \<rightarrow> Y \<and> (R,m) = (graph f, graph_morph f))"
 proof(auto)
-have m_mono: "monomorphism(m)"
+  have m_mono: "monomorphism(m)"
     using assms functional_on_def subobject_of_def2 by blast
   have pi0_m_type[type_rule]: "left_cart_proj X Y \<circ>\<^sub>c m : R \<rightarrow> X"
     using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
@@ -1732,6 +1683,12 @@ have m_mono: "monomorphism(m)"
     by auto
   then have f_type[type_rule]: "f : X \<rightarrow> Y"
     by (metis assms comp_type f_def functional_on_def h_type right_cart_proj_type subobject_of_def2)
+
+  show "\<exists>f. f : X \<rightarrow> Y \<and> R = graph f \<and> m = graph_morph f"
+  proof (rule_tac x=f in exI, auto)
+    show "f : X \<rightarrow> Y"
+      by (simp add: f_type)
+    show "m = graph_morph f"
 
   oops
 

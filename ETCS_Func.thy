@@ -229,19 +229,19 @@ qed
 
 (*Parameterized Functions*)
 
-definition left_param :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsub>'(_,-')\<^esub>" [100,0]100) where
+definition left_param :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsub>[_,-]\<^esub>" [100,0]100) where
   "left_param k p \<equiv> (THE f.  \<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> f = k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>)"
 
   
 
 lemma left_param_def2:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
-  shows "k\<^bsub>(p,-)\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
+  shows "k\<^bsub>[p,-]\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
 proof - 
   have "\<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> left_param k p = k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
     unfolding left_param_def apply (rule theI', auto)
     using assms by (blast, metis cfunc_type_def transpose_func_type)
-  then show "k\<^bsub>(p,-)\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
+  then show "k\<^bsub>[p,-]\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
     by (smt (z3) assms cfunc_type_def transpose_func_type)
 qed
 
@@ -249,16 +249,16 @@ qed
 lemma left_param_type[type_rule]:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
   assumes "p \<in>\<^sub>c P"
-  shows "k\<^bsub>(p,-)\<^esub> : Q \<rightarrow> R"
+  shows "k\<^bsub>[p,-]\<^esub> : Q \<rightarrow> R"
   using assms by (unfold left_param_def2, typecheck_cfuncs)
 
 lemma left_param_on_el:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
   assumes "p \<in>\<^sub>c P"
   assumes "q \<in>\<^sub>c Q"
-  shows  "k\<^bsub>(p,-)\<^esub> \<circ>\<^sub>c q = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
+  shows  "k\<^bsub>[p,-]\<^esub> \<circ>\<^sub>c q = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
 proof - 
-  have "k\<^bsub>(p,-)\<^esub> \<circ>\<^sub>c q = k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>  \<circ>\<^sub>c q"
+  have "k\<^bsub>[p,-]\<^esub> \<circ>\<^sub>c q = k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>  \<circ>\<^sub>c q"
     using assms cfunc_type_def comp_associative left_param_def2 by (typecheck_cfuncs, force)
   also have "... = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
     using  assms(2) assms(3) cart_prod_extract_right by force
@@ -268,25 +268,25 @@ qed
 
 
 
-definition right_param :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsub>'(-,_')\<^esub>" [100,0]100) where
+definition right_param :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsub>[-,_]\<^esub>" [100,0]100) where
   "right_param k q \<equiv> (THE f.  \<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> f = k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>)"
 
 
 lemma right_param_def2:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
-  shows "k\<^bsub>(-,q)\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
+  shows "k\<^bsub>[-,q]\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
 proof - 
   have "\<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> right_param k q = k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
     unfolding right_param_def apply (rule theI', auto)
     using assms by (blast, metis cfunc_type_def exp_set_inj transpose_func_type) 
-  then show "k\<^bsub>(-,q)\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>id\<^sub>c P,q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
+  then show "k\<^bsub>[-,q]\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>id\<^sub>c P,q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
     by (smt (z3) assms cfunc_type_def exp_set_inj transpose_func_type)
 qed
 
 lemma right_param_type[type_rule]:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
   assumes "q \<in>\<^sub>c Q"
-  shows "k\<^bsub>(-,q)\<^esub> : P \<rightarrow> R"
+  shows "k\<^bsub>[-,q]\<^esub> : P \<rightarrow> R"
   using assms by (unfold right_param_def2, typecheck_cfuncs)
   
 
@@ -294,9 +294,9 @@ lemma right_param_on_el:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
   assumes "p \<in>\<^sub>c P"
   assumes "q \<in>\<^sub>c Q"
-  shows  "k\<^bsub>(-,q)\<^esub> \<circ>\<^sub>c p = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
+  shows  "k\<^bsub>[-,q]\<^esub> \<circ>\<^sub>c p = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
 proof - 
-  have "k\<^bsub>(-,q)\<^esub> \<circ>\<^sub>c p = k \<circ>\<^sub>c  \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>  \<circ>\<^sub>c p"
+  have "k\<^bsub>[-,q]\<^esub> \<circ>\<^sub>c p = k \<circ>\<^sub>c  \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>  \<circ>\<^sub>c p"
     using assms cfunc_type_def comp_associative right_param_def2 by (typecheck_cfuncs, force)
   also have "... = k \<circ>\<^sub>c \<langle>p, q\<rangle>"
     using assms(2) assms(3) cart_prod_extract_left by force
