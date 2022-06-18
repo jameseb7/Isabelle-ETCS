@@ -310,6 +310,12 @@ lemma right_cart_proj_one_right_inverse:
   "right_cart_proj one X \<circ>\<^sub>c \<langle>\<beta>\<^bsub>X\<^esub>,id X\<rangle> = id X"
   using right_cart_proj_cfunc_prod by (typecheck_cfuncs, blast)
 
+lemma cfunc_cross_prod_right_terminal_decomp:
+  assumes "f : X \<rightarrow> Y" "x : one \<rightarrow> Z"
+  shows "f \<times>\<^sub>f x = \<langle>f, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X one"
+  using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_def cfunc_prod_comp cfunc_type_def
+      comp_associative2 right_cart_proj_type terminal_func_comp terminal_func_unique)
+
 (* Proposition 2.1.21 *)
 lemma cart_prod_elem_eq:
   assumes "a \<in>\<^sub>c X \<times>\<^sub>c Y" "b \<in>\<^sub>c X \<times>\<^sub>c Y"
