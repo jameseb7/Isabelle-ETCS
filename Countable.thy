@@ -965,8 +965,6 @@ It seems unnecessary also we don't want to use p and q here if we use them below
             then show "(i \<circ>\<^sub>c q  =  i \<circ>\<^sub>c p) \<Longrightarrow>  (q = p)"
               by blast
           qed
-          
-              
 
           show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
           proof (rule one_separator[where X="\<nat>\<^sub>c", where Y=\<Omega>])
@@ -1070,9 +1068,7 @@ It seems unnecessary also we don't want to use p and q here if we use them below
                       assume q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c"
                       have "m \<circ>\<^sub>c i \<circ>\<^sub>c q = m \<circ>\<^sub>c i \<circ>\<^sub>c p \<Longrightarrow> 
                             successor \<circ>\<^sub>c q = successor \<circ>\<^sub>c p"
-                        sorry
-                      (* proving here *)
-
+                        by (typecheck_cfuncs_prems, insert ind_hyp m_mono monomorphism_def3, blast)
                       then have "successor \<circ>\<^sub>c q \<noteq> successor \<circ>\<^sub>c p \<Longrightarrow>
                           m \<circ>\<^sub>c i \<circ>\<^sub>c q \<noteq> m \<circ>\<^sub>c i \<circ>\<^sub>c p"
                        by fastforce
@@ -1109,8 +1105,7 @@ It seems unnecessary also we don't want to use p and q here if we use them below
                       then show "(((IMPLIES \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c,NOT \<circ>\<^sub>c eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i\<rangle>) \<circ>\<^sub>c
                         \<langle>id\<^sub>c \<nat>\<^sub>c,(successor \<circ>\<^sub>c p) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c q = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c q"
                         by (typecheck_cfuncs, smt (z3)  beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 terminal_func_comp)
-                       
-                      
+                    qed
                   qed
 
                   show ?thesis
