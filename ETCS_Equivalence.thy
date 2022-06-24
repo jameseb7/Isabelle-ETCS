@@ -1593,6 +1593,98 @@ qed
 
 (*Proposition 2.3.14*)
 
+
+lemma functional_relations_are_graphs_isomorphism_clause:
+  assumes "functional_on X Y (R,m)"
+  shows "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
+proof-
+  have m_mono: "monomorphism(m)"
+    using assms functional_on_def subobject_of_def2 by blast
+  have pi0_m_type[type_rule]: "left_cart_proj X Y \<circ>\<^sub>c m : R \<rightarrow> X"
+    using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
+  have surj: "surjective(left_cart_proj X Y \<circ>\<^sub>c m)"
+  proof(unfold surjective_def, auto)
+    fix x 
+    assume "x \<in>\<^sub>c codomain (left_cart_proj X Y \<circ>\<^sub>c m)"
+    then have [type_rule]: "x \<in>\<^sub>c X"
+      using cfunc_type_def pi0_m_type by force
+    then have "\<exists>! y. (y \<in>\<^sub>c Y \<and>  \<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> (R,m))"
+      using assms functional_on_def  by force
+    then show "\<exists>z. z \<in>\<^sub>c domain (left_cart_proj X Y \<circ>\<^sub>c m) \<and> (left_cart_proj X Y \<circ>\<^sub>c m) \<circ>\<^sub>c z = x"
+      by (typecheck_cfuncs, smt (verit, best) cfunc_type_def comp_associative factors_through_def2 left_cart_proj_cfunc_prod relative_member_def2)
+  qed
+  have inj: "injective(left_cart_proj X Y \<circ>\<^sub>c m)"
+  proof(unfold injective_def, auto)
+    fix r1 r2 
+    assume "r1 \<in>\<^sub>c domain (left_cart_proj X Y \<circ>\<^sub>c m)" then have r1_type[type_rule]: "r1 \<in>\<^sub>c R"
+      by (metis cfunc_type_def pi0_m_type)
+    assume "r2 \<in>\<^sub>c domain (left_cart_proj X Y \<circ>\<^sub>c m)" then have r2_type[type_rule]: "r2 \<in>\<^sub>c R"
+      by (metis cfunc_type_def pi0_m_type)
+    assume "(left_cart_proj X Y \<circ>\<^sub>c m) \<circ>\<^sub>c r1 = (left_cart_proj X Y \<circ>\<^sub>c m) \<circ>\<^sub>c r2"
+    then have eq: "left_cart_proj X Y \<circ>\<^sub>c m \<circ>\<^sub>c r1 = left_cart_proj X Y \<circ>\<^sub>c m \<circ>\<^sub>c r2"
+      using assms cfunc_type_def comp_associative functional_on_def subobject_of_def2 by (typecheck_cfuncs, auto)
+    have mx_type[type_rule]: "m \<circ>\<^sub>c r1 \<in>\<^sub>c X\<times>\<^sub>cY"
+      using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
+    then obtain x1 and y1 where m1r1_eqs: "m \<circ>\<^sub>c r1 = \<langle>x1, y1\<rangle> \<and> x1 \<in>\<^sub>c X \<and> y1 \<in>\<^sub>c Y"
+      using cart_prod_decomp by presburger
+    have my_type[type_rule]: "m \<circ>\<^sub>c r2 \<in>\<^sub>c X\<times>\<^sub>cY"
+      using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
+    then obtain x2 and y2 where m2r2_eqs:"m \<circ>\<^sub>c r2 = \<langle>x2, y2\<rangle> \<and> x2 \<in>\<^sub>c X \<and> y2 \<in>\<^sub>c Y"
+      using cart_prod_decomp by presburger
+    have x_equal: "x1 = x2"
+      using eq left_cart_proj_cfunc_prod m1r1_eqs m2r2_eqs by force
+    have functional: "\<exists>! y. (y \<in>\<^sub>c Y \<and>  \<langle>x1,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> (R,m))"
+      using assms functional_on_def m1r1_eqs by force
+    then have y_equal: "y1 = y2"
+      by (metis prod.sel factors_through_def2 m1r1_eqs m2r2_eqs mx_type my_type r1_type r2_type relative_member_def x_equal)
+    then show "r1 = r2"
+      by (metis functional cfunc_type_def m1r1_eqs m2r2_eqs monomorphism_def r1_type r2_type relative_member_def2 x_equal)
+  qed
+  show "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
+    by (metis epi_mon_is_iso inj injective_imp_monomorphism mem_Collect_eq surj surjective_is_epimorphism)
+qed
+
+
+
+
+
+
+lemma functional_relations_are_graphs_uniqueness_clause:
+  assumes "functional_on X Y (R,m)"
+  assumes "\<exists> f. (f : X \<rightarrow> Y \<and> (R,m) = (graph f, graph_morph f))"
+  shows "\<exists>! f. (f : X \<rightarrow> Y \<and> (R,m) = (graph f, graph_morph f))"
+proof(auto)
+  show "\<exists>f. f : X \<rightarrow> Y \<and> R = graph f \<and> m = graph_morph f"
+    using assms(2) by blast
+  show "\<And>f g. f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> m = graph_morph g \<Longrightarrow> R = graph g \<Longrightarrow> graph f = graph g \<Longrightarrow> graph_morph f = graph_morph g \<Longrightarrow> f = g"
+  proof-
+    fix f g
+    assume f_type[type_rule]: "f : X \<rightarrow> Y"
+    assume g_type[type_rule]: "g : X \<rightarrow> Y"
+    assume m_def: "m = graph_morph g"
+    assume R_def: "R = graph g"
+    assume equal_graphs: "graph f = graph g"
+    assume equal_morphs: "graph_morph f = graph_morph g"
+    have f1: "f \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = right_cart_proj X Y \<circ>\<^sub>c m"
+      by (typecheck_cfuncs, smt (verit) comp_associative2 equal_morphs equalizer_def graph_equalizer4 graph_subobject m_def subobject_of_def2)
+    have f2: "g \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = right_cart_proj X Y \<circ>\<^sub>c m"
+      by (typecheck_cfuncs, smt (verit) comp_associative2 equal_morphs equalizer_def graph_equalizer4 graph_subobject m_def subobject_of_def2)
+    have f3: "f \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = g \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
+      by (simp add: f1 f2)
+    have "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
+      using assms(1) functional_relations_are_graphs_isomorphism_clause by auto
+    then show "f = g"
+      using assms(1) cfunc_type_def codomain_comp epimorphism_def f3 f_type functional_on_def g_type iso_imp_epi_and_monic left_cart_proj_type subobject_of_def2 by force
+  qed
+qed
+
+
+
+
+
+
+
+
 lemma functional_relations_are_graphs:
   assumes "functional_on X Y (R,m)"
   shows "\<exists>! f. (f : X \<rightarrow> Y \<and> (R,m) = (graph f, graph_morph f))"
@@ -1602,81 +1694,13 @@ proof(auto)
   have pi0_m_type[type_rule]: "left_cart_proj X Y \<circ>\<^sub>c m : R \<rightarrow> X"
     using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
   have isomorphism: "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
-  proof-
-    have surj: "surjective(left_cart_proj X Y \<circ>\<^sub>c m)"
-    proof(unfold surjective_def, auto)
-      fix x 
-      assume "x \<in>\<^sub>c codomain (left_cart_proj X Y \<circ>\<^sub>c m)"
-      then have [type_rule]: "x \<in>\<^sub>c X"
-        using cfunc_type_def pi0_m_type by force
-      then have "\<exists>! y. (y \<in>\<^sub>c Y \<and>  \<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> (R,m))"
-        using assms functional_on_def  by force
-      then show "\<exists>z. z \<in>\<^sub>c domain (left_cart_proj X Y \<circ>\<^sub>c m) \<and> (left_cart_proj X Y \<circ>\<^sub>c m) \<circ>\<^sub>c z = x"
-        by (typecheck_cfuncs, smt (verit, best) cfunc_type_def comp_associative factors_through_def2 left_cart_proj_cfunc_prod relative_member_def2)
-    qed
-    have inj: "injective(left_cart_proj X Y \<circ>\<^sub>c m)"
-    proof(unfold injective_def, auto)
-      fix r1 r2 
-      assume "r1 \<in>\<^sub>c domain (left_cart_proj X Y \<circ>\<^sub>c m)" then have r1_type[type_rule]: "r1 \<in>\<^sub>c R"
-        by (metis cfunc_type_def pi0_m_type)
-      assume "r2 \<in>\<^sub>c domain (left_cart_proj X Y \<circ>\<^sub>c m)" then have r2_type[type_rule]: "r2 \<in>\<^sub>c R"
-        by (metis cfunc_type_def pi0_m_type)
-      assume "(left_cart_proj X Y \<circ>\<^sub>c m) \<circ>\<^sub>c r1 = (left_cart_proj X Y \<circ>\<^sub>c m) \<circ>\<^sub>c r2"
-      then have eq: "left_cart_proj X Y \<circ>\<^sub>c m \<circ>\<^sub>c r1 = left_cart_proj X Y \<circ>\<^sub>c m \<circ>\<^sub>c r2"
-        using assms cfunc_type_def comp_associative functional_on_def subobject_of_def2 by (typecheck_cfuncs, auto)
-      have mx_type[type_rule]: "m \<circ>\<^sub>c r1 \<in>\<^sub>c X\<times>\<^sub>cY"
-        using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
-      then obtain x1 and y1 where m1r1_eqs: "m \<circ>\<^sub>c r1 = \<langle>x1, y1\<rangle> \<and> x1 \<in>\<^sub>c X \<and> y1 \<in>\<^sub>c Y"
-        using cart_prod_decomp by presburger
-      have my_type[type_rule]: "m \<circ>\<^sub>c r2 \<in>\<^sub>c X\<times>\<^sub>cY"
-        using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
-      then obtain x2 and y2 where m2r2_eqs:"m \<circ>\<^sub>c r2 = \<langle>x2, y2\<rangle> \<and> x2 \<in>\<^sub>c X \<and> y2 \<in>\<^sub>c Y"
-        using cart_prod_decomp by presburger
-      have x_equal: "x1 = x2"
-        using eq left_cart_proj_cfunc_prod m1r1_eqs m2r2_eqs by force
-      have functional: "\<exists>! y. (y \<in>\<^sub>c Y \<and>  \<langle>x1,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> (R,m))"
-        using assms functional_on_def m1r1_eqs by force
-      then have y_equal: "y1 = y2"
-        by (metis prod.sel factors_through_def2 m1r1_eqs m2r2_eqs mx_type my_type r1_type r2_type relative_member_def x_equal)
-      then show "r1 = r2"
-        by (metis functional cfunc_type_def m1r1_eqs m2r2_eqs monomorphism_def r1_type r2_type relative_member_def2 x_equal)
-    qed
-    show "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
-      by (metis epi_mon_is_iso inj injective_imp_monomorphism mem_Collect_eq surj surjective_is_epimorphism)
-  qed
+    using assms functional_relations_are_graphs_isomorphism_clause by force
 
   show "\<And>f y. f : X \<rightarrow> Y \<Longrightarrow>
            y : X \<rightarrow> Y \<Longrightarrow>
            m = graph_morph y \<Longrightarrow> R = graph y \<Longrightarrow> graph f = graph y \<Longrightarrow> graph_morph f = graph_morph y \<Longrightarrow> f = y"
-  proof - 
+    by (metis assms functional_relations_are_graphs_uniqueness_clause)
   
-    fix f g 
-    assume f_type[type_rule]: "f : X \<rightarrow> Y"
-    assume g_type[type_rule]: "g : X \<rightarrow> Y"
-    assume m_is: "m = graph_morph g"
-    assume R_is: "R = graph g"
-    assume equal_graphs: "graph f = graph g"
-    assume equal_morphisms: "graph_morph f = graph_morph g"
-    
-    have equalizer1: "equalizer (graph f) (graph_morph f) (f \<circ>\<^sub>c left_cart_proj X Y) (right_cart_proj X Y)"
-      using f_type graph_equalizer4 by auto
-
-    then have eqn1: "(f \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c (graph_morph f) = (right_cart_proj X Y) \<circ>\<^sub>c (graph_morph f)"
-      using equalizer_def by blast
-
-    have equalizer2: "equalizer (graph g) (graph_morph g) (g \<circ>\<^sub>c left_cart_proj X Y) (right_cart_proj X Y)"
-      by (simp add: equal_graphs equal_morphisms g_type graph_equalizer4)
-
-    then have eqn2: "(g \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c (graph_morph g) = (right_cart_proj X Y) \<circ>\<^sub>c (graph_morph g)"
-      using equalizer_def by blast
-
-    have eqn3: "f \<circ>\<^sub>c ((left_cart_proj X Y) \<circ>\<^sub>c (graph_morph f)) = g \<circ>\<^sub>c ((left_cart_proj X Y) \<circ>\<^sub>c (graph_morph g))"
-       by (typecheck_cfuncs, smt (z3) comp_associative2 eqn1 eqn2 equal_morphisms graph_subobject subobject_of_def2)
-
-    then show "f = g"    
-      by (typecheck_cfuncs, metis epimorphism_def3 eqn3 equal_morphisms iso_imp_epi_and_monic isomorphism m_is pi0_m_type)
-  qed
-
   obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_iso: "isomorphism(h)"
     by (meson is_isomorphic_def isomorphic_is_symmetric isomorphism pi0_m_type)
   obtain f where f_def: "f = (right_cart_proj X Y) \<circ>\<^sub>c m \<circ>\<^sub>c h"
