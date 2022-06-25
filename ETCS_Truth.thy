@@ -150,7 +150,54 @@ next
     by (metis assms(1) eq_pred_iff_eq true_false_distinct)
 qed
 
+lemma eq_pred_of_monomorphism:
+  assumes m_type[type_rule]: "m : X \<rightarrow> Y" and m_mono: "monomorphism m"
+  shows "eq_pred Y \<circ>\<^sub>c (m \<times>\<^sub>f m) = eq_pred X"
+proof (rule one_separator[where X="X \<times>\<^sub>c X", where Y=\<Omega>])
+  show "eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m : X \<times>\<^sub>c X \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "eq_pred X : X \<times>\<^sub>c X \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+next
+  fix x
+  assume "x \<in>\<^sub>c X \<times>\<^sub>c X"
+  then obtain x1 x2 where x_def: "x = \<langle>x1, x2\<rangle>" and x1_type[type_rule]: "x1 \<in>\<^sub>c X" and x2_type[type_rule]: "x2 \<in>\<^sub>c X"
+    using cart_prod_decomp by blast
+  show "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c x = eq_pred X \<circ>\<^sub>c x"
+  proof (unfold x_def, cases "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<t>")
+    assume LHS: "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<t>"
+    then have "eq_pred Y \<circ>\<^sub>c (m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<t>"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    then have "eq_pred Y \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c x1, m \<circ>\<^sub>c x2\<rangle> = \<t>"
+      by (typecheck_cfuncs, auto simp add: cfunc_cross_prod_comp_cfunc_prod)
+    then have "m \<circ>\<^sub>c x1 = m \<circ>\<^sub>c x2"
+      by (typecheck_cfuncs_prems, simp add: eq_pred_iff_eq)
+    then have "x1 = x2"
+      using m_mono m_type monomorphism_def3 x1_type x2_type by blast
+    then have RHS: "eq_pred X \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<t>"
+      by (typecheck_cfuncs, insert eq_pred_iff_eq, blast)
 
+    show "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = eq_pred X \<circ>\<^sub>c \<langle>x1,x2\<rangle>"
+      using LHS RHS by auto
+  next
+    assume "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> \<noteq> \<t>"
+    then have LHS: "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<f>"
+      by (typecheck_cfuncs, meson true_false_only_truth_values)
+    then have "eq_pred Y \<circ>\<^sub>c (m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<f>"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    then have "eq_pred Y \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c x1, m \<circ>\<^sub>c x2\<rangle> = \<f>"
+      by (typecheck_cfuncs, auto simp add: cfunc_cross_prod_comp_cfunc_prod)
+    then have "m \<circ>\<^sub>c x1 \<noteq> m \<circ>\<^sub>c x2"
+      using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, blast)
+    then have "x1 \<noteq> x2"
+      by auto
+    then have RHS: "eq_pred X \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<f>"
+      using eq_pred_iff_eq_conv by (typecheck_cfuncs, blast)
+
+    show "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = eq_pred X \<circ>\<^sub>c \<langle>x1,x2\<rangle>"
+      using LHS RHS by auto
+  qed
+qed
 
 (* Proposition 2.2.1: see under Axiom 8 *)
 
