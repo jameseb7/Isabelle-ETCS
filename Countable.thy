@@ -340,7 +340,47 @@ proof -
     using is_smaller_than_def m_type by blast
 qed
 
-
+lemma prod_leq_exp:
+  assumes X_not_2: "\<not>(\<exists> x. (\<exists> s. ((x \<in>\<^sub>c X) \<and> (s \<in>\<^sub>c X) \<and> (x\<noteq>s) \<and> (\<forall>z. (z=x) \<or> (z=s))  )))"
+  assumes "\<not>(terminal_object X)"
+  shows "(X \<times>\<^sub>c Y) \<le>\<^sub>c (X \<^bsup>Y\<^esup>)"
+proof(cases "initial_object(X)")
+  show "initial_object X \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+    by (metis initial_iso_empty initial_maps_mono initial_object_def is_smaller_than_def iso_empty_initial no_el_iff_iso_0 prod_with_empty_is_empty1)
+next
+  assume "\<not> initial_object X"
+  show "X \<times>\<^sub>c Y \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+  proof(cases "initial_object(Y)")
+    show "initial_object Y \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+      by (metis  initial_iso_empty initial_maps_mono initial_object_def is_smaller_than_def iso_empty_initial no_el_iff_iso_0 prod_with_empty_is_empty2)
+  next
+    assume "\<not> initial_object Y"
+    show "X \<times>\<^sub>c Y \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+    proof(cases "terminal_object(Y)")
+      assume  "terminal_object Y"
+      then have "Y \<cong> one"
+        by (simp add: one_terminal_object terminal_objects_isomorphic)
+      show "X \<times>\<^sub>c Y \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+      proof - 
+        obtain m where m_type[type_rule]: "(m : X \<times>\<^sub>c Y \<rightarrow> X)" and m_mono: "monomorphism(m)"
+          using \<open>terminal_object Y\<close> is_isomorphic_def iso_imp_epi_and_monic prod_with_term_obj2 by blast
+        obtain n where n_type[type_rule]: "(n : X  \<rightarrow> X\<^bsup>Y\<^esup>)" and n_mono: "monomorphism(n)"
+          by (meson Y_nonempty_then_X_le_XtoY \<open>Y \<cong> one\<close> is_smaller_than_def nonempty_def single_elem_iso_one)
+        then have nm: "(n \<circ>\<^sub>c m  : X \<times>\<^sub>c Y \<rightarrow>  X\<^bsup>Y\<^esup>) \<and> monomorphism(n \<circ>\<^sub>c m)"
+          by (typecheck_cfuncs, simp add: cfunc_type_def composition_of_monic_pair_is_monic m_mono n_mono)
+        then show ?thesis
+          using is_smaller_than_def by blast
+      qed
+    next
+      assume "\<not> terminal_object Y"
+      then obtain y1 and y2 where y1_type[type_rule]: "y1 \<in>\<^sub>c Y" and y2_type[type_rule]: "y2 \<in>\<^sub>c Y" and distinct_y: "y1\<noteq>y2"
+        using \<open>\<not> initial_object Y\<close>  iso_empty_initial iso_to1_is_term no_el_iff_iso_0 nonempty_def single_elem_iso_one by blast
+      obtain into where into_def: "into = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                               \<circ>\<^sub>c dist_prod_coprod_inv Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) "
+        by simp
+      then have into_type[type_rule]: "into : Y \<times>\<^sub>c (X \<times>\<^sub>c X) \<rightarrow> Y"
+        by (simp, typecheck_cfuncs)
+      oops  (*This takes <y, <x,z>>  and outputs y, y1, or y2 *)
 
 
 
