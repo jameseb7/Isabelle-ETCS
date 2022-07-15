@@ -1531,7 +1531,38 @@ next
               fix q 
               assume q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c"
               have "i \<circ>\<^sub>c q = i \<circ>\<^sub>c (successor \<circ>\<^sub>c p) \<Longrightarrow> q = (successor \<circ>\<^sub>c p)"
-                sorry 
+              proof -
+                assume iq_eq_isp: "i \<circ>\<^sub>c q = i \<circ>\<^sub>c successor \<circ>\<^sub>c p"
+
+                have "q = zero \<or> (\<exists>r. r \<in>\<^sub>c \<nat>\<^sub>c \<and> q = successor \<circ>\<^sub>c r)"
+                  using nonzero_is_succ q_type by blast
+                then show "q = successor \<circ>\<^sub>c p"
+                proof auto
+                  assume q_zero: "q = zero"
+                  then have "i \<circ>\<^sub>c zero = i \<circ>\<^sub>c successor \<circ>\<^sub>c p"
+                    using iq_eq_isp by auto
+                  then have "x = m \<circ>\<^sub>c i \<circ>\<^sub>c p"
+                    using comp_associative2 i_induct ibase successor_type by (typecheck_cfuncs, auto)
+                  then have False
+                    using comp_type i_type p_type x_def by blast
+                  then show "zero = successor \<circ>\<^sub>c p"
+                    by auto
+                next
+                  fix r
+                  assume r_type[type_rule]: "r \<in>\<^sub>c \<nat>\<^sub>c"
+                  assume q_succ: "q = successor \<circ>\<^sub>c r"
+                  then have "i \<circ>\<^sub>c successor \<circ>\<^sub>c r = i \<circ>\<^sub>c successor \<circ>\<^sub>c p"
+                    using iq_eq_isp by auto
+                  then have "m \<circ>\<^sub>c i \<circ>\<^sub>c r = m \<circ>\<^sub>c i \<circ>\<^sub>c p"
+                    using comp_associative2 i_induct successor_type by (typecheck_cfuncs, auto)
+                  then have "i \<circ>\<^sub>c r = i \<circ>\<^sub>c p"
+                    by (metis (mono_tags, lifting) cfunc_type_def codomain_comp i_type m_mono m_type monomorphism_def p_type r_type)
+                  then have "r = p"
+                    using ind_hyp r_type by blast
+                  then show "successor \<circ>\<^sub>c r = successor \<circ>\<^sub>c p"
+                    by auto
+                qed
+              qed
               then have "(eq_pred X \<circ>\<^sub>c \<langle> i \<circ>\<^sub>c q ,i \<circ>\<^sub>c (successor \<circ>\<^sub>c p)\<rangle> = \<t>) \<Longrightarrow> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>q , (successor \<circ>\<^sub>c p)\<rangle> = \<t>) "
                 using  eq_pred_iff_eq by (typecheck_cfuncs, blast)
               then have "IMPLIES \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle> i \<circ>\<^sub>c q ,i \<circ>\<^sub>c (successor \<circ>\<^sub>c p)\<rangle>, eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>q , (successor \<circ>\<^sub>c p)\<rangle> \<rangle> = \<t>"
@@ -1560,6 +1591,7 @@ next
             then show "((FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor) \<circ>\<^sub>c p = \<t>"
               using  comp_associative2 by (typecheck_cfuncs, auto)
     
+          qed
         qed
 
         show "((FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c i \<times>\<^sub>f i,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor) \<circ>\<^sub>c p
