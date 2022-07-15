@@ -682,10 +682,24 @@ proof(cases "initial_object Y")
       then have "\<And>p. p \<in>\<^sub>c  (X \<times>\<^sub>c Y) \<Longrightarrow> (into\<^bsub>[right_cart_proj X Y \<circ>\<^sub>c  p,-]\<^esub>)\<^bsub>[left_cart_proj X Y \<circ>\<^sub>c  p,-]\<^esub> : X \<rightarrow> Y"
         by (meson comp_type left_cart_proj_type left_param_type right_cart_proj_type)
 
+      obtain \<Theta> where \<Theta>_def: "\<Theta> = (into \<circ>\<^sub>c associate_right Y X X \<circ>\<^sub>c swap X (Y \<times>\<^sub>c X))\<^sup>\<sharp> \<circ>\<^sub>c swap X Y"
+        by auto
+
+      have \<Theta>_type[type_rule]: "\<Theta> : X \<times>\<^sub>c Y \<rightarrow> Y\<^bsup>X\<^esup>"
+        unfolding \<Theta>_def by typecheck_cfuncs
+
+      have "\<And> x y. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> : X \<rightarrow> Y"
+      proof -
+        fix x y
+        show "x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> : X \<rightarrow> Y"
+          by typecheck_cfuncs
+      qed
+
+      (*obtain \<Theta> where \<Theta>_def: "(\<And> p. p : one \<rightarrow> (X \<times>\<^sub>c Y) \<Longrightarrow> \<Theta> \<circ>\<^sub>c p = (into\<^bsub>[right_cart_proj X Y \<circ>\<^sub>c p,-]\<^esub>)\<^bsub>[left_cart_proj X Y \<circ>\<^sub>c p,-]\<^esub>)"*)
+      (*obtain \<Theta> where \<Theta>_def: "\<And>xy . xy \<in>\<^sub>c (X \<times>\<^sub>c Y) \<Longrightarrow> \<Theta> \<circ>\<^sub>c xy = metafunc ((into\<^bsub>[right_cart_proj X Y \<circ>\<^sub>c xy,-]\<^esub>)\<^bsub>[left_cart_proj X Y \<circ>\<^sub>c xy ,-]\<^esub>)"*)
         
-      (*
-      obtain \<Theta> where \<Theta>_def: "(\<And> p. p : one \<rightarrow> (X \<times>\<^sub>c Y) \<Longrightarrow> \<Theta> \<circ>\<^sub>c p = (into\<^bsub>[right_cart_proj X Y \<circ>\<^sub>c p,-]\<^esub>)\<^bsub>[left_cart_proj X Y \<circ>\<^sub>c p,-]\<^esub>)"
-*)
+
+      (* \<Theta>_type[type_rule]: "\<Theta> : X \<times>\<^sub>c Y \<rightarrow> Y\<^bsup>X\<^esup>" *)
 
       have f1: "\<And>x. \<And> y. x \<in>\<^sub>c X \<and> y \<in>\<^sub>c Y \<Longrightarrow> (into\<^bsub>[y,-]\<^esub>)\<^bsub>[x,-]\<^esub> \<circ>\<^sub>c x = y"
       proof(auto)
@@ -840,7 +854,7 @@ proof(cases "initial_object Y")
 
 
 (*
-      obtain \<Theta> where \<Theta>_type[type_rule]: "\<Theta> : X \<times>\<^sub>c Y \<rightarrow> Y\<^bsup>X\<^esup>" and \<Theta>_def: "\<And>xy . xy \<in>\<^sub>c (X \<times>\<^sub>c Y) \<Longrightarrow> \<Theta> \<circ>\<^sub>c xy = metafunc ((into\<^bsub>[right_cart_proj X Y \<circ>\<^sub>c xy,-]\<^esub>)\<^bsub>[left_cart_proj X Y \<circ>\<^sub>c xy ,-]\<^esub>)"
+      
 *)
 
 
