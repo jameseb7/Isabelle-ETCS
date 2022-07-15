@@ -591,6 +591,7 @@ proof(auto, unfold is_smaller_than_def)
 next
   show "\<And>x1 x2. x1 \<in>\<^sub>c X \<Longrightarrow> x2 \<in>\<^sub>c X \<Longrightarrow> x1 \<noteq> x2 \<Longrightarrow> \<exists>m. m : \<Omega> \<rightarrow> X \<and> monomorphism m"
     sorry
+    (*This line in the proof was shown under "non_init_non_ter_sets" in the Cardinality.thy file.*)
 qed
 
 
@@ -684,8 +685,7 @@ proof(cases "initial_object Y")
         
       (*
       obtain \<Theta> where \<Theta>_def: "(\<And> p. p : one \<rightarrow> (X \<times>\<^sub>c Y) \<Longrightarrow> \<Theta> \<circ>\<^sub>c p = (into\<^bsub>[right_cart_proj X Y \<circ>\<^sub>c p,-]\<^esub>)\<^bsub>[left_cart_proj X Y \<circ>\<^sub>c p,-]\<^esub>)"
-      *)
-
+*)
 
       have f1: "\<And>x. \<And> y. x \<in>\<^sub>c X \<and> y \<in>\<^sub>c Y \<Longrightarrow> (into\<^bsub>[y,-]\<^esub>)\<^bsub>[x,-]\<^esub> \<circ>\<^sub>c x = y"
       proof(auto)
@@ -842,6 +842,12 @@ proof(cases "initial_object Y")
 (*
       obtain \<Theta> where \<Theta>_type[type_rule]: "\<Theta> : X \<times>\<^sub>c Y \<rightarrow> Y\<^bsup>X\<^esup>" and \<Theta>_def: "\<And>xy . xy \<in>\<^sub>c (X \<times>\<^sub>c Y) \<Longrightarrow> \<Theta> \<circ>\<^sub>c xy = metafunc ((into\<^bsub>[right_cart_proj X Y \<circ>\<^sub>c xy,-]\<^esub>)\<^bsub>[left_cart_proj X Y \<circ>\<^sub>c xy ,-]\<^esub>)"
 *)
+
+
+
+
+  
+
 
 lemma prod_finite_with_self_finite:
   assumes "is_finite(Y)"
@@ -1965,6 +1971,8 @@ proof(rule ccontr, auto)
     using Omega_doesnt_have_ffp Omega_has_ffp by auto
 qed
 
+
+(* Visit the Cardinality.thy file.  This is already proved there.  I think Cardinality and Countable should be merged*)
 lemma generalized_Cantors_Negative_Theorem:
   assumes "\<Omega> \<le>\<^sub>c Y"
   shows "\<nexists> s. s : X \<rightarrow> Y\<^bsup>X\<^esup> \<and> surjective(s)"
@@ -1975,7 +1983,7 @@ proof(rule ccontr, auto)
   obtain m where m_def: "m : Y\<^bsup>X\<^esup> \<rightarrow> X" and m_mono: "monomorphism(m)"
     using epis_give_monos s_surj s_type surjective_is_epimorphism by blast
   have "\<Omega>\<^bsup>X\<^esup> \<le>\<^sub>c Y\<^bsup>X\<^esup>"
-    oops
+    apply typecheck_cfuncs
 
 
 (*Exercise 2.6.15*)

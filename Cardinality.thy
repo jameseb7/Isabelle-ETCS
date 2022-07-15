@@ -69,7 +69,7 @@ proof -
 qed
 
 
-(*
+
 
 lemma exp_set_smaller_than1:
   assumes "A \<le>\<^sub>c B"
@@ -233,7 +233,6 @@ lemma exp_set_smaller_than1:
   qed
 qed
 
-*)
 
 
 lemma exp_set_smaller_than2:
@@ -327,14 +326,16 @@ proof(rule ccontr, auto)
     have mn_mono: "monomorphism(m \<circ>\<^sub>c n)"
       using cfunc_type_def composition_of_monic_pair_is_monic m_mono m_type n_mono n_type by presburger
     then have "\<exists>g. g: X  \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> epimorphism(g) \<and> g \<circ>\<^sub>c (m \<circ>\<^sub>c n) = id (\<Omega>\<^bsup>X\<^esup>)"
-    (*We can finish this lemma as soon as we resolve the subscript notation, since
-      monos_give_epis is required to prove this step! ! ! *)
+      by (simp add: mn_type monos_give_epis nonempty)
+    then show False
+      by (metis Cantors_Negative_Theorem epi_is_surj powerset_def)
+  qed
+qed
 
-      oops
 
 
 
-(*
+
 lemma exp_set_smaller_than3:
   assumes "A \<le>\<^sub>c B"
   assumes "X \<le>\<^sub>c Y"
@@ -342,13 +343,13 @@ lemma exp_set_smaller_than3:
   shows "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
 proof - 
   have leq1: "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
-    using assms(1) assms(3) exp_set_smaller_than1 by blast
+    by (simp add: assms(1) assms(3) exp_set_smaller_than1)    
   have leq2: "X\<^bsup>B\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
     by (simp add: assms(2) exp_set_smaller_than2)
   show "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
     using leq1 leq2 leq_transitive by blast
 qed
-*)
+
 
 lemma sets_squared:
   "A\<^bsup>\<Omega>\<^esup> \<cong> A \<times>\<^sub>c A "
@@ -1154,11 +1155,7 @@ L \<amalg> R \<circ>\<^sub>c right_coproj (B\<times>\<^sub>c (A\<^bsup>B\<^esup>
 qed
 
 
-lemma set_connexity:
-  "(A \<le>\<^sub>c B) \<or> (B \<le>\<^sub>c A)"
-  apply typecheck_cfuncs
 
-  oops
 
 
 
