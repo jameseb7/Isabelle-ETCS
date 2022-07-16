@@ -1256,26 +1256,6 @@ qed
    
   
 
-lemma finite_is_countable: 
-  assumes "is_finite X"
-  shows "countable X"
-  oops
-
-lemma 
-  assumes "is_infinite X"
-  shows "\<nat>\<^sub>c \<le>\<^sub>c X"
-  oops 
-
-
-lemma N_is_smallest_infinite:
-  assumes "is_infinite X"
-  assumes "X \<le>\<^sub>c \<nat>\<^sub>c"
-  shows "\<nat>\<^sub>c \<cong> X"
-  oops
-
-(*We could add a part 2 to the above that says if they are not isomorphic
- then an infinite set is necessarily bigger than N.*)
-
 lemma
   assumes i_zero: "i 0 = x" and i_suc: "\<And> n. i (Suc n) = (m \<circ> i) n" 
   assumes m_mono: "\<And> p q. m p = m q \<Longrightarrow> p = q"
@@ -1749,6 +1729,11 @@ next
   qed
 qed
 
+
+lemma infinite_greater_than_N:
+  assumes "is_infinite X"
+  shows "\<nat>\<^sub>c \<le>\<^sub>c X"
+  by (metis assms epis_give_monos finite_iff_nosurj_to_N is_smaller_than_def not_finite_and_infinite surjective_is_epimorphism)
 
 
 
