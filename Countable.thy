@@ -1108,10 +1108,45 @@ qed
 
 
 
+definition triangle_number :: "cfunc" where
+  "triangle_number = (THE u. u: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c \<and> 
+     u \<circ>\<^sub>c zero = zero \<and>
+     ( u \<circ>\<^sub>c successor \<circ>\<^sub>c n = (u \<circ>\<^sub>c n) +\<^sub>\<nat> n))"
+
+
+
+
+
+lemma triangle_numbers_exist:
+  "\<exists> f. f : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<and> f \<circ>\<^sub>c zero = zero \<and> f \<circ>\<^sub>c successor \<circ>\<^sub>c n = (f \<circ>\<^sub>c n) +\<^sub>\<nat> n"
+proof- 
+  obtain f where f_def: "n \<in>\<^sub>c \<nat>\<^sub>c  \<Longrightarrow> f : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<and> f \<circ>\<^sub>c zero = zero \<and> f \<circ>\<^sub>c successor \<circ>\<^sub>c n = (f \<circ>\<^sub>c n) +\<^sub>\<nat> n"
+    by (typecheck_cfuncs, metis halve_mono halve_nth_even halve_nth_odd halve_type monomorphism_def2 nth_even_def2 nth_odd_def2 zero_is_not_successor)
+  then show ?thesis
+    by (metis halve_mono halve_nth_even halve_nth_odd halve_type monomorphism_def3 nth_even_def2 nth_odd_def2 zero_is_not_successor zero_type)
+qed
+
+
+
+
+
 (*Proposition 2.6.10*)
 lemma NxN_is_countable:
   "countable(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
 proof -
+(*CPF stands for Cantor Pairing Function*)
+
+  obtain CPF where CPF_def: "CPF = add2 \<circ>\<^sub>c \<langle>1/2 \<circ>\<^sub>c \<langle>add2, successor  \<circ>\<^sub>c add2\<rangle> , right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<rangle>"
+    by simp
+
+(*We need a proper "division by 2" function.*)
+  (*
+  then have CPF_type[type_rule]: "CPF: \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c"
+    unfolding CPF_def apply typecheck_cfuncs
+*)
+
+
+(*
   obtain f where f_def:
     "f = ((\<langle>id \<nat>\<^sub>c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c right_cart_proj one \<nat>\<^sub>c) \<amalg> id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))
           \<circ>\<^sub>c dist_prod_coprod_inv2 one \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (predecessor \<times>\<^sub>f successor)"
@@ -1190,7 +1225,7 @@ proof -
 *)
   oops
 
-
+*)
 
 
 
