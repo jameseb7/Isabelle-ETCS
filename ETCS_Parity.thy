@@ -1223,59 +1223,6 @@ qed
 lemma prod_of_consecutive_nats_is_even:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "is_even \<circ>\<^sub>c (n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)) = \<t>"
-  by (metis add_odds_is_even2 assms even_or_odd mult_evens_is_even2 mult_odds_is_odd2 mult_respects_succ_right mult_type succ_n_type)
-
-lemma halve_mono:
-  "monomorphism(halve)"
-  sorry
-
-(*
-proof - 
-  have "injective(halve)"
-  proof(unfold injective_def, auto)
-    fix m n 
-    assume m_type[type_rule]: "m \<in>\<^sub>c domain halve"
-    assume n_type[type_rule]: "n \<in>\<^sub>c domain halve"
-    assume equals: "halve \<circ>\<^sub>c m = halve \<circ>\<^sub>c n"
-    have m_type2[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
-      using cfunc_type_def halve_type by (typecheck_cfuncs, force)
-    have n_type2[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
-      using cfunc_type_def halve_type by (typecheck_cfuncs, force)
-    show "m = n"
-    proof(cases "is_even \<circ>\<^sub>c m = \<t>")
-      assume "is_even \<circ>\<^sub>c m = \<t>"
-      then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "m = nth_even \<circ>\<^sub>c k"
-        using is_even_exists_nth_even m_type2 by blast 
-      have halve_m_is_k: "halve \<circ>\<^sub>c m = (id \<nat>\<^sub>c \<amalg> id \<nat>\<^sub>c) \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_even \<circ>\<^sub>c k"
-        by (smt (verit, ccfv_SIG) cfunc_coprod_type comp_associative2 halve_def halve_with_parity_def2 id_type k_def m_type2)
-
-
-      have halve_m_is_k: "halve \<circ>\<^sub>c m = k"
-        by (metis cfunc_type_def comp_associative halve_nth_even halve_type id_left_unit2 k_def k_type nth_even_type)
-      show "m = n"
-      proof(cases "is_even \<circ>\<^sub>c n = \<t>")
-        assume  "is_even \<circ>\<^sub>c n = \<t>"
-        then obtain j where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and j_def: "n = nth_even \<circ>\<^sub>c j"
-          using is_even_exists_nth_even n_type2 by blast 
-        then have "k = j"
-          by (typecheck_cfuncs, metis cfunc_type_def comp_associative equals halve_nth_even halve_type id_left_unit2 j_def k_def nth_even_type)
-        then show "m = n"
-          by (simp add: j_def k_def)
-      next
-        assume "is_even \<circ>\<^sub>c n \<noteq> \<t>"
-        then have "is_odd \<circ>\<^sub>c n = \<t>"
-          using even_or_odd n_type2 by blast
-(*  %  It is worth point out that typecheck cfuncs has some issues with is_odd or possibly the halving function or both.*)
-        then obtain j where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and j_def: "n = nth_odd \<circ>\<^sub>c j"
-          using is_odd_exists_nth_odd n_type2 by blast 
-        have halve_n_is_j: "halve \<circ>\<^sub>c n = j"
-          using comp_associative2 halve_nth_odd halve_type id_left_unit2 j_def j_type nth_odd_type by force
-        then have "j = k"
-          using equals halve_m_is_k by fastforce
-        then show "m = n"
-          apply typecheck_cfuncs
-*)
-
-       
+  by (metis add_odds_is_even2 assms even_or_odd mult_evens_is_even2 mult_odds_is_odd2 mult_respects_succ_right mult_type succ_n_type)       
 
 end
