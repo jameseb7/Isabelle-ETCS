@@ -1031,6 +1031,15 @@ proof -
   qed
 qed
 
+
+
+lemma not_even_and_odd2:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "\<not>((\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = successor \<circ>\<^sub>c((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)) \<and> 
+         (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n =              (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)) "
+  by (smt (z3) assms comp_associative2 halve_nth_even halve_nth_odd halve_type id_left_unit2 n_neq_succ_n nth_even_is_times_twoB nth_even_type nth_odd_def2 nth_odd_is_succ_times_twoB)
+
+
 lemma is_even_exists_nth_even:
   assumes "is_even \<circ>\<^sub>c n = \<t>" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_even \<circ>\<^sub>c m"
