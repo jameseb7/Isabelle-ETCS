@@ -1,5 +1,5 @@
 theory Countable
-  imports ETCS_Axioms ETCS_Add ETCS_Mult ETCS_Pred ETCS_Parity ETCS_Comparison
+  imports ETCS_Axioms ETCS_Add ETCS_Mult ETCS_Exp ETCS_Pred ETCS_Parity ETCS_Comparison
 begin
 
 
@@ -1129,19 +1129,11 @@ qed
 *)
 
 
-
+(*
 (*Proposition 2.6.10*)
 lemma NxN_is_countable:
   "countable(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)"
-proof -
-  obtain \<phi> where \<phi>_def: " \<phi> = mult2 \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub>, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
-                                   exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub>, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>"
-    by auto
-  
-  then have \<phi>_type[type_rule]: "\<phi> : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<longrightarrow> \<nat>\<^sub>c"
-    apply typecheck_cfuncs
-    oops
-
+*)
 
 
 (*

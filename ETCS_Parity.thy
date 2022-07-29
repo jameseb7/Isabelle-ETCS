@@ -1,5 +1,5 @@
 theory ETCS_Parity
-  imports ETCS_Add ETCS_Mult ETCS_Pred ETCS_Quantifier
+  imports ETCS_Add ETCS_Mult ETCS_Exp ETCS_Pred ETCS_Quantifier
 begin
 
 definition nth_even :: "cfunc" where
@@ -1233,5 +1233,44 @@ lemma prod_of_consecutive_nats_is_even:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "is_even \<circ>\<^sub>c (n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)) = \<t>"
   by (metis add_odds_is_even2 assms even_or_odd mult_evens_is_even2 mult_odds_is_odd2 mult_respects_succ_right mult_type succ_n_type)       
+
+
+
+lemma powers_of_two_are_even:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c" 
+  assumes "n \<noteq> zero"
+  shows "is_even \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero,n\<rangle>) = \<t>"
+proof - 
+  obtain j where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and j_def: "n = successor \<circ>\<^sub>c j"
+    using assms(1) assms(2) nonzero_is_succ by blast
+  have "exp_uncurried \<circ>\<^sub>c   \<langle>successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero,n\<rangle> = exp_uncurried \<circ>\<^sub>c  \<langle>successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero, (successor  \<circ>\<^sub>c zero) +\<^sub>\<nat> j\<rangle>"
+    by (typecheck_cfuncs, metis add_commutes add_respects_succ3 add_respects_zero_on_right j_def)
+  also have "... = ((successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero) ^\<^sub>\<nat> (successor  \<circ>\<^sub>c zero)) \<cdot>\<^sub>\<nat> ((successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero) ^\<^sub>\<nat> j)"
+    using exp_def exp_right_dist by (typecheck_cfuncs, force)
+  also have "... = (successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero)  \<cdot>\<^sub>\<nat> ((successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero) ^\<^sub>\<nat> j)"
+    by (typecheck_cfuncs, simp add: exp_respects_one_right)
+  then show ?thesis
+    by (metis calculation exp_closure j_type mult_evens_is_even2 prod_of_consecutive_nats_is_even s0_is_left_id succ_n_type zero_type)
+qed
+
+
+lemma three_is_odd:
+  "is_odd \<circ>\<^sub>c (successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor  \<circ>\<^sub>c zero) = \<t>"
+  by (typecheck_cfuncs, metis (full_types) comp_associative2 is_even_not_is_odd is_odd_def2 prod_of_consecutive_nats_is_even s0_is_left_id)
+
+
+
+
+
+lemma powers_of_three_are_odd:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c" 
+  assumes "n \<noteq> zero"
+  shows "is_odd \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor  \<circ>\<^sub>c zero,n\<rangle>) = \<t>"
+  sorry
+
+
+
+
+
 
 end

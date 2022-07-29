@@ -4,16 +4,22 @@ begin
 
 lemma exp_order_preserving_converse:
   assumes a_type: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type: "b \<in>\<^sub>c \<nat>\<^sub>c" and c_type: "c \<in>\<^sub>c \<nat>\<^sub>c"
-  assumes "leq \<circ>\<^sub>c \<langle>a \<cdot>\<^sub>\<nat> (a ^\<^sub>\<nat> c) , b \<cdot>\<^sub>\<nat>(b ^\<^sub>\<nat> c)\<rangle> = \<t>"
+  assumes "leq \<circ>\<^sub>c \<langle>a ^\<^sub>\<nat> c , b ^\<^sub>\<nat> c\<rangle> = \<t>"
   assumes "c \<noteq> zero"
   shows "leq \<circ>\<^sub>c \<langle>a , b\<rangle> = \<t>"
-  oops
+  sorry
+
+
 
 
 lemma exp_order_preserving1:
   assumes a_type: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type: "b \<in>\<^sub>c \<nat>\<^sub>c" and c_type: "c \<in>\<^sub>c \<nat>\<^sub>c"
   assumes leq: "leq \<circ>\<^sub>c \<langle>a , b\<rangle> = \<t>"
   shows "leq \<circ>\<^sub>c \<langle>a ^\<^sub>\<nat> c , b ^\<^sub>\<nat> c\<rangle> = \<t>"
+  
+  sorry
+
+(*
 proof-
   obtain \<phi> where \<phi>_def: "\<phi> = leq \<circ>\<^sub>c (exp_uncurried \<times>\<^sub>f exp_uncurried) \<circ>\<^sub>c (distribute_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)"
     by blast
@@ -175,6 +181,9 @@ proof-
             by (simp add: exp_respects_successor p_def y_def)
           also have "... = leq \<circ>\<^sub>c \<langle>(m ^\<^sub>\<nat> p),(n ^\<^sub>\<nat> p)\<rangle>"
             oops
+*)
+
+
 
 
 (*
