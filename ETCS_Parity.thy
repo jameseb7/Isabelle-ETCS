@@ -1264,11 +1264,104 @@ lemma three_is_odd:
 
 lemma powers_of_three_are_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c" 
-  assumes "n \<noteq> zero"
   shows "is_odd \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor  \<circ>\<^sub>c zero,n\<rangle>) = \<t>"
-  sorry
-
-
+proof - 
+  have main_result: "is_odd \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor  \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id \<nat>\<^sub>c\<rangle>) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+  proof(rule natural_number_object_func_unique[where X = "\<Omega>", where f = "id \<Omega>" ]) 
+    show func_type[type_rule]: "is_odd \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor  \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id \<nat>\<^sub>c\<rangle>) : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "(is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+    proof - 
+      have "(is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = 
+             is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c zero"
+        using comp_associative2 by (typecheck_cfuncs, force)
+      also have "... = is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero ,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero\<rangle> "
+        using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
+      also have "... = is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero, zero\<rangle>"
+        by (typecheck_cfuncs, metis beta_N_succ_mEqs_Id1 id_left_unit2 id_right_unit2 terminal_func_comp)
+      also have "... = is_odd \<circ>\<^sub>c (successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)"
+        by (typecheck_cfuncs, metis even_or_odd exp_def exp_respects_Zero_Left mult_evens_is_even2 not_even_and_odd s0_is_left_id three_is_odd)
+      also have "... = \<t>"
+        by (simp add: three_is_odd)
+      then show ?thesis
+        by (metis calculation cfunc_type_def comp_associative is_even_def2 is_even_nth_even_true nth_even_def2 zero_type)
+    qed
+    show "(is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor =
+    id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>"
+    proof(rule one_separator[where X = "\<nat>\<^sub>c", where Y = "\<Omega>"])
+      show "(is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "\<And>x. x \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+         ((is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
+         (id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c x"
+      proof - 
+        fix m
+        assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+        have " (id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m = 
+                (is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>)  \<circ>\<^sub>c m"  
+          using id_left_unit2 by (typecheck_cfuncs, presburger)
+        also have "... = is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>  \<circ>\<^sub>c m"
+          by (typecheck_cfuncs, metis cfunc_type_def comp_associative)
+        also have "... = is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m ,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m\<rangle>"
+          using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, auto)
+        also have "... = is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) ,m\<rangle>"
+          by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 id_type one_unique_element)
+        also have "... = ((is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m"
+        proof(cases "is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) ,m\<rangle> = \<t>")
+          assume real_case: "is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) ,m\<rangle> = \<t>"  (*The only real case*)
+          have "((is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m = 
+                 (is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (successor \<circ>\<^sub>c m)"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "...  =  (is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (m +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+            by (typecheck_cfuncs, metis add_commutes add_respects_succ3 add_respects_zero_on_left)
+          also have "... =  is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (m +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+            by (typecheck_cfuncs, metis cfunc_type_def comp_associative)
+          also have "... =  is_odd \<circ>\<^sub>c ((exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c m) \<cdot>\<^sub>\<nat> 
+                                       (exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c zero)))"
+            by (typecheck_cfuncs, metis exp_apply1 exp_right_dist)
+          also have "... = \<t>"
+            by (typecheck_cfuncs, metis real_case exp_apply1 exp_def exp_respects_one_right mult_odds_is_odd2 three_is_odd)
+          then show ?thesis
+            using calculation real_case by presburger
+        next
+          assume "is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero,m\<rangle> \<noteq> \<t>"
+          then have fake_case: "is_even \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero,m\<rangle> = \<t>"   (*The fake case... only difference is final line!*)
+            by (metis even_or_odd exp_closure exp_def m_type succ_n_type zero_type)
+          have "((is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m = 
+                 (is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (successor \<circ>\<^sub>c m)"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "...  =  (is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (m +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+            by (typecheck_cfuncs, metis add_commutes add_respects_succ3 add_respects_zero_on_left)
+          also have "... =  is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (m +\<^sub>\<nat> (successor \<circ>\<^sub>c zero))"
+            by (typecheck_cfuncs, metis cfunc_type_def comp_associative)
+          also have "... =  is_odd \<circ>\<^sub>c ((exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c m) \<cdot>\<^sub>\<nat> 
+                                       (exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (successor \<circ>\<^sub>c zero)))"
+            by (typecheck_cfuncs, metis exp_apply1 exp_right_dist)
+          also have "... = \<f>"
+            by (typecheck_cfuncs, metis cart_prod_extract_right fake_case mult_evens_is_even2 not_even_and_odd true_false_only_truth_values)
+          then show ?thesis
+            by (metis NOT_true_is_false NOT_type calculation cfunc_type_def comp_associative exp_closure exp_def fake_case is_even_type is_odd_not_is_even m_type succ_n_type zero_type)
+        qed
+        then show "((is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m =
+         (id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m"
+          by (simp add: calculation)
+      qed
+    qed
+    show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+      by (typecheck_cfuncs, smt (z3) comp_associative2 id_left_unit2 terminal_func_comp)
+  qed
+  have "is_odd \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor  \<circ>\<^sub>c zero,n\<rangle>) = 
+        (is_odd \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor  \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id \<nat>\<^sub>c\<rangle>)) \<circ>\<^sub>c n"
+    using assms cfunc_type_def comp_associative exp_apply1 exp_def by (typecheck_cfuncs, fastforce)
+  then show ?thesis
+    by (typecheck_cfuncs, smt (z3) main_result assms beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 terminal_func_comp terminal_func_type)
+qed
 
 
 

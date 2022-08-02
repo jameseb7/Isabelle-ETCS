@@ -80,10 +80,15 @@ qed
 
 
 
-
+(*
 lemma exp_cancellative2:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "a \<noteq> zero" 
   shows  "(b ^\<^sub>\<nat> a = c ^\<^sub>\<nat> a) = (b = c)"
+proof(auto)
+ *)
+
+(*
+
 proof(auto)
   assume "b ^\<^sub>\<nat> a = c ^\<^sub>\<nat> a"
   obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "successor \<circ>\<^sub>c k   = a"
@@ -102,7 +107,7 @@ proof(auto)
     have "j = zero"
     proof(rule ccontr)
       oops
-
+*)
 
   
 
@@ -201,7 +206,7 @@ proof -
           using even exp_closure n_type not_even_and_odd succ_n_type zero_type by auto
         then show ?thesis
           by simp
-        (*Now repeat with s < m *)
+        (*Now repeat with s \<le> m *)
       qed
     next
       assume "leq \<circ>\<^sub>c \<langle>m,s\<rangle> \<noteq> \<t>"
