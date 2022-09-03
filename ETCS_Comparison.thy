@@ -5,6 +5,9 @@ begin
 definition leq :: "cfunc" where
   "leq = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (add2 \<times>\<^sub>f id \<nat>\<^sub>c) \<circ>\<^sub>c associate_left \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
 
+definition leq_infix :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" (infix "\<le>\<^sub>\<nat>" 50) where
+  "a \<le>\<^sub>\<nat> b = (leq \<circ>\<^sub>c \<langle>a, b\<rangle> = \<t>)"
+
 lemma leq_type[type_rule]:
   "leq : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<Omega>"
   unfolding leq_def by typecheck_cfuncs
