@@ -126,6 +126,35 @@ proof (rule ccontr)
     using true_false_distinct by auto
 qed
 
+lemma FORALL_true_implies_all_true2:
+  assumes p_type[type_rule]: "p : X \<times>\<^sub>c Y \<rightarrow> \<Omega>" and FORALL_p_true: "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+  shows "\<And> x y. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, y\<rangle> = \<t>"
+proof -
+  have "p\<^sup>\<sharp> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c one\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+    using FORALL_is_pullback FORALL_p_true unfolding is_pullback_def 
+    by (typecheck_cfuncs, metis terminal_func_unique)
+  then have "p\<^sup>\<sharp> = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c one\<^esub>) \<circ>\<^sub>c (id X \<times>\<^sub>f \<beta>\<^bsub>Y\<^esub>))\<^sup>\<sharp>"
+    by (typecheck_cfuncs, simp add: sharp_comp)
+  then have "p\<^sup>\<sharp> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>)\<^sup>\<sharp>"
+    by (typecheck_cfuncs_prems, smt (z3) comp_associative2 terminal_func_comp)
+  then have "p = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+    by (typecheck_cfuncs, metis flat_cancels_sharp)
+  then have "\<And> x y. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, y\<rangle> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c \<langle>x, y\<rangle>"
+    by auto
+  then show "\<And> x y. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, y\<rangle> = \<t>"
+  proof -
+    fix x y
+    assume xy_types[type_rule]: "x \<in>\<^sub>c X" "y \<in>\<^sub>c Y"
+    assume "\<And>x y. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y \<Longrightarrow> p \<circ>\<^sub>c \<langle>x,y\<rangle> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c \<langle>x,y\<rangle>"
+    then have "p \<circ>\<^sub>c \<langle>x,y\<rangle> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c \<langle>x,y\<rangle>"
+      using xy_types by auto
+    then have "p \<circ>\<^sub>c \<langle>x,y\<rangle> = \<t> \<circ>\<^sub>c (\<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub> \<circ>\<^sub>c \<langle>x,y\<rangle>)"
+      by (typecheck_cfuncs, smt comp_associative2)
+    then show "p \<circ>\<^sub>c \<langle>x, y\<rangle> = \<t>"
+      by (typecheck_cfuncs_prems, metis id_right_unit2 id_type one_unique_element)
+  qed
+qed
+
 definition EXISTS :: "cset \<Rightarrow> cfunc" where
   "EXISTS X = NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c NOT\<^bsup>X\<^esup>\<^sub>f"
 
