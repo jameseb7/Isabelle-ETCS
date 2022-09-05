@@ -49,6 +49,42 @@ proof -
     using NOT_false_is_true NOT_is_pullback is_pullback_def square_commutes_def by auto
 qed
 
+lemma all_true_implies_FORALL_true2:
+  assumes p_type[type_rule]: "p : X \<times>\<^sub>c Y \<rightarrow> \<Omega>" and all_p_true: "\<And> xy. xy \<in>\<^sub>c X \<times>\<^sub>c Y \<Longrightarrow> p \<circ>\<^sub>c xy = \<t>"
+  shows "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+proof -
+  have "p = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+  proof (rule one_separator[where X="X \<times>\<^sub>c Y", where Y=\<Omega>])
+    show "p : X \<times>\<^sub>c Y \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub> : X \<times>\<^sub>c Y \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+  next
+    fix xy
+    assume xy_type[type_rule]: "xy \<in>\<^sub>c X \<times>\<^sub>c Y"
+    then have "p \<circ>\<^sub>c xy = \<t>"
+      using all_p_true by blast
+    then have "p \<circ>\<^sub>c xy = \<t> \<circ>\<^sub>c (\<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub> \<circ>\<^sub>c xy)"
+      by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element)
+    then show "p \<circ>\<^sub>c xy = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<circ>\<^sub>c xy"
+      by (typecheck_cfuncs, smt comp_associative2)
+  qed
+  then have "p\<^sup>\<sharp> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>)\<^sup>\<sharp>"
+    by blast
+  then have "p\<^sup>\<sharp> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c one\<^esub> \<circ>\<^sub>c (id X \<times>\<^sub>f \<beta>\<^bsub>Y\<^esub>))\<^sup>\<sharp>"
+    by (typecheck_cfuncs, metis terminal_func_unique)
+  then have "p\<^sup>\<sharp> = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c one\<^esub>) \<circ>\<^sub>c (id X \<times>\<^sub>f \<beta>\<^bsub>Y\<^esub>))\<^sup>\<sharp>"
+    by (typecheck_cfuncs, smt comp_associative2)
+  then have "p\<^sup>\<sharp> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c one\<^esub>)\<^sup>\<sharp> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+    by (typecheck_cfuncs, simp add: sharp_comp)
+  then have "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = (FORALL X \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c one\<^esub>)\<^sup>\<sharp>) \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+    by (typecheck_cfuncs, smt comp_associative2)
+  then have "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>one\<^esub>) \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+    using FORALL_is_pullback unfolding is_pullback_def square_commutes_def by auto
+  then show "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+    by (metis id_right_unit2 id_type terminal_func_unique true_func_type)
+qed
+
 lemma FORALL_true_implies_all_true:
   assumes p_type: "p : X \<rightarrow> \<Omega>" and FORALL_p_true: "FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
   shows "\<And> x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c x = \<t>"
