@@ -2,6 +2,63 @@ theory ETCS_Wellordering
   imports ETCS_Axioms ETCS_Comparison
 begin
 
+
+lemma NOT_eq_pred_left_coproj:
+  assumes u_type[type_rule]: "u \<in>\<^sub>c X \<Coprod> Y" and x_type[type_rule]: "x \<in>\<^sub>c X"
+  shows "NOT \<circ>\<^sub>c eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, left_coproj X Y \<circ>\<^sub>c x\<rangle> = ((NOT \<circ>\<^sub>c  eq_pred X \<circ>\<^sub>c \<langle>id X, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))  \<circ>\<^sub>c u"
+proof- 
+  have "NOT \<circ>\<^sub>c eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, left_coproj X Y \<circ>\<^sub>c x\<rangle> = NOT \<circ>\<^sub>c (((eq_pred X \<circ>\<^sub>c \<langle>id X, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)) \<circ>\<^sub>c u)"
+    by (simp add: eq_pred_left_coproj u_type x_type)
+  also have "... = ( (NOT \<circ>\<^sub>c(eq_pred X \<circ>\<^sub>c \<langle>id X, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>)) \<amalg>  (NOT \<circ>\<^sub>c(\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))) \<circ>\<^sub>c u"
+    by (typecheck_cfuncs, smt (z3) cfunc_coprod_comp comp_associative2)
+  also have "... = ((NOT \<circ>\<^sub>c  eq_pred X \<circ>\<^sub>c \<langle>id X, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)  ) \<circ>\<^sub>c u"
+    using NOT_false_is_true comp_associative2 by (typecheck_cfuncs, auto)
+    then show ?thesis
+    using calculation by auto
+qed
+
+
+
+
+
+lemma NOT_eq_pred_right_coproj:
+  assumes u_type[type_rule]: "u \<in>\<^sub>c X \<Coprod> Y" and y_type[type_rule]: "y \<in>\<^sub>c Y"
+  shows "NOT \<circ>\<^sub>c eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, right_coproj X Y \<circ>\<^sub>c y\<rangle> = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (NOT \<circ>\<^sub>c  eq_pred Y \<circ>\<^sub>c \<langle>id Y, y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>)) \<circ>\<^sub>c u"
+proof- 
+  have "NOT \<circ>\<^sub>c eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, right_coproj X Y \<circ>\<^sub>c y\<rangle> = NOT \<circ>\<^sub>c (((\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id Y, y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>)) \<circ>\<^sub>c u)"
+    by (simp add: eq_pred_right_coproj u_type y_type)
+  also have "... = (( (NOT \<circ>\<^sub>c(\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>)) \<amalg> (NOT \<circ>\<^sub>c(eq_pred Y \<circ>\<^sub>c \<langle>id Y, y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>))) \<circ>\<^sub>c u)"
+    by (typecheck_cfuncs, smt (z3) cfunc_coprod_comp comp_associative2)
+  also have "... = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (NOT \<circ>\<^sub>c  eq_pred Y \<circ>\<^sub>c \<langle>id Y, y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>)) \<circ>\<^sub>c u"
+    by (typecheck_cfuncs, simp add: NOT_false_is_true comp_associative2)
+  then show ?thesis
+    using calculation by auto
+qed
+
+lemma eq_pred_func_pair:
+  assumes f1_type[type_rule]: "f1: A \<rightarrow> X" 
+  assumes f2_type[type_rule]: "f2: A \<rightarrow> X"  
+  assumes g1_type[type_rule]: "g1: A \<rightarrow> Y" 
+  assumes g2_type[type_rule]: "g2: A \<rightarrow> Y" 
+  shows "eq_pred (X\<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>, \<langle>f2, g2\<rangle>\<rangle> = 
+         AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,  eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle>"
+proof(cases "eq_pred (X\<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>, \<langle>f2, g2\<rangle>\<rangle> = \<t>",auto)
+  assume LHS_true: "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle> = \<t>"
+  then have pairs_equal: "\<langle>f1,g1\<rangle> = \<langle>f2,g2\<rangle>"
+    by (typecheck_cfuncs, smt (verit)  cfunc_prod_type cfunc_type_def comp_type eq_pred_iff_eq eq_pred_type true_func_type)
+  then have fncs_eq: "(f1 = f2) \<and> (g1=g2)"
+    by (metis f1_type f2_type g1_type g2_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
+  then show "\<t> = AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle>"
+    by (typecheck_cfuncs, smt (verit, ccfv_threshold) AND_true_true_is_true LHS_true cfunc_prod_type cfunc_type_def comp_type eq_pred_iff_eq eq_pred_type fncs_eq)
+next
+  assume "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle> \<noteq> \<t>" 
+  then have "\<langle>f1,g1\<rangle> \<noteq> \<langle>f2,g2\<rangle>"
+    using assms apply typecheck_cfuncs
+
+
+
+
+
 theorem well_ordering_principle:
   assumes "nonempty A" "(A, m) \<subseteq>\<^sub>c \<nat>\<^sub>c"
   shows "\<exists> a. a \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<and> (\<forall> b. b \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<longrightarrow>  a \<le>\<^sub>\<nat> b)"

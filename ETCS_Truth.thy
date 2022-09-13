@@ -150,6 +150,13 @@ next
     by (metis assms(1) eq_pred_iff_eq true_false_distinct)
 qed
 
+lemma eq_pred_iff_eq_conv2:
+  assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
+  shows "(x \<noteq> y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> \<noteq> \<t>)"
+  using assms(1) assms(2) eq_pred_iff_eq by presburger
+
+
+
 lemma eq_pred_of_monomorphism:
   assumes m_type[type_rule]: "m : X \<rightarrow> Y" and m_mono: "monomorphism m"
   shows "eq_pred Y \<circ>\<^sub>c (m \<times>\<^sub>f m) = eq_pred X"

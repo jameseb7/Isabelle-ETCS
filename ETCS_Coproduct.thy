@@ -2467,52 +2467,126 @@ proof -
 qed
 
 
-lemma eq_pred_right_coproj:
-  assumes u_type[type_rule]: "u : one \<rightarrow> X \<Coprod> Y" and f_type[type_rule]: "f : one \<rightarrow> Y"
-  shows "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, right_coproj X Y \<circ>\<^sub>c f\<rangle> = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id Y, f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>)) \<circ>\<^sub>c u"
-proof (cases "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, right_coproj X Y \<circ>\<^sub>c f\<rangle> = \<t>", auto)
-  assume "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c f\<rangle> = \<t>"
-  then have u_is_right_coproj: "u = right_coproj X Y \<circ>\<^sub>c f"
+
+lemma eq_pred_left_coproj:
+  assumes u_type[type_rule]: "u \<in>\<^sub>c X \<Coprod> Y" and x_type[type_rule]: "x \<in>\<^sub>c X"
+  shows "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, left_coproj X Y \<circ>\<^sub>c x\<rangle> = ((eq_pred X \<circ>\<^sub>c \<langle>id X, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)) \<circ>\<^sub>c u"
+proof (cases "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, left_coproj X Y \<circ>\<^sub>c x\<rangle>= \<t>", auto)
+  assume "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, left_coproj X Y \<circ>\<^sub>c x\<rangle> = \<t>"
+  then have u_is_left_coproj: "u = left_coproj X Y \<circ>\<^sub>c x"
     using eq_pred_iff_eq by (typecheck_cfuncs_prems, presburger)
   
-  show "\<t> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u"
+  show "\<t> = (eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c u"
   proof -
-    have "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u
-        = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c f"
+    have "((eq_pred X \<circ>\<^sub>c \<langle>id X, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)) \<circ>\<^sub>c u
+        = ((eq_pred X \<circ>\<^sub>c \<langle>id X, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)) \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c x"
+      using u_is_left_coproj by auto
+    also have "... =  (eq_pred X \<circ>\<^sub>c \<langle>id X, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c x "
+      by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod)
+    also have "... = eq_pred X \<circ>\<^sub>c \<langle>x, x\<rangle>"
+      by (typecheck_cfuncs, metis cart_prod_extract_left cfunc_type_def comp_associative)
+    also have "... = \<t>"
+      using eq_pred_iff_eq by (typecheck_cfuncs, blast)
+    then show ?thesis
+      by (simp add: calculation)
+  qed
+next
+  assume "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,left_coproj X Y \<circ>\<^sub>c x\<rangle> \<noteq> \<t>"
+  then have eq_pred_false: "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,left_coproj X Y \<circ>\<^sub>c x\<rangle> = \<f>"
+    using true_false_only_truth_values by (typecheck_cfuncs, blast)
+  then have u_not_left_coproj_x: "u  \<noteq> left_coproj X Y \<circ>\<^sub>c x"
+    using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, presburger)
+  show "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,left_coproj X Y \<circ>\<^sub>c x\<rangle> = (eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c u"
+  proof (insert eq_pred_false, cases "\<exists> g. g : one \<rightarrow> X \<and> u = left_coproj X Y \<circ>\<^sub>c g", auto)  
+    fix g
+    assume g_type[type_rule]: "g \<in>\<^sub>c X"
+    assume u_right_coproj: "u = left_coproj X Y \<circ>\<^sub>c g"
+    then have x_not_g: "x \<noteq> g"
+      using u_not_left_coproj_x by auto
+    show "\<f> = (eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c g"
+    proof -
+      have "(eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c g
+          = (eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c g"
+        using comp_associative2 left_coproj_cfunc_coprod by (typecheck_cfuncs, force)
+      also have "... = eq_pred X \<circ>\<^sub>c \<langle>g,x\<rangle>"
+        by (typecheck_cfuncs, simp add: cart_prod_extract_left comp_associative2)
+      also have "... = \<f>"
+        using eq_pred_iff_eq_conv x_not_g by (typecheck_cfuncs, blast)
+      then show ?thesis
+        by (simp add: calculation)
+    qed
+  next
+    assume "\<forall>g. g \<in>\<^sub>c X \<longrightarrow> u \<noteq> left_coproj X Y \<circ>\<^sub>c g"
+    then obtain g where g_type[type_rule]: "g \<in>\<^sub>c Y" and u_right_coproj: "u = right_coproj X Y \<circ>\<^sub>c g"
+      by (meson coprojs_jointly_surj u_type)
+
+    show "\<f> = (eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c u"  
+    proof -
+      have "(eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c u
+          = (eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)  \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c g"
+        using u_right_coproj by auto
+      also have "... = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c g"
+        by (typecheck_cfuncs, simp add: comp_associative2 right_coproj_cfunc_coprod)
+      also have "... = \<f>"
+        by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type terminal_func_comp terminal_func_unique)
+      then show ?thesis
+        using calculation by auto
+    qed
+  qed
+qed
+
+
+
+
+
+
+
+lemma eq_pred_right_coproj:
+  assumes u_type[type_rule]: "u \<in>\<^sub>c X \<Coprod> Y" and y_type[type_rule]: "y \<in>\<^sub>c Y"
+  shows "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, right_coproj X Y \<circ>\<^sub>c y\<rangle> = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id Y, y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>)) \<circ>\<^sub>c u"
+proof (cases "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, right_coproj X Y \<circ>\<^sub>c y\<rangle> = \<t>", auto)
+  assume "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c y\<rangle> = \<t>"
+  then have u_is_right_coproj: "u = right_coproj X Y \<circ>\<^sub>c y"
+    using eq_pred_iff_eq by (typecheck_cfuncs_prems, presburger)
+  
+  show "\<t> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u"
+  proof -
+    have "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u
+        = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y"
       using u_is_right_coproj by auto
-    also have "... = (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c f"
+    also have "... = (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c y"
       by (typecheck_cfuncs, simp add: comp_associative2 right_coproj_cfunc_coprod)
-    also have "... = eq_pred Y \<circ>\<^sub>c \<langle>f,f\<rangle>"
+    also have "... = eq_pred Y \<circ>\<^sub>c \<langle>y,y\<rangle>"
       by (typecheck_cfuncs, smt cart_prod_extract_left comp_associative2)
     also have "... = \<t>"
-      using eq_pred_iff_eq f_type by auto
+      using eq_pred_iff_eq y_type by auto
     then show ?thesis
       using calculation by auto
   qed
 next
-  assume "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c f\<rangle> \<noteq> \<t>"
-  then have eq_pred_false: "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c f\<rangle> = \<f>"
+  assume "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c y\<rangle> \<noteq> \<t>"
+  then have eq_pred_false: "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c y\<rangle> = \<f>"
     using true_false_only_truth_values by (typecheck_cfuncs, blast)
-  then have u_not_right_coproj_f: "u  \<noteq> right_coproj X Y \<circ>\<^sub>c f"
+  then have u_not_right_coproj_y: "u  \<noteq> right_coproj X Y \<circ>\<^sub>c y"
     using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, presburger)
 
-  show "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c f\<rangle> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u"
+  show "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c y\<rangle> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u"
   proof (insert eq_pred_false, cases "\<exists> g. g : one \<rightarrow> Y \<and> u = right_coproj X Y \<circ>\<^sub>c g", auto)
     fix g
     assume g_type[type_rule]: "g \<in>\<^sub>c Y"
     assume u_right_coproj: "u = right_coproj X Y \<circ>\<^sub>c g"
-    then have f_not_g: "f \<noteq> g"
-      using u_not_right_coproj_f by auto
+    then have y_not_g: "y \<noteq> g"
+      using u_not_right_coproj_y by auto
 
-    show "\<f> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c g"
+    show "\<f> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c g"
     proof -
-      have "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c g
-          = (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c g"
+      have "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c g
+          = (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c g"
         by (typecheck_cfuncs, simp add: comp_associative2 right_coproj_cfunc_coprod)
-      also have "... = eq_pred Y \<circ>\<^sub>c \<langle>g,f\<rangle>"
+      also have "... = eq_pred Y \<circ>\<^sub>c \<langle>g,y\<rangle>"
         using cart_prod_extract_left comp_associative2 by (typecheck_cfuncs, auto)
       also have "... = \<f>"
-        using eq_pred_iff_eq_conv f_not_g f_type g_type by blast
+        using eq_pred_iff_eq_conv y_not_g y_type g_type by blast
       then show ?thesis
         using calculation by auto
     qed
@@ -2521,10 +2595,10 @@ next
     then obtain g where g_type[type_rule]: "g \<in>\<^sub>c X" and u_left_coproj: "u = left_coproj X Y \<circ>\<^sub>c g"
       by (meson coprojs_jointly_surj u_type)
 
-    show "\<f> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u"
+    show "\<f> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u"
     proof -
-      have "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u
-          = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c g"
+      have "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u
+          = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c g"
         using u_left_coproj by auto
       also have "... = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c g"
         by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod)
@@ -2536,4 +2610,5 @@ next
   qed
 qed
 
+      
 end
