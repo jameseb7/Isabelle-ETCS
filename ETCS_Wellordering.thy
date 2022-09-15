@@ -112,6 +112,142 @@ proof(rule ccontr)
 qed
 
 
+lemma eq_pred_func_copair:
+  assumes f1_type[type_rule]: "f1: X \<rightarrow> Z" 
+  assumes f2_type[type_rule]: "f2: X \<rightarrow> Z"  
+  assumes g1_type[type_rule]: "g1: Y \<rightarrow> Z" 
+  assumes g2_type[type_rule]: "g2: Y \<rightarrow> Z" 
+  shows "eq_pred Z \<circ>\<^sub>c \<langle>(f1\<amalg>g1), (f2\<amalg>g2)\<rangle> = 
+        (eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>)\<amalg>(eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)"
+proof(rule ccontr)
+  assume "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle> \<noteq> (eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)"
+  then obtain xy where xy_type[type_rule]: "xy \<in>\<^sub>c X \<Coprod> Y" and xy_def: "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy \<noteq> ((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c xy"
+    using  one_separator by (typecheck_cfuncs, blast)
+  show False
+  proof(cases "\<exists> x. x \<in>\<^sub>c X \<and> xy = left_coproj X Y \<circ>\<^sub>c x")
+    assume "\<exists>x. x \<in>\<^sub>c X \<and> xy = left_coproj X Y \<circ>\<^sub>c x"
+    then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "xy = left_coproj X Y \<circ>\<^sub>c x"
+      by blast
+    show False
+    proof(cases "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy = \<t>")
+      assume LHS_true: "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy = \<t>"
+      
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle> \<circ>\<^sub>c xy = \<t>"
+        using  comp_associative2 by (typecheck_cfuncs, force)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>(f1 \<amalg> g1),(f2 \<amalg> g2)\<rangle> \<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x))  = \<t>"
+        using LHS_true x_def by blast
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>(f1 \<amalg> g1)\<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x) ,(f2 \<amalg> g2) \<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x)\<rangle> )  = \<t>"
+        using cfunc_prod_comp by (typecheck_cfuncs, auto)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>((f1 \<amalg> g1)\<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x ,((f2 \<amalg> g2) \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x\<rangle> )  = \<t>"
+        using  comp_associative2 by (typecheck_cfuncs, force)
+      then have contradiction: "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<circ>\<^sub>c x ,f2 \<circ>\<^sub>c x\<rangle>  = \<t>"
+        by (typecheck_cfuncs, metis  g1_type g2_type left_coproj_cfunc_coprod)
+      have "((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c xy = \<f>"
+        by (typecheck_cfuncs, metis LHS_true true_false_only_truth_values xy_def)
+      then have f0: "(((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x = \<f>"
+        using  comp_associative2 x_def by (typecheck_cfuncs, auto)
+      have "((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c left_coproj X Y = eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>"
+        using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<circ>\<^sub>c x = \<f>"
+        using f0 by presburger
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle> \<circ>\<^sub>c x = \<f>"
+        by (typecheck_cfuncs, simp add:  comp_associative2)
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<circ>\<^sub>c x,f2  \<circ>\<^sub>c x\<rangle> = \<f>"
+        using  cfunc_prod_comp by (typecheck_cfuncs, force)
+      then show False
+        using contradiction true_false_distinct by auto
+    next
+      assume "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy \<noteq> \<t>"
+      then have LHS_false: "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy = \<f>"
+        using  true_false_only_truth_values by (typecheck_cfuncs, blast)
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle> \<circ>\<^sub>c xy = \<f>"
+        using  comp_associative2 by (typecheck_cfuncs, force)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>(f1 \<amalg> g1),(f2 \<amalg> g2)\<rangle> \<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x))  = \<f>"
+        using LHS_false x_def by blast
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>(f1 \<amalg> g1)\<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x) ,(f2 \<amalg> g2) \<circ>\<^sub>c (left_coproj X Y \<circ>\<^sub>c x)\<rangle> )  = \<f>"
+        using cfunc_prod_comp by (typecheck_cfuncs, auto)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>((f1 \<amalg> g1)\<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x ,((f2 \<amalg> g2) \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x\<rangle> )  = \<f>"
+        using  comp_associative2 by (typecheck_cfuncs, force)
+      then have contradiction: "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<circ>\<^sub>c x ,f2 \<circ>\<^sub>c x\<rangle>   = \<f>"
+        by (typecheck_cfuncs, metis  g1_type g2_type left_coproj_cfunc_coprod)
+      have "((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c xy = \<t>"
+        by (typecheck_cfuncs, metis LHS_false true_false_only_truth_values xy_def)
+      then have f0: "(((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x = \<t>"
+        using  comp_associative2 x_def by (typecheck_cfuncs, auto)
+      have "((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c left_coproj X Y = eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>"
+        using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<circ>\<^sub>c x = \<t>"
+        using f0 by presburger
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle> \<circ>\<^sub>c x = \<t>"
+        by (typecheck_cfuncs, simp add:  comp_associative2)
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<circ>\<^sub>c x,f2  \<circ>\<^sub>c x\<rangle> = \<t>"
+        using  cfunc_prod_comp by (typecheck_cfuncs, force)
+      then show False
+        using contradiction true_false_distinct by auto
+    qed
+  next
+    assume "\<nexists>x. x \<in>\<^sub>c X \<and> xy = left_coproj X Y \<circ>\<^sub>c x"
+    then obtain y where y_type[type_rule]: "y \<in>\<^sub>c Y" and y_def: " xy = right_coproj X Y \<circ>\<^sub>c y"
+      using  coprojs_jointly_surj by (typecheck_cfuncs, blast)
+    show False
+    proof(cases "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy = \<t>")
+      assume LHS_true: "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy = \<t>"
+      
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle> \<circ>\<^sub>c xy = \<t>"
+        using  comp_associative2 by (typecheck_cfuncs, force)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>(f1 \<amalg> g1),(f2 \<amalg> g2)\<rangle> \<circ>\<^sub>c (right_coproj X Y \<circ>\<^sub>c y))  = \<t>"
+        using LHS_true y_def by blast
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>(f1 \<amalg> g1)\<circ>\<^sub>c (right_coproj X Y \<circ>\<^sub>c y) ,(f2 \<amalg> g2) \<circ>\<^sub>c (right_coproj X Y \<circ>\<^sub>c y)\<rangle> )  = \<t>"
+        using cfunc_prod_comp by (typecheck_cfuncs, auto)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>((f1 \<amalg> g1)\<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y ,((f2 \<amalg> g2) \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y\<rangle> )  = \<t>"
+        using  comp_associative2 by (typecheck_cfuncs, force)
+      then have contradiction: "eq_pred Z \<circ>\<^sub>c \<langle>g1 \<circ>\<^sub>c y ,g2 \<circ>\<^sub>c y\<rangle>  = \<t>"
+        by (typecheck_cfuncs, metis  f1_type f2_type right_coproj_cfunc_coprod)
+      have "((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c xy = \<f>"
+        by (typecheck_cfuncs, metis LHS_true true_false_only_truth_values xy_def)
+      then have f0: "(((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y = \<f>"
+        using  comp_associative2 y_def by (typecheck_cfuncs, auto)
+      have "((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c right_coproj X Y = eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>"
+        using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>) \<circ>\<^sub>c y = \<f>"
+        using f0 by presburger
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle> \<circ>\<^sub>cy = \<f>"
+        by (typecheck_cfuncs, simp add:  comp_associative2)
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>g1 \<circ>\<^sub>c y,g2  \<circ>\<^sub>c y\<rangle> = \<f>"
+        using  cfunc_prod_comp by (typecheck_cfuncs, force)
+      then show False
+        using contradiction true_false_distinct by auto
+    next
+      assume "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy \<noteq> \<t>"
+      then have LHS_false: "(eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle>) \<circ>\<^sub>c xy = \<f>"
+        using  true_false_only_truth_values by (typecheck_cfuncs, blast)
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>f1 \<amalg> g1,f2 \<amalg> g2\<rangle> \<circ>\<^sub>c xy = \<f>"
+        using  comp_associative2 by (typecheck_cfuncs, force)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>(f1 \<amalg> g1),(f2 \<amalg> g2)\<rangle> \<circ>\<^sub>c (right_coproj X Y \<circ>\<^sub>c y))  = \<f>"
+        using LHS_false y_def by blast
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>(f1 \<amalg> g1)\<circ>\<^sub>c (right_coproj X Y \<circ>\<^sub>c y) ,(f2 \<amalg> g2) \<circ>\<^sub>c (right_coproj X Y \<circ>\<^sub>c y)\<rangle> )  = \<f>"
+        using cfunc_prod_comp by (typecheck_cfuncs, auto)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>((f1 \<amalg> g1)\<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y ,((f2 \<amalg> g2) \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y\<rangle> )  = \<f>"
+        using  comp_associative2 by (typecheck_cfuncs, force)
+      then have contradiction: "eq_pred Z \<circ>\<^sub>c \<langle>g1 \<circ>\<^sub>c y ,g2 \<circ>\<^sub>c y\<rangle>   = \<f>"
+        by (typecheck_cfuncs, metis  f1_type f2_type right_coproj_cfunc_coprod)
+      have "((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c xy = \<t>"
+        by (typecheck_cfuncs, metis LHS_false true_false_only_truth_values xy_def)
+      then have f0: "(((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y = \<t>"
+        using  comp_associative2 y_def by (typecheck_cfuncs, auto)
+      have "((eq_pred Z \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<amalg> (eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>)) \<circ>\<^sub>c right_coproj X Y = eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>"
+        using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
+      then have "(eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle>) \<circ>\<^sub>c y = \<t>"
+        using f0 by presburger
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>g1,g2\<rangle> \<circ>\<^sub>c y = \<t>"
+        by (typecheck_cfuncs, simp add:  comp_associative2)
+      then have "eq_pred Z \<circ>\<^sub>c \<langle>g1 \<circ>\<^sub>c y, g2  \<circ>\<^sub>c y\<rangle> = \<t>"
+        using  cfunc_prod_comp by (typecheck_cfuncs, force)
+      then show False
+        using contradiction true_false_distinct by auto
+    qed
+  qed
+qed
 
 
 
