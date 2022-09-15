@@ -35,6 +35,9 @@ proof-
     using calculation by auto
 qed
 
+
+
+
 lemma eq_pred_func_pair:
   assumes f1_type[type_rule]: "f1: A \<rightarrow> X" 
   assumes f2_type[type_rule]: "f2: A \<rightarrow> X"  
@@ -42,18 +45,72 @@ lemma eq_pred_func_pair:
   assumes g2_type[type_rule]: "g2: A \<rightarrow> Y" 
   shows "eq_pred (X\<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>, \<langle>f2, g2\<rangle>\<rangle> = 
          AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,  eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle>"
-proof(cases "eq_pred (X\<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>, \<langle>f2, g2\<rangle>\<rangle> = \<t>",auto)
-  assume LHS_true: "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle> = \<t>"
-  then have pairs_equal: "\<langle>f1,g1\<rangle> = \<langle>f2,g2\<rangle>"
-    by (typecheck_cfuncs, smt (verit)  cfunc_prod_type cfunc_type_def comp_type eq_pred_iff_eq eq_pred_type true_func_type)
-  then have fncs_eq: "(f1 = f2) \<and> (g1=g2)"
-    by (metis f1_type f2_type g1_type g2_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
-  then show "\<t> = AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle>"
-    by (typecheck_cfuncs, smt (verit, ccfv_threshold) AND_true_true_is_true LHS_true cfunc_prod_type cfunc_type_def comp_type eq_pred_iff_eq eq_pred_type fncs_eq)
-next
-  assume "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle> \<noteq> \<t>" 
-  then have "\<langle>f1,g1\<rangle> \<noteq> \<langle>f2,g2\<rangle>"
-    using assms apply typecheck_cfuncs
+proof(rule ccontr)
+  assume "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle> \<noteq> AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle>"
+  then obtain a where a_type[type_rule]: "a \<in>\<^sub>c A" and a_def: "(eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle>) \<circ>\<^sub>c a \<noteq> (AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle>) \<circ>\<^sub>c a"
+    by (typecheck_cfuncs, meson  one_separator)
+  then show False 
+  proof (cases "(eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle>) \<circ>\<^sub>c a = \<t>")
+    assume a1: "(eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle>) \<circ>\<^sub>c a = \<t>"
+    then have "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle> \<circ>\<^sub>c a  = \<t>"
+      by (typecheck_cfuncs, simp add: a1 comp_associative2)
+    then have "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle> \<circ>\<^sub>c a ,\<langle>f2,g2\<rangle> \<circ>\<^sub>c a\<rangle>   = \<t>"
+      using  cfunc_prod_comp by (typecheck_cfuncs, force)
+    then have "\<langle>f1,g1\<rangle> \<circ>\<^sub>c a =  \<langle>f2, g2\<rangle> \<circ>\<^sub>c a"
+      by (typecheck_cfuncs, meson comp_type eq_pred_iff_eq)
+    then have "\<langle>f1 \<circ>\<^sub>c a,g1 \<circ>\<^sub>c a\<rangle>  =  \<langle>f2 \<circ>\<^sub>c a , g2\<circ>\<^sub>c a \<rangle>"
+      using  cfunc_prod_comp by (typecheck_cfuncs, force)
+    then have contradiction: "(f1 \<circ>\<^sub>c a = f2 \<circ>\<^sub>c a) \<and> (g1 \<circ>\<^sub>c a = g2 \<circ>\<^sub>c a)"
+      using cart_prod_eq2 by (typecheck_cfuncs, auto)
+    have "(AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle>) \<circ>\<^sub>c a = \<f>"
+      using a_def a1  by (typecheck_cfuncs, metis  true_false_only_truth_values)
+    then have "AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle> \<circ>\<^sub>c a = \<f>"
+      by (typecheck_cfuncs, simp add:  comp_associative2)
+    then have "AND \<circ>\<^sub>c \<langle>(eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<circ>\<^sub>c a, (eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>) \<circ>\<^sub>c a\<rangle>  = \<f>"
+      using  cfunc_prod_comp by (typecheck_cfuncs, force)
+    then have "(((eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<circ>\<^sub>c a) = \<f>) \<or> (((eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>) \<circ>\<^sub>c a) = \<f>)"
+      by (typecheck_cfuncs, metis AND_true_true_is_true  true_false_only_truth_values)
+    then have "((eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle> \<circ>\<^sub>c a) = \<f>) \<or> ((eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle> \<circ>\<^sub>c a) = \<f>)"
+      by (typecheck_cfuncs, simp add:  comp_associative2)
+    then have "((eq_pred X \<circ>\<^sub>c \<langle>f1 \<circ>\<^sub>c a,f2 \<circ>\<^sub>c a\<rangle>) = \<f>) \<or> ((eq_pred Y \<circ>\<^sub>c \<langle>g1 \<circ>\<^sub>c a, g2 \<circ>\<^sub>c a\<rangle>) = \<f>)"
+      using  cfunc_prod_comp by (typecheck_cfuncs, force)
+    then have "(f1 \<circ>\<^sub>c a \<noteq> f2 \<circ>\<^sub>c a) \<or> (g1 \<circ>\<^sub>c a \<noteq> g2 \<circ>\<^sub>c a)"
+      using  eq_pred_iff_eq_conv by (typecheck_cfuncs, blast)
+    then show False
+      by (simp add: contradiction)
+  next
+    assume "(eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle>) \<circ>\<^sub>c a \<noteq> \<t>"
+    then have a1: "(eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle>) \<circ>\<^sub>c a = \<f>"
+      using true_false_only_truth_values by (typecheck_cfuncs, blast)
+    then have "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle>,\<langle>f2,g2\<rangle>\<rangle> \<circ>\<^sub>c a = \<f>"
+      by (typecheck_cfuncs, simp add: a1 comp_associative2)
+    then have "eq_pred (X \<times>\<^sub>c Y) \<circ>\<^sub>c \<langle>\<langle>f1,g1\<rangle> \<circ>\<^sub>c a ,\<langle>f2,g2\<rangle> \<circ>\<^sub>c a\<rangle>   = \<f>"
+      using  cfunc_prod_comp by (typecheck_cfuncs, force)
+    then have "\<langle>f1,g1\<rangle> \<circ>\<^sub>c a \<noteq>  \<langle>f2, g2\<rangle> \<circ>\<^sub>c a"
+      using  eq_pred_iff_eq_conv by (typecheck_cfuncs, presburger)
+    then have "\<langle>f1 \<circ>\<^sub>c a,g1 \<circ>\<^sub>c a\<rangle>  \<noteq>  \<langle>f2 \<circ>\<^sub>c a , g2\<circ>\<^sub>c a \<rangle>"
+      using  cfunc_prod_comp by (typecheck_cfuncs, force)
+    then have contradiction: "(f1 \<circ>\<^sub>c a \<noteq> f2 \<circ>\<^sub>c a) \<or> (g1 \<circ>\<^sub>c a \<noteq> g2 \<circ>\<^sub>c a)"
+      using cart_prod_eq2 by (typecheck_cfuncs, auto)
+    have "(AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle>) \<circ>\<^sub>c a = \<t>"
+      by (typecheck_cfuncs, metis  a1 a_def true_false_only_truth_values)
+    then have "AND \<circ>\<^sub>c \<langle>eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>,eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>\<rangle> \<circ>\<^sub>c a = \<t>"
+      by (typecheck_cfuncs, simp add:  comp_associative2)
+    then have "AND \<circ>\<^sub>c \<langle>(eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<circ>\<^sub>c a, (eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>) \<circ>\<^sub>c a\<rangle>  = \<t>"
+      using  cfunc_prod_comp by (typecheck_cfuncs, force)
+    then have "(((eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle>) \<circ>\<^sub>c a) = \<t>) \<and> (((eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle>) \<circ>\<^sub>c a) = \<t>)"
+      by (typecheck_cfuncs, metis AND_false_left_is_false AND_false_right_is_false  true_false_only_truth_values)
+    then have "((eq_pred X \<circ>\<^sub>c \<langle>f1,f2\<rangle> \<circ>\<^sub>c a) = \<t>) \<and> ((eq_pred Y \<circ>\<^sub>c \<langle>g1,g2\<rangle> \<circ>\<^sub>c a) = \<t>)"
+      by (typecheck_cfuncs, simp add:  comp_associative2)
+    then have "((eq_pred X \<circ>\<^sub>c \<langle>f1 \<circ>\<^sub>c a,f2 \<circ>\<^sub>c a\<rangle>) = \<t>) \<and> ((eq_pred Y \<circ>\<^sub>c \<langle>g1 \<circ>\<^sub>c a, g2 \<circ>\<^sub>c a\<rangle>) = \<t>)"
+      using  cfunc_prod_comp by (typecheck_cfuncs, force)
+    then have "(f1 \<circ>\<^sub>c a = f2 \<circ>\<^sub>c a) \<and> (g1 \<circ>\<^sub>c a = g2 \<circ>\<^sub>c a)"
+      using  eq_pred_iff_eq by (typecheck_cfuncs, blast)  
+    then show False
+      using contradiction by blast
+  qed
+qed
+
 
 
 
