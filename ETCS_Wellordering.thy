@@ -249,7 +249,10 @@ proof(rule ccontr)
   qed
 qed
 
-
+lemma eq_pred_right_coproj2:
+  assumes a_type[type_rule]: "a : A \<rightarrow> Y" and b_type[type_rule]: "b : A \<rightarrow> Y"
+  shows "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>right_coproj X Y \<circ>\<^sub>c a, right_coproj X Y \<circ>\<^sub>c b\<rangle> = eq_pred Y \<circ>\<^sub>c \<langle>a, b\<rangle>"
+  oops
 
 
 theorem well_ordering_principle:
@@ -282,6 +285,132 @@ next
             and  u_successor: "f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
     using natural_number_object_property2 by (typecheck_cfuncs, blast)
 
+  have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>
+          eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+  proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
+    show "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,
+        right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+
+
+
+    show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c  \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                         eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c  zero =
+      (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+        proof - 
+          have "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c  \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                         eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c  zero  = 
+          FORALL \<nat>\<^sub>c \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c  \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+                                         eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)  \<circ>\<^sub>c  (id \<nat>\<^sub>c \<times>\<^sub>f zero))\<^sup>\<sharp>"
+            by (typecheck_cfuncs, smt (z3) comp_associative2 sharp_comp)
+          also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>one\<^esub>"
+          proof(rule all_true_implies_FORALL_true2)
+            show "(IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c
+                      id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<Omega>"
+              by typecheck_cfuncs
+            show "\<And> n_one. n_one \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c one \<Longrightarrow>
+          ((IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c  id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero) \<circ>\<^sub>c
+                     n_one = \<t>"
+            proof - 
+              fix n_one 
+              assume n_one_type[type_rule]: "n_one \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c one"
+              then obtain n where n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and n_def: "n_one = \<langle>n, id one\<rangle>"
+                by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)
+              have "((IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c  id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero) \<circ>\<^sub>c
+                     n_one = 
+                    (IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero) \<circ>\<^sub>c
+                     n_one"
+                using comp_associative2 by (typecheck_cfuncs, force)
+              also have "... = (IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c  \<langle>n, zero\<rangle>"
+                by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 id_type n_def)
+              also have "... = IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c  \<langle>n, zero\<rangle>"
+                by (typecheck_cfuncs, simp add: comp_associative2)
+              also have "... = IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c ,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c  \<langle>n, zero\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c  \<langle>n, zero\<rangle>\<rangle> "
+                by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+              also have "... = IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>n, zero\<rangle>,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>n, zero\<rangle>\<rangle> ,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>n, zero\<rangle>,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>n, zero\<rangle>\<rangle> \<rangle> "
+                using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
+              also have "... = IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c zero,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle> ,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle> \<rangle>"
+                using left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by (typecheck_cfuncs, presburger)
+              also have "... = IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c zero, right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle> ,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle>\<rangle>"
+                using u_zero q_def by auto
+              also have "... = IMPLIES \<circ>\<^sub>c \<langle>eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle> ,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, n\<rangle>\<rangle>"
+                apply typecheck_cfuncs
+              thm q_def
+
+    show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor
+        = id\<^sub>c \<Omega> \<circ>\<^sub>c FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>"
+    proof (rule one_separator[where X="\<nat>\<^sub>c", where Y=\<Omega>])
+      show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,
+          right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c
+            successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+      show "id\<^sub>c \<Omega> \<circ>\<^sub>c FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c  \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c
+          \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+        by typecheck_cfuncs
+    next
+      fix n
+      assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+      show "((FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor) \<circ>\<^sub>c n
+        = (id\<^sub>c \<Omega> \<circ>\<^sub>c FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c n"
+      proof (cases "((FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor) \<circ>\<^sub>c n = \<t>")
+        assume "((FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor) \<circ>\<^sub>c n = \<t>"
+        then have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+          by (typecheck_cfuncs_prems, smt (z3) cfunc_type_def codomain_comp comp_associative)
+        then have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c n)))\<^sup>\<sharp> = \<t>"
+          by (typecheck_cfuncs_prems, metis sharp_comp)
+        then have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c 
+          \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c 
+          \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, (successor \<circ>\<^sub>c n) \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c one\<rangle>)\<^sup>\<sharp> = \<t>"
+          apply (typecheck_cfuncs, metis cfunc_cross_prod_def2)
+          find_theorems "left_cart_proj"
+(*      have "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+            \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+            eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor
+          = FORALL \<nat>\<^sub>c \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c 
+            \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
+            eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor))\<^sup>\<sharp>"
+        by (typecheck_cfuncs, smt (z3) comp_associative2 sharp_comp)
+      also have "... = FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+            \<langle>(eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor),
+            (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor)\<rangle>)\<^sup>\<sharp>"
+        by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+      also have "... = FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+            \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>(u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor), 
+              (right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor)\<rangle>,
+            eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c  \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor), left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor)\<rangle>\<rangle>)\<^sup>\<sharp>"
+        by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+      also have "... = FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
+            \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>(u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor), 
+              (right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f successor)\<rangle>,
+            eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c , left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>"*)
+
+  have "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> u \<circ>\<^sub>c n = right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c n \<or> (\<exists> \<omega>. \<omega> \<in>\<^sub>c \<Omega> \<and> u \<circ>\<^sub>c n = left_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c \<omega>)"
+  proof auto
+    fix n
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+
   obtain q' where q'_def: "q' = \<langle>\<t>, zero\<rangle>"   (*I redefined q' because we only need the special case when 0 is not an element of the set!*)
     by simp
   have q'_type[type_rule]: "q' : one \<rightarrow> \<Omega> \<times>\<^sub>c \<nat>\<^sub>c"
@@ -306,8 +435,10 @@ next
   proof - 
     have f1: "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq, NOT \<circ>\<^sub>c \<chi>\<^sub>A \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c zero = \<t>"
     proof - 
-      have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq, NOT \<circ>\<^sub>c \<chi>\<^sub>A \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero =
-            FORALL \<nat>\<^sub>c \<circ>\<^sub>c((IMPLIES \<circ>\<^sub>c \<langle>leq, NOT \<circ>\<^sub>c \<chi>\<^sub>A \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id (\<nat>\<^sub>c) \<times>\<^sub>f zero))\<^sup>\<sharp>"
+      have "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq, NOT \<circ>\<^sub>c \<chi>\<^sub>A \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c zero
+          = FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq, NOT \<circ>\<^sub>c \<chi>\<^sub>A \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero"
+        by (typecheck_cfuncs, smt comp_associative2)
+      also have "... = FORALL \<nat>\<^sub>c \<circ>\<^sub>c((IMPLIES \<circ>\<^sub>c \<langle>leq, NOT \<circ>\<^sub>c \<chi>\<^sub>A \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id (\<nat>\<^sub>c) \<times>\<^sub>f zero))\<^sup>\<sharp>"
         by (typecheck_cfuncs, metis sharp_comp)
       also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>one\<^esub>"
       proof(rule all_true_implies_FORALL_true2)
@@ -342,7 +473,7 @@ next
       also have "... = \<t>"
         by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element)
       then show ?thesis
-        sorry
+        using calculation by auto
     qed
     have "v1 \<circ>\<^sub>c zero = \<langle>(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq, NOT \<circ>\<^sub>c \<chi>\<^sub>A \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c zero, id \<nat>\<^sub>c \<circ>\<^sub>c zero \<rangle>"
       using cfunc_prod_comp v1_def by (typecheck_cfuncs, blast)
@@ -401,7 +532,7 @@ next
       (*  assume case1: "u \<circ>\<^sub>c  n = right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c  n"    (*This is an assumption to try to make the calculations fall out easier*)
 *)
 
-(*
+
         have "(v2 \<circ>\<^sub>c successor) \<circ>\<^sub>c n = v2 \<circ>\<^sub>c (successor  \<circ>\<^sub>c n)"
           by (typecheck_cfuncs, simp add: comp_associative2)
         also have "... = \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u, right_coproj \<Omega> \<nat>\<^sub>c\<rangle>  \<circ>\<^sub>c (successor  \<circ>\<^sub>c n), id \<nat>\<^sub>c  \<circ>\<^sub>c (successor  \<circ>\<^sub>c n)\<rangle>"
@@ -410,10 +541,17 @@ next
           using cfunc_prod_comp id_left_unit2 by (typecheck_cfuncs, force)
         also have "... = \<langle>((\<f>  \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<amalg> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c , (successor  \<circ>\<^sub>c n)  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)) \<circ>\<^sub>c u \<circ>\<^sub>c (successor  \<circ>\<^sub>c n) ,  (successor  \<circ>\<^sub>c n)\<rangle>"
           using eq_pred_right_coproj by (typecheck_cfuncs, presburger)
+        also have "... = \<langle>((\<f>  \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<amalg> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c , (successor  \<circ>\<^sub>c n)  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)) \<circ>\<^sub>c (f \<circ>\<^sub>c u \<circ>\<^sub>c n) ,  (successor  \<circ>\<^sub>c n)\<rangle>"
+          by (typecheck_cfuncs, simp add: comp_associative2 u_successor)
+        also have "... = \<langle>(\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<amalg> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,(successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c
+            (left_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c \<f> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<amalg>
+            (((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c one\<^esub>) \<bowtie>\<^sub>f left_cart_proj \<nat>\<^sub>c one) \<circ>\<^sub>c dist_prod_coprod_inv \<nat>\<^sub>c one one \<circ>\<^sub>c \<langle>successor,case_bool \<circ>\<^sub>c \<chi>\<^sub>A \<circ>\<^sub>c successor\<rangle>) \<circ>\<^sub>c
+              u \<circ>\<^sub>c n,successor \<circ>\<^sub>c n\<rangle>"
+          unfolding f_def by simp
+        also have "... = undefined"
+        proof (cases "u \<circ>\<^sub>c n = right_coproj")
         (*The above follows from the newly proved lemma!*)
-
-*)
-
+        thm f_def f'_def v2_def u_successor f_type \<chi>\<^sub>A_type
 
 
 
@@ -421,6 +559,9 @@ next
 
 
 
+
+
+(*
         have "(f' \<circ>\<^sub>c v2) \<circ>\<^sub>c n = f' \<circ>\<^sub>c (v2 \<circ>\<^sub>c n)"
           by (typecheck_cfuncs, simp add: comp_associative2)
         also have "... = f' \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u, right_coproj \<Omega> \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n , id \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>"
@@ -434,7 +575,7 @@ next
         successor \<circ>\<^sub>c right_cart_proj \<Omega> \<nat>\<^sub>c \<rangle> \<circ>\<^sub>c \<langle>((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<amalg> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c  \<langle>id \<nat>\<^sub>c , n \<circ>\<^sub>c \<beta>\<^bsub> \<nat>\<^sub>c\<^esub>\<rangle>)) \<circ>\<^sub>c (u \<circ>\<^sub>c n)   , n\<rangle>"
           using eq_pred_right_coproj by (typecheck_cfuncs, presburger)
         (*The above follows from the newly proved lemma!*)
-
+*)
 
 
 
