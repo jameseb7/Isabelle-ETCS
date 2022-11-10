@@ -45,7 +45,9 @@ lemma id_right_unit2: "f : X \<rightarrow> Y \<Longrightarrow> f \<circ>\<^sub>c
 lemma id_left_unit2: "f : X \<rightarrow> Y \<Longrightarrow> id Y \<circ>\<^sub>c f = f"
   unfolding cfunc_type_def using id_left_unit by auto
 
-subsection \<open>Tactic to construct type facts\<close>
+subsection \<open>Tactic definitions\<close>
+
+subsubsection \<open>typecheck_cfuncs: Tactic to construct type facts\<close>
 
 (* check_cfunc determines if a given term is of type cfunc *)
 ML \<open>
@@ -185,6 +187,12 @@ ML \<open>fun construct_cfunc_type_lemmas1 ctxt rules binder_typs (t $ u) =
   assuming there are no unbound bound variables *)
 ML \<open>fun construct_cfunc_type_lemmas ctxt rules t = construct_cfunc_type_lemmas1 ctxt rules [] t\<close>
 
+ML \<open>fun typecheck_cfunc ctxt rules t = 
+      let val rules' = rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
+          val lems = construct_cfunc_type_lemmas ctxt rules' t
+      in hd lems
+      end\<close>
+
 (* extract_prems attempts to extract premises from a term that has the form of a theorem *)
 ML \<open>fun extract_prems ((@{term Trueprop}) $ P) = extract_prems P
       | extract_prems (@{term "Pure.imp"} $ P $ Q) = P::extract_prems Q
@@ -262,19 +270,36 @@ method_setup typecheck_cfuncs_prems =
   \<open>Scan.succeed typecheck_cfuncs_prems_method\<close>
   "Check types of cfuncs in assumptions of the current goal and add as assumptions of the current goal"
 
-(*ML \<open>fun typecheck_proof_tac_facts_subtac ctxt rules facts tac (subgoal, n) =
-          let val type_rules = rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
-              val type_lems = construct_cfunc_type_lemmas ctxt type_rules subgoal
-              val typechecked_facts = List.map 
-          in ()
-          end\<close>
+subsubsection \<open>etcs_rule: Tactic to apply rules with ETCS typechecking\<close>
 
-ML_val \<open>elim_type_rule_prems\<close>
-ML_val \<open>SUBGOAL\<close>
-ML_val \<open>Method.rule_tac\<close>
-ML_val \<open>Method.rule\<close>
-ML_val \<open>fn x => Attrib.thms >> x\<close>
-ML_val \<open>Scan.succeed\<close>*)
+ML \<open>fun ETCS_resolve_subtac ctxt type_rules thm i (foc : Subgoal.focus) = 
+      (* try to match the given theorem against the current subgoal*)
+      case match_term [] (Thm.concl_of thm) (Thm.term_of (#concl foc)) of
+        SOME insts =>
+              (* certify any instantiations that result *)
+          let val insts' = certify_instantiations ctxt [] insts
+              (* instantiate the given theorem *)
+              val inst_thm = Thm.instantiate ([], insts') thm
+              (* generate typing lemmas and eliminate any typing premises required *)
+              val type_lems =
+                construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) (Thm.term_of (#concl foc))
+              val inst_thm' = elim_type_rule_prems ctxt inst_thm type_lems
+            (* resolve the current subgoal using the instantiated theorem *)
+          in resolve_tac ctxt [inst_thm'] i
+          end
+      | NONE => no_tac\<close>
+
+ML \<open>fun ETCS_resolve_tac _    _          []          _ = all_tac
+      | ETCS_resolve_tac ctxt type_rules (thm::thms) i = 
+          (Subgoal.FOCUS (ETCS_resolve_subtac ctxt type_rules thm i) ctxt i)
+            THEN ETCS_resolve_tac ctxt type_rules thms i\<close>
+
+ML \<open>fun ETCS_resolve_method thms ctxt =
+      let val type_rules = Named_Theorems.get ctxt "ETCS_Base.type_rule"
+      in METHOD (fn add_rules => ETCS_resolve_tac ctxt (type_rules @ add_rules) thms 1)
+      end\<close>
+
+method_setup etcs_rule = \<open>Attrib.thms >> ETCS_resolve_method\<close> "apply rule with ETCS type checking"
 
 subsection \<open>Basic Category Theory Definitions\<close>
 
