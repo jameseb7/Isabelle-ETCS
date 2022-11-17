@@ -301,6 +301,76 @@ ML \<open>fun ETCS_resolve_method thms ctxt =
 
 method_setup etcs_rule = \<open>Attrib.thms >> ETCS_resolve_method\<close> "apply rule with ETCS type checking"
 
+(* extract_subst_term extracts the term f of type cfunc from a theorem of the form "f = g" or "f \<equiv> g" *)
+ML \<open>fun extract_subst_term rule =
+          case Thm.concl_of rule of
+            Const ("HOL.Trueprop", _) $ boolrule =>
+              (case boolrule of 
+                (Const ("HOL.eq", _) $ t) $ _ => SOME t
+              | _ => NONE)
+          | (Const ("Pure.eq", _) $ t) $ _ => SOME t
+          | _ => NONE
+                \<close>
+
+(* match_nested_term tries to apply match_term over the structure of a term until it finds a match *)
+ML \<open>fun match_nested_term bound_typs pat (t1 $ t2) = (
+        (* try matching the toplevel first *)
+        case match_term bound_typs pat (t1 $ t2) of
+          SOME insts => SOME insts
+        | NONE =>
+            (* otherwise try matching in left of application *)
+            case match_nested_term bound_typs pat t1 of
+              SOME insts => SOME insts
+              (* otherwise try matching in right of application *)
+            | NONE => match_nested_term bound_typs pat t2
+      )
+    | match_nested_term bound_typs pat (Abs (v, ty, t)) = (
+        (* try matching the toplevel first *)
+        case match_term bound_typs pat (Abs (v, ty, t)) of
+          SOME insts => SOME insts
+          (* otherwise try matching quantified term *)
+        | NONE => match_nested_term bound_typs pat t
+      )
+      (* finally, just try regular match *)
+    | match_nested_term bound_typs pat t = match_term bound_typs pat t
+          \<close>
+
+ML \<open>fun ETCS_subst_subtac ctxt type_rules thm i (foc : Subgoal.focus) =
+          (* extract the left-hand side from the conclusion of the theorem *) 
+      let val subst_term = extract_subst_term thm
+          (* try to match the given theorem against the current subgoal*)
+          val insts_opt = case subst_term of
+              SOME t => match_nested_term [] t (Thm.term_of (#concl foc))
+            | NONE   => NONE
+      in 
+        case insts_opt of
+          SOME insts =>
+                (* certify any instantiations that result *)
+            let val insts' = certify_instantiations ctxt [] insts
+                (* instantiate the given theorem *)
+                val inst_thm = Thm.instantiate ([], insts') thm
+                (* generate typing lemmas and eliminate any typing premises required *)
+                val type_lems =
+                  construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) (Thm.term_of (#concl foc))
+                val inst_thm' = elim_type_rule_prems ctxt inst_thm type_lems
+              (* resolve the current subgoal using the instantiated theorem *)
+            in EqSubst.eqsubst_tac ctxt [0] [inst_thm'] i
+            end
+          | NONE => no_tac
+      end\<close>
+
+ML \<open>fun ETCS_subst_tac _    _          []          _ = all_tac
+      | ETCS_subst_tac ctxt type_rules (thm::thms) i = 
+          (Subgoal.FOCUS (ETCS_subst_subtac ctxt type_rules thm i) ctxt i)
+            THEN ETCS_subst_tac ctxt type_rules thms i\<close>
+
+ML \<open>fun ETCS_subst_method thms ctxt =
+      let val type_rules = Named_Theorems.get ctxt "ETCS_Base.type_rule"
+      in METHOD (fn add_rules => ETCS_subst_tac ctxt (type_rules @ add_rules) thms 1)
+      end\<close>
+
+method_setup etcs_subst = \<open>Attrib.thms >> ETCS_subst_method\<close> "apply substitution with ETCS type checking"
+
 subsection \<open>Basic Category Theory Definitions\<close>
 
 (*
