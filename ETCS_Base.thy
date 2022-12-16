@@ -1,5 +1,5 @@
 theory ETCS_Base
-  imports Main
+  imports Main "HOL-Eisbach.Eisbach"
 begin
 
 typedecl cset
@@ -219,22 +219,25 @@ ML \<open>fun typecheck_cfuncs_tac ctxt type_rules =
 
 (* typecheck_cfuncs_method lifts typecheck_cfuncs_tac to a proof method that
   generates cfunc type facts for the first goal *)
-ML \<open>fun typecheck_cfuncs_method ctxt = 
-          (fn thms => CONTEXT_TACTIC (typecheck_cfuncs_tac ctxt thms 1)) : Method.method\<close>
+ML \<open>fun typecheck_cfuncs_method opt_type_rules ctxt = 
+      (fn thms => CONTEXT_TACTIC (typecheck_cfuncs_tac ctxt (these opt_type_rules @ thms) 1))\<close>
 
 (* setup typecheck_cfuncs_method as a proof method in the theory *)
 method_setup typecheck_cfuncs =
-  \<open>Scan.succeed typecheck_cfuncs_method\<close>
+  \<open>Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
+     >> typecheck_cfuncs_method\<close>
   "Check types of cfuncs in current goal and add as assumptions of the current goal"
 
 (* typecheck_cfuncs_all_method lifts typecheck_cfuncs_tac to a proof method that
   generates cfunc type facts for the first goal *)
-ML \<open>fun typecheck_cfuncs_all_method ctxt = 
-         CONTEXT_METHOD (fn thms => CONTEXT_TACTIC (ALLGOALS (typecheck_cfuncs_tac ctxt thms)))\<close>
+ML \<open>fun typecheck_cfuncs_all_method opt_type_rule ctxt = 
+      CONTEXT_METHOD (fn thms => 
+        CONTEXT_TACTIC (ALLGOALS (typecheck_cfuncs_tac ctxt (these opt_type_rule @ thms))))\<close>
 
 (* setup typecheck_cfuncs_method as a proof method in the theory *)
 method_setup typecheck_cfuncs_all =
-  \<open>Scan.succeed typecheck_cfuncs_all_method\<close>
+  \<open>Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
+     >> typecheck_cfuncs_all_method\<close>
   "Check types of cfuncs in all subgoals and add as assumptions of the current goal"
 
 (* typecheck_cfuncs_prems_subproof implements a tactic that generates cfunc type facts as assumptions of a goal,
@@ -262,12 +265,13 @@ ML \<open>fun typecheck_cfuncs_prems_tac ctxt type_rules =
 
 (* typecheck_cfuncs_prems_method lifts typecheck_cfuncs_tac to a proof method that
   generates cfunc type facts for the first goal *)
-ML \<open>fun typecheck_cfuncs_prems_method ctxt = 
-          (fn thms => CONTEXT_TACTIC (typecheck_cfuncs_prems_tac ctxt thms 1)) : Method.method\<close>
+ML \<open>fun typecheck_cfuncs_prems_method opt_type_rules ctxt = 
+          (fn thms => CONTEXT_TACTIC (typecheck_cfuncs_prems_tac ctxt (these opt_type_rules @ thms) 1))\<close>
 
 (* setup typecheck_cfuncs_prems_method as a proof method in the theory *)
 method_setup typecheck_cfuncs_prems =
-  \<open>Scan.succeed typecheck_cfuncs_prems_method\<close>
+  \<open>Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
+     >> typecheck_cfuncs_prems_method\<close>
   "Check types of cfuncs in assumptions of the current goal and add as assumptions of the current goal"
 
 subsubsection \<open>etcs_rule: Tactic to apply rules with ETCS typechecking\<close>
@@ -294,12 +298,16 @@ ML \<open>fun ETCS_resolve_tac _    _          []          _ = all_tac
           (Subgoal.FOCUS (ETCS_resolve_subtac ctxt type_rules thm i) ctxt i)
             THEN ETCS_resolve_tac ctxt type_rules thms i\<close>
 
-ML \<open>fun ETCS_resolve_method thms ctxt =
-      let val type_rules = Named_Theorems.get ctxt "ETCS_Base.type_rule"
+ML \<open>fun ETCS_resolve_method (thms, opt_type_rules) ctxt =
+      let val type_rules = these opt_type_rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
       in METHOD (fn add_rules => ETCS_resolve_tac ctxt (type_rules @ add_rules) thms 1)
       end\<close>
 
-method_setup etcs_rule = \<open>Attrib.thms >> ETCS_resolve_method\<close> "apply rule with ETCS type checking"
+method_setup etcs_rule = 
+  \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
+    -- Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
+     >> ETCS_resolve_method\<close>
+  "apply rule with ETCS type checking"
 
 (* extract_subst_term extracts the term f of type cfunc from a theorem of the form "f = g" or "f \<equiv> g" *)
 ML \<open>fun extract_subst_term rule =
@@ -364,12 +372,19 @@ ML \<open>fun ETCS_subst_tac _    _          []          _ = all_tac
           (Subgoal.FOCUS (ETCS_subst_subtac ctxt type_rules thm i) ctxt i)
             THEN ETCS_subst_tac ctxt type_rules thms i\<close>
 
-ML \<open>fun ETCS_subst_method thms ctxt =
-      let val type_rules = Named_Theorems.get ctxt "ETCS_Base.type_rule"
+ML \<open>fun ETCS_subst_method (thms, opt_type_rules) ctxt =
+      let val type_rules = these opt_type_rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
       in METHOD (fn add_rules => ETCS_subst_tac ctxt (type_rules @ add_rules) thms 1)
       end\<close>
 
-method_setup etcs_subst = \<open>Attrib.thms >> ETCS_subst_method\<close> "apply substitution with ETCS type checking"
+method_setup etcs_subst = 
+  \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
+    -- Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
+     >> ETCS_subst_method\<close> 
+  "apply substitution with ETCS type checking"
+
+method etcs_assocl declares type_rule = (etcs_subst comp_associative2)+
+method etcs_assocr declares type_rule = (etcs_subst sym[OF comp_associative2])+
 
 subsection \<open>Basic Category Theory Definitions\<close>
 
