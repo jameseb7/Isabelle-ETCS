@@ -286,10 +286,14 @@ ML \<open>fun ETCS_resolve_subtac ctxt type_rules thm i (foc : Subgoal.focus) =
               val inst_thm = Thm.instantiate ([], insts') thm
               (* generate typing lemmas and eliminate any typing premises required *)
               val type_lems =
-                construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) (Thm.term_of (#concl foc))
+                construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) (Thm.prop_of inst_thm)
               val inst_thm' = elim_type_rule_prems ctxt inst_thm type_lems
+              (* generate typing lemmas for any remaining premises of the goal and try to eliminate them *)
+              val prem_type_lems =
+                flat (map (construct_cfunc_type_lemmas ctxt (type_rules)) (Thm.prems_of inst_thm'))
+              val inst_thm'' = elim_type_rule_prems ctxt inst_thm' prem_type_lems
             (* resolve the current subgoal using the instantiated theorem *)
-          in resolve_tac ctxt [inst_thm'] i
+          in resolve_tac ctxt [inst_thm''] i
           end
       | NONE => no_tac\<close>
 
@@ -308,6 +312,8 @@ method_setup etcs_rule =
     -- Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
      >> ETCS_resolve_method\<close>
   "apply rule with ETCS type checking"
+
+subsubsection \<open>etcs_subst: Tactic to apply substitutions with ETCS typechecking\<close>
 
 (* extract_subst_term extracts the term f of type cfunc from a theorem of the form "f = g" or "f \<equiv> g" *)
 ML \<open>fun extract_subst_term rule =
@@ -346,9 +352,11 @@ ML \<open>fun match_nested_term bound_typs pat (t1 $ t2) = (
 ML \<open>fun ETCS_subst_subtac ctxt type_rules thm i (foc : Subgoal.focus) =
           (* extract the left-hand side from the conclusion of the theorem *) 
       let val subst_term = extract_subst_term thm
+          (* extract current subgoal *)
+          val subgoal = (Thm.term_of (#concl foc))
           (* try to match the given theorem against the current subgoal*)
           val insts_opt = case subst_term of
-              SOME t => match_nested_term [] t (Thm.term_of (#concl foc))
+              SOME t => match_nested_term [] t subgoal
             | NONE   => NONE
       in 
         case insts_opt of
@@ -359,10 +367,14 @@ ML \<open>fun ETCS_subst_subtac ctxt type_rules thm i (foc : Subgoal.focus) =
                 val inst_thm = Thm.instantiate ([], insts') thm
                 (* generate typing lemmas and eliminate any typing premises required *)
                 val type_lems =
-                  construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) (Thm.term_of (#concl foc))
+                  construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) subgoal
                 val inst_thm' = elim_type_rule_prems ctxt inst_thm type_lems
+                (* generate typing lemmas for any remaining premises of the goal and try to eliminate them *)
+                val prem_type_lems =
+                  flat (map (construct_cfunc_type_lemmas ctxt (type_rules)) (Thm.prems_of inst_thm'))
+                val inst_thm'' = elim_type_rule_prems ctxt inst_thm' prem_type_lems
               (* resolve the current subgoal using the instantiated theorem *)
-            in EqSubst.eqsubst_tac ctxt [0] [inst_thm'] i
+            in EqSubst.eqsubst_tac ctxt [0] [inst_thm''] i
             end
           | NONE => no_tac
       end\<close>
@@ -385,6 +397,81 @@ method_setup etcs_subst =
 
 method etcs_assocl declares type_rule = (etcs_subst comp_associative2)+
 method etcs_assocr declares type_rule = (etcs_subst sym[OF comp_associative2])+
+
+ML \<open>fun string_of_var (Const (str, _))    = str
+      | string_of_var (Free (str, _))     = str
+      | string_of_var (Var ((str, _), _)) = str
+      | string_of_var _ = "" (*raise TERM ("string_of_var", [t])*)\<close>
+
+ML \<open>fun ETCS_subst_asm_subtac type_rules thm i (foc : Subgoal.focus) =
+          (* extract the left-hand side from the conclusion of the theorem *) 
+          let val subst_term = (extract_subst_term thm)
+          (* extract current subgoal *)
+          val subgoal_prems = (#prems foc)
+          val ctxt = (#context foc)
+          (* try to match the given theorem against the current subgoal*)
+          fun match_asm t (asm::asms) = 
+              (case match_nested_term [] t (Thm.prop_of asm) of
+                SOME insts => SOME (insts, asm)
+              | NONE => match_asm t asms)
+            | match_asm _ [] = NONE;
+          val insts_opt = case subst_term of
+              SOME t => match_asm t subgoal_prems
+            | NONE   => NONE
+          
+      in 
+        case insts_opt of
+          SOME (insts, selected_prem) =>
+                (* certify any instantiations that result *)
+            let val insts' = certify_instantiations ctxt [] insts
+                (* instantiate the given theorem *)
+                val inst_thm = Thm.instantiate ([], insts') thm
+                (* generate typing lemmas and eliminate any typing premises required *)
+                val selected_prem_term = Thm.prop_of selected_prem
+                val type_lems =
+                  construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) selected_prem_term
+                val inst_thm' = elim_type_rule_prems ctxt inst_thm type_lems
+                (* generate typing lemmas for any remaining premises of the goal and try to eliminate them *)
+                val prem_type_lems =
+                  flat (map (construct_cfunc_type_lemmas ctxt (type_rules)) (Thm.prems_of inst_thm'))
+                val inst_thm'' = elim_type_rule_prems ctxt inst_thm' prem_type_lems
+              (* generalize selected premise for use outside of focus *)
+              val names_to_generalize = map (string_of_var o Thm.term_of o snd) (#params foc)
+              val generalized_prem = Thm.generalize_cterm ([], names_to_generalize) 0 (Thm.cprop_of selected_prem)
+              (* insert selected premise and substitute it using the instantiated theorem *)
+            in ((cut_tac selected_prem i) THEN (EqSubst.eqsubst_asm_tac ctxt [0] [inst_thm''] i),
+                SOME generalized_prem)
+            end
+          | NONE => (no_tac, NONE)
+      end\<close>
+
+ML \<open>fun ETCS_subst_asm_tac _    _          []          _ goal = all_tac goal
+      | ETCS_subst_asm_tac ctxt type_rules (thm::thms) i goal = 
+          if Thm.nprems_of goal < i then Seq.empty
+          else
+            let val (foc as {context = ctxt', asms, params, ...}, goal') = Subgoal.focus ctxt i NONE goal
+                val (inner_tac, selected_prem_opt) = ETCS_subst_asm_subtac type_rules thm i foc
+                val tac1 = (Seq.lifts (Subgoal.retrofit ctxt' ctxt params asms i) (inner_tac goal'))
+                val tac2 = case selected_prem_opt of
+                  SOME selected_prem => 
+                    let val match_prem = fn t => is_none (match_term [] (Thm.term_of selected_prem) t)
+                        val remove_prem_tac = fn (foc : Subgoal.focus) => filter_prems_tac (#context foc) match_prem i
+                    in (Subgoal.FOCUS_PARAMS remove_prem_tac ctxt i) THEN (Tactic.rotate_tac (0-1) i)
+                    end
+                | NONE => no_tac
+            in (tac1 THEN tac2 THEN (ETCS_subst_asm_tac ctxt type_rules thms i)) goal
+            end\<close>
+
+ML \<open>fun ETCS_subst_asm_method (thms, opt_type_rules) ctxt =
+      let val type_rules = these opt_type_rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
+      in METHOD (fn add_rules => ETCS_subst_asm_tac ctxt (type_rules @ add_rules) thms 1)
+      end\<close>
+
+method_setup etcs_subst_asm = 
+  \<open>Runtime.exn_trace (fn _ => Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
+    -- Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
+     >> ETCS_subst_asm_method)\<close> 
+  "apply substitution to assumptions of the goal, with ETCS type checking"
 
 subsection \<open>Basic Category Theory Definitions\<close>
 
