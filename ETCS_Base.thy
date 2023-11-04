@@ -153,6 +153,15 @@ ML \<open>fun elim_type_rule_prems ctxt thm lems =
           in elim_type_rule_prems' thm (Thm.prems_of thm)
           end\<close>
 
+ML \<open>fun elim_type_rule_prems_opt ctxt thm lems =
+          let fun elim_type_rule_prems' thm [] = SOME thm
+                | elim_type_rule_prems' thm (prem::prems) =
+                    case elim_type_rule_prem ctxt thm prem lems of
+                      SOME thm' => elim_type_rule_prems' thm' prems
+                    | NONE => NONE
+          in elim_type_rule_prems' thm (Thm.prems_of thm)
+          end\<close>
+
 (* construct_cfunc_type_lemma attempts to construct a type lemma for a given term
   using a list of typing rules and a list of existing typing lemmas;
   the lemma is returned in a list, which is empty if no lemma can be constructed *)
@@ -349,33 +358,57 @@ ML \<open>fun match_nested_term bound_typs pat (t1 $ t2) = (
     | match_nested_term bound_typs pat t = match_term bound_typs pat t
           \<close>
 
+ML \<open>fun instantiate_typecheck ctxt thm type_rules insts =
+      let val cinsts = certify_instantiations ctxt [] insts
+          val inst_thm = Thm.instantiate ([], cinsts) thm
+          val gen_type_lems = construct_cfunc_type_lemmas ctxt type_rules
+          val type_lems = flat (map (gen_type_lems o snd) insts)
+      in elim_type_rule_prems_opt ctxt inst_thm type_lems
+      end\<close>
+
+(* match_nested_term_typecheck tries to apply match_term over the structure of a term until it finds
+  a match that typechecks to leave no premises*)
+ML \<open>fun match_nested_term_typecheck ctxt thm type_rules bound_typs pat (t1 $ t2) = (
+        (* try matching the toplevel first and check if it passes typechecking *)
+        case Option.mapPartial 
+              (instantiate_typecheck ctxt thm type_rules)
+              (match_term bound_typs pat (t1 $ t2)) of
+          SOME inst_thm => SOME inst_thm
+        | NONE =>
+            (* otherwise try matching in left of application *)
+            case match_nested_term_typecheck ctxt thm type_rules bound_typs pat t1 of
+              SOME inst_thm => SOME inst_thm
+              (* otherwise try matching in right of application *)
+            | NONE => match_nested_term_typecheck ctxt thm type_rules bound_typs pat t2
+      )
+    | match_nested_term_typecheck ctxt thm type_rules bound_typs pat (Abs (v, ty, t)) = (
+       (* try matching the toplevel first and check if it passes typechecking *)
+        case Option.mapPartial 
+              (instantiate_typecheck ctxt thm type_rules)
+              (match_term bound_typs pat (Abs (v, ty, t))) of
+          SOME inst_thm => SOME inst_thm
+          (* otherwise try matching quantified term *)
+        | NONE => match_nested_term_typecheck ctxt thm type_rules bound_typs pat t
+      )
+      (* finally, just try regular match and instantiate *)
+    | match_nested_term_typecheck ctxt thm type_rules bound_typs pat t = 
+        Option.mapPartial 
+          (instantiate_typecheck ctxt thm type_rules)
+          (match_term bound_typs pat t)
+          \<close>
+
 ML \<open>fun ETCS_subst_subtac ctxt type_rules thm i (foc : Subgoal.focus) =
           (* extract the left-hand side from the conclusion of the theorem *) 
       let val subst_term = extract_subst_term thm
           (* extract current subgoal *)
           val subgoal = (Thm.term_of (#concl foc))
           (* try to match the given theorem against the current subgoal*)
-          val insts_opt = case subst_term of
-              SOME t => match_nested_term [] t subgoal
+          val inst_thm_opt = case subst_term of
+              SOME t => match_nested_term_typecheck ctxt thm ((#prems foc) @ type_rules) [] t subgoal
             | NONE   => NONE
       in 
-        case insts_opt of
-          SOME insts =>
-                (* certify any instantiations that result *)
-            let val insts' = certify_instantiations ctxt [] insts
-                (* instantiate the given theorem *)
-                val inst_thm = Thm.instantiate ([], insts') thm
-                (* generate typing lemmas and eliminate any typing premises required *)
-                val type_lems =
-                  construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) subgoal
-                val inst_thm' = elim_type_rule_prems ctxt inst_thm type_lems
-                (* generate typing lemmas for any remaining premises of the goal and try to eliminate them *)
-                val prem_type_lems =
-                  flat (map (construct_cfunc_type_lemmas ctxt (type_rules)) (Thm.prems_of inst_thm'))
-                val inst_thm'' = elim_type_rule_prems ctxt inst_thm' prem_type_lems
-              (* resolve the current subgoal using the instantiated theorem *)
-            in EqSubst.eqsubst_tac ctxt [0] [inst_thm''] i
-            end
+        case inst_thm_opt of
+          SOME inst_thm => EqSubst.eqsubst_tac ctxt [0] [inst_thm] i
           | NONE => no_tac
       end\<close>
 
@@ -411,35 +444,23 @@ ML \<open>fun ETCS_subst_asm_subtac type_rules thm i (foc : Subgoal.focus) =
           val ctxt = (#context foc)
           (* try to match the given theorem against the current subgoal*)
           fun match_asm t (asm::asms) = 
-              (case match_nested_term [] t (Thm.prop_of asm) of
-                SOME insts => SOME (insts, asm)
+              (* match_nested_term_typecheck ctxt thm type_rules bound_typs pat t *)
+              (case match_nested_term_typecheck ctxt thm ((#prems foc) @ type_rules) [] t (Thm.prop_of asm) of
+                SOME inst_thm => SOME (inst_thm, asm)
               | NONE => match_asm t asms)
             | match_asm _ [] = NONE;
-          val insts_opt = case subst_term of
+          val inst_thm_opt = case subst_term of
               SOME t => match_asm t subgoal_prems
             | NONE   => NONE
           
       in 
-        case insts_opt of
-          SOME (insts, selected_prem) =>
-                (* certify any instantiations that result *)
-            let val insts' = certify_instantiations ctxt [] insts
-                (* instantiate the given theorem *)
-                val inst_thm = Thm.instantiate ([], insts') thm
-                (* generate typing lemmas and eliminate any typing premises required *)
-                val selected_prem_term = Thm.prop_of selected_prem
-                val type_lems =
-                  construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) selected_prem_term
-                val inst_thm' = elim_type_rule_prems ctxt inst_thm type_lems
-                (* generate typing lemmas for any remaining premises of the goal and try to eliminate them *)
-                val prem_type_lems =
-                  flat (map (construct_cfunc_type_lemmas ctxt (type_rules)) (Thm.prems_of inst_thm'))
-                val inst_thm'' = elim_type_rule_prems ctxt inst_thm' prem_type_lems
-              (* generalize selected premise for use outside of focus *)
-              val names_to_generalize = map (string_of_var o Thm.term_of o snd) (#params foc)
-              val generalized_prem = Thm.generalize_cterm ([], names_to_generalize) 0 (Thm.cprop_of selected_prem)
-              (* insert selected premise and substitute it using the instantiated theorem *)
-            in ((cut_tac selected_prem i) THEN (EqSubst.eqsubst_asm_tac ctxt [0] [inst_thm''] i),
+        case inst_thm_opt of
+          SOME (inst_thm, selected_prem) =>
+                (* generalize selected premise for use outside of focus *)
+            let val names_to_generalize = map (string_of_var o Thm.term_of o snd) (#params foc)
+                val generalized_prem = Thm.generalize_cterm ([], names_to_generalize) 0 (Thm.cprop_of selected_prem)
+                (* insert selected premise and substitute it using the instantiated theorem *)
+            in ((cut_tac selected_prem i) THEN (EqSubst.eqsubst_asm_tac ctxt [0] [inst_thm] i),
                 SOME generalized_prem)
             end
           | NONE => (no_tac, NONE)
