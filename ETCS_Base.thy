@@ -114,14 +114,16 @@ ML \<open>fun match_type_rule ctxt bound_typs t rule =
             | NONE => NONE
           end\<close>
 
-ML \<open>fun is_type_rule thm =
-          case Thm.concl_of thm of
+ML \<open>fun is_type_rule_term t =
+          case Logic.strip_imp_concl t of
             Const ("HOL.Trueprop", _) $ boolrule =>
               (case boolrule of 
                 (Const ("ETCS_Base.cfunc_type", _) $ _) $ _ $ _ => true
               | _ => false)
           | _ => false
                 \<close>
+
+ML \<open>fun is_type_rule thm = is_type_rule_term (Thm.concl_of thm)\<close>
 
 (* find_type_rule searches a list of type rules, attempting to match each in turn *)
 ML \<open>fun find_type_rule _ _ _ [] = NONE (* no typing rules left *)
@@ -285,6 +287,8 @@ method_setup typecheck_cfuncs_prems =
 
 subsubsection \<open>etcs_rule: Tactic to apply rules with ETCS typechecking\<close>
 
+ML_val \<open>filter (fn x => not (is_type_rule x))\<close>
+
 ML \<open>fun ETCS_resolve_subtac ctxt type_rules thm i (foc : Subgoal.focus) = 
       (* try to match the given theorem against the current subgoal*)
       case match_term [] (Thm.concl_of thm) (Thm.term_of (#concl foc)) of
@@ -301,8 +305,13 @@ ML \<open>fun ETCS_resolve_subtac ctxt type_rules thm i (foc : Subgoal.focus) =
               val prem_type_lems =
                 flat (map (construct_cfunc_type_lemmas ctxt (type_rules)) (Thm.prems_of inst_thm'))
               val inst_thm'' = elim_type_rule_prems ctxt inst_thm' prem_type_lems
+              (* look for unresolved type premises of the theorem *)
+              val prems = Thm.prems_of inst_thm'';
+              val type_prems = (filter (fn x => is_type_rule_term x) prems)
             (* resolve the current subgoal using the instantiated theorem *)
-          in resolve_tac ctxt [inst_thm''] i
+          in case type_prems of
+               [] => resolve_tac ctxt [inst_thm''] i
+             | _  => no_tac (* unresolved type premises, fail *)
           end
       | NONE => no_tac\<close>
 
