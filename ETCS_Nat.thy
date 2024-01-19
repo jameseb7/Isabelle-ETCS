@@ -642,9 +642,68 @@ proof -
     using \<chi>\<^sub>\<delta>sharp_type powerset_def by auto
 qed
 
+theorem nat_induction:
+  assumes p_type[type_rule]: "p : \<nat>\<^sub>c \<rightarrow> \<Omega>" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes base_case: "p \<circ>\<^sub>c zero = \<t>"
+  assumes induction_case: "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> p \<circ>\<^sub>c n = \<t> \<Longrightarrow> p \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+  shows "p \<circ>\<^sub>c n = \<t>"
+proof -
+  obtain p' P where
+    p'_type[type_rule]: "p' : P \<rightarrow> \<nat>\<^sub>c" and
+    p'_equalizer: "p \<circ>\<^sub>c p' = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c p'" and
+    p'_uni_prop: "\<forall> h F. ((h : F \<rightarrow> \<nat>\<^sub>c) \<and> (p \<circ>\<^sub>c h = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c h)) \<longrightarrow> (\<exists>! k. (k : F \<rightarrow> P) \<and> p' \<circ>\<^sub>c k = h)"
+    using equalizer_exists2 by (typecheck_cfuncs, blast)
 
+  from base_case have "p \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+    by (etcs_assocr, etcs_subst terminal_func_comp_elem id_right_unit2, -)
+  then obtain z' where
+    z'_type[type_rule]: "z' \<in>\<^sub>c P" and
+    z'_def: "zero = p' \<circ>\<^sub>c z'"
+    using p'_uni_prop by (typecheck_cfuncs, metis)
 
+  have "p \<circ>\<^sub>c successor \<circ>\<^sub>c p' = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor \<circ>\<^sub>c p'"
+  proof (etcs_rule one_separator)
+    fix m
+    assume m_type[type_rule]: "m \<in>\<^sub>c P"
 
+    have "p  \<circ>\<^sub>c p' \<circ>\<^sub>c m = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c p' \<circ>\<^sub>c m"
+      by (etcs_assocl, simp add: p'_equalizer)
+    then have "p \<circ>\<^sub>c p' \<circ>\<^sub>c m = \<t>"
+      by (-, etcs_subst_asm terminal_func_comp_elem id_right_unit2, simp)
+    then have "p \<circ>\<^sub>c successor \<circ>\<^sub>c p' \<circ>\<^sub>c m = \<t>"
+      using induction_case by (typecheck_cfuncs, simp)
+    then show "(p \<circ>\<^sub>c successor \<circ>\<^sub>c p') \<circ>\<^sub>c m = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor \<circ>\<^sub>c p') \<circ>\<^sub>c m"
+      by (etcs_assocr, etcs_subst terminal_func_comp_elem id_right_unit2, -)
+  qed
+  then obtain s' where
+    s'_type[type_rule]: "s' : P \<rightarrow> P" and
+    s'_def: "p' \<circ>\<^sub>c s' = successor \<circ>\<^sub>c p'"
+    using p'_uni_prop by (typecheck_cfuncs, metis)
 
+  obtain u where
+    u_type[type_rule]: "u : \<nat>\<^sub>c \<rightarrow> P" and
+    u_zero: "u \<circ>\<^sub>c zero = z'" and
+    u_succ: "u \<circ>\<^sub>c successor = s' \<circ>\<^sub>c u"
+    using natural_number_object_property2 by (typecheck_cfuncs, metis s'_type)
+
+  have p'_u_is_id: "p' \<circ>\<^sub>c u = id \<nat>\<^sub>c"
+  proof (etcs_rule natural_number_object_func_unique[where f=successor])
+
+    show "(p' \<circ>\<^sub>c u) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      by (etcs_subst id_left_unit2, etcs_assocr, etcs_subst u_zero z'_def, simp)
+
+    show "(p' \<circ>\<^sub>c u) \<circ>\<^sub>c successor = successor \<circ>\<^sub>c p' \<circ>\<^sub>c u"
+      by (etcs_assocr, etcs_subst u_succ, etcs_assocl, etcs_subst s'_def, simp)
+
+    show "id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
+      by (etcs_subst id_right_unit2 id_left_unit2, simp)
+  qed
+
+  have "p \<circ>\<^sub>c p' \<circ>\<^sub>c u \<circ>\<^sub>c n = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c p' \<circ>\<^sub>c u \<circ>\<^sub>c n"
+    by (typecheck_cfuncs, smt comp_associative2 p'_equalizer)
+  then show "p \<circ>\<^sub>c n = \<t>"
+    by (typecheck_cfuncs, smt (z3) comp_associative2 id_left_unit2 id_right_unit2 p'_type p'_u_is_id terminal_func_comp_elem terminal_func_type u_type)
+qed
+    
 
 end

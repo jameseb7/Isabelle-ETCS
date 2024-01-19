@@ -16,6 +16,11 @@ lemma terminal_func_comp:
   "x : X \<rightarrow> Y \<Longrightarrow> \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c x = \<beta>\<^bsub>X\<^esub>"
   by (simp add: comp_type terminal_func_type terminal_func_unique)
 
+lemma terminal_func_comp_elem:
+  "x : one \<rightarrow> X \<Longrightarrow> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = id one"
+  by (metis id_type terminal_func_comp terminal_func_unique)
+  
+
 (* Definition 2.1.16 *)
 abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
   "x \<in>\<^sub>c X \<equiv> (x : one \<rightarrow> X)"
