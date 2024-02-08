@@ -164,6 +164,18 @@ ML \<open>fun elim_type_rule_prems_opt ctxt thm lems =
           in elim_type_rule_prems' thm (Thm.prems_of thm)
           end\<close>
 
+(* variant that only eliminates type rules *)
+ML \<open>fun elim_type_rule_prems_opt' ctxt thm lems =
+          let fun elim_type_rule_prems' thm [] = SOME thm
+                | elim_type_rule_prems' thm (prem::prems) =
+                    case elim_type_rule_prem ctxt thm prem lems of
+                      SOME thm' => elim_type_rule_prems' thm' prems
+                    | NONE => if is_type_rule_term prem 
+                              then NONE 
+                              else (elim_type_rule_prems' (Thm.permute_prems 0 1 thm) prems)
+          in elim_type_rule_prems' thm (Thm.prems_of thm)
+          end\<close>
+
 (* construct_cfunc_type_lemma attempts to construct a type lemma for a given term
   using a list of typing rules and a list of existing typing lemmas;
   the lemma is returned in a list, which is empty if no lemma can be constructed *)
@@ -375,6 +387,14 @@ ML \<open>fun instantiate_typecheck ctxt thm type_rules insts =
       in elim_type_rule_prems_opt ctxt inst_thm type_lems
       end\<close>
 
+ML \<open>fun instantiate_typecheck' ctxt thm type_rules insts =
+      let val cinsts = certify_instantiations ctxt [] insts
+          val inst_thm = Thm.instantiate ([], cinsts) thm
+          val gen_type_lems = construct_cfunc_type_lemmas ctxt type_rules
+          val type_lems = flat (map (gen_type_lems o snd) insts)
+      in elim_type_rule_prems_opt' ctxt inst_thm type_lems
+      end\<close>
+
 (* match_nested_term_typecheck tries to apply match_term over the structure of a term until it finds
   a match that typechecks to leave no premises*)
 ML \<open>fun match_nested_term_typecheck ctxt thm type_rules bound_typs pat (t1 $ t2) = (
@@ -502,6 +522,70 @@ method_setup etcs_subst_asm =
     -- Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
      >> ETCS_subst_asm_method)\<close> 
   "apply substitution to assumptions of the goal, with ETCS type checking"
+
+method etcs_assocl_asm declares type_rule = (etcs_subst_asm comp_associative2)+
+method etcs_assocr_asm declares type_rule = (etcs_subst_asm sym[OF comp_associative2])+
+
+subsubsection \<open>etcs_erule: Tactic to apply elimination rules with ETCS typechecking\<close>
+
+thm allE exE conjE disjE
+
+ML_val \<open>instantiate_typecheck'\<close>
+
+ML \<open>fun ETCS_eresolve_subtac type_rules thm i (foc : Subgoal.focus) = 
+      (* extract the first premise of the given theorem*)
+      let val first_prem = try hd (Thm.prems_of thm)
+          val subgoal_prems = (#prems foc)
+          val ctxt = (#context foc)
+          (* try to match the extracted premise against the current subgoal*)
+          fun match_asm_inst t (asm::asms)= 
+              (case Option.mapPartial
+                  (instantiate_typecheck' ctxt thm ((#prems foc) @ type_rules)) 
+                  (match_term [] t (Thm.prop_of asm)) of
+                SOME thm => SOME (thm, asm)
+              | NONE => match_asm_inst t asms)
+            | match_asm_inst _ [] = NONE;
+      in case Option.mapPartial (fn prem => match_asm_inst prem subgoal_prems) first_prem of
+         SOME (inst_thm, selected_prem) =>
+                (* generalize selected premise for use outside of focus *)
+            let val names_to_generalize = map (string_of_var o Thm.term_of o snd) (#params foc)
+                val generalized_prem = Thm.generalize_cterm ([], names_to_generalize) 0 (Thm.cprop_of selected_prem)
+                (* insert selected premise and substitute it using the instantiated theorem *)
+            in ((cut_tac selected_prem i) THEN (eresolve_tac ctxt [inst_thm] i),
+                SOME generalized_prem)
+            end
+         | NONE => (no_tac, NONE)
+               (*[] => eresolve_tac ctxt [inst_thm''] i*)
+      end\<close>
+
+ML \<open>fun ETCS_eresolve_tac _    _          []          _ goal = all_tac goal
+      | ETCS_eresolve_tac ctxt type_rules (thm::thms) i goal = 
+          if Thm.nprems_of goal < i then Seq.empty
+          else
+            let val (foc as {context = ctxt', asms, params, ...}, goal') = Subgoal.focus ctxt i NONE goal
+                val (inner_tac, selected_prem_opt) = ETCS_eresolve_subtac type_rules thm i foc
+                val tac1 = (Seq.lifts (Subgoal.retrofit ctxt' ctxt params asms i) (inner_tac goal'))
+                val tac2 = case selected_prem_opt of
+                  SOME selected_prem => 
+                    let val match_prem = fn t => is_none (match_term [] (Thm.term_of selected_prem) t)
+                        val remove_prem_tac = fn (foc : Subgoal.focus) => filter_prems_tac (#context foc) match_prem i
+                    in (Subgoal.FOCUS_PARAMS remove_prem_tac ctxt i) THEN (Tactic.rotate_tac (0-1) i)
+                    end
+                | NONE => no_tac
+            in (tac1 THEN tac2 THEN (ETCS_eresolve_tac ctxt type_rules thms i)) goal
+            end\<close>
+
+ML \<open>fun ETCS_eresolve_method (thms, opt_type_rules) ctxt =
+      let val type_rules = these opt_type_rules @ Named_Theorems.get ctxt "ETCS_Base.type_rule"
+      in METHOD (fn add_rules => ETCS_eresolve_tac ctxt (type_rules @ add_rules) thms 1)
+      end\<close>
+
+method_setup etcs_erule = 
+  \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
+    -- Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
+     >> ETCS_eresolve_method\<close>
+  "apply erule with ETCS type checking"
+
 
 subsection \<open>Basic Category Theory Definitions\<close>
 
