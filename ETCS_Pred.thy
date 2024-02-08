@@ -1629,17 +1629,41 @@ proof -
   qed
 qed
 
+thm impE
 
+lemma IMPLIES_elim:
+  assumes IMPLIES_true: "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
+  assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"
+  assumes X_nonempty: "\<exists>x. x \<in>\<^sub>c X"
+  shows "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> ((Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<Longrightarrow> R) \<Longrightarrow> R"
+  using IMPLIES_implies_implies assms by blast
+
+lemma IMPLIES_elim'':
+  assumes IMPLIES_true: "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t>"
+  assumes P_type[type_rule]: "P : one \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : one \<rightarrow> \<Omega>"
+  shows "(P = \<t>) \<Longrightarrow> ((Q = \<t>) \<Longrightarrow> R) \<Longrightarrow> R"
+proof -
+  have one_nonempty: "\<exists>x. x \<in>\<^sub>c one"
+    using one_unique_element by blast
+
+  have "(IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>one \<times>\<^sub>c one\<^esub>)"
+    by (typecheck_cfuncs, metis IMPLIES_true id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+  then have "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>one\<^esub>) \<Longrightarrow> ((Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>one\<^esub>) \<Longrightarrow> R) \<Longrightarrow> R"
+    using one_nonempty by (-, etcs_erule IMPLIES_elim, auto)
+  then show "(P = \<t>) \<Longrightarrow> ((Q = \<t>) \<Longrightarrow> R) \<Longrightarrow> R"
+    by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element terminal_func_type)
+qed
+
+lemma IMPLIES_elim':
+  assumes IMPLIES_true: "IMPLIES \<circ>\<^sub>c \<langle>P, Q\<rangle> = \<t>"
+  assumes P_type[type_rule]: "P : one \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : one \<rightarrow> \<Omega>"
+  shows "(P = \<t>) \<Longrightarrow> ((Q = \<t>) \<Longrightarrow> R) \<Longrightarrow> R"
+  using IMPLIES_true IMPLIES_true_false_is_false Q_type true_false_only_truth_values by force
 
 lemma implies_implies_IMPLIES:
-  assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"
-  shows  "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<Longrightarrow> (IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>)"
-proof(auto)
-  assume "P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>"
-  assume "Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-  show "IMPLIES \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<times>\<^sub>f \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-    by (typecheck_cfuncs, smt (z3) IMPLIES_true_true_is_true NOT_false_is_true NOT_is_pullback cfunc_cross_prod_def cfunc_prod_comp cfunc_type_def comp_associative2 is_pullback_def left_cart_proj_type one_separator right_cart_proj_type square_commutes_def terminal_func_comp)
-qed
+  assumes P_type[type_rule]: "P : one \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : one \<rightarrow> \<Omega>"
+  shows  "(P = \<t> \<Longrightarrow> Q = \<t>) \<Longrightarrow> IMPLIES \<circ>\<^sub>c \<langle>P, Q\<rangle> = \<t>"
+  by (typecheck_cfuncs, metis IMPLIES_false_is_true_false true_false_only_truth_values)
 
 
 

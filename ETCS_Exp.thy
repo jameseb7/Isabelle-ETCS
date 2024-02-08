@@ -1479,7 +1479,4 @@ proof-
     by (simp add: calculation)
 qed
 
-
-
-
 end
