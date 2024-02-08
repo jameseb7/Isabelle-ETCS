@@ -309,38 +309,230 @@ proof(rule one_separator[where X = A, where Y = \<Omega>])
     then show "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>right_coproj X Y \<circ>\<^sub>c f,right_coproj X Y \<circ>\<^sub>c g\<rangle>) \<circ>\<^sub>c a = (eq_pred Y \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c a"
       using calculation by auto
   qed
-qed
-
-
-      
-      
+qed 
   
-  
-theorem well_ordering_principle:
-  assumes "nonempty A" "(A, m) \<subseteq>\<^sub>c \<nat>\<^sub>c"
-  shows "\<exists> a. a \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<and> (\<forall> b. b \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<longrightarrow>  (leq \<circ>\<^sub>c \<langle>a  , b \<rangle>   = \<t>))"
-proof(cases "zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m)")
-  have "zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<Longrightarrow> \<exists>a. a \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<and> (\<forall>b. b \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<longrightarrow> a \<le>\<^sub>\<nat> b)"
-    unfolding leq_infix_def using relative_member_def zero_is_smallest by blast
-  then show "zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<Longrightarrow> \<exists>a. a \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<and> (\<forall>b. b \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<longrightarrow> (leq \<circ>\<^sub>c \<langle>a,b\<rangle> = \<t>))"
-    unfolding leq_infix_def by auto
-next
-  assume no_zero: " \<not> zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m)"
-  obtain \<chi>\<^sub>A where \<chi>\<^sub>A_def: "\<chi>\<^sub>A = characteristic_func m"
-    by simp
-  have \<chi>\<^sub>A_type[type_rule]: "\<chi>\<^sub>A : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    using assms unfolding \<chi>\<^sub>A_def subobject_of_def2 by (auto, typecheck_cfuncs)
-  
+lemma true_beta_one:
+  "\<t> \<circ>\<^sub>c \<beta>\<^bsub>one\<^esub> = \<t>"
+  by (metis diagonal_def eq_pred_iff_eq_conv2 eq_pred_square id_type)
+
+lemma false_beta_one:
+  "\<f> \<circ>\<^sub>c \<beta>\<^bsub>one\<^esub> = \<f>"
+  by (metis false_func_type id_right_unit2 id_type one_unique_element terminal_func_type)
+
+lemma comp_one_id: "a : one \<rightarrow> Y \<Longrightarrow> x : one \<rightarrow> one \<Longrightarrow> a \<circ>\<^sub>c x = a"
+  by (metis id_right_unit2 id_type one_unique_element)
+
+lemma ETCS_bool_eq_implies:
+  assumes p_type[type_rule]: "p : one \<rightarrow> \<Omega>" and q_type[type_rule]: "q : one \<rightarrow> \<Omega>"
+  shows "(p = \<t> \<Longrightarrow> q = \<t>) \<Longrightarrow> (q = \<t> \<Longrightarrow> p = \<t>) \<Longrightarrow> p = q"
+  using p_type q_type true_false_only_truth_values by blast
+
+lemma ETCS_bool_eq_implies':
+  assumes p_type[type_rule]: "p : X \<rightarrow> \<Omega>" and q_type[type_rule]: "q : X \<rightarrow> \<Omega>"
+  shows "(\<And>x. x : one \<rightarrow> X \<Longrightarrow> p \<circ>\<^sub>c x = \<t> \<Longrightarrow> q \<circ>\<^sub>c x = \<t>)
+     \<Longrightarrow> (\<And>x. x : one \<rightarrow> X \<Longrightarrow> q \<circ>\<^sub>c x = \<t> \<Longrightarrow> p \<circ>\<^sub>c x = \<t>) \<Longrightarrow> p = q"
+  by (etcs_rule one_separator, smt comp_type p_type q_type ETCS_bool_eq_implies)
 
 
+lemma 
+  assumes p_type[type_rule]: "p : \<nat>\<^sub>c \<rightarrow> \<Omega>" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes zero_case: "p \<circ>\<^sub>c zero = \<t>"
+  assumes successor_case: "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> p \<circ>\<^sub>c n = \<t> \<Longrightarrow> p \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+  shows "p \<circ>\<^sub>c n = \<t>"
+proof -
+  obtain q where
+    q_type[type_rule]: "q : one \<rightarrow> \<Omega> \<times>\<^sub>c \<nat>\<^sub>c" and
+    q_def: "q = \<langle>p \<circ>\<^sub>c zero, zero\<rangle>"
+    by typecheck_cfuncs
+  obtain f where
+    f_type[type_rule]: "f : \<Omega> \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<Omega> \<times>\<^sub>c \<nat>\<^sub>c" and
+    f_def: "f = \<langle>IMPLIES \<circ>\<^sub>c \<langle>left_cart_proj \<Omega> \<nat>\<^sub>c, p \<circ>\<^sub>c successor \<circ>\<^sub>c right_cart_proj \<Omega> \<nat>\<^sub>c\<rangle>, successor \<circ>\<^sub>c right_cart_proj \<Omega> \<nat>\<^sub>c\<rangle>"
+    by typecheck_cfuncs
 
+  obtain induct_p where
+    induct_p_type[type_rule]: "induct_p : \<nat>\<^sub>c \<rightarrow> \<Omega> \<times>\<^sub>c \<nat>\<^sub>c" and
+    induct_p_zero: "induct_p \<circ>\<^sub>c zero = q" and
+    induct_p_successor: "induct_p \<circ>\<^sub>c successor = f \<circ>\<^sub>c induct_p"
+    by (typecheck_cfuncs, metis natural_number_object_property2)
 
+  have "right_cart_proj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c induct_p = id \<nat>\<^sub>c"
+  proof (etcs_rule natural_number_object_func_unique[where f=successor])
+    show "(right_cart_proj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c induct_p) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+      by (etcs_assocr, etcs_subst induct_p_zero, unfold q_def, etcs_subst right_cart_proj_cfunc_prod id_left_unit2, simp)
+    show "(right_cart_proj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c induct_p) \<circ>\<^sub>c successor = successor \<circ>\<^sub>c right_cart_proj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c induct_p"
+      by (etcs_assocr, etcs_subst induct_p_successor, unfold f_def, etcs_assocl, etcs_subst right_cart_proj_cfunc_prod, simp)
+    show "id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
+      by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2)
+  qed
+ 
+  have "left_cart_proj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c induct_p = p"
+    proof (etcs_rule natural_number_object_func_unique[where f="id \<Omega>"])
 
+thm type_rule
 
+thm inverse_image_mapping_type
 
+find_theorems "quotient_func ?f ?R \<circ>\<^sub>c ?h = ?P"
 
+(* consider cases for ?f \<circ>\<^sub>c ?g (associate right)
+  id\<^sub>c ?X (id_right_unit2, id_left_unit2)
+  left_cart_proj ?X ?Y (left_cart_proj_cfunc_prod, left_cart_proj_cfunc_cross_prod)
+  right_cart_proj ?X ?Y (right_cart_proj_cfunc_prod, right_cart_proj_cfunc_cross_prod)
+  \<langle>?f,?g\<rangle> (cfunc_prod_comp)
+  diagonal ?X (diag_on_elements)
+  ?f \<times>\<^sub>f ?g (cfunc_cross_prod_comp_cfunc_prod, cfunc_cross_prod_comp_cfunc_cross_prod)
+  swap ?X ?Y (swap_ap, swap_cross_prod)
+  associate_right ?X ?Y ?Z (associate_right_ap, associate_right_crossprod_ap)
+  associate_left ?X ?Y ?Z (associate_left_ap, associate_left_crossprod_ap)
+  distribute_right_left ?X ?Y ?Z (distribute_right_left_ap)
+  distribute_right_right ?X ?Y ?Z (distribute_right_right_ap)
+  distribute_right ?X ?Y ?Z (distribute_right_ap)
+  distribute_left_left ?X ?Y ?Z (distribute_left_left_ap)
+  distribute_left_right ?X ?Y ?Z (distribute_left_right_ap)
+  distribute_left ?X ?Y ?Z (distribute_left_ap)
+  outers ?A ?B ?C ?D (outers_apply)
+  inners ?A ?B ?C ?D (inners_apply)
+  lefts ?A ?B ?C ?D (lefts_apply)
+  rights ?A ?B ?C ?D (rights_apply)
+  \<beta>\<^bsub>?X\<^esub> (terminal_func_comp)
+  inverse_image_mapping ?f ?B ?m
+  [?f\<^sup>-\<^sup>1[?B]\<^bsub>?m\<^esub>]map
+  fibered_product_morphism ?X ?f ?g ?Y
+  fibered_product_left_proj ?X ?f ?g ?Y
+  fibered_product_right_proj ?X ?f ?g ?Y
+  \<t>
+  \<f>
+  characteristic_func ?m (characteristic_func_eq, complement_morphism_eq) (TODO:does these work in assocr?)
+  eq_pred ?X (eq_pred_square, eq_pred_of_monomorphism, eq_pred_left_coproj2, eq_pred_right_coproj2, eq_pred_left_coproj, eq_pred_right_coproj)
+  fiber_morphism ?f ?y
+  ?m\<^sup>c
+  equiv_class ?R
+  quotient_func ?f ?R (quotient_func_eq)
+  ?f\<restriction>\<^bsub>(?A, ?n)\<^esub>
+  [?f[?A]\<^bsub>?n\<^esub>]map
+  left_coproj ?X ?Y
+  right_coproj ?X ?Y
+  ?f \<amalg> ?g
+  dist_prod_coprod ?A ?B ?C
+  dist_prod_coprod_inv ?A ?B ?C
+  ?f \<bowtie>\<^sub>f ?g
+  case_bool
+  dist_prod_coprod2 ?A ?B ?C
+  dist_prod_coprod_inv2 ?A ?B ?C
+  into_super ?m : ?X \<Coprod> (?Y \<setminus> (?X, ?m)) \<rightarrow> ?Y
+  try_cast ?m : ?Y \<rightarrow> ?X \<Coprod> (?Y \<setminus> (?X, ?m))
+  NOT
+  AND
+  NOR
+  OR
+  XOR
+  NAND
+  IFF
+  IMPLIES
+  \<alpha>\<^bsub>?X\<^esub>
+  eval_func ?X ?A
+  ?f\<^sup>\<sharp>
+  ?g\<^bsup>?A\<^esup>\<^sub>f
+  ?f\<^sup>\<flat>
+  ?metafunc ?f
+  ?k\<^bsub>[?p,-]\<^esub>
+  ?k\<^bsub>[-,?q]\<^esub>
+  FORALL ?X
+  EXISTS ?X
+  zero
+  successor
+  predecessor
+  add1
+  add2
+  ?m +\<^sub>\<nat> ?n
+  leq *)
 
+method etcs_eval = ((etcs_assocr, etcs_subst sharp_comp)
+        | (etcs_assocr, etcs_subst terminal_func_comp)
+        | (etcs_assocr, etcs_subst cfunc_prod_comp)
+        | (etcs_subst true_beta_one)
+        | (drule cart_prod_decomp, clarify)
+        | (etcs_subst cfunc_cross_prod_comp_cfunc_prod)
+        | (etcs_subst_asm cfunc_cross_prod_comp_cfunc_prod)
+        | (etcs_subst left_cart_proj_cfunc_prod)
+        | (etcs_subst right_cart_proj_cfunc_prod)
+        | (etcs_subst_asm left_cart_proj_cfunc_prod)
+        | (etcs_subst_asm right_cart_proj_cfunc_prod)
+        | (etcs_subst id_left_unit2)
+        | (etcs_subst id_right_unit2)
+        | (etcs_subst_asm id_left_unit2)
+        | (etcs_subst_asm id_right_unit2)
+        | (etcs_subst comp_one_id)
+        | (etcs_subst_asm comp_one_id))+
+thm all_true_implies_FORALL_true
+method etcs2hol = 
+    (((etcs_rule ETCS_bool_eq_implies, (simp_all)?)
+     | (etcs_rule ETCS_bool_eq_implies', (simp_all)?))?,
+        (((etcs_assocr)?, etcs_subst sharp_comp)
+        | ((etcs_assocr)?, etcs_subst terminal_func_comp)
+        | (etcs_rule all_true_implies_FORALL_true)
+        | (etcs_rule all_true_implies_FORALL_true2)
+        | ((etcs_assocr)?, etcs_subst cfunc_prod_comp)
+        (*| ((etcs_assocr_asm)?, etcs_subst_asm cfunc_prod_comp)*)
+        | (etcs_subst true_beta_one)
+        | (etcs_rule implies_implies_IMPLIES)
+        | (etcs_subst sym[OF eq_pred_iff_eq])
+        | (etcs_subst_asm sym[OF eq_pred_iff_eq])
+        | (drule cart_prod_decomp, clarify)
+        | (etcs_subst cfunc_cross_prod_comp_cfunc_prod)
+        | (etcs_subst_asm cfunc_cross_prod_comp_cfunc_prod)
+        | (etcs_subst left_cart_proj_cfunc_prod)
+        | (etcs_subst right_cart_proj_cfunc_prod)
+        | (etcs_subst_asm left_cart_proj_cfunc_prod)
+        | (etcs_subst_asm right_cart_proj_cfunc_prod)
+        | ((etcs_assocr)?, etcs_subst cfunc_cross_prod_comp_cfunc_prod)
+        | (etcs_subst id_left_unit2)
+        | (etcs_subst id_right_unit2)
+        | (etcs_subst_asm id_left_unit2)
+        | (etcs_subst_asm id_right_unit2)
+        | (etcs_subst comp_one_id)
+        | (etcs_subst_asm comp_one_id)
+        | (etcs_rule all_true_implies_FORALL_true3)
+        | (etcs_subst_asm sharp_comp)
+        (*| ((etcs_assocr_asm)?, etcs_erule FORALL_elim)*))+)
 
+(*
+apply ((etcs_assocr, etcs_subst sharp_comp)
+        | (etcs_assocr, etcs_subst terminal_func_comp)
+        | (etcs_rule all_true_implies_FORALL_true2)
+        | (etcs_assocr, etcs_subst cfunc_prod_comp)
+        | (etcs_subst true_beta_one)
+        | (etcs_rule implies_implies_IMPLIES)
+        | (etcs_subst sym[OF eq_pred_iff_eq])
+        | (etcs_subst_asm sym[OF eq_pred_iff_eq])
+        | (drule cart_prod_decomp, clarify)
+        | (etcs_subst cfunc_cross_prod_comp_cfunc_prod)
+        | (etcs_subst_asm cfunc_cross_prod_comp_cfunc_prod)
+        | (etcs_subst left_cart_proj_cfunc_prod)
+        | (etcs_subst right_cart_proj_cfunc_prod)
+        | (etcs_subst_asm left_cart_proj_cfunc_prod)
+        | (etcs_subst_asm right_cart_proj_cfunc_prod)
+        | (etcs_subst id_left_unit2)
+        | (etcs_subst id_right_unit2)
+        | (etcs_subst_asm id_left_unit2)
+        | (etcs_subst_asm id_right_unit2)
+        | (etcs_subst comp_one_id)
+        | (etcs_subst_asm comp_one_id))+
+*)
+
+ML_val Subgoal.focus
+
+lemma "n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> = \<t> \<Longrightarrow> Q"
+  apply (etcs_erule EXISTS_elim)
+
+thm exE EXISTS_elim
+thm conjE
+thm impE
+thm allE
+  oops
+lemma "(\<exists>x. P x) \<Longrightarrow> Q x"
+  apply (erule exE)
+  oops
 
 theorem well_ordering_principle:
   assumes "nonempty A" "(A, m) \<subseteq>\<^sub>c \<nat>\<^sub>c"
@@ -375,20 +567,75 @@ next
   have "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>
           eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
           eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
-  proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
-    show "FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,
-        right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
-    show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
-    show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
+    apply (etcs_rule natural_number_object_func_unique[where f="id \<Omega>"])
+      apply etcs2hol
+    apply (metis monomorphism_def3 q_def right_coproj_are_monomorphisms right_proj_type u_zero zero_type)
+(* (right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f x) \<circ>\<^sub>c \<langle>xa,id\<^sub>c one\<rangle> = (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f x) \<circ>\<^sub>c \<langle>xa,id\<^sub>c one\<rangle> *)
+       apply (etcs2hol)
+      apply (metis monomorphism_def3 q_def right_coproj_are_monomorphisms right_proj_type u_zero zero_type)
+    apply (etcs2hol)
+    apply etcs_assocr_asm
+      apply (etcs_subst_asm sharp_comp)
+    thm FORALL_elim
+      apply (etcs_erule FORALL_elim)
+      apply etcs_assocr_asm
+      apply (etcs2hol)
+    thm IMPLIES_elim'
+      apply (etcs_erule IMPLIES_elim')
+       apply (etcs2hol)
+    
+    apply (erule_tac x=xa in FORALL_elim)
+        apply (typecheck_cfuncs)
+       apply (meson cfunc_cross_prod_type comp_type, simp)
+    apply (etcs2hol)
+  proof -
+    fix x xa
+    assume x_type[type_rule]: "x \<in>\<^sub>c \<nat>\<^sub>c" and xa_type[type_rule]: "xa \<in>\<^sub>c \<nat>\<^sub>c"
+    obtain p where p_def: "p = (IMPLIES \<circ>\<^sub>c
+         \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c
+          \<langle>u \<circ>\<^sub>c
+           right_cart_proj \<nat>\<^sub>c
+            \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c
+                 left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c
+        id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c x"
+      by auto
+    have p_type: "p : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<Omega>"
+      unfolding p_def by typecheck_cfuncs
+    
+    have FORALL_elim'': "\<And>P x. FORALL \<nat>\<^sub>c \<circ>\<^sub>c p\<^sup>\<sharp> = \<t> \<Longrightarrow> x \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (p \<circ>\<^sub>c \<langle>x,id\<^sub>c one\<rangle> = \<t> \<Longrightarrow> P) \<Longrightarrow> P"
+      using FORALL_elim' p_type xa_type by auto
 
+    show "
+       u \<circ>\<^sub>c x = right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c xa \<Longrightarrow>
+       FORALL \<nat>\<^sub>c \<circ>\<^sub>c
+       ((IMPLIES \<circ>\<^sub>c
+         \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c
+          \<langle>u \<circ>\<^sub>c
+           right_cart_proj \<nat>\<^sub>c
+            \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c
+                 left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c
+        id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor \<circ>\<^sub>c x)\<^sup>\<sharp> =
+       \<t> \<Longrightarrow>
+       x \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> xa \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> x = xa"
+       apply (fold p_def)
+       apply (erule_tac x=xa in FORALL_elim'', simp)
+
+    apply etcs2hol
+    thm FORALL_elim allE
+    apply (erule_tac x=xa in FORALL_elim)
+    thm cfunc_prod_comp
+    thm implies_implies_IMPLIES
+    thm true_beta_one
+    thm sym[OF eq_pred_iff_eq]
+    thm comp_one_id
 
 
     show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c  \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
                                          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c  zero =
       (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
+      apply (etcs_assocr)
+      thm  all_true_implies_FORALL_true sharp_comp
+      apply (etcs_rule all_true_implies_FORALL_true2)
         proof - 
           have "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c  \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
                                          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c  zero  = 
