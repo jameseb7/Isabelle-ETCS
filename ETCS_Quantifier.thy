@@ -85,6 +85,16 @@ proof -
     by (metis id_right_unit2 id_type terminal_func_unique true_func_type)
 qed
 
+lemma all_true_implies_FORALL_true3:
+  assumes p_type[type_rule]: "p : X \<times>\<^sub>c one \<rightarrow> \<Omega>" and all_p_true: "\<And> x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, id one\<rangle> = \<t>"
+  shows "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t>"
+proof -
+  have "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>one\<^esub>"
+    by (etcs_rule all_true_implies_FORALL_true2, metis all_p_true cart_prod_decomp id_type one_unique_element)
+  then show ?thesis
+    by (metis id_right_unit2 id_type terminal_func_unique true_func_type)
+qed
+
 lemma FORALL_true_implies_all_true:
   assumes p_type: "p : X \<rightarrow> \<Omega>" and FORALL_p_true: "FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
   shows "\<And> x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c x = \<t>"
@@ -155,6 +165,24 @@ proof -
   qed
 qed
 
+lemma FORALL_true_implies_all_true3:
+  assumes p_type[type_rule]: "p : X \<times>\<^sub>c one \<rightarrow> \<Omega>" and FORALL_p_true: "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t>"
+  shows "\<And> x. x \<in>\<^sub>c X  \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, id one\<rangle> = \<t>"
+  using FORALL_p_true FORALL_true_implies_all_true2 id_right_unit2 terminal_func_unique by (typecheck_cfuncs, auto)
+
+thm allE
+
+lemma FORALL_elim:
+  assumes FORALL_p_true: "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t>" and p_type[type_rule]: "p : X \<times>\<^sub>c one \<rightarrow> \<Omega>"
+  assumes x_type[type_rule]: "x \<in>\<^sub>c X"
+  shows "(p \<circ>\<^sub>c \<langle>x, id one\<rangle> = \<t> \<Longrightarrow> P) \<Longrightarrow> P"
+  using FORALL_p_true FORALL_true_implies_all_true3 p_type x_type by blast
+
+lemma FORALL_elim':
+  assumes FORALL_p_true: "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t>" and p_type[type_rule]: "p : X \<times>\<^sub>c one \<rightarrow> \<Omega>"
+  shows "((\<And>x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, id one\<rangle> = \<t>) \<Longrightarrow> P) \<Longrightarrow> P"
+  using FORALL_p_true FORALL_true_implies_all_true3 p_type by auto
+
 definition EXISTS :: "cset \<Rightarrow> cfunc" where
   "EXISTS X = NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c NOT\<^bsup>X\<^esup>\<^sub>f"
 
@@ -185,6 +213,13 @@ proof -
   then show "\<exists>x. x \<in>\<^sub>c X \<and> p \<circ>\<^sub>c x = \<t>"
     by blast
 qed
+
+lemma EXISTS_elim:
+  assumes EXISTS_p_true: "EXISTS X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>" and p_type: "p : X \<rightarrow> \<Omega>"
+  shows "(\<And> x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c x = \<t> \<Longrightarrow> Q) \<Longrightarrow> Q"
+  using EXISTS_p_true EXISTS_true_implies_exists_true p_type by auto
+
+
 
 lemma exists_true_implies_EXISTS_true:
   assumes p_type: "p : X \<rightarrow> \<Omega>" and exists_p_true: "\<exists> x. x \<in>\<^sub>c X \<and> p \<circ>\<^sub>c x = \<t>"
@@ -250,14 +285,6 @@ next
     apply typecheck_cfuncs
 
 *)
-
-(*
-  then have "\<exists> x. x \<in>\<^sub>c X \<and> p \<circ>\<^sub>c x = \<f>"
-    apply typecheck_cfuncs
-    by (smt (verit, best) \<open>FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<f>\<close> all_true_implies_FORALL_true comp_type true_false_distinct true_false_only_truth_values)
 *)
-
-*)
-
 
 end
