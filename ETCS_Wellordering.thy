@@ -316,6 +316,30 @@ qed
       
   
   
+theorem well_ordering_principle:
+  assumes "nonempty A" "(A, m) \<subseteq>\<^sub>c \<nat>\<^sub>c"
+  shows "\<exists> a. a \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<and> (\<forall> b. b \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<longrightarrow>  (leq \<circ>\<^sub>c \<langle>a  , b \<rangle>   = \<t>))"
+proof(cases "zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m)")
+  have "zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<Longrightarrow> \<exists>a. a \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<and> (\<forall>b. b \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<longrightarrow> a \<le>\<^sub>\<nat> b)"
+    unfolding leq_infix_def using relative_member_def zero_is_smallest by blast
+  then show "zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<Longrightarrow> \<exists>a. a \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<and> (\<forall>b. b \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m) \<longrightarrow> (leq \<circ>\<^sub>c \<langle>a,b\<rangle> = \<t>))"
+    unfolding leq_infix_def by auto
+next
+  assume no_zero: " \<not> zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (A, m)"
+  obtain \<chi>\<^sub>A where \<chi>\<^sub>A_def: "\<chi>\<^sub>A = characteristic_func m"
+    by simp
+  have \<chi>\<^sub>A_type[type_rule]: "\<chi>\<^sub>A : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    using assms unfolding \<chi>\<^sub>A_def subobject_of_def2 by (auto, typecheck_cfuncs)
+  
+
+
+
+
+
+
+
+
+
 
 
 theorem well_ordering_principle:

@@ -1,16 +1,15 @@
 theory NN_is_countable
-  imports Countable ETCS_Ordinal_Inequalities
+  imports Countable ETCS_Ordinal_Inequalities_
 
 begin
 
 
-
+(*
 lemma nonzero_to_any_power:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"  "a \<noteq> zero"
   shows "a ^\<^sub>\<nat> b \<noteq> zero"
   by (simp add: assms(1) assms(2) assms(3) exp_order_preserving1 nonzero_to_k_nonzero)
-
-
+*)
 
 
 
@@ -23,9 +22,9 @@ proof(auto)
   show "b = zero \<Longrightarrow> a ^\<^sub>\<nat> zero = successor \<circ>\<^sub>c zero"
     by (simp add: assms(1) exp_respects_Zero_Left)
   show "a ^\<^sub>\<nat> b = successor \<circ>\<^sub>c zero \<Longrightarrow> b = zero"
-    by (smt (verit, best) add_respects_zero_on_right assms(1) assms(2) assms(3) cfunc_type_def comp_type exists_implies_leq_true exp_closure exp_order_preserving1 exp_order_preserving_converse exp_respects_Zero_Left exp_respects_one_left exp_respects_successor lqe_antisymmetry nonzero_is_succ s0_is_right_id zero_type)
-qed
+    by (metis assms exp_order_preserving' exp_respects_one_left succ_n_type zero_type)
 
+qed
 
 
 
@@ -35,9 +34,9 @@ lemma exp_cancellative:
 proof(auto)
   assume "(a ^\<^sub>\<nat> b = a ^\<^sub>\<nat> c)"
   have "a ^\<^sub>\<nat> b \<noteq> zero"
-    by (simp add: assms(1) assms(2) assms(4) nonzero_to_any_power)
+    by (simp add: assms(1) assms(2) assms(4) nonzero_to_k_nonzero)
 
-  show "b = c"
+    show "b = c"
   proof(cases "leq \<circ>\<^sub>c \<langle>b, c\<rangle> = \<t>")
     assume "leq \<circ>\<^sub>c \<langle>b, c\<rangle> = \<t>"
     then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "k +\<^sub>\<nat> b = c"
@@ -73,21 +72,16 @@ qed
 
 
 
-  
-
 
 
 
 
 
 (*
+
 lemma exp_cancellative2:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "a \<noteq> zero" 
   shows  "(b ^\<^sub>\<nat> a = c ^\<^sub>\<nat> a) = (b = c)"
-proof(auto)
- *)
-
-(*
 
 proof(auto)
   assume "b ^\<^sub>\<nat> a = c ^\<^sub>\<nat> a"
@@ -108,7 +102,6 @@ proof(auto)
     proof(rule ccontr)
       oops
 *)
-
   
 
 
@@ -188,7 +181,7 @@ proof -
         by (typecheck_cfuncs, metis add_commutes equals2 exp_right_dist k_def)
       then have f1: "((successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat>  n) = 
                      ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c  zero)^\<^sub>\<nat> k) \<cdot>\<^sub>\<nat> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat>  t)"
-        by (typecheck_cfuncs, metis  exp_closure l_mult_cancellative m_type mult_associative nonzero_to_any_power zero_is_not_successor)
+        by (typecheck_cfuncs, metis  exp_closure l_mult_cancellative m_type mult_associative nonzero_to_k_nonzero zero_is_not_successor)
       show ?thesis
       proof(cases "k = zero")
         assume "k = zero"
@@ -222,7 +215,7 @@ proof -
         using  mult_commutative by (typecheck_cfuncs, presburger)
       then have f1: "((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat> p) \<cdot>\<^sub>\<nat>  ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat>  n) = 
                                                                ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat>  t)"
-        by (typecheck_cfuncs, metis  exp_closure l_mult_cancellative mult_associative nonzero_to_any_power s_type zero_is_not_successor)
+        by (typecheck_cfuncs, metis  exp_closure l_mult_cancellative mult_associative nonzero_to_k_nonzero s_type zero_is_not_successor)
       show ?thesis
       proof(cases "p = zero")
         assume "p = zero"

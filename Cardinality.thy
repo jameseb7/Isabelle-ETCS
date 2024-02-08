@@ -1155,10 +1155,49 @@ L \<amalg> R \<circ>\<^sub>c right_coproj (B\<times>\<^sub>c (A\<^bsup>B\<^esup>
 qed
 
 
-
-
-
-
-
+(*   This is also proved in countable. Is it a new proof?  Is the injection the same?
+lemma prod_leq_exp:
+  assumes "\<not>(Y \<cong> one)"
+  shows "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+proof(cases "nonempty Y")
+  case True
+  obtain y0 y1 where 
+    y0_type[type_rule]: "y0 \<in>\<^sub>c Y" and
+    y1_type[type_rule]: "y1 \<in>\<^sub>c Y" and
+    distinct_y: "y0 \<noteq> y1"
+    by (meson assms True nonempty_def single_elem_iso_one)
+  obtain m where m_def:
+    "m = (((y0 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c left_cart_proj \<Omega> one)
+            \<amalg> (((y0\<^sup>c \<circ>\<^sub>c right_cart_proj one (Y \<setminus> (one, y0))) \<amalg> (y0 \<circ>\<^sub>c left_cart_proj one (Y \<setminus> (one, y0))))
+                \<circ>\<^sub>c dist_prod_coprod_inv2 one one (Y \<setminus> (one, y0))
+                \<circ>\<^sub>c (case_bool \<times>\<^sub>f id (Y \<setminus> (one, y0))))
+          \<circ>\<^sub>c dist_prod_coprod_inv \<Omega> one (Y \<setminus> (one, y0))
+          \<circ>\<^sub>c (eq_pred X \<times>\<^sub>f try_cast y0)
+          \<circ>\<^sub>c associate_left X X Y)\<^sup>\<sharp>"
+    by blast
+  have m_type[type_rule]: "m : (X \<times>\<^sub>c Y) \<rightarrow> Y\<^bsup>X\<^esup>"
+    unfolding m_def using y0_type y1_type element_monomorphism  by (typecheck_cfuncs, blast)
+  have "injective m"
+  proof(unfold injective_def, auto)
+    fix a b
+    assume a_type[type_rule]: "a \<in>\<^sub>c domain m"
+    assume b_type[type_rule]: "b \<in>\<^sub>c domain m"
+    assume eql: "m \<circ>\<^sub>c a = m \<circ>\<^sub>c b"
+    
+    obtain u1 and v1 where u1_type[type_rule]: "u1 \<in>\<^sub>c X" and
+                           v1_type[type_rule]: "v1 \<in>\<^sub>c Y" and 
+                           a_def: "a = \<langle>u1,v1\<rangle>"
+      by (typecheck_cfuncs, metis cart_prod_decomp cfunc_type_def m_type)
+    obtain u2 and v2 where u2_type[type_rule]: "u2 \<in>\<^sub>c X" and
+                           v2_type[type_rule]: "v2 \<in>\<^sub>c Y" and 
+                           a_def: "b = \<langle>u2,v2\<rangle>"
+      by (typecheck_cfuncs, metis cart_prod_decomp cfunc_type_def m_type)  
+    
+    show "a = b"
+    proof(cases "v1 = y0")
+      case True
+      have "
+      
+*)
 
 end

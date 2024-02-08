@@ -2,107 +2,82 @@ theory ETCS_Ordinal_Inequalities
   imports ETCS_Exp ETCS_Comparison
 begin
 
+
+
 lemma
+  assumes a_type[type_rule]: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type[type_rule]: "b \<in>\<^sub>c \<nat>\<^sub>c" and c_type[type_rule]: "c \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , successor\<rangle>  , exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , successor\<rangle>\<rangle>,
+        leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c c  = \<t>"
+proof(etcs_rule nat_induction)
+  show "(IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>,
+                    leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero =  \<t>"
+  proof(rule ccontr)
+    assume "(IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>,
+                        leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero \<noteq>  \<t>"
+    then have "(IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>,
+                        leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero =  \<f>"
+      using  true_false_only_truth_values by (typecheck_cfuncs, blast)  
+    then have "IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> ,
+                          leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle> \<circ>\<^sub>c zero =  \<f>"
+      using  comp_associative2 by (typecheck_cfuncs, force)
+    then have "IMPLIES \<circ>\<^sub>c \<langle>(leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero ,
+                           (leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero\<rangle>  =  \<f>"
+      by (typecheck_cfuncs, metis cfunc_prod_comp)
+    then have "(leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero = \<t> \<and>
+                           (leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero  =  \<f>"
+      using IMPLIES_false_is_true_false  by (typecheck_cfuncs, blast)
+    then have "(leq \<circ>\<^sub>c (\<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> \<circ>\<^sub>c zero) = \<t>) \<and>
+                            leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero  =  \<f>"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    then have "(leq \<circ>\<^sub>c (\<langle>(exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>)  \<circ>\<^sub>c zero,(exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>) \<circ>\<^sub>c zero\<rangle>) = \<t>) \<and>
+                            leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero  =  \<f>"
+      using  cfunc_prod_comp by (typecheck_cfuncs, auto)
+    then have "(leq \<circ>\<^sub>c (\<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>  \<circ>\<^sub>c zero, exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle> \<circ>\<^sub>c zero\<rangle>) = \<t>) \<and>
+                            leq \<circ>\<^sub>c \<langle>(a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero ,(b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero\<rangle>   =  \<f>"
+      by (typecheck_cfuncs, smt (z3)  cfunc_prod_comp comp_associative2)
+    then have "(leq \<circ>\<^sub>c (\<langle>exp_uncurried \<circ>\<^sub>c \<langle>(a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)  \<circ>\<^sub>c zero,successor  \<circ>\<^sub>c zero\<rangle> , exp_uncurried \<circ>\<^sub>c \<langle>(b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)  \<circ>\<^sub>c zero,successor  \<circ>\<^sub>c zero\<rangle>\<rangle>) = \<t>) \<and>
+                            leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero ,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero\<rangle>   =  \<f>"
+      using  cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
+    then have "(leq \<circ>\<^sub>c (\<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c zero,successor  \<circ>\<^sub>c zero\<rangle> , exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c zero,successor  \<circ>\<^sub>c zero\<rangle>\<rangle>) = \<t>) \<and>
+                            leq \<circ>\<^sub>c \<langle>a ,b \<rangle>   =  \<f>"
+      by (typecheck_cfuncs, smt (z3)  beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 terminal_func_comp)
+    then have "(leq \<circ>\<^sub>c (\<langle>exp_uncurried \<circ>\<^sub>c \<langle>a,successor  \<circ>\<^sub>c zero\<rangle> , exp_uncurried \<circ>\<^sub>c \<langle>b ,successor  \<circ>\<^sub>c zero\<rangle>\<rangle>) = \<t>) \<and>
+                            leq \<circ>\<^sub>c \<langle>a ,b \<rangle>   =  \<f>"
+      by (typecheck_cfuncs, metis id_right_unit2 terminal_func_comp_elem)
+    then have "(leq \<circ>\<^sub>c \<langle>a ,b \<rangle>   = \<t>) \<and>  (leq \<circ>\<^sub>c \<langle>a ,b \<rangle>   =  \<f>)"
+      using  exp_def exp_respects_one_right by (typecheck_cfuncs, force)
+    then show False
+      using true_false_distinct by auto
+  qed
+  
+  show "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+        (IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>,
+                    leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c n = \<t>
+    \<Longrightarrow> (IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>,
+                    leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n =\<t>"    
+  proof - 
+    fix n 
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume ind_hyp: "(IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>,
+                    leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c n = \<t>"
+    then show "(IMPLIES \<circ>\<^sub>c \<langle>leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>,
+                    leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n =\<t>"
+      oops
+
+
+
+
+
+
+(*
+
+
+lemma exp_order_preserving_converse0:
   assumes a_type[type_rule]: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type[type_rule]: "b \<in>\<^sub>c \<nat>\<^sub>c" 
-  shows "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , successor\<rangle>  , exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , successor\<rangle>\<rangle>
-      = leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-proof(rule natural_number_object_func_unique[where X = "\<Omega>", where f = "id \<Omega>" ])
-  show "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
+  assumes "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , successor\<rangle>  , exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , successor\<rangle>\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>" 
+  shows "leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>" 
+proof(rule nat_induction)
 
-  show "(leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero =
-    (leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
-  proof -
-    have "(leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c zero
-        = leq \<circ>\<^sub>c \<langle>(exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>) \<circ>\<^sub>c zero, (exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>) \<circ>\<^sub>c zero\<rangle>"
-      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-    also have "... = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>(a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)  \<circ>\<^sub>c zero,successor  \<circ>\<^sub>c zero\<rangle>, exp_uncurried \<circ>\<^sub>c \<langle>(b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero,successor \<circ>\<^sub>c zero\<rangle>\<rangle>"
-      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-    also have "... = leq \<circ>\<^sub>c \<langle>(a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)  \<circ>\<^sub>c zero, (b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero\<rangle>"
-      by (typecheck_cfuncs, smt exp_def exp_respects_one_right)
-    also have "... = (leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
-      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-    then show ?thesis
-      using calculation by auto
-  qed
-
-  show "(leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-  proof -
-    have "(leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor
-        = leq \<circ>\<^sub>c \<langle>(a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor, (b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor\<rangle>"
-      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-    also have "... = leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-      by (typecheck_cfuncs, smt (z3) comp_associative2 terminal_func_comp)
-    also have "... = id\<^sub>c \<Omega> \<circ>\<^sub>c leq \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
-      using id_left_unit2 by (typecheck_cfuncs, presburger)
-    then show ?thesis
-      using calculation by auto
-  qed
-
-  show "(leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor
-      = id\<^sub>c \<Omega> \<circ>\<^sub>c leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>"
-  proof -
-    have "(leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c successor
-        = leq \<circ>\<^sub>c \<langle>(exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>) \<circ>\<^sub>c successor, (exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>) \<circ>\<^sub>c successor\<rangle>"
-      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-    also have "... = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>(a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor, successor \<circ>\<^sub>c successor\<rangle>, 
-                            exp_uncurried \<circ>\<^sub>c \<langle>(b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor, successor \<circ>\<^sub>c successor\<rangle>\<rangle>"
-      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-    also have "... = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor \<circ>\<^sub>c successor\<rangle>, 
-                            exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor \<circ>\<^sub>c successor\<rangle>\<rangle>"
-      by (typecheck_cfuncs, smt (z3) comp_associative2 terminal_func_comp)
-    also have "... = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor\<rangle>, 
-                            exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, successor\<rangle>\<rangle>"
-    proof (rule one_separator[where X="\<nat>\<^sub>c", where Y=\<Omega>])
-      show "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor \<circ>\<^sub>c successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor \<circ>\<^sub>c successor\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-        by typecheck_cfuncs
-      show "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-        by typecheck_cfuncs
-    next
-      fix n
-      assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
-      show "(leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor \<circ>\<^sub>c successor\<rangle>,
-                    exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor \<circ>\<^sub>c successor\<rangle>\<rangle>) \<circ>\<^sub>c n
-          = (leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>\<rangle>) \<circ>\<^sub>c n"
-      proof -
-        have "(leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor \<circ>\<^sub>c successor\<rangle>,
-                    exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor \<circ>\<^sub>c successor\<rangle>\<rangle>) \<circ>\<^sub>c n
-            = leq \<circ>\<^sub>c \<langle>(exp_uncurried \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor \<circ>\<^sub>c successor\<rangle>) \<circ>\<^sub>c n,
-                     (exp_uncurried \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor \<circ>\<^sub>c successor\<rangle>) \<circ>\<^sub>c n\<rangle>"
-          by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-        also have "... = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>(a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c n, (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c n\<rangle>,
-                                exp_uncurried \<circ>\<^sub>c \<langle>(b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c n, (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c n\<rangle>\<rangle>"
-          by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-        also have "... = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>,
-                                exp_uncurried \<circ>\<^sub>c \<langle>b, successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>"
-          by (typecheck_cfuncs, smt (z3) beta_N_succ_mEqs_Id1 cfunc_type_def comp_associative id_right_unit2 terminal_func_comp)
-        also have "... = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle>,
-                                exp_uncurried \<circ>\<^sub>c \<langle>b, successor \<circ>\<^sub>c n\<rangle>\<rangle>"
-        proof (cases "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle>, exp_uncurried \<circ>\<^sub>c \<langle>b, successor \<circ>\<^sub>c n\<rangle>\<rangle> = \<t>")
-          assume leq_exp_true: "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c n\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c n\<rangle>\<rangle> = \<t>"
-
-          show "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>
-              = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c n\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c n\<rangle>\<rangle>"
-          proof (cases "leq \<circ>\<^sub>c \<langle>a,b\<rangle> = \<t>")
-            assume leq_true: "leq \<circ>\<^sub>c \<langle>a,b\<rangle> = \<t>"
-
-            have "leq \<circ>\<^sub>c \<langle>a \<cdot>\<^sub>\<nat> (exp_uncurried \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c n\<rangle>), b \<cdot>\<^sub>\<nat> (exp_uncurried \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c n\<rangle>)\<rangle> = \<t>"
-              by (typecheck_cfuncs, meson leq_exp_true leq_true mult_monotonic)
-            then have "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>, exp_uncurried \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle> = \<t>"
-              by (typecheck_cfuncs, metis exp_def exp_respects_successor)
-            then show "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>
-                     = leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c n\<rangle>,exp_uncurried \<circ>\<^sub>c \<langle>b,successor \<circ>\<^sub>c n\<rangle>\<rangle>"
-              by (simp add: leq_exp_true)
-          next
-            assume "leq \<circ>\<^sub>c \<langle>a,b\<rangle> \<noteq> \<t>"
-            then have leq_true: "leq \<circ>\<^sub>c \<langle>b,a\<rangle> = \<t>"
-              by (meson a_type b_type lqe_connexity)
-              
-              
 
 lemma exp_order_preserving_converse0:
   assumes a_type[type_rule]: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type[type_rule]: "b \<in>\<^sub>c \<nat>\<^sub>c" 
@@ -255,16 +230,24 @@ qed*)
 qed
 *)
 
+*)
 
+(*
+lemma exp_order_preserving_converse:
+  assumes a_type: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type: "b \<in>\<^sub>c \<nat>\<^sub>c" and c_type: "c \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes c_nonzero: "c \<noteq> zero"
+  sorry
 
+*)
+
+(*
 lemma exp_order_preserving_converse:
   assumes a_type: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type: "b \<in>\<^sub>c \<nat>\<^sub>c" and c_type: "c \<in>\<^sub>c \<nat>\<^sub>c"
   assumes c_nonzero: "c \<noteq> zero"
   assumes "leq \<circ>\<^sub>c \<langle>exp_uncurried \<circ>\<^sub>c \<langle>a  , c\<rangle>  , exp_uncurried \<circ>\<^sub>c \<langle>b , c\<rangle>\<rangle> = \<t> "
   shows "leq \<circ>\<^sub>c \<langle>a,b\<rangle> = \<t>"
-  oops
-
-
+proof(rule nat_induction)
+*)
 
 
 lemma exp_order_preserving1:
@@ -485,7 +468,7 @@ have "(eval_func \<Omega> (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<cir
 
 
 
-
+(*
 lemma nonzero_to_k_nonzero:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "k \<in>\<^sub>c \<nat>\<^sub>c"
   assumes "a \<noteq> zero"
@@ -499,10 +482,10 @@ proof -
     using  assms(2) exp_respects_one_left lqe_antisymmetry succ_n_type zero_is_not_successor zero_is_smallest by (typecheck_cfuncs,force)
 qed
 
+*)
 
 
-
-
+(*
 lemma exp_order_preserving2:
   assumes x_type: "x \<in>\<^sub>c \<nat>\<^sub>c" and y_type: "y \<in>\<^sub>c \<nat>\<^sub>c" and a_type: "a \<in>\<^sub>c \<nat>\<^sub>c"
   assumes a_nonzero: "a \<noteq> zero"
@@ -529,9 +512,9 @@ proof -
   then show "leq \<circ>\<^sub>c \<langle>a ^\<^sub>\<nat> x, a ^\<^sub>\<nat> y\<rangle> = \<t>"
     by (typecheck_cfuncs, metis  a_type calculation exists_implies_leq_true mult_closure p_def x_type y_type)
 qed
+*)
 
-
-
+(*
 lemma succ_n_le_2_to_n:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c" 
   shows "leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c n , (successor \<circ>\<^sub>c (successor \<circ>\<^sub>c zero)) ^\<^sub>\<nat> n \<rangle> = \<t>"
@@ -655,11 +638,11 @@ proof -
     using calculation by presburger
 qed
 
-
+*)
   
   
 
-
+(*
 
 
 lemma mult_le_exp:
@@ -687,7 +670,7 @@ then show "leq \<circ>\<^sub>c \<langle>a  \<cdot>\<^sub>\<nat> b , a ^\<^sub>\<
   by (metis assms(1) c_def exp_closure exp_respects_successor f1 f2 leq_transitivity mult_closure succ_n_type zero_type)
 qed
 
-
+*)
 
 
 

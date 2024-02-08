@@ -1260,6 +1260,13 @@ proof -
 qed
 
 
+lemma setprod_le_setexp:
+  assumes "nonempty(Y)"
+  assumes "Y \<cong> one"
+  shows "(X \<times>\<^sub>c Y) \<le>\<^sub>cY\<^bsup>X\<^esup>"
+  sorry
+
+
 
 
 lemma truth_set_is_finite:

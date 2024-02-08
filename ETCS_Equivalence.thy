@@ -1647,6 +1647,9 @@ qed
 
 
 
+(*It seems that we have that IF the graph exists then it is unique, and we have by the above that it is an isomorphism.
+Is there a better way to state this?*)
+
 
 
 lemma functional_relations_are_graphs_uniqueness_clause:
