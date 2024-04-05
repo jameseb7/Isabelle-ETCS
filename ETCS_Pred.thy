@@ -1764,4 +1764,5 @@ lemma NAND_not_idempotent:
 
 
 
+
 end

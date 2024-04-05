@@ -706,4 +706,349 @@ proof -
 qed
     
 
+
+definition ITER_curried :: "cset \<Rightarrow> cfunc" where 
+  "ITER_curried U = (THE u . u : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  u \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp> \<and>
+    ((meta_comp U U U) \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>    \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
+
+thm theI'
+
+lemma ITER_curried_def2: 
+"ITER_curried U : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  ITER_curried U \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp> \<and>
+  ((meta_comp U U U) \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>    \<circ>\<^sub>c ITER_curried U = ITER_curried U  \<circ>\<^sub>c successor"
+  unfolding ITER_curried_def
+  by(rule theI', etcs_rule natural_number_object_property2)
+  
+
+lemma ITER_curried_type[type_rule]:
+  "ITER_curried U : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>"
+  by (simp add: ITER_curried_def2)
+
+lemma ITER_curried_zero: 
+  "ITER_curried U \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>"
+  by (simp add: ITER_curried_def2)
+
+lemma ITER_curried_successor:
+"ITER_curried U  \<circ>\<^sub>c successor = (meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>    \<circ>\<^sub>c ITER_curried U"
+  using ITER_curried_def2
+  by simp 
+
+
+definition ITER :: "cset \<Rightarrow> cfunc" where 
+  "ITER U = (ITER_curried U)\<^sup>\<flat>"
+
+lemma ITER_type[type_rule]:
+  "ITER U : ((U\<^bsup>U\<^esup>) \<times>\<^sub>c \<nat>\<^sub>c  ) \<rightarrow> (U\<^bsup>U\<^esup>)"
+  unfolding ITER_def by typecheck_cfuncs
+
+
+ 
+
+
+thm cfunc_cross_prod_comp_cfunc_prod
+
+
+
+lemma ITER_zero: 
+  assumes "f : Z \<rightarrow> (U\<^bsup>U\<^esup>)"
+  shows "ITER U \<circ>\<^sub>c \<langle>f, zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle> = metafunc (id U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>"
+proof(rule one_separator[where X = Z, where Y = "U\<^bsup>U\<^esup>"])
+  show "ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle> : Z \<rightarrow> U\<^bsup>U\<^esup>"
+    using assms by typecheck_cfuncs
+  show "metafunc (id\<^sub>c U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub> : Z \<rightarrow> U\<^bsup>U\<^esup>"
+    using assms by typecheck_cfuncs
+next
+  fix z 
+  assume z_type[type_rule]: "z \<in>\<^sub>c Z"
+  have "(ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle>) \<circ>\<^sub>c z = ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle> \<circ>\<^sub>c z"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2)
+  also have "... = ITER U \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,zero\<rangle>"
+    using assms by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))  \<circ>\<^sub>c (id\<^sub>c (U\<^bsup>U\<^esup>) \<times>\<^sub>f ITER_curried U) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,zero\<rangle>"
+    using assms ITER_def comp_associative2 inv_transpose_func_def2 by (typecheck_cfuncs, auto)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))  \<circ>\<^sub>c  \<langle>f \<circ>\<^sub>c z,ITER_curried U \<circ>\<^sub>c zero\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))  \<circ>\<^sub>c  \<langle>f \<circ>\<^sub>c z,(metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>\<rangle>"
+    using assms by (simp add: ITER_curried_def2)   
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))  \<circ>\<^sub>c  \<langle>f \<circ>\<^sub>c z,((left_cart_proj (U) one)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: id_left_unit2 metafunc_def2)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))  \<circ>\<^sub>c (id\<^sub>c (U\<^bsup>U\<^esup>) \<times>\<^sub>f  ((left_cart_proj (U) one)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>f  \<circ>\<^sub>c z,id\<^sub>c one\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+  also have "... = (left_cart_proj (U) one)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one)  \<circ>\<^sub>c \<langle>f  \<circ>\<^sub>c z,id\<^sub>c one\<rangle>"
+    using assms by (typecheck_cfuncs,simp add: cfunc_type_def comp_associative transpose_func_def)
+  also have "... = (left_cart_proj (U) one)\<^sup>\<sharp>"
+    using assms by (typecheck_cfuncs, simp add: id_right_unit2 right_cart_proj_cfunc_prod)
+  also have "... = (metafunc (id\<^sub>c U))"
+    using assms by (typecheck_cfuncs, simp add: id_left_unit2 metafunc_def2)
+  also have "... = (metafunc (id\<^sub>c U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>) \<circ>\<^sub>c z"
+    using assms by (typecheck_cfuncs, metis cfunc_type_def comp_associative id_right_unit2 terminal_func_comp_elem)
+  then show "(ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle>) \<circ>\<^sub>c z = (metafunc (id\<^sub>c U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>) \<circ>\<^sub>c z"
+    using calculation by auto
+qed
+
+
+lemma ITER_zero': 
+  assumes "f \<in>\<^sub>c (U\<^bsup>U\<^esup>)"
+  shows "ITER U \<circ>\<^sub>c \<langle>f, zero\<rangle> = metafunc (id U)"
+  by (typecheck_cfuncs, metis ITER_zero assms id_right_unit2 id_type one_unique_element terminal_func_type)
+
+
+
+
+lemma ITER_succ:
+ assumes "f : Z \<rightarrow> (U\<^bsup>U\<^esup>)"
+ assumes "n : Z \<rightarrow> \<nat>\<^sub>c"
+ shows "ITER U \<circ>\<^sub>c \<langle>f, successor \<circ>\<^sub>c n\<rangle> = f \<box> (ITER U \<circ>\<^sub>c \<langle>f, n \<rangle>)"
+proof(rule one_separator[where X = Z, where Y = "U\<^bsup>U\<^esup>"])
+  show "ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle> : Z \<rightarrow> U\<^bsup>U\<^esup>"
+    using assms by typecheck_cfuncs
+  show "f \<box> ITER U \<circ>\<^sub>c \<langle>f,n\<rangle> : Z \<rightarrow> U\<^bsup>U\<^esup>"
+    using assms by typecheck_cfuncs
+next
+  fix z 
+  assume z_type[type_rule]: "z \<in>\<^sub>c Z"
+  have "(ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle>) \<circ>\<^sub>c z  = ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c z"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2)
+  also have "... = ITER U \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z ,successor \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))  \<circ>\<^sub>c (id\<^sub>c (U\<^bsup>U\<^esup>) \<times>\<^sub>f ITER_curried U) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z ,successor \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: ITER_def comp_associative2 inv_transpose_func_def2)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))    \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z , ITER_curried U \<circ>\<^sub>c (successor \<circ>\<^sub>c (n  \<circ>\<^sub>c z))\<rangle>"
+    using assms cfunc_cross_prod_comp_cfunc_prod id_left_unit2 by (typecheck_cfuncs, force)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))    \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z , (ITER_curried U \<circ>\<^sub>c successor) \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
+    using assms by(typecheck_cfuncs, metis comp_associative2)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))    \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z , ((meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>    \<circ>\<^sub>c ITER_curried U) \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
+    using assms ITER_curried_successor by presburger
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))    \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f ((meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>    \<circ>\<^sub>c ITER_curried U) \<circ>\<^sub>c (n  \<circ>\<^sub>c z))\<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, id one\<rangle>"
+    using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>))    \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f ((meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>     ))\<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, ITER_curried U \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
+    using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_right_unit2)
+  also have "... = (meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)     ))\<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, ITER_curried U \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
+    using assms by (typecheck_cfuncs, metis cfunc_type_def comp_associative transpose_func_def)
+  also have "... = (meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) )\<circ>\<^sub>c \<langle>\<langle>f \<circ>\<^sub>c z,f \<circ>\<^sub>c z\<rangle>, ITER_curried U \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
+    using assms by (etcs_assocr, typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod diag_on_elements id_left_unit2)
+  also have "... = meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c   \<langle>f \<circ>\<^sub>c z, \<langle>f \<circ>\<^sub>c z, ITER_curried U \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, smt (z3) associate_right_ap comp_associative2)
+  also have "... = meta_comp U U U \<circ>\<^sub>c  \<langle>f \<circ>\<^sub>c z, eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, ITER_curried U \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>\<rangle>"
+    using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+  also have "... = meta_comp U U U \<circ>\<^sub>c  \<langle>f \<circ>\<^sub>c z, eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) \<circ>\<^sub>c (id(U\<^bsup>U\<^esup>) \<times>\<^sub>f ITER_curried U )\<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,  (n  \<circ>\<^sub>c z)\<rangle>     \<rangle>"
+    using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+  also have "... = meta_comp U U U \<circ>\<^sub>c  \<langle>f \<circ>\<^sub>c z, ITER U \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,  (n  \<circ>\<^sub>c z)\<rangle>     \<rangle>"
+    using assms by (typecheck_cfuncs, smt (z3) ITER_def comp_associative2 inv_transpose_func_def2)
+  also have "... = meta_comp U U U \<circ>\<^sub>c  \<langle>f, ITER U \<circ>\<^sub>c \<langle>f , n\<rangle>     \<rangle> \<circ>\<^sub>c z"
+    using assms by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+  also have "... = (meta_comp U U U \<circ>\<^sub>c  \<langle>f, ITER U \<circ>\<^sub>c \<langle>f , n\<rangle>     \<rangle>) \<circ>\<^sub>c z"
+    using assms by (typecheck_cfuncs, meson comp_associative2)
+  also have "... = (f \<box> (ITER U \<circ>\<^sub>c \<langle>f,n\<rangle>)) \<circ>\<^sub>c z"
+    using assms by (typecheck_cfuncs, simp add: meta_comp2_def5)
+  then show "(ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle>) \<circ>\<^sub>c z = (f \<box> ITER U \<circ>\<^sub>c \<langle>f,n\<rangle>) \<circ>\<^sub>c z"
+    by (simp add: calculation)
+qed
+
+
+ 
+
+lemma ITER_one:
+ assumes "f \<in>\<^sub>c (U\<^bsup>U\<^esup>)"
+ shows "ITER U \<circ>\<^sub>c \<langle>f, successor \<circ>\<^sub>c zero\<rangle> = f \<box> ( metafunc (id U))"
+  using ITER_succ ITER_zero' assms zero_type by presburger
+
+
+
+
+(*We need to change the values used because 55 is not sufficient as it is throwing type errors when pasting a goal*)
+
+definition iter_comp :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsup>\<circ>_\<^esup>"[55,0]55) where
+  "iter_comp g n  \<equiv> cnufatem (ITER (domain g) \<circ>\<^sub>c \<langle>metafunc g,n\<rangle>)"
+
+
+lemma iter_comp_def2: 
+  "g\<^bsup>\<circ>n\<^esup>  \<equiv> cnufatem (ITER (domain g) \<circ>\<^sub>c \<langle>metafunc g,n\<rangle>)"
+  by (simp add: iter_comp_def)
+
+
+
+lemma iter_comp_type[type_rule]:
+  assumes "g : X \<rightarrow> X"
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "g\<^bsup>\<circ>n\<^esup>: X \<rightarrow> X"
+  unfolding iter_comp_def2
+  by (smt (verit, ccfv_SIG) ITER_type assms(1) assms(2) cfunc_type_def cnufatem_type comp_type metafunc_type right_param_on_el right_param_type) 
+  
+
+lemma iter_comp_def3: 
+  assumes "g : X \<rightarrow> X"
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "g\<^bsup>\<circ>n\<^esup>  = cnufatem (ITER X \<circ>\<^sub>c \<langle>metafunc g,n\<rangle>)"
+  using assms cfunc_type_def iter_comp_def2 by auto
+
+
+
+
+lemma zero_iters:
+  assumes "g : X \<rightarrow> X"
+  shows "g\<^bsup>\<circ>zero\<^esup> = id\<^sub>c X"
+proof(rule one_separator[where X=X, where Y=X])
+  show "g\<^bsup>\<circ>zero\<^esup> : X \<rightarrow> X"
+    by (simp add: assms iter_comp_type zero_type)
+  show "id\<^sub>c X : X \<rightarrow> X"
+    by typecheck_cfuncs
+next 
+  fix x 
+  assume x_type[type_rule]: "x \<in>\<^sub>c X"
+  have "(g\<^bsup>\<circ>zero\<^esup>) \<circ>\<^sub>c x = (cnufatem (ITER X \<circ>\<^sub>c \<langle>metafunc g,zero\<rangle>)) \<circ>\<^sub>c x"
+    using assms cfunc_type_def iter_comp_def2 by force
+  also have "... = cnufatem (metafunc (id X)) \<circ>\<^sub>c x"
+    by (simp add: ITER_zero' assms metafunc_type)
+  also have "... = id\<^sub>c X \<circ>\<^sub>c x"
+    by (metis cnufatem_metafunc id_type)
+  also have "... = x"
+    by (typecheck_cfuncs, simp add: id_left_unit2)
+  then show "(g\<^bsup>\<circ>zero\<^esup>) \<circ>\<^sub>c x = id\<^sub>c X \<circ>\<^sub>c x"
+    by (simp add: calculation)
+qed
+
+
+
+(*we should consider deleting this lemma after we prove the succ version since it is just a special case*)
+lemma one_iter:
+  assumes "g : X \<rightarrow> X"
+  shows "g\<^bsup>\<circ>(successor \<circ>\<^sub>c zero)\<^esup> = g"    
+proof(rule one_separator[where X=X, where Y=X])
+  show "g\<^bsup>\<circ>successor \<circ>\<^sub>c zero\<^esup> : X \<rightarrow> X"
+    using assms by typecheck_cfuncs
+  show "g : X \<rightarrow> X"
+    using assms by typecheck_cfuncs
+next
+  fix x 
+  assume x_type[type_rule]: "x \<in>\<^sub>c X"
+  have "(g\<^bsup>\<circ>successor \<circ>\<^sub>c zero\<^esup>) \<circ>\<^sub>c x =  (cnufatem (ITER X \<circ>\<^sub>c \<langle>metafunc g,successor \<circ>\<^sub>c zero\<rangle>))  \<circ>\<^sub>c x"
+    using assms(1) cfunc_type_def iter_comp_def2 by force
+  also have "... = (cnufatem (metafunc(g) \<box> metafunc (id X)))  \<circ>\<^sub>c x"
+    using assms by (typecheck_cfuncs, simp add: ITER_one)
+  also have "... = (cnufatem (metafunc(g)))  \<circ>\<^sub>c x"
+    using assms by (typecheck_cfuncs, simp add: meta_left_identity)
+  also have "... = g  \<circ>\<^sub>c x"
+    using assms cnufatem_metafunc by auto
+  then show "(g\<^bsup>\<circ>successor \<circ>\<^sub>c zero\<^esup>) \<circ>\<^sub>c x = g \<circ>\<^sub>c x"
+    by (simp add: calculation)
+qed
+
+
+
+thm ITER_succ
+    
+lemma succ_iters:
+  assumes "g : X \<rightarrow> X"
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "g\<^bsup>\<circ>(successor \<circ>\<^sub>c n)\<^esup> = g \<circ>\<^sub>c (g\<^bsup>\<circ>n\<^esup>)"    
+proof - 
+  have "g\<^bsup>\<circ>successor \<circ>\<^sub>c n\<^esup>   = cnufatem(ITER X \<circ>\<^sub>c \<langle>metafunc g,successor \<circ>\<^sub>c n \<rangle>)"
+    using assms by (typecheck_cfuncs, simp add: iter_comp_def3)
+  also have "... = cnufatem(metafunc g \<box> ITER X \<circ>\<^sub>c \<langle>metafunc g, n \<rangle>)"
+    using assms by (typecheck_cfuncs, simp add: ITER_succ)
+  also have "... = cnufatem(metafunc g \<box> metafunc (g\<^bsup>\<circ>n\<^esup>))"
+    using assms by (typecheck_cfuncs, metis iter_comp_def3 metafunc_cnufatem)
+  also have "... = g \<circ>\<^sub>c (g\<^bsup>\<circ>n\<^esup>)"
+    using assms by (typecheck_cfuncs, simp add: comp_as_metacomp)
+  then show ?thesis
+    using calculation by auto
+qed
+
+
+
+
+
+
+
+lemma eval_lemma_for_ITER:
+  assumes "f : X \<rightarrow> X"
+  assumes "x \<in>\<^sub>c X"
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(f\<^bsup>\<circ>m\<^esup>) \<circ>\<^sub>c x = eval_func X X \<circ>\<^sub>c \<langle>x ,ITER X \<circ>\<^sub>c \<langle>metafunc f ,m\<rangle>\<rangle>"
+  using assms by (typecheck_cfuncs, metis eval_lemma iter_comp_def3 metafunc_cnufatem)
+
+
+lemma n_accessible_by_succ_iter_aux:
+   "eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,  ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(metafunc successor) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> ,id \<nat>\<^sub>c  \<rangle>\<rangle> = id \<nat>\<^sub>c"
+proof(rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f = successor])
+  show "eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+next
+  have "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero =
+         eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero\<rangle> \<rangle>"
+    by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+  also have "... =  eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor,zero\<rangle> \<rangle>"
+    by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+  also have "... =  eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero,metafunc (id \<nat>\<^sub>c) \<rangle>"
+    by (typecheck_cfuncs, simp add: ITER_zero')
+  also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+    using eval_lemma by (typecheck_cfuncs, blast)
+  then show "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
+    using calculation by auto
+  show "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor =
+    successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>"
+  proof(rule one_separator[where X ="\<nat>\<^sub>c", where Y = "\<nat>\<^sub>c"])
+    show "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      by typecheck_cfuncs
+    show "successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      by typecheck_cfuncs
+  next    
+    fix m
+    assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+    have "(successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c m = 
+         successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m\<rangle>\<rangle> "
+      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+    also have "... = successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero ,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor ,m\<rangle>\<rangle>"
+      by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+    also have "... = successor \<circ>\<^sub>c (successor\<^bsup>\<circ>m\<^esup>) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: eval_lemma_for_ITER)
+    also have "... = (successor\<^bsup>\<circ>successor \<circ>\<^sub>c m\<^esup>) \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, simp add: comp_associative2 succ_iters)
+    also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero ,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor ,successor \<circ>\<^sub>c m\<rangle> \<rangle>"
+      by (typecheck_cfuncs, simp add: eval_lemma_for_ITER)
+    also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c (successor \<circ>\<^sub>c m),ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<circ>\<^sub>c (successor \<circ>\<^sub>c m),id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (successor \<circ>\<^sub>c m)\<rangle> \<rangle>"
+      by (typecheck_cfuncs,simp add: id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+    also have "... = ((eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m"
+      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+    then show "((eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m =
+         (successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c m"
+      using calculation by presburger
+  qed
+  show "id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
+    by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2)
+qed
+
+
+
+
+
+lemma n_accessible_by_succ_iter:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(successor\<^bsup>\<circ>n\<^esup>) \<circ>\<^sub>c zero = n"
+proof - 
+  have "n = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,  ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> ,id \<nat>\<^sub>c  \<rangle>\<rangle> \<circ>\<^sub>c n"
+    using assms by (typecheck_cfuncs, simp add: comp_associative2 id_left_unit2 n_accessible_by_succ_iter_aux)
+  also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n ,  ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c n ,id \<nat>\<^sub>c  \<circ>\<^sub>c n \<rangle>\<rangle> "
+    using assms by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
+  also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero,  ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor ,n \<rangle>\<rangle> "
+    using assms by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+  also have "... = (successor\<^bsup>\<circ>n\<^esup>) \<circ>\<^sub>c zero"
+    using assms by (typecheck_cfuncs, metis eval_lemma iter_comp_def3 metafunc_cnufatem)
+  then show ?thesis
+    using calculation by auto
+qed
+
+
+
+
+
+
+
+
+  
 end

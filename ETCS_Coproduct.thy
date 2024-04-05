@@ -1942,6 +1942,17 @@ next
 qed
 
 
+lemma cfunc_bowtieprod_iso:
+  assumes type_assms: "f : X \<rightarrow> Y" "g : V \<rightarrow> W"
+  assumes f_iso: "isomorphism f" and g_iso: "isomorphism g"
+  shows "isomorphism (f \<bowtie>\<^sub>f g)"
+  using assms  
+  by (meson cfunc_bowtieprod_epi cfunc_bowtieprod_inj epi_mon_is_iso f_iso g_iso injective_imp_monomorphism iso_imp_epi_and_monic monomorphism_imp_injective singletonI)
+
+
+
+
+
 lemma cfunc_bowtieprod_surj_converse:
   assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
   assumes inj_f_bowtie_g: "surjective (f \<bowtie>\<^sub>f g)"
@@ -2066,6 +2077,9 @@ next
       using cfunc_type_def type_assms(2) z_def by auto
  qed
 qed
+
+
+
 
 
 definition dist_prod_coprod2 :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
@@ -2397,7 +2411,7 @@ qed
 
 lemma try_cast_not_in_X:
   assumes m_type: "monomorphism m" "m : X \<rightarrow> Y"
-  assumes y_in_X: "\<not> y \<in>\<^bsub>Y\<^esub> (X, m)" and y_type: "y \<in>\<^sub>c Y"
+  assumes y_in_X: "\<not> y \<in>\<^bsub>Y\<^esub> (X, m)" and y_type: "y \<in>\<^sub>c Y"  
   shows "\<exists> x. x \<in>\<^sub>c Y \<setminus> (X,m) \<and> try_cast m \<circ>\<^sub>c y = right_coproj X (Y \<setminus> (X,m)) \<circ>\<^sub>c x"
 proof -
   have y_in_complement: "y \<in>\<^bsub>Y\<^esub> (Y \<setminus> (X,m), m\<^sup>c)"

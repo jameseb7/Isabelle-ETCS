@@ -907,8 +907,213 @@ leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<cir
     using OR_true_implies_one_is_true cfunc_prod_type comp_type leq_type m_type n_type by blast
 qed
 
+lemma nat_strict_total_order:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(n \<le>\<^sub>\<nat> m) = (\<not>(successor \<circ>\<^sub>c m \<le>\<^sub>\<nat> n))"
+proof(auto)
+  show "n \<le>\<^sub>\<nat> m \<Longrightarrow> successor \<circ>\<^sub>c m \<le>\<^sub>\<nat> n \<Longrightarrow> False"
+   using assms by (metis add_monotonic add_respects_succ3 add_respects_zero_on_left
+          exists_implies_leq_true leq_infix_def lqe_antisymmetry n_neq_succ_n succ_n_type zero_type) 
+next
+  assume "\<not> successor \<circ>\<^sub>c m \<le>\<^sub>\<nat> n"
+  then have "(n \<le>\<^sub>\<nat> successor \<circ>\<^sub>c m) \<and> (n \<noteq> successor \<circ>\<^sub>c m)"
+    using assms by (meson comp_type leq_infix_def lqe_connexity successor_type) 
+  then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "successor \<circ>\<^sub>c m = n +\<^sub>\<nat> k"  and k_nonzero: "k \<noteq> zero"
+    using assms by (typecheck_cfuncs, metis add_commutes add_respects_zero_on_right leq_infix_def leq_true_implies_exists)
+  then show "n \<le>\<^sub>\<nat> m"
+    using assms by (smt (verit, best) add_commutes add_respects_succ3 add_type 
+                    exists_implies_leq_true leq_infix_def nonzero_is_succ succ_inject)
+qed
+
+
+
+
+lemma Succession_Principle:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "k \<in>\<^sub>c \<nat>\<^sub>c \<and>  n \<le>\<^sub>\<nat> k \<and> k \<le>\<^sub>\<nat> successor \<circ>\<^sub>c n \<Longrightarrow> k = n \<or> k = successor \<circ>\<^sub>c n"
+proof(unfold leq_infix_def, rule ccontr, auto)
+  assume k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c"
+  assume k_not_n: "k \<noteq> n"
+  assume k_not_sn: "k \<noteq> successor \<circ>\<^sub>c n"
+  assume n_lt_k: "leq \<circ>\<^sub>c \<langle>n,k\<rangle> = \<t>"
+  assume k_lt_sn: "leq \<circ>\<^sub>c \<langle>k,successor \<circ>\<^sub>c n\<rangle> = \<t>"
+  
+  obtain p where p_type[type_rule]: "p \<in>\<^sub>c \<nat>\<^sub>c" and p_def:  "k = p +\<^sub>\<nat> n" and p_nonzero: "p \<noteq> zero"
+    by (typecheck_cfuncs, metis add_respects_zero_on_left k_not_n leq_true_implies_exists n_lt_k)
+
+  obtain i where i_type[type_rule]: "i \<in>\<^sub>c \<nat>\<^sub>c" and i_def:  "p = successor \<circ>\<^sub>c i"
+    using nonzero_is_succ p_nonzero by (typecheck_cfuncs, blast)
+
+  obtain q where q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and q_def:  "successor \<circ>\<^sub>c n = q +\<^sub>\<nat> k"  and q_nonzero: "q \<noteq> zero"
+    by (typecheck_cfuncs, metis add_respects_zero_on_left k_lt_sn k_not_sn leq_true_implies_exists)
+
+  obtain j where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and j_def:  "q = successor \<circ>\<^sub>c j"
+    using nonzero_is_succ q_nonzero by (typecheck_cfuncs, blast)
+  
+  have "successor \<circ>\<^sub>c k = successor \<circ>\<^sub>c (p +\<^sub>\<nat> n)"
+    using p_def by blast
+  then have "successor \<circ>\<^sub>c k = p +\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+    by (typecheck_cfuncs, simp add: add2_respects_succ_right add_def p_def)
+  then have "successor \<circ>\<^sub>c k = p +\<^sub>\<nat> (q +\<^sub>\<nat> k)" 
+    by (simp add: q_def)
+  then have "successor \<circ>\<^sub>c zero = p +\<^sub>\<nat> q"
+    by (typecheck_cfuncs, metis add_associates add_cancellative add_commutes add_respects_succ3 add_respects_zero_on_left n_type p_def q_def)
+  then have "(successor \<circ>\<^sub>c zero) +\<^sub>\<nat> zero = ((successor \<circ>\<^sub>c zero) +\<^sub>\<nat> i) +\<^sub>\<nat> (successor \<circ>\<^sub>c j)"
+    by (typecheck_cfuncs, metis add_respects_succ3 add_respects_zero_on_left i_def j_def)
+  then have "zero = successor \<circ>\<^sub>c (i +\<^sub>\<nat> j)"
+    using \<open>successor \<circ>\<^sub>c zero = p +\<^sub>\<nat> q\<close> add_respects_succ1 add_respects_succ3 i_def j_def p_type succ_inject by (typecheck_cfuncs, presburger)
+  then show False
+    using add_type i_type j_type zero_is_not_successor by force
+qed
+
+
+theorem strong_induction:
+  assumes P_type[type_rule]: "P : \<nat>\<^sub>c \<rightarrow> \<Omega>" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes base_case: "P \<circ>\<^sub>c zero = \<t>"
+  assumes induction_case: "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (\<And>k. k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> k \<le>\<^sub>\<nat> n \<Longrightarrow> P \<circ>\<^sub>c k = \<t>) \<Longrightarrow>   P \<circ>\<^sub>c (successor \<circ>\<^sub>c n) = \<t>"
+  shows "P \<circ>\<^sub>c n = \<t>"
+proof - 
+  obtain Q where Q_type[type_rule]: "Q : \<nat>\<^sub>c \<rightarrow> \<Omega>" 
+      and Q_def: "Q = (FORALL \<nat>\<^sub>c ) \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>"
+    by typecheck_cfuncs
+  have "\<And> n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>(( Q \<circ>\<^sub>c n = \<t>) = ( (\<forall> k. k \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> k \<le>\<^sub>\<nat> n \<longrightarrow> P \<circ>\<^sub>c k = \<t>)))"
+  proof(auto)
+    fix n 
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume "Q \<circ>\<^sub>c n = \<t>"
+    then have "(FORALL \<nat>\<^sub>c ) \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n = \<t>"
+      unfolding Q_def by (etcs_assocl, blast)
+    then have "(FORALL \<nat>\<^sub>c ) \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> ) \<circ>\<^sub>c (id  \<nat>\<^sub>c \<times>\<^sub>f n)   )\<^sup>\<sharp> = \<t>"
+      using  sharp_comp by (typecheck_cfuncs, force) 
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> ((IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> ) \<circ>\<^sub>c (id  \<nat>\<^sub>c \<times>\<^sub>f n)) \<circ>\<^sub>c \<langle>k   ,id one  \<rangle>  = \<t> "
+      by (typecheck_cfuncs, meson FORALL_elim )
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> ) \<circ>\<^sub>c( (id  \<nat>\<^sub>c \<times>\<^sub>f n) \<circ>\<^sub>c \<langle>k   ,id one  \<rangle> ) = \<t> "
+      by(etcs_assocl, simp)
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c \<langle>k   ,n  \<rangle>  = \<t> "
+      by (typecheck_cfuncs, smt (z3)  cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 id_type)
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c \<langle>k,n \<rangle>)  = \<t>"
+      by(etcs_assocl, simp)
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<langle>leq \<circ>\<^sub>c \<langle>k, n\<rangle> , (P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>k, n\<rangle>  \<rangle> )  = \<t>"
+      sorry
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<langle>leq \<circ>\<^sub>c \<langle>k, n\<rangle> , P \<circ>\<^sub>c k  \<rangle> )  = \<t>"
+      by (typecheck_cfuncs, metis cfunc_prod_type cfunc_type_def comp_associative left_cart_proj_cfunc_prod left_cart_proj_type)
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> leq \<circ>\<^sub>c \<langle>k, n\<rangle> = \<t> \<Longrightarrow> P \<circ>\<^sub>c k   = \<t>"
+      by (typecheck_cfuncs, metis IMPLIES_elim' comp_type)
+    then show "\<And> k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> k \<le>\<^sub>\<nat> n \<Longrightarrow> P \<circ>\<^sub>c k = \<t>"
+      by(simp add: leq_infix_def)
+  next 
+    fix n 
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume "\<forall>k. k \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> k \<le>\<^sub>\<nat> n \<longrightarrow> P \<circ>\<^sub>c k = \<t>"
+    then have "\<And> k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> leq \<circ>\<^sub>c \<langle>k, n\<rangle> = \<t> \<Longrightarrow> P \<circ>\<^sub>c k   = \<t>"
+      using leq_infix_def by blast
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<langle>leq \<circ>\<^sub>c \<langle>k, n\<rangle> , P \<circ>\<^sub>c k  \<rangle> )  = \<t>"
+      by (typecheck_cfuncs, smt (verit, ccfv_SIG)  cfunc_prod_type comp_type implies_implies_IMPLIES)
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<langle>leq \<circ>\<^sub>c \<langle>k, n\<rangle> , P \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>k, n\<rangle>)  \<rangle> )  = \<t>"
+      by (typecheck_cfuncs, simp add:  left_cart_proj_cfunc_prod) 
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<langle>leq \<circ>\<^sub>c \<langle>k, n\<rangle> , (P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>k, n\<rangle>  \<rangle> )  = \<t>"
+      by(etcs_assocr, simp)
+    then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c \<langle>k,n \<rangle>)  = \<t>"
+      oops
+
+
+
+
+
+
+(*    
+  have "Q \<circ>\<^sub>c n = \<t>"
+  proof(etcs_rule nat_induction)
+    show "Q \<circ>\<^sub>c zero = \<t>"
+        proof - 
+          fix n 
+          assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+          *)
+ 
+  
+  
+  
+
+
+
+
+thm nat_induction
+
+
+theorem well_ordering_principle:
+  assumes nonempty_set: "nonempty S"  
+  assumes subset_nat: "(S,m) \<subseteq>\<^sub>c \<nat>\<^sub>c"
+  shows "\<exists> min. min \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m) \<and> (\<forall> s. s \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m) \<longrightarrow> min  \<le>\<^sub>\<nat> s)"
+proof(rule ccontr) 
+  assume no_min: "\<nexists>min. min \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m) \<and> (\<forall>s. s \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m) \<longrightarrow> min \<le>\<^sub>\<nat> s)"
+  obtain P where P_type[type_rule]: "P : \<nat>\<^sub>c \<rightarrow> \<Omega>" and P_def: "P = NOT \<circ>\<^sub>c (characteristic_func m)"
+    by (metis NOT_type characteristic_func_type comp_type subobject_of_def2 subset_nat)
+  have P_eq_t: "\<And> n. n \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> P \<circ>\<^sub>c n  = \<t>"
+  proof(auto)
+    fix n 
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    show "P \<circ>\<^sub>c n  = \<t>"
+    proof(etcs_rule strong_induction)
+      show "P \<circ>\<^sub>c zero = \<t>"
+      proof(rule ccontr)
+        assume "P \<circ>\<^sub>c zero \<noteq> \<t>"
+        then have "P \<circ>\<^sub>c zero = \<f>"
+          by (typecheck_cfuncs, metis true_false_only_truth_values)
+        have "zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m)"
+          by (metis NOT_false_is_true NOT_type P_def \<open>P \<circ>\<^sub>c zero \<noteq> \<t>\<close> characteristic_func_type
+              comp_associative2 not_relative_member_characteristic_func_false subobject_of_def2 subset_nat zero_type)
+        have "(\<forall> s. s \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m) \<longrightarrow>  zero \<le>\<^sub>\<nat>  s)"
+          by (simp add: leq_infix_def relative_member_def zero_is_smallest)
+        then show False
+          using no_min \<open>zero \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m)\<close> by blast
+      qed
+      show "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (\<And>k. k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> k \<le>\<^sub>\<nat> n \<Longrightarrow> P \<circ>\<^sub>c k = \<t>) \<Longrightarrow> P \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+      proof - 
+        fix n 
+        assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+        assume "(\<And>k. k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> k \<le>\<^sub>\<nat> n \<Longrightarrow> P \<circ>\<^sub>c k = \<t>)"
+        then have induction_hypothesis: "(\<And>k. k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> k \<le>\<^sub>\<nat> n \<Longrightarrow> \<not>(k \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m)))"
+          by (typecheck_cfuncs, smt (z3) NOT_true_is_false NOT_type P_def characteristic_func_type
+              comp_associative2 relative_member_characteristic_func_true
+              relative_member_def2 true_false_distinct)
+        have "\<not>(successor \<circ>\<^sub>c n  \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m))"
+        proof(rule ccontr, auto)
+          assume BWOC: "successor \<circ>\<^sub>c n  \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m)"
+          then have "(\<forall> s. s \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m) \<longrightarrow> successor \<circ>\<^sub>c n  \<le>\<^sub>\<nat> s )"
+            by (typecheck_cfuncs, metis Succession_Principle induction_hypothesis leq_infix_def lqe_connexity relative_member_def2)
+          then show False
+            using BWOC no_min by blast
+        qed
+        then show "P \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+          by (typecheck_cfuncs, metis NOT_false_is_true NOT_type P_def  characteristic_func_type 
+              comp_associative2 not_relative_member_characteristic_func_false subobject_of_def2 subset_nat)
+      qed
+    qed
+  qed
+  have "\<not>(nonempty S)"
+  proof(rule ccontr, auto, unfold nonempty_def)
+    assume "\<exists>s. s \<in>\<^sub>c S"
+    then obtain s where s_type[type_rule]: "s \<in>\<^sub>c S"
+      by blast
+    then have "P \<circ>\<^sub>c (m  \<circ>\<^sub>c s) = \<t>"
+      using P_eq_t comp_type subobject_of_def2 subset_nat by blast
+    then have "\<not> (m  \<circ>\<^sub>c s  \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (S, m))"
+      by (metis NOT_true_is_false NOT_type P_def characteristic_func_type comp_associative2
+          relative_member_characteristic_func_true relative_member_def2 true_false_distinct)
+    then have "\<nexists>h. (m \<circ>\<^sub>c h = m \<circ>\<^sub>c s)"
+      by (typecheck_cfuncs, meson factors_through_def2 relative_member_def2 subobject_of_def2 subset_nat)
+    then show False
+      by blast
+  qed
+  then show False
+    using nonempty_set by auto
+qed
+
 
 
 
 
 end
+
+
