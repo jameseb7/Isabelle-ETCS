@@ -662,9 +662,59 @@ lemma third_canonically_finite_set_Omega:
   
 
 
+lemma 
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "[n +\<^sub>\<nat> m]\<^sub>c \<cong> [n]\<^sub>c \<Coprod> [m]\<^sub>c"
+proof -
+  obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : [n]\<^sub>c \<Coprod> [m]\<^sub>c \<rightarrow> \<nat>\<^sub>c" and
+    \<phi>_def: "\<phi> = canonically_finite_morphism n \<amalg> (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>)"
+    by (typecheck_cfuncs)
 
+  have "injective \<phi>"
+  proof (etcs_subst injective_def2, auto)
+    fix x y
+    assume x_type[type_rule]: "x \<in>\<^sub>c [n]\<^sub>c \<Coprod> [m]\<^sub>c"
+    assume y_type[type_rule]: "y \<in>\<^sub>c [n]\<^sub>c \<Coprod> [m]\<^sub>c"
+    assume \<phi>_eq: "\<phi> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c y"
 
+    show "x = y"
+    proof (cases "\<exists> x'. x = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' \<and> x' \<in>\<^sub>c [m]\<^sub>c", auto)
+      fix x'
+      assume x_type[type_rule]: "x' \<in>\<^sub>c [m]\<^sub>c"
+      assume x_right: "x = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x'"
 
+      show "right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' = y"
+      proof (cases "\<exists> y'. y = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y' \<and> y' \<in>\<^sub>c [m]\<^sub>c", auto)
+        fix y'
+        assume y_type[type_rule]: "y' \<in>\<^sub>c [m]\<^sub>c"
+        assume y_right: "y = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
+
+        have "(add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>) \<circ>\<^sub>c x' = (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>) \<circ>\<^sub>c y'"
+          using \<phi>_eq unfolding \<phi>_def x_right y_right by (typecheck_cfuncs_prems, auto simp add: comp_associative2 right_coproj_cfunc_coprod)
+        then have "add2 \<circ>\<^sub>c \<langle>n, canonically_finite_morphism m \<circ>\<^sub>c x'\<rangle> = add2 \<circ>\<^sub>c \<langle>n, canonically_finite_morphism m \<circ>\<^sub>c y'\<rangle>"
+          by (typecheck_cfuncs_prems, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
+        then have "canonically_finite_morphism m \<circ>\<^sub>c x' = canonically_finite_morphism m \<circ>\<^sub>c y'"
+          by (fold add_def, typecheck_cfuncs_prems, smt add_commutes add_cancellative)
+        then have "x' = y'"
+          using canonically_finite_morph_mono monomorphism_def3 by (typecheck_cfuncs_prems, blast)
+        then show "right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
+          by auto
+      next
+        assume "\<forall>y'. y = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y' \<longrightarrow> \<not> y' \<in>\<^sub>c [m]\<^sub>c"
+        then obtain y' where y'_type[type_rule]: "y' \<in>\<^sub>c [n]\<^sub>c" and
+          y_left: "y = left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
+          using coprojs_jointly_surj y_type by blast
+        then show "right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' = y"
+          oops
+
+lemma 
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "[n \<cdot>\<^sub>\<nat> m]\<^sub>c \<cong> [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
+proof -
+  obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c \<rightarrow> \<nat>\<^sub>c" and
+    \<phi>_def: "\<phi> = mult2 \<circ>\<^sub>c (canonically_finite_morphism n \<times>\<^sub>f canonically_finite_morphism m)"
+    by (typecheck_cfuncs)
+  oops
 
 theorem Herrlichs_finiteness_criterion: 
   "is_finite A = (\<nexists> f. f: \<nat>\<^sub>c \<rightarrow> A \<and> injective f)"
