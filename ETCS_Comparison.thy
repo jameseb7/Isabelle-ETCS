@@ -143,6 +143,9 @@ proof -
     using m_type n_type comp_associative2 unfolding leq_def by (typecheck_cfuncs, auto)
 qed
 
+
+
+
 lemma add_monotonic:
   assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and u_type: "u \<in>\<^sub>c \<nat>\<^sub>c" and v_type: "v \<in>\<^sub>c \<nat>\<^sub>c"
   assumes m_leq_n: "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>" 
@@ -158,6 +161,8 @@ proof -
   show "leq \<circ>\<^sub>c \<langle>m +\<^sub>\<nat> u, n +\<^sub>\<nat> v\<rangle> = \<t>"
     by (metis add_type combined_Eqns exists_implies_leq_true m_type u_type)
 qed
+
+
 
 lemma leq_transitivity:
   assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and p_type: "p \<in>\<^sub>c \<nat>\<^sub>c"
@@ -221,10 +226,38 @@ proof -
     using add_respects_zero_on_left k_def n_type by blast
 qed
 
+
+
+
+
+
+
 lemma zero_is_smallest:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "leq \<circ>\<^sub>c\<langle>zero ,n\<rangle> = \<t>"
   using add_respects_zero_on_right assms exists_implies_leq_true zero_type by blast
+
+
+lemma fewer_is_less: 
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" 
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "k \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "m +\<^sub>\<nat> k \<le>\<^sub>\<nat> n"
+  shows "m \<le>\<^sub>\<nat> n"
+  using assms unfolding leq_infix_def by (typecheck_cfuncs, metis add_commutes add_type assms(3) exists_implies_leq_true leq_infix_def leq_transitivity)
+
+
+lemma fewer_is_less':
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and u_type: "u \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes m_leq_n: "leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>" 
+  assumes u_leq_v: "leq \<circ>\<^sub>c \<langle>u, m\<rangle> = \<t>" 
+  shows "leq \<circ>\<^sub>c \<langle>u, n\<rangle> = \<t>"
+  by (meson leq_transitivity m_leq_n m_type n_type u_leq_v u_type) 
+
+
+
+
+
 
 lemma lqe_connexity:
   assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -973,6 +1006,10 @@ theorem strong_induction:
   assumes base_case: "P \<circ>\<^sub>c zero = \<t>"
   assumes induction_case: "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (\<And>k. k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> k \<le>\<^sub>\<nat> n \<Longrightarrow> P \<circ>\<^sub>c k = \<t>) \<Longrightarrow>   P \<circ>\<^sub>c (successor \<circ>\<^sub>c n) = \<t>"
   shows "P \<circ>\<^sub>c n = \<t>"
+  sorry
+
+
+(*
 proof - 
   obtain Q where Q_type[type_rule]: "Q : \<nat>\<^sub>c \<rightarrow> \<Omega>" 
       and Q_def: "Q = (FORALL \<nat>\<^sub>c ) \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>"
@@ -1016,7 +1053,7 @@ proof -
       by(etcs_assocr, simp)
     then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> IMPLIES \<circ>\<^sub>c (\<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c \<langle>k,n \<rangle>)  = \<t>"
       oops
-
+*)
 
 
 
@@ -1039,6 +1076,7 @@ proof -
 
 
 thm nat_induction
+
 
 
 theorem well_ordering_principle:

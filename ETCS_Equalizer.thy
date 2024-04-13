@@ -95,6 +95,11 @@ proof -
 qed
 
 
+
+
+
+
+
 (*Definition 2.1.32*)
 definition factors_through :: "cfunc  \<Rightarrow> cfunc \<Rightarrow> bool" (infix "factorsthru" 90)
   where "g factorsthru f \<longleftrightarrow> (\<exists> h. (h: domain(g)\<rightarrow> domain(f)) \<and> f \<circ>\<^sub>c h = g)"
@@ -118,6 +123,65 @@ next
     unfolding cfunc_type_def factors_through_def
     by (metis RHS assms(1) assms(3) assms(4) cfunc_type_def equalizer_def)
 qed
+
+
+
+
+
+
+
+
+
+
+lemma isomorphic_to_equalizer_is_equalizer:
+  assumes "\<phi>: E' \<rightarrow> E"
+  assumes "isomorphism \<phi>"
+  assumes "equalizer E m f g" 
+  assumes "f : X \<rightarrow> Y"
+  assumes "g : X \<rightarrow> Y"
+  assumes "m : E \<rightarrow> X"
+  shows   "equalizer E' (m \<circ>\<^sub>c \<phi>) f g"
+proof - 
+  obtain \<phi>_inv where \<phi>_inv_type[type_rule]: "\<phi>_inv : E \<rightarrow> E'" and \<phi>_inv_\<phi>: "\<phi>_inv \<circ>\<^sub>c \<phi> = id(E')" and \<phi>\<phi>_inv: "\<phi> \<circ>\<^sub>c \<phi>_inv = id(E)"
+    using assms(1,2) cfunc_type_def isomorphism_def by auto
+
+  have equalizes: "f \<circ>\<^sub>c m \<circ>\<^sub>c \<phi> = g \<circ>\<^sub>c m \<circ>\<^sub>c \<phi>"
+    using assms apply typecheck_cfuncs
+  using assms(3) comp_associative2 equalizer_def by force
+    have "(\<forall>h F. h : F \<rightarrow> X \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E' \<and> (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = h))"
+    proof(auto)
+      fix h F
+      assume h_type[type_rule]: "h : F \<rightarrow> X"
+      assume h_equalizes: "f \<circ>\<^sub>c h = g \<circ>\<^sub>c h"
+      have k_exists_uniquely: "\<exists>! k. k: F  \<rightarrow> E \<and> m \<circ>\<^sub>c k = h"
+        using assms equalizer_def2 h_equalizes by (typecheck_cfuncs, auto)
+      then obtain k where k_type[type_rule]: "k: F  \<rightarrow> E" and k_def: "m \<circ>\<^sub>c k = h"
+        by blast
+      then show "\<exists>k. k : F \<rightarrow> E' \<and> (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = h"
+        using assms by (typecheck_cfuncs, smt (z3) \<phi>\<phi>_inv \<phi>_inv_type comp_associative2 comp_type id_right_unit2 k_exists_uniquely)
+    next
+      fix F k y
+      assume "(m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k : F \<rightarrow> X"
+      assume "f \<circ>\<^sub>c (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = g \<circ>\<^sub>c (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k"
+      assume k_type[type_rule]: "k : F \<rightarrow> E'"
+      assume y_type[type_rule]: "y : F \<rightarrow> E'"
+      assume "(m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c y = (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k"
+      then show "k = y"
+        by (typecheck_cfuncs, smt (verit, ccfv_threshold) assms(1,2,3) cfunc_type_def comp_associative comp_type equalizer_def id_left_unit2 isomorphism_def)
+    qed
+    then show ?thesis
+      by (smt (verit, best) assms(1,4,5,6) comp_type equalizer_def equalizes)
+qed
+
+
+
+
+
+
+
+
+
+
 
 (*Proposition 2.1.34*)
 lemma equalizer_is_monomorphism:

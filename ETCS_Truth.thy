@@ -68,6 +68,8 @@ proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
     using assms(1) assms(3) cfunc_type_def by auto
 qed
 
+
+
 lemma characteristic_func_false_not_relative_member:
   assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<f>"
@@ -97,6 +99,22 @@ proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
   then show "False"
     using true_false_distinct by auto
 qed
+
+lemma relative_member_characteristic_func_true:
+  assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
+  assumes "x \<in>\<^bsub>X\<^esub> (B,m)"
+  shows "characteristic_func m \<circ>\<^sub>c x = \<t>"
+  by (meson assms(4) characteristic_func_false_not_relative_member characteristic_func_type comp_type relative_member_def2 true_false_only_truth_values)
+
+
+
+lemma not_relative_member_characteristic_func_false:
+  assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
+  assumes "\<not> (x \<in>\<^bsub>X\<^esub> (B,m))"
+  shows "characteristic_func m \<circ>\<^sub>c x = \<f>"
+  by (meson assms characteristic_func_true_relative_member characteristic_func_type comp_type true_false_only_truth_values)
+
+
 
 definition eq_pred :: "cset \<Rightarrow> cfunc" where
   "eq_pred X = (THE \<chi>. is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) \<chi>)"

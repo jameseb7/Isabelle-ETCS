@@ -191,8 +191,7 @@ qed
 lemma canonically_finite_morph_mono:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "monomorphism(canonically_finite_morphism n)"
-  using assms  
-  by (meson canonically_finite_morphism_def2 equalizer_is_monomorphism)
+  by (meson canonically_finite_morphism_def2 equalizer_is_monomorphism assms)
 
 lemma member_canonically_finite_set:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -569,7 +568,7 @@ lemma strange_elems_of_can_finite_sets:
 
 
 
-
+(*Should we delete this now that we have the summation version which is more general?*)
 lemma canonically_finite_succ:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "[successor \<circ>\<^sub>c n]\<^sub>c \<cong> [n]\<^sub>c \<Coprod> one"
@@ -662,13 +661,13 @@ lemma third_canonically_finite_set_Omega:
   
 
 
-lemma 
+lemma sum_of_canonically_finite_sets:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
   shows "[n +\<^sub>\<nat> m]\<^sub>c \<cong> [n]\<^sub>c \<Coprod> [m]\<^sub>c"
 proof -
   obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : [n]\<^sub>c \<Coprod> [m]\<^sub>c \<rightarrow> \<nat>\<^sub>c" and
     \<phi>_def: "\<phi> = canonically_finite_morphism n \<amalg> (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>)"
-    by (typecheck_cfuncs)
+    by typecheck_cfuncs
 
   have "injective \<phi>"
   proof (etcs_subst injective_def2, auto)
@@ -680,13 +679,13 @@ proof -
     show "x = y"
     proof (cases "\<exists> x'. x = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' \<and> x' \<in>\<^sub>c [m]\<^sub>c", auto)
       fix x'
-      assume x_type[type_rule]: "x' \<in>\<^sub>c [m]\<^sub>c"
+      assume x'type[type_rule]: "x' \<in>\<^sub>c [m]\<^sub>c"
       assume x_right: "x = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x'"
 
       show "right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' = y"
       proof (cases "\<exists> y'. y = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y' \<and> y' \<in>\<^sub>c [m]\<^sub>c", auto)
         fix y'
-        assume y_type[type_rule]: "y' \<in>\<^sub>c [m]\<^sub>c"
+        assume y'_type[type_rule]: "y' \<in>\<^sub>c [m]\<^sub>c"
         assume y_right: "y = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
 
         have "(add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>) \<circ>\<^sub>c x' = (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>) \<circ>\<^sub>c y'"
@@ -704,17 +703,711 @@ proof -
         then obtain y' where y'_type[type_rule]: "y' \<in>\<^sub>c [n]\<^sub>c" and
           y_left: "y = left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
           using coprojs_jointly_surj y_type by blast
-        then show "right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' = y"
-          oops
 
-lemma 
+        have bnd: "successor \<circ>\<^sub>c canonically_finite_morphism n \<circ>\<^sub>c y' \<le>\<^sub>\<nat> n"
+          by (simp add: leq_infix_def member_canonically_finite_set n_type y'_type)
+
+
+        have "n +\<^sub>\<nat> (canonically_finite_morphism m \<circ>\<^sub>c x') = canonically_finite_morphism n \<circ>\<^sub>c y'"
+        proof - 
+          have "n +\<^sub>\<nat> (canonically_finite_morphism m \<circ>\<^sub>c x') = add2 \<circ>\<^sub>c \<langle>n, canonically_finite_morphism m \<circ>\<^sub>c x'\<rangle>"
+            using add_def by auto
+          also have "... = add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub> \<circ>\<^sub>c x', canonically_finite_morphism m \<circ>\<^sub>c x'\<rangle>"
+            by (typecheck_cfuncs, simp add: id_right_unit2 terminal_func_comp_elem)
+          also have "... = add2 \<circ>\<^sub>c \<langle>(n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>) \<circ>\<^sub>c x', canonically_finite_morphism m \<circ>\<^sub>c x'\<rangle>"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... = add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>  \<circ>\<^sub>c x'"
+            by (typecheck_cfuncs, simp add: cfunc_prod_comp)
+          also have "... = canonically_finite_morphism n \<amalg> (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>)  \<circ>\<^sub>c right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x'"
+            unfolding \<phi>_def by (typecheck_cfuncs, simp add: comp_associative2 right_coproj_cfunc_coprod)
+          also have "... = canonically_finite_morphism n \<amalg> (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>)  \<circ>\<^sub>c left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'" 
+             using \<phi>_eq unfolding \<phi>_def  x_right y_left by fastforce
+          also have "... = canonically_finite_morphism n \<circ>\<^sub>c y'"
+            by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod)
+          then show ?thesis 
+            by (simp add: calculation)
+        qed
+        then have "(successor \<circ>\<^sub>c n) +\<^sub>\<nat> (canonically_finite_morphism m \<circ>\<^sub>c x') \<le>\<^sub>\<nat> n "
+          using  add_respects_succ3 bnd by (typecheck_cfuncs, presburger)
+        then have "successor \<circ>\<^sub>c n \<le>\<^sub>\<nat> n "
+          by (typecheck_cfuncs, metis canonically_finite_morphism_type comp_type fewer_is_less m_type x'type)
+        then have False
+          using leq_infix_def lqe_connexity n_type nat_strict_total_order by blast
+        then show "right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' = y"
+          by simp
+      qed
+    next
+      assume "\<forall>x'. x = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x' \<longrightarrow> \<not> x' \<in>\<^sub>c [m]\<^sub>c"
+      then obtain x' where x'_type[type_rule]: "x' \<in>\<^sub>c [n]\<^sub>c" and
+          x_left: "x = left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x'"
+          using coprojs_jointly_surj x_type by blast
+
+      have x'_bnd: "successor \<circ>\<^sub>c canonically_finite_morphism n \<circ>\<^sub>c x' \<le>\<^sub>\<nat> n"
+        by (simp add: leq_infix_def member_canonically_finite_set n_type x'_type)
+    
+      show "x = y"    
+      proof(cases "\<exists> y'. y = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y' \<and> y' \<in>\<^sub>c [m]\<^sub>c", auto)
+        fix y'
+        assume y'_type[type_rule]: "y' \<in>\<^sub>c [m]\<^sub>c"
+        assume y_right: "y = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
+        
+        have " n +\<^sub>\<nat> (canonically_finite_morphism m \<circ>\<^sub>c y') = canonically_finite_morphism n \<circ>\<^sub>c x' "
+        proof - 
+          have "n +\<^sub>\<nat> (canonically_finite_morphism m \<circ>\<^sub>c y') = add2 \<circ>\<^sub>c \<langle>n, canonically_finite_morphism m \<circ>\<^sub>c y'\<rangle>"
+            using add_def by auto
+          also have "... = add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub> \<circ>\<^sub>c y', canonically_finite_morphism m \<circ>\<^sub>c y'\<rangle>"
+            by (typecheck_cfuncs, simp add: id_right_unit2 terminal_func_comp_elem)
+          also have "... = add2 \<circ>\<^sub>c \<langle>(n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>) \<circ>\<^sub>c y', canonically_finite_morphism m \<circ>\<^sub>c y'\<rangle>"
+            by (typecheck_cfuncs, simp add: comp_associative2)
+          also have "... = add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>  \<circ>\<^sub>c y'"
+            by (typecheck_cfuncs, simp add: cfunc_prod_comp)
+          also have "... = canonically_finite_morphism n \<amalg> (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>)  \<circ>\<^sub>c right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
+            unfolding \<phi>_def by (typecheck_cfuncs, simp add: comp_associative2 right_coproj_cfunc_coprod)
+          also have "... = canonically_finite_morphism n \<amalg> (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>)  \<circ>\<^sub>c left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c x'" 
+             using \<phi>_eq unfolding \<phi>_def  y_right x_left by fastforce
+          also have "... = canonically_finite_morphism n \<circ>\<^sub>c x'"
+            by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod)
+          then show ?thesis
+            by (simp add: calculation)
+        qed
+        then have "(successor \<circ>\<^sub>c n) +\<^sub>\<nat> (canonically_finite_morphism m \<circ>\<^sub>c y') \<le>\<^sub>\<nat> n "
+          using  add_respects_succ3 x'_bnd by (typecheck_cfuncs, presburger)
+        then have "successor \<circ>\<^sub>c n \<le>\<^sub>\<nat> n "
+          by (typecheck_cfuncs, metis canonically_finite_morphism_type comp_type fewer_is_less m_type y'_type)
+        then have False
+          using leq_infix_def lqe_connexity n_type nat_strict_total_order by blast
+        then show " x = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
+          by simp 
+      next
+        assume "\<forall>y'. y = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y' \<longrightarrow> \<not> y' \<in>\<^sub>c [m]\<^sub>c"
+        then obtain y' where y'_type[type_rule]: "y' \<in>\<^sub>c [n]\<^sub>c" and
+          y_left: "y = left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y'"
+          using coprojs_jointly_surj y_type by blast
+        have "canonically_finite_morphism n \<circ>\<^sub>c x' = canonically_finite_morphism n \<circ>\<^sub>c  y'"
+        proof - 
+          have "canonically_finite_morphism n \<circ>\<^sub>c x' = (canonically_finite_morphism n \<amalg> (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>) \<circ>\<^sub>c left_coproj [n]\<^sub>c [m]\<^sub>c) \<circ>\<^sub>c x'"
+            by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+          also have "... = (canonically_finite_morphism n \<amalg> (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>) \<circ>\<^sub>c left_coproj [n]\<^sub>c [m]\<^sub>c) \<circ>\<^sub>c y'"
+            using \<phi>_def \<phi>_eq comp_associative2 x_left y_left by (typecheck_cfuncs, force)
+          also have "... =canonically_finite_morphism n \<circ>\<^sub>c y'"
+            by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+          then show ?thesis
+            by (simp add: calculation)
+        qed
+        then have "x' = y'"
+          by (typecheck_cfuncs_prems, metis elem_canon_finite_def2 elem_canon_finite_set_representation)
+        then show "x=y"
+          using x_left y_left by blast
+        qed
+   qed
+ qed
+
+  have "(leq \<circ>\<^sub>c \<langle>successor, (n +\<^sub>\<nat> m)  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  \<phi> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c  \<phi>"
+  proof(rule one_separator[where X = "[n]\<^sub>c \<Coprod> [m]\<^sub>c", where Y = \<Omega>])
+    show "(leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi> : [n]\<^sub>c \<Coprod> [m]\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi> : [n]\<^sub>c \<Coprod> [m]\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+  next
+    fix nm
+    assume nm_type: "nm  \<in>\<^sub>c [n]\<^sub>c \<Coprod> [m]\<^sub>c"
+    show "((leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c nm = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c nm"
+    proof(cases "\<exists> y. nm= right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y \<and> y \<in>\<^sub>c [m]\<^sub>c", auto)
+      fix y
+      assume y_type[type_rule]: "y \<in>\<^sub>c [m]\<^sub>c"
+      assume "nm = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y" 
+
+      obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_bnd: "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> m" and k_def: "y = \<lbrakk>k:m\<rbrakk>\<^sub>c"
+        using elem_canon_finite_set_representation m_type y_type by blast
+
+      have "((leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y = 
+             (leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c (\<phi> \<circ>\<^sub>c right_coproj [n]\<^sub>c [m]\<^sub>c) \<circ>\<^sub>c y"
+        by (typecheck_cfuncs, simp add:  comp_associative2)
+      also have "... = (leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>) \<circ>\<^sub>c y"
+        by (typecheck_cfuncs, metis \<phi>_def canonically_finite_morphism_type right_coproj_cfunc_coprod)
+      also have "... = (leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c (add2 \<circ>\<^sub>c \<langle>n, canonically_finite_morphism m \<circ>\<^sub>c y\<rangle> )"
+        by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
+      also have "... = (leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c (n +\<^sub>\<nat> k )"
+        using add_def elem_canon_finite_def2 k_bnd k_def by (typecheck_cfuncs, presburger)
+      also have "... = leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c (n +\<^sub>\<nat> k ),n +\<^sub>\<nat> m\<rangle>"
+        by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
+      also have "... = \<t>"
+        by (typecheck_cfuncs, metis add_monotonic add_respects_succ1 k_bnd leq_infix_def lqe_connexity succ_n_type)
+      also have "... = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y"
+        by (typecheck_cfuncs, smt (verit, ccfv_SIG)  comp_associative2 comp_type id_right_unit2 terminal_func_comp_elem)
+      then show "((leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y"
+        by (simp add: calculation)
+    next
+      assume "\<forall>y. nm = right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y \<longrightarrow> \<not> y \<in>\<^sub>c [m]\<^sub>c"
+      then obtain y where y_type[type_rule]: "y \<in>\<^sub>c [n]\<^sub>c" and
+          y_left: "nm = left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c y"
+        by (metis coprojs_jointly_surj nm_type)
+     
+
+      have "((leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c nm =  (leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c ((\<phi> \<circ>\<^sub>c left_coproj [n]\<^sub>c [m]\<^sub>c) \<circ>\<^sub>c y)"
+        using cfunc_type_def comp_associative y_left by (typecheck_cfuncs, force)
+      also have "... = (leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c (canonically_finite_morphism n \<circ>\<^sub>c y)"
+        unfolding \<phi>_def by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
+      also have "... = leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c (canonically_finite_morphism n \<circ>\<^sub>c y),n +\<^sub>\<nat> m \<rangle>"
+        by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
+      also have "... = \<t>"
+        by (typecheck_cfuncs, metis fewer_is_less leq_infix_def member_canonically_finite_set nat_strict_total_order)
+      also have "... = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c nm"
+        by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type nm_type terminal_func_comp terminal_func_type terminal_func_unique)
+      then show "((leq \<circ>\<^sub>c \<langle>successor,n +\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c nm = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c nm"
+        by (simp add: calculation)
+    qed
+  qed
+  then obtain \<psi> where \<psi>_type[type_rule]: "\<psi> : [n]\<^sub>c \<Coprod> [m]\<^sub>c \<rightarrow> [n +\<^sub>\<nat> m]\<^sub>c" and \<psi>_def: "(canonically_finite_morphism (n +\<^sub>\<nat> m)) \<circ>\<^sub>c \<psi> = \<phi>"
+    by (typecheck_cfuncs, metis canonically_finite_morphism_def2 cfunc_type_def equalizer_def)
+  then have \<psi>_mono: "monomorphism \<psi>"
+    by (metis \<open>injective \<phi>\<close> add_type canonically_finite_morphism_type comp_monic_imp_monic' injective_imp_monomorphism m_type mem_Collect_eq n_type)
+  have "surjective \<psi>"
+  proof(etcs_subst surjective_def2, auto)
+    fix y 
+    assume y_type[type_rule]: "y \<in>\<^sub>c [n +\<^sub>\<nat> m]\<^sub>c"
+    then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "y = \<lbrakk>k:n +\<^sub>\<nat> m\<rbrakk>\<^sub>c" and k_bnd: "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> n +\<^sub>\<nat> m"
+      by (metis add_type assms elem_canon_finite_set_representation)
+    show "\<exists>x. x \<in>\<^sub>c [n]\<^sub>c \<Coprod> [m]\<^sub>c \<and> \<psi> \<circ>\<^sub>c x = y"
+    proof(cases "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> n")
+      assume case1: "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> n"
+      have "(canonically_finite_morphism (n +\<^sub>\<nat> m)) \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c (left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<lbrakk>k:n\<rbrakk>\<^sub>c)) = (canonically_finite_morphism (n +\<^sub>\<nat> m)) \<circ>\<^sub>c \<lbrakk>k:n +\<^sub>\<nat> m\<rbrakk>\<^sub>c"
+      proof - 
+        have "(canonically_finite_morphism (n +\<^sub>\<nat> m)) \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c (left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<lbrakk>k:n\<rbrakk>\<^sub>c)) = \<phi> \<circ>\<^sub>c (left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<lbrakk>k:n\<rbrakk>\<^sub>c)"
+          by (typecheck_cfuncs, smt \<psi>_def case1 comp_associative2)
+        also have "... = canonically_finite_morphism n\<circ>\<^sub>c \<lbrakk>k:n\<rbrakk>\<^sub>c"
+          unfolding \<phi>_def by (typecheck_cfuncs, simp add: case1 comp_associative2 left_coproj_cfunc_coprod)
+        also have "... = canonically_finite_morphism (n +\<^sub>\<nat> m) \<circ>\<^sub>c \<lbrakk>k:n +\<^sub>\<nat> m\<rbrakk>\<^sub>c"
+          using case1 elem_canon_finite_def2 k_bnd by (typecheck_cfuncs, presburger)
+        then show ?thesis 
+          by (simp add: calculation)
+      qed     
+      then have "\<psi> \<circ>\<^sub>c (left_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<lbrakk>k:n\<rbrakk>\<^sub>c) = y"
+        unfolding k_def by (typecheck_cfuncs_prems, meson canonically_finite_morph_mono case1 k_bnd monomorphism_def3)
+      then show ?thesis
+        by (metis case1 comp_type elem_canon_finite_set k_type left_proj_type n_type)
+    next
+      assume "\<not> successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> n"
+      then have case2: "n \<le>\<^sub>\<nat> k"
+        by (typecheck_cfuncs, simp add: nat_strict_total_order)
+      then obtain j where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and j_def: "j +\<^sub>\<nat> n = k"  
+        using assms by (typecheck_cfuncs, meson case2 leq_infix_def leq_true_implies_exists)
+      then have j_bnd: "successor \<circ>\<^sub>c j \<le>\<^sub>\<nat> m"
+        using k_bnd by (typecheck_cfuncs_prems, metis add_commutes add_monotonic leq_infix_def lqe_connexity nat_strict_total_order)
+
+
+      have "(canonically_finite_morphism (n +\<^sub>\<nat> m)) \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c (right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<lbrakk>j:m\<rbrakk>\<^sub>c)) = (canonically_finite_morphism (n +\<^sub>\<nat> m)) \<circ>\<^sub>c \<lbrakk>k:n +\<^sub>\<nat> m\<rbrakk>\<^sub>c"
+      proof - 
+        have "(canonically_finite_morphism (n +\<^sub>\<nat> m)) \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c (right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<lbrakk>j:m\<rbrakk>\<^sub>c)) = \<phi> \<circ>\<^sub>c (right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<lbrakk>j:m\<rbrakk>\<^sub>c)"
+          by (typecheck_cfuncs, metis \<psi>_def cfunc_type_def comp_associative j_bnd)
+        also have "... = (add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>[m]\<^sub>c\<^esub>, canonically_finite_morphism m\<rangle>) \<circ>\<^sub>c \<lbrakk>j:m\<rbrakk>\<^sub>c"
+          by (typecheck_cfuncs, metis (full_types) \<phi>_def canonically_finite_morphism_type comp_associative2 j_bnd right_coproj_cfunc_coprod)
+        also have "... = add2 \<circ>\<^sub>c \<langle>n, canonically_finite_morphism m \<circ>\<^sub>c \<lbrakk>j:m\<rbrakk>\<^sub>c\<rangle>"
+          by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 j_bnd terminal_func_comp_elem)
+        also have "... = (canonically_finite_morphism (n +\<^sub>\<nat> m)) \<circ>\<^sub>c \<lbrakk>k:n +\<^sub>\<nat> m\<rbrakk>\<^sub>c"
+          by (typecheck_cfuncs, metis j_def add_commutes add_def elem_canon_finite_def2 j_bnd k_bnd)
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+      then have "\<psi> \<circ>\<^sub>c (right_coproj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<lbrakk>j:m\<rbrakk>\<^sub>c) = y"
+        unfolding k_def by (typecheck_cfuncs_prems, meson canonically_finite_morph_mono j_bnd k_bnd monomorphism_def3)
+      then show ?thesis
+        by (metis comp_type elem_canon_finite_set j_bnd j_type m_type right_proj_type)
+    qed
+  qed
+  then show ?thesis
+    using \<psi>_type surjective_is_epimorphism \<psi>_mono epi_mon_is_iso is_isomorphic_def isomorphic_is_symmetric by blast
+qed
+
+
+(*Maybe we need to use canonical_finite_inclusion n succ n   ?*)
+lemma canonically_finite_sets_are_finite_aux:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "\<not>([n]\<^sub>c \<cong> [successor  \<circ>\<^sub>c  n]\<^sub>c)"
+proof(rule ccontr, auto)
+  assume "[n]\<^sub>c \<cong> [successor \<circ>\<^sub>c n]\<^sub>c"
+  then obtain \<psi> where \<phi>_type[type_rule]: "\<psi> : [n]\<^sub>c \<rightarrow> [successor \<circ>\<^sub>c n]\<^sub>c" and \<psi>_iso: "isomorphism \<psi>"
+    using is_isomorphic_def by blast
+  then have new_equalizer: "equalizer [n]\<^sub>c (canonically_finite_morphism (successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<psi>) (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) (leq \<circ>\<^sub>c \<langle>successor, successor \<circ>\<^sub>c n  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)"
+    by (typecheck_cfuncs, simp add: \<psi>_iso canonically_finite_morphism_def2 comp_associative2 isomorphic_to_equalizer_is_equalizer)
+  
+  have "(leq \<circ>\<^sub>c \<langle>successor, successor \<circ>\<^sub>c n  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)  \<circ>\<^sub>c n = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c n"
+    by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 lqe_connexity succ_n_type terminal_func_comp_elem)
+  then have "n factorsthru (canonically_finite_morphism (successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<psi>)"
+    using  xfactorthru_equalizer_iff_fx_eq_gx by (-, typecheck_cfuncs, smt new_equalizer)
+  then obtain u where u_type[type_rule]: "u \<in>\<^sub>c [n]\<^sub>c" and u_def: "(canonically_finite_morphism (successor \<circ>\<^sub>c n) \<circ>\<^sub>c \<psi>) \<circ>\<^sub>c u = n"
+    by (typecheck_cfuncs, meson factors_through_def2)
+  then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_bnd: "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> n" and k_def: "u = \<lbrakk>k:n\<rbrakk>\<^sub>c"
+    by (metis elem_canon_finite_set_representation n_type)
+  have "n= canonically_finite_morphism (successor \<circ>\<^sub>c n) \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c u)"
+    by (typecheck_cfuncs, simp add: comp_associative2 u_def)
+  then have "\<psi> \<circ>\<^sub>c u = \<lbrakk>n:successor \<circ>\<^sub>c n\<rbrakk>\<^sub>c"
+    by (typecheck_cfuncs, metis canonically_finite_morph_mono canonically_finite_morphism_type elem_canon_finite_def2 leq_infix_def lqe_connexity monomorphism_def2)
+  
+  oops
+
+
+
+
+
+
+
+theorem Euclid's_division_lemma:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" and "m \<noteq> zero"
+  shows "\<exists> q r. ((q \<in>\<^sub>c \<nat>\<^sub>c) \<and> (r \<in>\<^sub>c \<nat>\<^sub>c) \<and> (n = (m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r) \<and> (successor  \<circ>\<^sub>c r \<le>\<^sub>\<nat> m)) \<and> 
+         (\<forall> s t. (s \<in>\<^sub>c \<nat>\<^sub>c) \<and> (t \<in>\<^sub>c \<nat>\<^sub>c) \<and> (n = (m \<cdot>\<^sub>\<nat> s) +\<^sub>\<nat> t) \<and> (successor  \<circ>\<^sub>c t \<le>\<^sub>\<nat> m) \<longrightarrow> (s=q) \<and> (t=r))"
+proof(cases "n=zero")
+  show "n= zero \<Longrightarrow> ?thesis"
+    by(rule_tac x=zero in exI, rule_tac x=zero in exI, typecheck_cfuncs, metis add_respects_zero_on_right add_type
+       assms(2,3) exists_implies_leq_true leq_infix_def mult_cancellative mult_commutative mult_respects_zero_right
+       mult_type nat_strict_total_order nonzero_is_succ zero_is_smallest zero_type)
+  next
+    assume "n \<noteq> zero"
+    obtain f where f_type[type_rule]: "f : \<nat>\<^sub>c \<rightarrow> \<Omega>" and f_def: "f = leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, mult2 \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>"
+      using assms by typecheck_cfuncs
+    obtain g where g_type[type_rule]: "g : \<nat>\<^sub>c \<rightarrow> \<Omega>" and g_def: "g = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
+      using assms by typecheck_cfuncs
+  
+    then obtain E e where  e_type[type_rule]: "e : E \<rightarrow> \<nat>\<^sub>c" and  E_def: "f \<circ>\<^sub>c e = g \<circ>\<^sub>c e \<and> (\<forall> h F. ((h : F \<rightarrow> \<nat>\<^sub>c) \<and> (f \<circ>\<^sub>c h = g \<circ>\<^sub>c h)) \<longrightarrow> (\<exists>! k. (k : F \<rightarrow> E) \<and> e \<circ>\<^sub>c k = h))"
+      using equalizer_exists2 by (typecheck_cfuncs, blast)
+    then have equalizer: "equalizer E e f g"   
+      unfolding equalizer_def by (typecheck_cfuncs, blast)
+    then have mono_e: "monomorphism e"
+      using equalizer equalizer_is_monomorphism by blast
+  
+    have satisfying_set:  "\<And>j. (j \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (j  \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E,e)) = (successor \<circ>\<^sub>c n \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> j))"
+    proof - 
+      have f1: "\<And>j. (j \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (j  \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E,e)) = (f \<circ>\<^sub>c j = \<t>))"
+      proof(auto)
+        fix j 
+        assume j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c"
+        assume j_relmem: "j \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E, e)"
+        then have "j factorsthru e"
+          using j_relmem by (meson relative_member_def2)          
+        then obtain h where h_type[type_rule]: "h \<in>\<^sub>c E" and h_def: "e \<circ>\<^sub>c h = j"
+          using factors_through_def2 by (typecheck_cfuncs, auto)
+        have "f \<circ>\<^sub>c j = (f \<circ>\<^sub>c e) \<circ>\<^sub>c h"
+          using comp_associative2 e_type f_type h_def h_type by blast
+        also have "... = g \<circ>\<^sub>c (e \<circ>\<^sub>c h)"
+          using E_def comp_associative2 e_type g_type h_type by auto
+        also have "... = \<t>"
+          using comp_associative2 g_def h_def id_right_unit2 j_type terminal_func_comp_elem terminal_func_type true_func_type by fastforce
+        then show "f \<circ>\<^sub>c j = \<t>"
+          by (simp add: calculation)
+      next
+        fix j 
+        assume j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c"
+        assume fj_true: "f \<circ>\<^sub>c j = \<t>"
+        have "g \<circ>\<^sub>c j = \<t>"
+          by (typecheck_cfuncs, smt (z3) comp_associative2 g_def id_right_unit2 terminal_func_comp_elem terminal_func_type)
+        then obtain k where k_type[type_rule]: "k \<in>\<^sub>c E" and k_def: "e \<circ>\<^sub>c k = j"
+          by (typecheck_cfuncs, metis E_def fj_true)
+        then have "j factorsthru e"
+          using e_type factors_through_def2 j_type by auto
+        then show "j \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E, e)"
+          by (simp add:  e_type j_type mono_e relative_member_def2)
+      qed
+  
+      have "\<And>j. (j \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (f \<circ>\<^sub>c j = \<t>) = (successor \<circ>\<^sub>c n \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> j))"
+      proof(auto) 
+        fix j
+        assume j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c"
+        assume "f \<circ>\<^sub>c j = \<t>"
+        then show "successor \<circ>\<^sub>c n \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> j"
+          using assms unfolding f_def  by (-,typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 leq_infix_def mult_apply1right terminal_func_comp_elem)
+      next
+        fix j 
+        assume j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c"
+        assume "successor \<circ>\<^sub>c n \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> j"
+        then show "f \<circ>\<^sub>c j = \<t>"
+          using assms unfolding f_def by (-, typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 leq_infix_def mult_apply1right terminal_func_comp_elem)
+      qed
+      then show "\<And>j. (j \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (j  \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E,e)) = (successor \<circ>\<^sub>c n \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> j))"
+        by (simp add: f1)
+    qed
+  
+    have "successor \<circ>\<^sub>c n \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)" 
+      by (typecheck_cfuncs, smt (z3) add_monotonic add_respects_succ2 add_respects_zero_on_left assms(3) leq_infix_def lqe_connexity mult_monotonic nonzero_is_succ s0_is_left_id succ_n_type zero_is_smallest zero_type assms)  
+    then have "(successor \<circ>\<^sub>c n) \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E,e)"
+      by (simp add: assms(1) satisfying_set succ_n_type)  
+    then have "nonempty E"
+      by (meson  factors_through_def2 nonempty_def relative_member_def2) 
+    have  "(E,e) \<subseteq>\<^sub>c \<nat>\<^sub>c"
+       using \<open>successor \<circ>\<^sub>c n \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E, e)\<close> relative_member_def2 subobject_of_def2 by blast
+    then obtain min where min_type[type_rule]: "min \<in>\<^sub>c \<nat>\<^sub>c" and min_rel_type: "min \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E, e)" and m_def: "\<forall> s. s \<in>\<^bsub>\<nat>\<^sub>c\<^esub> (E, e) \<longrightarrow> min  \<le>\<^sub>\<nat> s"
+      by (metis  \<open>nonempty E\<close> relative_member_def2 well_ordering_principle)  
+    then have "min \<noteq> zero"
+      using assms(1) assms(2) leq_infix_def mult_respects_zero_right nat_strict_total_order satisfying_set zero_is_smallest by force
+    then obtain q where q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and q_def: "successor \<circ>\<^sub>c q = min"
+      using min_type nonzero_is_succ by blast
+    then have "q \<cdot>\<^sub>\<nat> m \<le>\<^sub>\<nat> n"  
+      by (typecheck_cfuncs, metis satisfying_set m_def min_rel_type min_type mult_commutative nat_strict_total_order q_def assms(1,2))
+    then obtain r where r_type[type_rule]: "r \<in>\<^sub>c \<nat>\<^sub>c" and r_def: "r +\<^sub>\<nat> (q \<cdot>\<^sub>\<nat> m) = n"
+      using assms by (typecheck_cfuncs, metis leq_infix_def leq_true_implies_exists)
+    have r_bnd: "successor \<circ>\<^sub>c r \<le>\<^sub>\<nat> m"
+    proof(rule ccontr)
+      assume "\<not> successor \<circ>\<^sub>c r \<le>\<^sub>\<nat> m"
+      then have "m \<le>\<^sub>\<nat> r"
+        by (simp add: assms(2) nat_strict_total_order r_type)
+      then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "r = m +\<^sub>\<nat> k"
+        by (metis add_commutes assms(2) leq_infix_def leq_true_implies_exists r_type)    
+      then have "(m +\<^sub>\<nat> k) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> q) = n"
+        using assms k_def mult_commutative r_def by (typecheck_cfuncs, presburger)
+      then have "((successor \<circ>\<^sub>c q) \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> k = n"
+        using assms add_associates add_commutes k_def mult_closure mult_commutative mult_respects_succ_right r_def by (typecheck_cfuncs, force)
+      then have "min \<cdot>\<^sub>\<nat> m \<le>\<^sub>\<nat> n"
+        by (typecheck_cfuncs, metis add_respects_zero_on_left exists_implies_leq_true fewer_is_less k_type leq_infix_def q_def zero_type assms(1,2))
+      then show False
+        using assms(1,2) min_rel_type min_type mult_closure mult_commutative nat_strict_total_order satisfying_set by force
+    qed
+    have uniqueness: "\<forall>s t. s \<in>\<^sub>c \<nat>\<^sub>c \<and> t \<in>\<^sub>c \<nat>\<^sub>c \<and> n = m \<cdot>\<^sub>\<nat> s +\<^sub>\<nat> t \<and> successor \<circ>\<^sub>c t \<le>\<^sub>\<nat> m \<longrightarrow> s = q \<and> t = r"
+    proof(auto)
+      fix q' r'
+      assume q'_type[type_rule]: "q' \<in>\<^sub>c \<nat>\<^sub>c"
+      assume r'_type[type_rule]: "r' \<in>\<^sub>c \<nat>\<^sub>c"
+      assume alt_sol: "n = m \<cdot>\<^sub>\<nat> q' +\<^sub>\<nat> r'"
+      assume "successor \<circ>\<^sub>c r' \<le>\<^sub>\<nat> m"
+      show "q' = q"
+      proof(cases "q \<le>\<^sub>\<nat> q'")
+        assume "q \<le>\<^sub>\<nat> q'"
+        then obtain j where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and j_def: "q +\<^sub>\<nat> j = q'"
+          by (metis add_commutes leq_infix_def leq_true_implies_exists q'_type q_type)        
+        show "q' = q"
+        proof(cases "r' \<le>\<^sub>\<nat> r")
+          assume "r' \<le>\<^sub>\<nat> r"
+          then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "r' +\<^sub>\<nat> k = r"
+            by (metis add_commutes leq_infix_def leq_true_implies_exists r'_type r_type)
+  
+          have "r = (j\<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> r'"
+          proof - 
+            have "((j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> r') +\<^sub>\<nat> (q'\<cdot>\<^sub>\<nat> m) = (j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (r' +\<^sub>\<nat> (q'\<cdot>\<^sub>\<nat> m))"
+              using assms(2) add_associates by (typecheck_cfuncs, presburger)
+            also have "... = (j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> ((q\<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> r)"
+              using assms(2) add_commutes alt_sol mult_commutative r_def by (typecheck_cfuncs, force)
+            also have "... = ((j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (q\<cdot>\<^sub>\<nat> m))  +\<^sub>\<nat> r"
+              by (typecheck_cfuncs, simp add: add_associates assms(2))
+            also have "... = ((j +\<^sub>\<nat> q) \<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> r"
+              by (typecheck_cfuncs, simp add: mult_Left_Distributivity assms(2))
+            also have "... = (q' \<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> r"
+              using assms(2) add_commutes j_def by (typecheck_cfuncs, presburger)
+            then show ?thesis
+              by (typecheck_cfuncs, smt (z3) add_cancellative add_commutes add_type calculation j_def mult_closure q_type assms(2))
+          qed
+          then have k_eq_mj: "k = m  \<cdot>\<^sub>\<nat> j"
+            using assms(2)  by (typecheck_cfuncs, metis add_cancellative add_commutes  k_def mult_commutative r'_type)
+          have "j = zero"
+          proof(rule ccontr)
+            assume BWOC: "j \<noteq> zero"
+            then have "m \<le>\<^sub>\<nat> k"
+              by (metis BWOC k_eq_mj add_respects_zero_on_left exists_implies_leq_true fewer_is_less j_type leq_infix_def mult_respects_succ_right mult_type nonzero_is_succ assms(2))
+            have "k \<le>\<^sub>\<nat> r"
+              using exists_implies_leq_true k_def k_type leq_infix_def r'_type r_type by blast
+            then have "k \<noteq> k"
+              by (typecheck_cfuncs, metis  \<open>m \<le>\<^sub>\<nat> k\<close> r_bnd add_commutes assms(2) fewer_is_less leq_infix_def leq_true_implies_exists nat_strict_total_order r_type)
+            then show False
+              by simp
+          qed
+          show "q'=q"
+            using \<open>j = zero\<close> add_respects_zero_on_right j_def q_type by blast
+        next
+          assume "\<not> r' \<le>\<^sub>\<nat> r"
+          then have "r \<le>\<^sub>\<nat> r'"
+            by (typecheck_cfuncs, meson leq_infix_def lqe_connexity)
+          then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "r +\<^sub>\<nat> k = r'"
+            by (metis add_commutes leq_infix_def leq_true_implies_exists r'_type r_type)
+          
+          have f1: "(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r =  m \<cdot>\<^sub>\<nat> (q +\<^sub>\<nat> j) +\<^sub>\<nat> r'"
+            using add_commutes alt_sol j_def mult_commutative r_def assms(2) by (typecheck_cfuncs, presburger)
+          also have "... = ((m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> j)) +\<^sub>\<nat> r'"
+            by (typecheck_cfuncs, simp add: mult_right_distributivity assms(2))
+          also have "... = (m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> ((m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (r +\<^sub>\<nat> k))"
+            using assms(2) add_associates k_def by (typecheck_cfuncs, presburger)
+          also have "... = (m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> ((r +\<^sub>\<nat> k) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> j))"
+            by (typecheck_cfuncs, simp add: add_commutes assms(2))
+          also have "... = (m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (r +\<^sub>\<nat> (k +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> j)))"
+            using assms(2) add_associates by (typecheck_cfuncs, presburger)
+          also have "... = ((m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r) +\<^sub>\<nat> (k +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> j))"
+            using assms(2) by (typecheck_cfuncs, meson add_associates)
+          then have "k +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> j) = zero"
+            by (metis  add_cancellative add_commutes add_respects_zero_on_right add_type alt_sol assms(1,2) f1 calculation j_def j_type k_type mult_type zero_type)
+          then have "k = zero"
+            by (typecheck_cfuncs, metis add_respects_zero_on_left assms(2) exists_implies_leq_true fewer_is_less j_type leq_infix_def mult_type nat_strict_total_order nonzero_is_succ)
+          then show ?thesis
+            using \<open>\<not> r' \<le>\<^sub>\<nat> r\<close> \<open>r \<le>\<^sub>\<nat> r'\<close> add_respects_zero_on_right k_def r_type by force
+        qed
+      next
+        assume "\<not> q \<le>\<^sub>\<nat> q'"
+        then have "q' \<le>\<^sub>\<nat> q"
+          by (typecheck_cfuncs, meson leq_infix_def lqe_connexity)
+        then obtain j where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and j_def: "q' +\<^sub>\<nat> j = q"
+          by (metis add_commutes leq_infix_def leq_true_implies_exists q'_type q_type)        
+         show "q' = q"
+        proof(cases "r' \<le>\<^sub>\<nat> r")
+          assume "r' \<le>\<^sub>\<nat> r"
+          then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "r' +\<^sub>\<nat> k = r"
+            by (metis add_commutes leq_infix_def leq_true_implies_exists r'_type r_type)
+          have "(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r = m \<cdot>\<^sub>\<nat> (q' +\<^sub>\<nat> j) +\<^sub>\<nat> r"
+            using assms(2) j_def k_def by blast
+          also have "... = ((m \<cdot>\<^sub>\<nat> q') +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat>j )) +\<^sub>\<nat> r" 
+             by (typecheck_cfuncs, smt assms(2) mult_right_distributivity)
+          also have "... = ((m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> q')) +\<^sub>\<nat> r" 
+             by (typecheck_cfuncs, simp add: add_commutes assms(2))
+          also have "... = (m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> ((m \<cdot>\<^sub>\<nat> q') +\<^sub>\<nat> r)" 
+             by (typecheck_cfuncs, simp add: add_associates assms(2))
+          also have "... = (m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (((m \<cdot>\<^sub>\<nat> q') +\<^sub>\<nat> r') +\<^sub>\<nat> k)" 
+             by (typecheck_cfuncs, metis add_associates k_def assms(2))     
+          also have "... = (m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (((m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r)  +\<^sub>\<nat> k)" 
+            using assms(2)  add_commutes alt_sol mult_commutative r_def by (typecheck_cfuncs, presburger)
+          also have "... = ((m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> ((m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r))  +\<^sub>\<nat> k" 
+            by (typecheck_cfuncs, meson add_associates assms(2))
+          also have "... = ((m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r) +\<^sub>\<nat>  ((m \<cdot>\<^sub>\<nat> j)  +\<^sub>\<nat> k)" 
+            by (typecheck_cfuncs, metis add_associates4 add_commutes assms(2))
+          then have "((m \<cdot>\<^sub>\<nat> j)  +\<^sub>\<nat> k) = zero"
+            by (typecheck_cfuncs, metis  add_cancellative add_commutes add_respects_zero_on_left assms(1,2) calculation mult_commutative mult_type q_type r_def r_type)
+          then have "j = zero"  
+            by (typecheck_cfuncs, metis assms(2,3) fewer_is_less k_type l_mult_cancellative leq_infix_def lqe_antisymmetry mult_respects_zero_right mult_type zero_is_smallest)
+          then show ?thesis
+            using add_respects_zero_on_right j_def q'_type by auto
+        next
+          assume "\<not> r' \<le>\<^sub>\<nat> r"
+          then have "r \<le>\<^sub>\<nat> r'"
+            by (typecheck_cfuncs, meson leq_infix_def lqe_connexity)
+          then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "r +\<^sub>\<nat> k = r'"
+            by (metis add_commutes leq_infix_def leq_true_implies_exists r'_type r_type)
+          have "r' = (j\<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> r"
+          proof - 
+            have "((j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (q\<cdot>\<^sub>\<nat> m))  +\<^sub>\<nat> r' = ((j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> r') +\<^sub>\<nat> (q\<cdot>\<^sub>\<nat> m)"
+              using assms(2) add_associates add_commutes by (typecheck_cfuncs, presburger)
+            also have "... = (j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (r' +\<^sub>\<nat> (q\<cdot>\<^sub>\<nat> m))"
+              using assms(2) add_associates by (typecheck_cfuncs, presburger)
+            also have "... = (j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> ((q\<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> r')"
+              using assms(2) add_commutes alt_sol mult_commutative r_def by (typecheck_cfuncs, force)
+            also have "... = (j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (((q'\<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> (j \<cdot>\<^sub>\<nat>m))  +\<^sub>\<nat> r')"
+              using assms(2) j_def mult_Left_Distributivity by (typecheck_cfuncs, force)
+            also have "... = (j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (((j \<cdot>\<^sub>\<nat>m)  +\<^sub>\<nat> (q'\<cdot>\<^sub>\<nat> m))  +\<^sub>\<nat> r')"
+              using assms(2)  add_commutes by (typecheck_cfuncs, presburger)          
+            also have "... = (j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> ((j \<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> ((q\<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> r))"
+              using assms(2) add_associates add_commutes alt_sol mult_commutative r_def by (typecheck_cfuncs, force)
+            also have "... = (j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (((q\<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> r)  +\<^sub>\<nat>(j \<cdot>\<^sub>\<nat> m) )"
+              using assms(2)  by (typecheck_cfuncs, simp add: add_commutes)
+            also have "... = ((j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (q\<cdot>\<^sub>\<nat> m)) +\<^sub>\<nat> (r  +\<^sub>\<nat>(j \<cdot>\<^sub>\<nat> m) )"
+              using assms(2) add_associates by (typecheck_cfuncs, presburger)
+            also have "... = ((j \<cdot>\<^sub>\<nat> m) +\<^sub>\<nat> (q\<cdot>\<^sub>\<nat> m)) +\<^sub>\<nat> ((j \<cdot>\<^sub>\<nat> m)  +\<^sub>\<nat> r )"
+              using assms(2) add_commutes by (typecheck_cfuncs, presburger)
+            then show ?thesis
+              by (typecheck_cfuncs, smt (z3) add_cancellative add_commutes add_type calculation j_def mult_closure q_type assms(2))
+          qed
+          then have k_eq_mj: "k = m  \<cdot>\<^sub>\<nat> j"
+            by (typecheck_cfuncs, metis add_cancellative add_commutes assms(2) k_def mult_commutative r_type)
+          have "j = zero"
+          proof(rule ccontr)
+            assume BWOC: "j \<noteq> zero"
+            then have "m \<le>\<^sub>\<nat> k"
+              by (metis BWOC k_eq_mj add_respects_zero_on_left exists_implies_leq_true fewer_is_less j_type leq_infix_def mult_respects_succ_right mult_type nonzero_is_succ assms(2))
+            have "k \<le>\<^sub>\<nat> r'"
+              using exists_implies_leq_true k_def k_type leq_infix_def r'_type r_type by blast
+            then have "k \<noteq> k"
+              by (typecheck_cfuncs, metis \<open>m \<le>\<^sub>\<nat> k\<close> \<open>r' = j \<cdot>\<^sub>\<nat> m +\<^sub>\<nat> r\<close> \<open>successor \<circ>\<^sub>c r' \<le>\<^sub>\<nat> m\<close> assms(2,3) k_eq_mj fewer_is_less j_type mult_commutative nat_strict_total_order nonzero_is_succ r'_type r_type)
+            then show False
+              by simp
+          qed
+          show "q'=q"
+            using \<open>j = zero\<close> add_respects_zero_on_right j_def q'_type by auto 
+        qed
+      qed
+      then show "r' = r"
+        by (metis add_cancellative add_commutes alt_sol assms(2) mult_commutative mult_type q'_type r'_type r_def r_type)
+    qed
+  then show ?thesis     
+    by (rule_tac x=q in exI, rule_tac x=r in exI, typecheck_cfuncs, smt add_commutes assms(2) mult_commutative r_bnd r_def )
+qed
+
+
+
+
+lemma product_of_canonically_finite_sets:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
   shows "[n \<cdot>\<^sub>\<nat> m]\<^sub>c \<cong> [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
-proof -
+proof(cases "m = zero")
+  show "m = zero \<Longrightarrow> [n \<cdot>\<^sub>\<nat> m]\<^sub>c \<cong> [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
+    by (metis cart_prod_decomp first_canonically_finite_set_empty isomorphic_is_symmetric isomorphic_is_transitive mult_respects_zero_right n_type no_el_iff_iso_0 nonempty_def)
+next
+  assume "m \<noteq> zero"
   obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c \<rightarrow> \<nat>\<^sub>c" and
-    \<phi>_def: "\<phi> = mult2 \<circ>\<^sub>c (canonically_finite_morphism n \<times>\<^sub>f canonically_finite_morphism m)"
-    by (typecheck_cfuncs)
-  oops
+    \<phi>_def: "\<phi> = add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>[n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c\<^esub>, (canonically_finite_morphism n) \<circ>\<^sub>c (left_cart_proj [n]\<^sub>c [m]\<^sub>c)\<rangle>, (canonically_finite_morphism m) \<circ>\<^sub>c (right_cart_proj [n]\<^sub>c [m]\<^sub>c)\<rangle>"
+    by typecheck_cfuncs
+  have phi_action: "\<And> j k. j \<in>\<^sub>c \<nat>\<^sub>c \<and> k \<in>\<^sub>c \<nat>\<^sub>c \<and> successor \<circ>\<^sub>c j \<le>\<^sub>\<nat> n \<and> successor \<circ>\<^sub>c k  \<le>\<^sub>\<nat> m \<longrightarrow> \<phi> \<circ>\<^sub>c \<langle>\<lbrakk>j:n\<rbrakk>\<^sub>c, \<lbrakk>k:m\<rbrakk>\<^sub>c\<rangle> = (m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> k"
+  proof(unfold \<phi>_def, auto)
+    fix j k 
+    assume j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c"
+    assume k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c"
+    assume j_bnd: "successor \<circ>\<^sub>c j \<le>\<^sub>\<nat> n"
+    assume k_bnd: "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> m"   
+
+    (*James.... we, in fact, need all three of these.... an opportunity for improvement!*)
+    have type1[type_rule]: "\<lbrakk>j:n\<rbrakk>\<^sub>c  \<in>\<^sub>c [n]\<^sub>c"
+      by (simp add: elem_canon_finite_set j_bnd j_type n_type)
+    have type2[type_rule]: "\<lbrakk>k:m\<rbrakk>\<^sub>c \<in>\<^sub>c [m]\<^sub>c"
+      by (simp add: elem_canon_finite_set k_bnd k_type m_type)
+    have type_info[type_rule]: "\<langle>\<lbrakk>j:n\<rbrakk>\<^sub>c, \<lbrakk>k:m\<rbrakk>\<^sub>c\<rangle> \<in>\<^sub>c [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
+      by (simp add: cfunc_prod_type type1 type2)
+
+
+    have "(add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c  \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>([n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c)\<^esub>,canonically_finite_morphism n \<circ>\<^sub>c left_cart_proj [n]\<^sub>c [m]\<^sub>c\<rangle>,canonically_finite_morphism m \<circ>\<^sub>c right_cart_proj [n]\<^sub>c [m]\<^sub>c\<rangle>) \<circ>\<^sub>c \<langle>\<lbrakk>j:n\<rbrakk>\<^sub>c,\<lbrakk>k:m\<rbrakk>\<^sub>c\<rangle> =
+           add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>([n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c)\<^esub> \<circ>\<^sub>c \<langle>\<lbrakk>j:n\<rbrakk>\<^sub>c,\<lbrakk>k:m\<rbrakk>\<^sub>c\<rangle>,canonically_finite_morphism n \<circ>\<^sub>c left_cart_proj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<langle>\<lbrakk>j:n\<rbrakk>\<^sub>c,\<lbrakk>k:m\<rbrakk>\<^sub>c\<rangle>\<rangle> ,canonically_finite_morphism m \<circ>\<^sub>c right_cart_proj [n]\<^sub>c [m]\<^sub>c \<circ>\<^sub>c \<langle>\<lbrakk>j:n\<rbrakk>\<^sub>c,\<lbrakk>k:m\<rbrakk>\<^sub>c\<rangle>\<rangle> "
+      by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2)
+    also have "... = (m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> k"
+      by (typecheck_cfuncs, simp add: add_def elem_canon_finite_def2 id_right_unit2 j_bnd k_bnd left_cart_proj_cfunc_prod mult_def right_cart_proj_cfunc_prod terminal_func_comp_elem)
+    then show "(add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c \<beta>\<^bsub>[n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c\<^esub>,canonically_finite_morphism n \<circ>\<^sub>c left_cart_proj [n]\<^sub>c [m]\<^sub>c\<rangle>,canonically_finite_morphism m \<circ>\<^sub>c right_cart_proj [n]\<^sub>c [m]\<^sub>c\<rangle>) \<circ>\<^sub>c  \<langle>\<lbrakk>j:n\<rbrakk>\<^sub>c,\<lbrakk>k:m\<rbrakk>\<^sub>c\<rangle> =  m \<cdot>\<^sub>\<nat> j +\<^sub>\<nat> k"
+      by (simp add: calculation)
+  qed
+
+  have "injective \<phi>"
+  proof (etcs_subst injective_def2, auto)
+    fix x y 
+    assume x_type[type_rule]: "x \<in>\<^sub>c [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
+    assume y_type[type_rule]: "y \<in>\<^sub>c [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
+    assume \<phi>_eq: "\<phi> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c y"
+    obtain x1 x2  where x1_type[type_rule]: "x1 \<in>\<^sub>c [n]\<^sub>c" and x2_type[type_rule]:"x2 \<in>\<^sub>c [m]\<^sub>c"    and                
+                        x_def: "x = \<langle>x1, x2\<rangle>"
+      using cart_prod_decomp by (typecheck_cfuncs, blast)
+    obtain x1'  where x1'_type[type_rule]: "x1' \<in>\<^sub>c \<nat>\<^sub>c" and x1'_bnd: "successor \<circ>\<^sub>c x1' \<le>\<^sub>\<nat> n" and  x1_def: "x1 = \<lbrakk>x1':n\<rbrakk>\<^sub>c"            
+      using elem_canon_finite_set_representation by (typecheck_cfuncs, blast)
+    obtain x2'  where x2'_type[type_rule]: "x2' \<in>\<^sub>c \<nat>\<^sub>c" and x2'_bnd: "successor \<circ>\<^sub>c x2' \<le>\<^sub>\<nat> m" and  x2_def: "x2 = \<lbrakk>x2':m\<rbrakk>\<^sub>c"
+      using elem_canon_finite_set_representation by (typecheck_cfuncs, blast)
+    obtain y1 y2  where y1_type[type_rule]: "y1 \<in>\<^sub>c [n]\<^sub>c" and y2_type[type_rule]:"y2 \<in>\<^sub>c [m]\<^sub>c"    and                
+                        y_def: "y = \<langle>y1, y2\<rangle>"
+      using cart_prod_decomp by (typecheck_cfuncs, blast)
+    obtain y1'  where y1'_type[type_rule]: "y1' \<in>\<^sub>c \<nat>\<^sub>c" and y1'_bnd: "successor \<circ>\<^sub>c y1' \<le>\<^sub>\<nat> n" and  y1_def: "y1 = \<lbrakk>y1':n\<rbrakk>\<^sub>c"            
+      using elem_canon_finite_set_representation by (typecheck_cfuncs, blast)
+    obtain y2'  where y2'_type[type_rule]: "y2' \<in>\<^sub>c \<nat>\<^sub>c" and y2'_bnd: "successor \<circ>\<^sub>c y2' \<le>\<^sub>\<nat> m" and  y2_def: "y2 = \<lbrakk>y2':m\<rbrakk>\<^sub>c"
+      using elem_canon_finite_set_representation by (typecheck_cfuncs, blast)
+
+    
+
+    have lhs_eq: "\<phi> \<circ>\<^sub>c x = (m \<cdot>\<^sub>\<nat> x1') +\<^sub>\<nat> x2'"
+      by (typecheck_cfuncs, simp add: x1'_bnd x2'_bnd phi_action x1_def x2_def x_def)
+
+    have rhs_eq: "\<phi> \<circ>\<^sub>c y = (m \<cdot>\<^sub>\<nat> y1') +\<^sub>\<nat> y2'"
+      by (typecheck_cfuncs, simp add: y1'_bnd y2'_bnd phi_action y1_def y2_def y_def)
+    
+    have "(m \<cdot>\<^sub>\<nat> x1') +\<^sub>\<nat> x2' = (m \<cdot>\<^sub>\<nat> y1') +\<^sub>\<nat> y2'"
+      using \<phi>_eq lhs_eq rhs_eq by force
+    then have "(x1' = y1') \<and> (x2' = y2')"
+      using assms by (typecheck_cfuncs, metis Euclid's_division_lemma \<open>m \<noteq> zero\<close> \<phi>_eq add_type lhs_eq m_type mult_type rhs_eq x2'_bnd y2'_bnd)
+    then show "x = y"
+      using  x1_def x2_def x_def y1_def y2_def y_def by force
+  qed
+
+  have \<phi>_equalizes: "(leq \<circ>\<^sub>c \<langle>successor, (n \<cdot>\<^sub>\<nat> m)  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c  \<phi> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c  \<phi>"
+  proof(rule one_separator[where X = "[n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c", where Y = \<Omega>])
+    show "(leq \<circ>\<^sub>c \<langle>successor,n \<cdot>\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi> : [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+    show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi> : [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c \<rightarrow> \<Omega>"
+      by typecheck_cfuncs
+  next
+    fix x 
+    assume x_type[type_rule]: "x \<in>\<^sub>c [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
+    then obtain x1 x2 where x1_type[type_rule]: "x1 \<in>\<^sub>c [n]\<^sub>c" and x2_type[type_rule]: "x2 \<in>\<^sub>c [m]\<^sub>c" and x_def: "x = \<langle>x1,x2\<rangle>"
+      using cart_prod_decomp by blast        
+    then obtain j k where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and  x1_def: "x1 = \<lbrakk>j:n\<rbrakk>\<^sub>c" and j_bnd: "successor \<circ>\<^sub>c j \<le>\<^sub>\<nat> n" and
+                          k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and  x2_def: "x2 = \<lbrakk>k:m\<rbrakk>\<^sub>c" and k_bnd: "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> m"
+      by (metis assms elem_canon_finite_set_representation)
+
+
+    
+    have \<phi>_x: "\<phi> \<circ>\<^sub>c x = (m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> k"
+      by (typecheck_cfuncs, simp add: j_bnd k_bnd phi_action x1_def x2_def x_def)
+
+    have "((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c x = \<t>"
+      by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 terminal_func_comp terminal_func_comp_elem terminal_func_type)
+    also have "... = leq \<circ>\<^sub>c \<langle> m \<cdot>\<^sub>\<nat>  (successor \<circ>\<^sub>c j) ,n \<cdot>\<^sub>\<nat> m\<rangle>"
+      by (typecheck_cfuncs, metis j_bnd leq_infix_def lqe_connexity mult_commutative mult_monotonic)
+    also have "... = leq \<circ>\<^sub>c \<langle> (m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> m ,n \<cdot>\<^sub>\<nat> m\<rangle>"
+      using add_commutes mult_respects_succ_right by (typecheck_cfuncs, presburger)
+    also have "... = leq \<circ>\<^sub>c \<langle> (m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (successor \<circ>\<^sub>c k) ,n \<cdot>\<^sub>\<nat> m\<rangle>"
+      by (typecheck_cfuncs, metis \<open>\<t> = leq \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c j),n \<cdot>\<^sub>\<nat> m\<rangle>\<close> \<open>leq \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c j),n \<cdot>\<^sub>\<nat> m\<rangle> = leq \<circ>\<^sub>c \<langle>m \<cdot>\<^sub>\<nat> j +\<^sub>\<nat> m,n \<cdot>\<^sub>\<nat> m\<rangle>\<close> add_monotonic k_bnd leq_infix_def leq_transitivity lqe_connexity)
+    also have "... = leq \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c ((m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> k) ,n \<cdot>\<^sub>\<nat> m\<rangle>"
+      using add_respects_succ1 by (typecheck_cfuncs, presburger)
+    also have "... = leq \<circ>\<^sub>c \<langle>successor,n \<cdot>\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c ((m \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> k)"
+      by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
+    also have "... = (leq \<circ>\<^sub>c \<langle>successor,n \<cdot>\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c (\<phi> \<circ>\<^sub>c x)"
+      by (typecheck_cfuncs, simp add: \<phi>_x comp_associative2)
+    also have "... = ((leq \<circ>\<^sub>c \<langle>successor,n \<cdot>\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c x"
+      by (typecheck_cfuncs, meson comp_associative2)
+    then show "((leq \<circ>\<^sub>c \<langle>successor,n \<cdot>\<^sub>\<nat> m \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c x = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c x"
+      by (simp add: calculation)
+  qed
+
+  thm equalizer_exists2
+
+
+  then obtain \<psi> where \<psi>_type[type_rule]: "\<psi> : ([n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c) \<rightarrow> [n \<cdot>\<^sub>\<nat> m]\<^sub>c" and \<psi>_def: "(canonically_finite_morphism (n \<cdot>\<^sub>\<nat> m)) \<circ>\<^sub>c \<psi> = \<phi>"
+    sorry
+
+  then have \<psi>_mono: "monomorphism \<psi>"
+    by (metis \<open>injective \<phi>\<close> canonically_finite_morphism_type comp_monic_imp_monic' injective_imp_monomorphism m_type mem_Collect_eq mult_type n_type)
+
+  have "surjective \<psi>"
+  proof(etcs_subst surjective_def2, auto)
+    fix y 
+    assume y_type[type_rule]: "y \<in>\<^sub>c [n \<cdot>\<^sub>\<nat> m]\<^sub>c"
+    then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and y_rep: "y = \<lbrakk>k:n \<cdot>\<^sub>\<nat> m\<rbrakk>\<^sub>c" and k_bnd: "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> n \<cdot>\<^sub>\<nat> m"
+      by (metis elem_canon_finite_set_representation m_type mult_closure n_type)
+    
+    then obtain q r where q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and r_type[type_rule]: "r \<in>\<^sub>c \<nat>\<^sub>c"
+        and k_def: "(k = (m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r) \<and> (successor  \<circ>\<^sub>c r \<le>\<^sub>\<nat> m)" 
+        and uniqueness_of_qr:  "\<forall> s t. (s \<in>\<^sub>c \<nat>\<^sub>c) \<and> (t \<in>\<^sub>c \<nat>\<^sub>c) \<and> (k = (m \<cdot>\<^sub>\<nat> s) +\<^sub>\<nat> t) \<and> (successor  \<circ>\<^sub>c t \<le>\<^sub>\<nat> m) \<longrightarrow> (s=q) \<and> (t=r)"
+      by (metis Euclid's_division_lemma \<open>m \<noteq> zero\<close> m_type)
+
+    have q_bnd: "successor  \<circ>\<^sub>c q \<le>\<^sub>\<nat> n"   
+    proof(rule ccontr)
+      assume "\<not> successor \<circ>\<^sub>c q \<le>\<^sub>\<nat> n"
+      then have n_leq_q: "n \<le>\<^sub>\<nat> q"
+        by (simp add: n_type nat_strict_total_order q_type)
+      then have "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> n"
+        using k_bnd m_type mult_commutative n_type by auto
+      then have "m \<cdot>\<^sub>\<nat> n \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> q"
+        by (typecheck_cfuncs, meson leq_infix_def lqe_connexity mult_monotonic n_leq_q)
+      have "m \<cdot>\<^sub>\<nat> q \<le>\<^sub>\<nat> k" 
+        by (typecheck_cfuncs, metis add_respects_zero_on_left exists_implies_leq_true fewer_is_less k_def leq_infix_def r_type zero_type) 
+      then have "successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> k"
+        by (typecheck_cfuncs, smt (z3) \<open>m \<cdot>\<^sub>\<nat> n \<le>\<^sub>\<nat> m \<cdot>\<^sub>\<nat> q\<close>  k_bnd leq_infix_def leq_transitivity m_type mult_closure mult_commutative n_type q_type)
+      then show False
+        using k_type leq_infix_def lqe_connexity nat_strict_total_order by blast
+    qed
+
+
+
+
+   
+  
+    have \<phi>_x: "\<phi> \<circ>\<^sub>c   \<langle>\<lbrakk>q:n\<rbrakk>\<^sub>c, \<lbrakk>r:m\<rbrakk>\<^sub>c\<rangle> = (m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r"
+      by (typecheck_cfuncs, simp add: k_def phi_action q_bnd)
+    
+
+    then have "canonically_finite_morphism (n \<cdot>\<^sub>\<nat> m) \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c \<langle>\<lbrakk>q:n\<rbrakk>\<^sub>c, \<lbrakk>r:m\<rbrakk>\<^sub>c\<rangle>) = canonically_finite_morphism (n \<cdot>\<^sub>\<nat> m) \<circ>\<^sub>c \<lbrakk>k:n \<cdot>\<^sub>\<nat> m\<rbrakk>\<^sub>c"
+      by (typecheck_cfuncs, metis \<phi>_x \<psi>_def cfunc_type_def comp_associative elem_canon_finite_def2 k_bnd k_def q_bnd)
+
+    then show "\<exists>x. x \<in>\<^sub>c [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c \<and> \<psi> \<circ>\<^sub>c x = y"
+      by (rule_tac x="\<langle>\<lbrakk>q:n\<rbrakk>\<^sub>c, \<lbrakk>r:m\<rbrakk>\<^sub>c\<rangle>" in exI, typecheck_cfuncs, metis canonically_finite_morph_mono k_def monomorphism_def2 q_bnd y_rep)    
+  qed
+  then show ?thesis
+    using \<psi>_mono \<psi>_type epi_mon_is_iso is_isomorphic_def isomorphic_is_symmetric surjective_is_epimorphism by blast
+qed
+
+
+
+
+
+
+
+
+
+
+
+
 
 theorem Herrlichs_finiteness_criterion: 
   "is_finite A = (\<nexists> f. f: \<nat>\<^sub>c \<rightarrow> A \<and> injective f)"
@@ -1027,51 +1720,51 @@ next
    qed
 qed
 
+lemma Infinite_Set_Coprod_One:
+  "(is_finite X) = (\<not>(X \<cong> X \<Coprod> one))"
+proof(auto)
+  assume fin_X: "is_finite X"
+  assume sets_iso: " X \<cong> X \<Coprod> one"
+  then obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : X \<Coprod> one \<rightarrow> X" and \<phi>_iso: "isomorphism \<phi>"
+    by (meson is_isomorphic_def isomorphic_is_symmetric fin_X)
+  then obtain \<phi>_inv where \<phi>_inv[type_rule]: "\<phi>_inv : X \<rightarrow> X \<Coprod> one" 
+                      and \<phi>_inv_def: "\<phi>_inv \<circ>\<^sub>c \<phi> = id (X \<Coprod> one) \<and> \<phi> \<circ>\<^sub>c \<phi>_inv = id X" 
+                      and \<phi>_inv_iso: "isomorphism \<phi>_inv"
+    by (metis \<phi>_iso cfunc_type_def isomorphism_def)
+  have coproj_mono_not_epi:"\<not>epimorphism (left_coproj X one) \<and> monomorphism (left_coproj X one)"
+    by (metis cfunc_type_def coproducts_disjoint epi_is_surj id_right_unit id_type left_coproj_are_monomorphisms left_proj_type right_proj_type surjective_def2)
+  then have "isomorphism(\<phi> \<circ>\<^sub>c left_coproj X one)"
+    by (typecheck_cfuncs, metis \<phi>_iso fin_X cfunc_type_def composition_of_monic_pair_is_monic coproj_mono_not_epi is_finite_def iso_imp_epi_and_monic)
+  then have "isomorphism(\<phi>_inv \<circ>\<^sub>c \<phi> \<circ>\<^sub>c left_coproj X one)"
+    using \<phi>_inv_iso isomorphism_comp' by (typecheck_cfuncs, blast)
+  then have "epimorphism (left_coproj X one)"
+    by (smt (z3) \<phi>_inv \<phi>_inv_def \<phi>_type comp_associative2 id_left_unit2 iso_imp_epi_and_monic left_proj_type)
+  then show False
+    using coproj_mono_not_epi by auto
+next
+  assume "\<not> X \<cong> X \<Coprod> one"
+  have "(\<not>(is_finite X)) \<longrightarrow> X \<cong> X \<Coprod> one"
+    sorry
+  then show "is_finite X "
+    by (simp add: \<open>\<not> X \<cong> X \<Coprod> one\<close>)
+    
+qed
+
+  
+
+
+
+
+
+
+
 
 
 
 lemma canonically_finite_sets_are_finite:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "is_finite [n]\<^sub>c"
-proof-
- 
-
-
-(*
-  assume BWOC: "\<not> is_finite [n]\<^sub>c"
-  then obtain f where f_type: "f : \<nat>\<^sub>c \<rightarrow> [n]\<^sub>c" and f_inj: "injective f"
-    using Herrlichs_finiteness_criterion by blast
-  then have f1: "\<And> j k . j \<in>\<^sub>c \<nat>\<^sub>c \<and> k \<in>\<^sub>c \<nat>\<^sub>c \<and> j \<noteq> k \<Longrightarrow> f \<circ>\<^sub>c j \<noteq> f \<circ>\<^sub>c k"
-    by (metis cfunc_type_def f_inj injective_def)
-  have f2: "\<And> j. j \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> \<exists>! p. p \<in>\<^sub>c \<nat>\<^sub>c \<and> successor \<circ>\<^sub>c p \<le>\<^sub>\<nat> n \<and> f \<circ>\<^sub>c j  = \<lbrakk>p: n\<rbrakk>\<^sub>c"
-    using assms by (smt (verit, best) comp_type elem_canon_finite_set_representation f_type)
-  have f3: "\<And> j k. j \<in>\<^sub>c \<nat>\<^sub>c \<and> k \<in>\<^sub>c \<nat>\<^sub>c \<and> j \<noteq> k \<and> successor \<circ>\<^sub>c j \<le>\<^sub>\<nat> n \<and> successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> n \<Longrightarrow> f \<circ>\<^sub>c j \<noteq> f \<circ>\<^sub>c k"
-    by (simp add: f1)
-  have f4: "\<And> j k. j \<in>\<^sub>c \<nat>\<^sub>c \<and> k \<in>\<^sub>c \<nat>\<^sub>c \<and> j \<noteq> k \<and> successor \<circ>\<^sub>c j \<le>\<^sub>\<nat> n \<and> successor \<circ>\<^sub>c k \<le>\<^sub>\<nat> n \<Longrightarrow>
-                 \<exists> p q.  p \<in>\<^sub>c \<nat>\<^sub>c \<and> q \<in>\<^sub>c \<nat>\<^sub>c \<and> p \<noteq> q \<and>
-                 successor \<circ>\<^sub>c p \<le>\<^sub>\<nat> n \<and> successor \<circ>\<^sub>c q \<le>\<^sub>\<nat> n \<and>
-                 f \<circ>\<^sub>c j  = \<lbrakk>p: n\<rbrakk>\<^sub>c \<and> f \<circ>\<^sub>c k  = \<lbrakk>q: n\<rbrakk>\<^sub>c \<and> \<lbrakk>p: n\<rbrakk>\<^sub>c \<noteq> \<lbrakk>q: n\<rbrakk>\<^sub>c"
-    using assms by (typecheck_cfuncs, metis f1 f2)   (*It seems that uniquness is tacitly implied by the way this is stated!*)
-
-
-
-  have f5: "\<exists>! r. r \<in>\<^sub>c \<nat>\<^sub>c \<and> successor \<circ>\<^sub>c r \<le>\<^sub>\<nat> n \<and> f \<circ>\<^sub>c n = \<lbrakk>r: n\<rbrakk>\<^sub>c"
-    by (simp add: assms f2)
-  then obtain r where r_type[type_rule]: "r \<in>\<^sub>c \<nat>\<^sub>c" and r_def:  "successor \<circ>\<^sub>c r \<le>\<^sub>\<nat> n \<and> f \<circ>\<^sub>c n = \<lbrakk>r: n\<rbrakk>\<^sub>c"
-    by blast
-  
-  have "\<And> q. q \<in>\<^sub>c \<nat>\<^sub>c \<and> successor \<circ>\<^sub>c q \<le>\<^sub>\<nat> n  \<Longrightarrow> \<exists>p. p \<in>\<^sub>c \<nat>\<^sub>c \<and> successor \<circ>\<^sub>c p \<le>\<^sub>\<nat> n \<and> f \<circ>\<^sub>c p = \<lbrakk>q: n\<rbrakk>\<^sub>c"
-    sorry
-
-  then have "\<exists>p. p \<in>\<^sub>c \<nat>\<^sub>c \<and> successor \<circ>\<^sub>c p \<le>\<^sub>\<nat> n \<and> f \<circ>\<^sub>c p = \<lbrakk>r: n\<rbrakk>\<^sub>c"
-    using assms by (typecheck_cfuncs, simp add:  r_def)
-  then show False
-    by (metis assms f1 leq_infix_def lqe_connexity nat_strict_total_order r_def)
-qed
-*)
-
-
-
+  sorry
 
 
 

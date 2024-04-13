@@ -1138,7 +1138,7 @@ proof -
             by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
           also have "... = f\<^sup>\<flat>  \<circ>\<^sub>c \<langle>x,h\<rangle>"
             apply typecheck_cfuncs
-
+            oops
 
 
 
