@@ -253,6 +253,36 @@ lemma prod_with_term_obj2:
   shows  "X \<times>\<^sub>c Y \<cong> X"
   by (meson assms isomorphic_is_transitive prod_with_term_obj1 product_commutes)
 
+lemma coprojs_jointly_surj':
+  assumes z_type[type_rule]: "z : Z \<rightarrow> X \<Coprod> Y"
+  shows "(\<exists> x. (x : Z \<rightarrow> X \<and> z = (left_coproj X Y) \<circ>\<^sub>c x))
+      \<or>  (\<exists> y. (y : Z \<rightarrow> Y \<and> z = (right_coproj X Y) \<circ>\<^sub>c y))"
+proof (cases "\<exists> z'. z' \<in>\<^sub>c Z", auto)
+  assume Z_empty: "\<forall>z'. \<not> z' \<in>\<^sub>c Z"
+  then have "Z \<cong> \<emptyset>"
+    using no_el_iff_iso_0 nonempty_def by auto
+  then have "\<exists> f. f : Z \<rightarrow> \<emptyset>"
+    using is_isomorphic_def by blast
+  then show "\<forall>y. y : Z \<rightarrow> Y \<longrightarrow> z \<noteq> right_coproj X Y \<circ>\<^sub>c y \<Longrightarrow> \<exists>x. x : Z \<rightarrow> X \<and> z = left_coproj X Y \<circ>\<^sub>c x"
+    by (auto, rule_tac x="\<alpha>\<^bsub>X\<^esub> \<circ>\<^sub>c f" in exI, typecheck_cfuncs, meson Z_empty assms comp_type one_separator)
+next
+  fix z'
+  assume z'_in_Z[type_rule]: "z' \<in>\<^sub>c Z"
+  
+  have "(\<exists>x. x \<in>\<^sub>c X \<and> z \<circ>\<^sub>c z' = left_coproj X Y \<circ>\<^sub>c x) \<or> (\<exists>y. y \<in>\<^sub>c Y \<and> z \<circ>\<^sub>c z' = right_coproj X Y \<circ>\<^sub>c y)"
+    by (typecheck_cfuncs, simp add: coprojs_jointly_surj)
+  then show "\<forall>y. y : Z \<rightarrow> Y \<longrightarrow> z \<noteq> right_coproj X Y \<circ>\<^sub>c y \<Longrightarrow> \<exists>x. x : Z \<rightarrow> X \<and> z = left_coproj X Y \<circ>\<^sub>c x"
+  proof auto
+    fix x
+    assume x_type[type_rule]: "x \<in>\<^sub>c X"
+
+    assume x_eq: "z \<circ>\<^sub>c z' = left_coproj X Y \<circ>\<^sub>c x"
+    then show "\<exists>x. x : Z \<rightarrow> X \<and> z = left_coproj X Y \<circ>\<^sub>c x"
+      apply (rule_tac x="x \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>" in exI, typecheck_cfuncs, auto)
+      oops
+
+    thm coprojs_jointly_surj[where z="z \<circ>\<^sub>c z'", where X=X, where Y=Y]
+
 
 
 

@@ -402,14 +402,11 @@ lemma prod_with_empty_is_empty2:
 definition injective :: "cfunc \<Rightarrow> bool" where
  "injective f  \<longleftrightarrow> (\<forall> x y. (x \<in>\<^sub>c domain f \<and> y \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y) \<longrightarrow> x = y)"
 
+
 lemma injective_def2:
   assumes "f : X \<rightarrow> Y"
   shows "injective f  \<longleftrightarrow> (\<forall> x y. (x \<in>\<^sub>c X \<and> y \<in>\<^sub>c X \<and> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y) \<longrightarrow> x = y)"
   using assms cfunc_type_def injective_def by force
-
-
-
-
 
 
 (* Exercise 2.1.26 *)

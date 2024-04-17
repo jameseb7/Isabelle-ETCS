@@ -628,7 +628,7 @@ next
     thm true_beta_one
     thm sym[OF eq_pred_iff_eq]
     thm comp_one_id
-
+(*
 
     show "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c  \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
                                          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c  zero =
@@ -758,7 +758,7 @@ next
 
 
 
-          find_theorems "left_cart_proj"
+          find_theorems "left_cart_proj"*)
 (*      have "(FORALL \<nat>\<^sub>c \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c 
             \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,right_coproj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
             eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c successor
