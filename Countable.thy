@@ -1773,14 +1773,14 @@ lemma canonically_finite_sets_are_finite:
 thm nat_induction
 
 (*
- "(Z\<^bsup>X\<^esup>) \<times>\<^sub>c (Z\<^bsup>Y\<^esup>) \<cong> (Z\<^bsup>(X \<Coprod> Y)\<^esup>)"  Surprisingly we haven't proven this.
-  Use the above Criteria to show these finite sets are finite.
-  Define cardinality of finite sets as: card(A) = n iff A \<cong> [n]    (skippable
-  Use strong induction to show that [sn]\<cong>[n]U[1], [n+m]\<cong>[n]U[m], [nm]\<cong>[n]*[m], [n^m]\<cong>[n]^[m]
-  Theorem: Finite sets are isomorphic to [n] for some n.   (proof uses AC).
+  (0) [sn] is not isomorphic to [n] (via facts about \ and order preserving maps).
+  (1) Summation facts. 
+  (2) [n^m]\<cong>[n]^[m]
+  (3) If X is infinite then X \<cong> X U 1
+  Corollary: Canonically finite sets are finite.
+  (4) Theorem: Finite sets are isomorphic to [n] for some n.   (proof uses AC).
   Corollary: Finite sets are countable. 
   Corollary: finite sets are closed under coprods, prods, and exps
-  Did we ever show that N*N is countable? .... yes, there's literally a theory file devoted to this!
 *)
 
 
