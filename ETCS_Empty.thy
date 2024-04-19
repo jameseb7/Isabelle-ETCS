@@ -254,4 +254,6 @@ lemma prod_with_term_obj2:
   by (meson assms isomorphic_is_transitive prod_with_term_obj1 product_commutes)
 
 
+
+
 end

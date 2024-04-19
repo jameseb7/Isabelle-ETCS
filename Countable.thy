@@ -958,7 +958,7 @@ theorem Euclid's_division_lemma:
   shows "\<exists> q r. ((q \<in>\<^sub>c \<nat>\<^sub>c) \<and> (r \<in>\<^sub>c \<nat>\<^sub>c) \<and> (n = (m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> r) \<and> (successor  \<circ>\<^sub>c r \<le>\<^sub>\<nat> m)) \<and> 
          (\<forall> s t. (s \<in>\<^sub>c \<nat>\<^sub>c) \<and> (t \<in>\<^sub>c \<nat>\<^sub>c) \<and> (n = (m \<cdot>\<^sub>\<nat> s) +\<^sub>\<nat> t) \<and> (successor  \<circ>\<^sub>c t \<le>\<^sub>\<nat> m) \<longrightarrow> (s=q) \<and> (t=r))"
 proof(cases "n=zero")
-  show "n= zero \<Longrightarrow> ?thesis"
+  show "n = zero \<Longrightarrow> ?thesis"
     by(rule_tac x=zero in exI, rule_tac x=zero in exI, typecheck_cfuncs, metis add_respects_zero_on_right add_type
        assms(2,3) exists_implies_leq_true leq_infix_def mult_cancellative mult_commutative mult_respects_zero_right
        mult_type nat_strict_total_order nonzero_is_succ zero_is_smallest zero_type)
@@ -1340,11 +1340,10 @@ next
       by (simp add: calculation)
   qed
 
-  thm equalizer_exists2
 
 
-  then obtain \<psi> where \<psi>_type[type_rule]: "\<psi> : ([n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c) \<rightarrow> [n \<cdot>\<^sub>\<nat> m]\<^sub>c" and \<psi>_def: "(canonically_finite_morphism (n \<cdot>\<^sub>\<nat> m)) \<circ>\<^sub>c \<psi> = \<phi>"
-    sorry
+  then obtain \<psi> where \<psi>_type[type_rule]: "\<psi> : [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c \<rightarrow> [n \<cdot>\<^sub>\<nat> m]\<^sub>c" and \<psi>_def: "(canonically_finite_morphism (n \<cdot>\<^sub>\<nat> m)) \<circ>\<^sub>c \<psi> = \<phi>"
+    using equalizer_def2 by (-,typecheck_cfuncs, metis canonically_finite_morphism_def2)
 
   then have \<psi>_mono: "monomorphism \<psi>"
     by (metis \<open>injective \<phi>\<close> canonically_finite_morphism_type comp_monic_imp_monic' injective_imp_monomorphism m_type mem_Collect_eq mult_type n_type)

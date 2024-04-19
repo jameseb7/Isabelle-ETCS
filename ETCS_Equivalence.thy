@@ -802,7 +802,9 @@ lemma epi_monic_factorization2:
     \<and> (\<forall>x. x : E \<rightarrow> Y \<longrightarrow> f = x \<circ>\<^sub>c g \<longrightarrow> x = m)"
   using epi_monic_factorization coequalizer_is_epimorphism by (meson f_type)
 
+
 thm epi_monic_factorization[where f = "f \<circ>\<^sub>c n", where X=A, where Y=Y]
+
 (* Definition 2.3.7 *)
 definition image_of :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_[_]\<^bsub>_\<^esub>" [101,0,0]100) where
   "image_of f A n = (SOME fA. \<exists>g m.
@@ -916,6 +918,9 @@ lemma image_subobj_map_unique:
   shows "x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<Longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<Longrightarrow> x = [f[A]\<^bsub>n\<^esub>]map"
   using assms image_subobject_mapping_def2 by blast
 
+
+
+
 (*Now we show that f(A) is the smallest subobject of Y through which f factors (in the sense of epi-monic factorization)*)
 (*Proposition 2.3.8*)
 lemma image_smallest_subobject:
@@ -964,6 +969,7 @@ proof -
     unfolding relative_subset_def2 using n_mono image_subobj_map_mono
     by (typecheck_cfuncs, auto, rule_tac x=k in exI, typecheck_cfuncs)
 qed
+
 lemma images_iso:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"
   assumes m_type[type_rule]: "m : Z \<rightarrow> X" and n_type[type_rule]: "n : A \<rightarrow> Z" 
@@ -1069,6 +1075,10 @@ proof (typecheck_cfuncs, auto)
     by (rule_tac x="k \<circ>\<^sub>c k'" in exI, typecheck_cfuncs, simp add: b_k_eq_map comp_associative2 k'_maps_eq)
 qed
 
+
+
+
+(*I think this might be false... just consider {0} and {0,1} *)
 lemma subsets_off_by_iso:
   assumes "(A,a) \<subseteq>\<^sub>c X" "(A,b) \<subseteq>\<^sub>c X"
   shows "\<exists> i. isomorphism(i) \<and> i \<circ>\<^sub>c a = b"
@@ -1210,6 +1220,20 @@ proof -
   then show "(A,m) \<subseteq>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[f[A]\<^bsub>m\<^esub>]\<^bsub>[f[A]\<^bsub>m\<^esub>]map\<^esub>, [f\<^sup>-\<^sup>1[f[A]\<^bsub>m\<^esub>]\<^bsub>[f[A]\<^bsub>m\<^esub>]map\<^esub>]map)"
     by (meson assms relative_subset_def2 subobject_of_def2 subset_inv_image_iff_image_subset)
 qed
+
+
+(*
+
+lemma iso_to_mono_image:
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  assumes f_mono: "monomorphism f"
+  assumes  n_type[type_rule]: "n : Z \<rightarrow> X"
+  shows "f[A]\<^bsub>n\<^esub> \<cong> A"
+  using assms apply typecheck_cfuncs
+
+*)
+
+
 
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"

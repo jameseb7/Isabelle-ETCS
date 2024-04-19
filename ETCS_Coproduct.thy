@@ -2192,6 +2192,37 @@ proof -
     using calculation by auto
 qed
 
+lemma dist_prod_coprod_inv2_left_coproj:
+  "dist_prod_coprod_inv2 X Y H \<circ>\<^sub>c (left_coproj X Y \<times>\<^sub>f id H) = left_coproj (X \<times>\<^sub>c H) (Y \<times>\<^sub>c H)"
+  by (typecheck_cfuncs, smt (z3) one_separator cart_prod_decomp cfunc_cross_prod_comp_cfunc_prod comp_associative2 dist_prod_coprod_inv2_left_ap id_left_unit2)
+
+lemma dist_prod_coprod_inv2_right_coproj:
+  "dist_prod_coprod_inv2 X Y H \<circ>\<^sub>c (right_coproj X Y \<times>\<^sub>f id H) = right_coproj (X \<times>\<^sub>c H) (Y \<times>\<^sub>c H)"
+  by (typecheck_cfuncs, smt (z3) one_separator cart_prod_decomp cfunc_cross_prod_comp_cfunc_prod comp_associative2 dist_prod_coprod_inv2_right_ap id_left_unit2)
+
+
+
+
+lemma dist_prod_coprod2_inv2_id:
+"dist_prod_coprod2 A B C \<circ>\<^sub>c dist_prod_coprod_inv2 A B C = id ((A \<Coprod> B) \<times>\<^sub>c C)"
+  unfolding dist_prod_coprod2_def dist_prod_coprod_inv2_def by(-,typecheck_cfuncs,
+  smt (z3) cfunc_bowtie_prod_comp_cfunc_bowtie_prod comp_associative2 dist_prod_coprod_inv_right id_bowtie_prod id_right_unit2 swap_idempotent)
+   
+lemma dist_prod_coprod_inv2_inv_id:
+"dist_prod_coprod_inv2 A B C \<circ>\<^sub>c dist_prod_coprod2 A B C = id ((A \<times>\<^sub>c C) \<Coprod> (B \<times>\<^sub>c C))"
+  unfolding dist_prod_coprod2_def dist_prod_coprod_inv2_def by(-,typecheck_cfuncs,
+  smt (z3) cfunc_bowtie_prod_comp_cfunc_bowtie_prod comp_associative2 dist_prod_coprod_inv_left id_bowtie_prod id_right_unit2 swap_idempotent)
+
+
+lemma dist_prod_coprod2_iso:
+  "isomorphism(dist_prod_coprod2 A B C)"
+  by (metis cfunc_type_def dist_prod_coprod2_inv2_id dist_prod_coprod2_type dist_prod_coprod_inv2_inv_id dist_prod_coprod_inv2_type isomorphism_def)
+
+
+
+
+
+
 (* begin section on subset inclusion*)
 
 

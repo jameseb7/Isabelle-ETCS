@@ -1010,7 +1010,7 @@ proof -
         by (simp add: exp_func_type)
       then have "((left_cart_proj X Y)\<^bsup>A\<^esup>\<^sub>f)\<circ>\<^sub>c \<langle>f\<^sup>\<flat> ,g\<^sup>\<flat>\<rangle>\<^sup>\<sharp> = ((left_cart_proj X Y) \<circ>\<^sub>c \<langle>f\<^sup>\<flat> ,g\<^sup>\<flat>\<rangle>)\<^sup>\<sharp>"
         using prod_fflat_gflat_type proj_type transpose_of_comp by auto
-      also have "... = (f\<^sup>\<flat>)\<^sup>\<sharp>"
+      also have "... = f\<^sup>\<flat>\<^sup>\<sharp>"
         using fflat_type gflat_type left_cart_proj_cfunc_prod by auto
       also have "... = f"
         using assms f_type sharp_cancels_flat by blast
@@ -1032,7 +1032,7 @@ proof -
         assume h_property1:  "f = ((left_cart_proj X Y)\<^bsup>A\<^esup>\<^sub>f) \<circ>\<^sub>c h"
         assume h_property2:  "g = ((right_cart_proj X Y)\<^bsup>A\<^esup>\<^sub>f) \<circ>\<^sub>c h"
     
-        have "f = ((left_cart_proj X Y)\<^bsup>A\<^esup>\<^sub>f) \<circ>\<^sub>c (h\<^sup>\<flat>)\<^sup>\<sharp>"
+        have "f = (left_cart_proj X Y)\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c h\<^sup>\<flat>\<^sup>\<sharp>"
           by (metis  h_property1 h_type sharp_cancels_flat)
         also have "... = ((left_cart_proj X Y) \<circ>\<^sub>c h\<^sup>\<flat>)\<^sup>\<sharp>"
           by (metis  flat_type h_type proj_type transpose_of_comp)
@@ -1072,12 +1072,9 @@ qed
 
 
 
-
-
 (*Consider renaming this lemma*)
 lemma exponential_distribution:
-  assumes "\<And>X A Y B. X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
-  shows "(Z\<^bsup>(X \<Coprod> Y)\<^esup>) \<cong> (Z\<^bsup>X\<^esup>) \<times>\<^sub>c (Z\<^bsup>Y\<^esup>)"
+  "(Z\<^bsup>(X \<Coprod> Y)\<^esup>) \<cong> (Z\<^bsup>X\<^esup>) \<times>\<^sub>c (Z\<^bsup>Y\<^esup>)"
 proof - 
   have "is_cart_prod (Z\<^bsup>(X \<Coprod> Y)\<^esup>) ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c (left_coproj X Y) \<times>\<^sub>f (id(Z\<^bsup>(X \<Coprod> Y)\<^esup>)) )\<^sup>\<sharp>) ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c (right_coproj X Y) \<times>\<^sub>f (id(Z\<^bsup>(X \<Coprod> Y)\<^esup>)) )\<^sup>\<sharp>) (Z\<^bsup>X\<^esup>) (Z\<^bsup>Y\<^esup>)"
     unfolding is_cart_prod_def
@@ -1097,48 +1094,132 @@ proof -
                  (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h2 = f \<and>
                  (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h2 = g \<longrightarrow>
                  h2 = h)"
-    proof (rule_tac x="((f\<^sup>\<flat> \<amalg> g\<^sup>\<flat>) \<circ>\<^sub>c (dist_prod_coprod_inv2 X Y H))\<^sup>\<sharp>" in exI, auto)
+    proof (rule_tac x="(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>" in exI, auto)
       show "(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp> : H \<rightarrow> Z\<^bsup>(X \<Coprod> Y)\<^esup>"
         by typecheck_cfuncs
-      show "(eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp> = f"
-      proof - 
-
-(*
-        have " left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>) :  X  \<times>\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>) \<rightarrow> (X \<Coprod> Y) \<times>\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)"
-          using assms by typecheck_cfuncs
-        have "eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c (left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)) :  X  \<times>\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>) \<rightarrow> Z"
+    next
+      have "(eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp> = 
+            ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)) \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>))\<^sup>\<sharp>"
+        using sharp_comp by (typecheck_cfuncs, blast)
+      also have "... = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  (left_coproj X Y \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>))\<^sup>\<sharp>"
+        by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_cross_prod comp_associative2 id_left_unit2 id_right_unit2)
+      also have "... = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  (id (X \<Coprod> Y) \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>) \<circ>\<^sub>c (left_coproj X Y \<times>\<^sub>f id H))\<^sup>\<sharp>"
+        by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+      also have "... = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c (dist_prod_coprod_inv2 X Y H \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id H))\<^sup>\<sharp>"
+        using comp_associative2 transpose_func_def by (typecheck_cfuncs, force)
+      also have "... = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c left_coproj (X \<times>\<^sub>c H) (Y \<times>\<^sub>c H))\<^sup>\<sharp>"
+        by (simp add: dist_prod_coprod_inv2_left_coproj)
+      also have "... = f"
+        by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod sharp_cancels_flat)
+      then show "(eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp> = f"
+        by (simp add: calculation)
+    next
+      have "(eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp> = 
+            ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)) \<circ>\<^sub>c (id Y \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>))\<^sup>\<sharp>"
+        using sharp_comp by (typecheck_cfuncs, blast)
+      also have "... = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  (right_coproj X Y \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>))\<^sup>\<sharp>"
+        by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_cross_prod comp_associative2 id_left_unit2 id_right_unit2)
+      also have "... = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  (id (X \<Coprod> Y) \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>) \<circ>\<^sub>c (right_coproj X Y \<times>\<^sub>f id H))\<^sup>\<sharp>"
+        by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
+      also have "... = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c (dist_prod_coprod_inv2 X Y H \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id H))\<^sup>\<sharp>"
+        using comp_associative2 transpose_func_def by (typecheck_cfuncs, force)
+      also have "... = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c right_coproj (X \<times>\<^sub>c H) (Y \<times>\<^sub>c H))\<^sup>\<sharp>"
+        by (simp add: dist_prod_coprod_inv2_right_coproj)
+      also have "... = g"
+        by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod sharp_cancels_flat)
+      then show "(eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp> = g"
+        by (simp add: calculation)
+    next
+      fix h 
+      assume h_type[type_rule]: "h : H \<rightarrow> Z\<^bsup>(X \<Coprod> Y)\<^esup>"
+      assume f_eqs: "f = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c  h"
+      assume g_eqs: "g = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h"
+      have "(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H) =  h\<^sup>\<flat>"
+      proof(rule one_separator[where X = "(X \<Coprod> Y)\<times>\<^sub>cH", where Y = Z])
+        show "f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H : (X \<Coprod> Y) \<times>\<^sub>c H \<rightarrow> Z"
           by typecheck_cfuncs
-        have "(eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c (left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)))\<^sup>\<sharp> :   (Z\<^bsup>(X \<Coprod> Y)\<^esup>) \<rightarrow> Z\<^bsup>X\<^esup>"
+        show "h\<^sup>\<flat> : (X \<Coprod> Y) \<times>\<^sub>c H \<rightarrow> Z"
           by typecheck_cfuncs
-
-        have "((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp> )\<^sup>\<flat> = 
-              (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp>\<^sup>\<flat>  \<circ>\<^sub>c (id X \<times>\<^sub>f(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>)"
-          using assms inv_transpose_of_composition by (typecheck_cfuncs, blast)
-        also have "... = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))  \<circ>\<^sub>c id X \<times>\<^sub>f(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>"
-          using assms by (typecheck_cfuncs, simp add: flat_cancels_sharp)
-*)
-        have "f\<^sup>\<flat> = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))  \<circ>\<^sub>c id X \<times>\<^sub>f(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>"   
-        proof(rule one_separator[where X = "X\<times>\<^sub>cH", where Y = Z])
-          show "f\<^sup>\<flat> : X \<times>\<^sub>c H \<rightarrow> Z"
-            by typecheck_cfuncs
-          show "(eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp> : X \<times>\<^sub>c H \<rightarrow> Z"
-            by typecheck_cfuncs
-        next
-          fix xh 
-          assume xh_type[type_rule]: "xh \<in>\<^sub>c X \<times>\<^sub>c H"
-          then obtain x h where x_type[type_rule]: "x \<in>\<^sub>c X" and h_type[type_rule]: "h \<in>\<^sub>c H" and xh_def: "xh = \<langle>x,h\<rangle>"
+        show "\<And>xyh. xyh \<in>\<^sub>c (X \<Coprod> Y) \<times>\<^sub>c H \<Longrightarrow> (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H) \<circ>\<^sub>c xyh = h\<^sup>\<flat> \<circ>\<^sub>c xyh"
+        proof-
+          fix xyh
+          assume l_type[type_rule]: "xyh \<in>\<^sub>c (X \<Coprod> Y) \<times>\<^sub>c H"
+          then obtain xy and z where xy_type[type_rule]: "xy \<in>\<^sub>c X \<Coprod> Y" and z_type[type_rule]: "z \<in>\<^sub>c H"
+            and xyh_def: "xyh = \<langle>xy,z\<rangle>"
             using cart_prod_decomp by blast
-                
-          have "((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>) \<circ>\<^sub>c xh = 
-                 (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c   left_coproj X Y \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H       )\<^sup>\<sharp>     ) \<circ>\<^sub>c \<langle>x,h\<rangle>"
-            using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_cross_prod comp_associative2 id_left_unit2 id_right_unit2 xh_def)
-          also have "... = eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c   (left_coproj X Y \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H       )\<^sup>\<sharp>)      \<circ>\<^sub>c \<langle>x,h\<rangle>"
-            by (typecheck_cfuncs, simp add:  comp_associative2)
-          also have "... = eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  \<langle>left_coproj X Y \<circ>\<^sub>c  x, (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H       )\<^sup>\<sharp> \<circ>\<^sub>c h\<rangle>"
-            by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-          also have "... = f\<^sup>\<flat>  \<circ>\<^sub>c \<langle>x,h\<rangle>"
-            apply typecheck_cfuncs
-            oops
+          show "(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H) \<circ>\<^sub>c xyh = h\<^sup>\<flat> \<circ>\<^sub>c xyh"
+          proof(cases "\<exists>x. x \<in>\<^sub>c X \<and> xy =  left_coproj X Y \<circ>\<^sub>c x")
+            assume "\<exists>x. x \<in>\<^sub>c X \<and> xy = left_coproj X Y \<circ>\<^sub>c x"
+            then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and xy_def: "xy =  left_coproj X Y \<circ>\<^sub>c x"
+              by blast
+            have "(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H) \<circ>\<^sub>c xyh = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat>) \<circ>\<^sub>c (dist_prod_coprod_inv2 X Y H  \<circ>\<^sub>c \<langle>left_coproj X Y \<circ>\<^sub>c x,z\<rangle>)"
+              by (typecheck_cfuncs, simp add: comp_associative2 xy_def xyh_def)
+            also have "... = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat>) \<circ>\<^sub>c ((dist_prod_coprod_inv2 X Y H  \<circ>\<^sub>c (left_coproj X Y \<times>\<^sub>f id H)) \<circ>\<^sub>c \<langle>x,z\<rangle>)"
+              using dist_prod_coprod_inv2_left_ap dist_prod_coprod_inv2_left_coproj by (typecheck_cfuncs, presburger)
+            also have "... = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat>) \<circ>\<^sub>c (left_coproj (X \<times>\<^sub>c H) (Y \<times>\<^sub>c H)  \<circ>\<^sub>c \<langle>x,z\<rangle>)"
+              using dist_prod_coprod_inv2_left_coproj by presburger
+            also have "... = f\<^sup>\<flat> \<circ>\<^sub>c \<langle>x,z\<rangle>"
+              by (typecheck_cfuncs,  simp add: comp_associative2 left_coproj_cfunc_coprod)
+            also have "... = ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c  h)\<^sup>\<flat>  \<circ>\<^sub>c \<langle>x,z\<rangle>"
+              using f_eqs by fastforce
+            also have "... = (((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp>\<^sup>\<flat>) \<circ>\<^sub>c  (id X \<times>\<^sub>f h)) \<circ>\<^sub>c \<langle>x,z\<rangle>"
+              using inv_transpose_of_composition by (typecheck_cfuncs, presburger)
+            also have "... = ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)) \<circ>\<^sub>c  (id X \<times>\<^sub>f h)) \<circ>\<^sub>c \<langle>x,z\<rangle>"
+              by (typecheck_cfuncs, simp add: flat_cancels_sharp)
+            also have "... = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f h) \<circ>\<^sub>c \<langle>x,z\<rangle>"
+              by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_cross_prod comp_associative2 id_left_unit2 id_right_unit2)
+            also have "... = eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  \<langle>left_coproj X Y \<circ>\<^sub>c x, h \<circ>\<^sub>c z\<rangle>"
+              by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2)
+            also have "... = eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  ((id(X \<Coprod> Y) \<times>\<^sub>f h) \<circ>\<^sub>c \<langle>xy,z\<rangle>)"
+              by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 xy_def)
+            also have "... = h\<^sup>\<flat> \<circ>\<^sub>c xyh"
+              by (typecheck_cfuncs, simp add: comp_associative2 inv_transpose_func_def2 xyh_def)
+            then show ?thesis
+              by (simp add: calculation)
+          next
+            assume "\<nexists>x. x \<in>\<^sub>c X \<and> xy = left_coproj X Y \<circ>\<^sub>c x"
+            then obtain y where y_type[type_rule]: "y \<in>\<^sub>c Y" and xy_def: "xy =  right_coproj X Y \<circ>\<^sub>c y"
+              using  coprojs_jointly_surj by (typecheck_cfuncs, blast)
+            have "(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_inv2 X Y H) \<circ>\<^sub>c xyh = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat>) \<circ>\<^sub>c (dist_prod_coprod_inv2 X Y H  \<circ>\<^sub>c \<langle>right_coproj X Y \<circ>\<^sub>c y,z\<rangle>)"
+              by (typecheck_cfuncs, simp add: comp_associative2 xy_def xyh_def)
+            also have "... = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat>) \<circ>\<^sub>c ((dist_prod_coprod_inv2 X Y H  \<circ>\<^sub>c (right_coproj X Y \<times>\<^sub>f id H)) \<circ>\<^sub>c \<langle>y,z\<rangle>)"
+              using dist_prod_coprod_inv2_right_ap dist_prod_coprod_inv2_right_coproj by (typecheck_cfuncs, presburger)
+            also have "... = (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat>) \<circ>\<^sub>c (right_coproj (X \<times>\<^sub>c H) (Y \<times>\<^sub>c H)  \<circ>\<^sub>c \<langle>y,z\<rangle>)"
+              using dist_prod_coprod_inv2_right_coproj by presburger
+            also have "... = g\<^sup>\<flat> \<circ>\<^sub>c \<langle>y,z\<rangle>"
+              by (typecheck_cfuncs,  simp add: comp_associative2 right_coproj_cfunc_coprod)
+            also have "... = ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c  h)\<^sup>\<flat>  \<circ>\<^sub>c \<langle>y,z\<rangle>"
+              using g_eqs by fastforce
+            also have "... = (((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp>\<^sup>\<flat>) \<circ>\<^sub>c  (id Y \<times>\<^sub>f h)) \<circ>\<^sub>c \<langle>y,z\<rangle>"
+              using inv_transpose_of_composition by (typecheck_cfuncs, presburger)
+            also have "... = ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)) \<circ>\<^sub>c  (id Y \<times>\<^sub>f h)) \<circ>\<^sub>c \<langle>y,z\<rangle>"
+              by (typecheck_cfuncs, simp add: flat_cancels_sharp)
+            also have "... = (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f h) \<circ>\<^sub>c \<langle>y,z\<rangle>"
+              by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_cross_prod comp_associative2 id_left_unit2 id_right_unit2)
+            also have "... = eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  \<langle>right_coproj X Y \<circ>\<^sub>c y, h \<circ>\<^sub>c z\<rangle>"
+              by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2)
+            also have "... = eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c  ((id(X \<Coprod> Y) \<times>\<^sub>f h) \<circ>\<^sub>c \<langle>xy,z\<rangle>)"
+              by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 xy_def)
+            also have "... = h\<^sup>\<flat> \<circ>\<^sub>c xyh"
+              by (typecheck_cfuncs, simp add: comp_associative2 inv_transpose_func_def2 xyh_def)
+            then show ?thesis
+              by (simp add: calculation)
+          qed
+        qed
+      qed
+      then show "h = (((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h)\<^sup>\<flat> \<amalg>
+                     ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h)\<^sup>\<flat> \<circ>\<^sub>c
+                                                                      dist_prod_coprod_inv2 X Y H)\<^sup>\<sharp>"
+              using f_eqs g_eqs h_type sharp_cancels_flat by force
+    qed
+  qed
+  then show ?thesis
+    by (metis canonical_cart_prod_is_cart_prod cart_prods_isomorphic is_isomorphic_def prod.sel(1,2))
+qed
+
+
+
+
 
 
 
@@ -1165,7 +1246,7 @@ proof-
 qed
 
 
-(*Bad version... see Coproduct Theory file for good version*)
+(*Bad version... see Coproduct Theory file for good version..... What's bad about it?  Is it just the one from the book and less aesthetic?*)
 (* Proposition 2.5.10 *)
 lemma prod_distribute_coprod:
   assumes "\<And>X A Y B. X\<^bsup>A\<^esup> = Y\<^bsup>B\<^esup> \<Longrightarrow> X = Y \<and> A = B"
@@ -1556,7 +1637,7 @@ lemma nonempty_to_nonempty:
 
 lemma empty_to_nonempty_converse:
   assumes "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
-  shows "(nonempty X) \<and> (\<not>(nonempty Y))"
+  shows "(\<not>(nonempty Y)) \<and> (nonempty X)"
   by (meson Y_to_empty assms no_el_iff_iso_0 nonempty_def nonempty_to_nonempty single_elem_iso_one)
 
 
