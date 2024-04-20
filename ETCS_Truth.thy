@@ -971,4 +971,59 @@ proof
     using true_false_distinct by auto
 qed
 
+lemma set_subtraction_right_cong:
+  assumes m_type[type_rule]: "m : A \<rightarrow> C" and m_mono[type_rule]: "monomorphism m"
+  assumes i_type[type_rule]: "i : B \<rightarrow> A" and i_iso: "isomorphism i"
+  shows "C \<setminus> (A,m) \<cong> C \<setminus> (B, m \<circ>\<^sub>c i)"
+proof -
+  have mi_mono[type_rule]: "monomorphism (m \<circ>\<^sub>c i)"
+    using cfunc_type_def composition_of_monic_pair_is_monic i_iso i_type iso_imp_epi_and_monic m_mono m_type by presburger
+  obtain \<chi>m where \<chi>m_type[type_rule]: "\<chi>m : C \<rightarrow> \<Omega>" and \<chi>m_def: "\<chi>m = characteristic_func m"
+    using characteristic_func_type m_mono m_type by blast
+  obtain \<chi>mi where \<chi>mi_type[type_rule]: "\<chi>mi : C \<rightarrow> \<Omega>" and \<chi>mi_def: "\<chi>mi = characteristic_func (m \<circ>\<^sub>c i)"
+    by (typecheck_cfuncs)
+  have "\<And> c. c \<in>\<^sub>c C \<Longrightarrow> (\<chi>m \<circ>\<^sub>c c = \<t>) = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
+  proof -
+    fix c
+    assume c_type[type_rule]: "c \<in>\<^sub>c C"
+    have "(\<chi>m \<circ>\<^sub>c c = \<t>) = (c \<in>\<^bsub>C\<^esub> (A,m))"
+      unfolding \<chi>m_def by (typecheck_cfuncs, meson characteristic_func_true_relative_member m_mono relative_member_characteristic_func_true)
+    also have "... = (\<exists> a. a \<in>\<^sub>c A \<and> c = m \<circ>\<^sub>c a)"
+      using cfunc_type_def factors_through_def m_mono relative_member_def2 by (typecheck_cfuncs, auto)
+    also have "... = (\<exists> b. b \<in>\<^sub>c B \<and> c = m \<circ>\<^sub>c i \<circ>\<^sub>c b)"
+      by (typecheck_cfuncs, smt (z3) cfunc_type_def comp_type epi_is_surj i_iso iso_imp_epi_and_monic surjective_def)
+    also have "... = (c \<in>\<^bsub>C\<^esub> (B,m \<circ>\<^sub>c i))"
+      using cfunc_type_def comp_associative2 composition_of_monic_pair_is_monic factors_through_def2 i_iso iso_imp_epi_and_monic m_mono relative_member_def2
+      by (typecheck_cfuncs, auto)
+    also have "... = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
+      unfolding \<chi>mi_def by (typecheck_cfuncs, metis cfunc_type_def composition_of_monic_pair_is_monic i_iso iso_imp_epi_and_monic m_mono not_relative_member_characteristic_func_false relative_member_characteristic_func_true true_false_distinct)
+    then show "(\<chi>m \<circ>\<^sub>c c = \<t>) = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
+      using calculation by auto
+  qed
+  then have "\<And> c. c \<in>\<^sub>c C \<Longrightarrow> (\<chi>m \<circ>\<^sub>c c = \<f>) = (\<chi>mi \<circ>\<^sub>c c = \<f>)"
+    using \<chi>m_type \<chi>mi_type comp_type true_false_only_truth_values by fastforce
+  then have \<chi>m_\<chi>mi_conv: "\<And> c. c \<in>\<^sub>c C \<Longrightarrow> (\<chi>m \<circ>\<^sub>c c = \<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c c) = (\<chi>mi \<circ>\<^sub>c c = \<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c c)"
+    by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+  
+  have "(\<chi>m \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c) = (\<chi>mi \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c)"
+    using \<chi>m_\<chi>mi_conv apply typecheck_cfuncs
+
+  (*thm complement_morphism_eq
+  have "characteristic_func (m \<circ>\<^sub>c i) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c"
+    using complement_morphism_eq mi_mono by (typecheck_cfuncs, blast)
+  then have "characteristic_func m \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c"
+    using \<chi>m_\<chi>mi_conv unfolding \<chi>m_def \<chi>mi_def 
+  
+  then have "(characteristic_func m \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c) \<and> (characteristic_func (m \<circ>\<^sub>c i) \<circ>\<^sub>c m\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c m\<^sup>c)"
+    unfolding \<chi>m_def \<chi>mi_def apply (typecheck_cfuncs)
+    
+  then show "C \<setminus> (A,m) \<cong> C \<setminus> (B, m \<circ>\<^sub>c i)"*)
+    oops
+
+lemma set_subtraction_left_cong:
+  assumes m_type[type_rule]: "m : C \<rightarrow> A" and m_mono[type_rule]: "monomorphism m"
+  assumes i_type[type_rule]: "i : A \<rightarrow> B" and i_iso: "isomorphism i"
+  shows "A \<setminus> (C,m) \<cong> B \<setminus> (C, i \<circ>\<^sub>c m)"
+  oops
+
 end
