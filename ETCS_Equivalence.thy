@@ -918,8 +918,24 @@ lemma image_subobj_map_unique:
   shows "x : f[A]\<^bsub>n\<^esub> \<rightarrow> Y \<Longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, n)\<^esub>) \<Longrightarrow> x = [f[A]\<^bsub>n\<^esub>]map"
   using assms image_subobject_mapping_def2 by blast
 
-
-
+lemma image_self:
+  assumes "f : X \<rightarrow> Y" and "monomorphism f"
+  assumes "a : A \<rightarrow> X" and "monomorphism a"
+  shows "f[A]\<^bsub>a\<^esub> \<cong> A"
+proof -
+  have "monomorphism (f \<circ>\<^sub>c a)"
+    using assms cfunc_type_def composition_of_monic_pair_is_monic by auto
+  then have "monomorphism ([f[A]\<^bsub>a\<^esub>]map \<circ>\<^sub>c (f\<restriction>\<^bsub>(A, a)\<^esub>))"
+    using assms image_subobj_comp_image_rest by auto
+  then have "monomorphism (f\<restriction>\<^bsub>(A, a)\<^esub>)"
+    by (meson assms comp_monic_imp_monic' image_rest_map_type image_subobj_map_type)
+  then have "isomorphism (f\<restriction>\<^bsub>(A, a)\<^esub>)"
+    using assms epi_mon_is_iso image_rest_map_epi by blast
+  then have "A \<cong> f[A]\<^bsub>a\<^esub>"
+    using assms unfolding is_isomorphic_def by (rule_tac x="f\<restriction>\<^bsub>(A, a)\<^esub>" in exI, typecheck_cfuncs)
+  then show ?thesis
+    by (simp add: isomorphic_is_symmetric)
+qed
 
 (*Now we show that f(A) is the smallest subobject of Y through which f factors (in the sense of epi-monic factorization)*)
 (*Proposition 2.3.8*)
