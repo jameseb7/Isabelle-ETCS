@@ -15,7 +15,7 @@ lemma emptyset_is_not_epi_countable:
   using comp_type emptyset_is_empty epi_countable_def zero_type by blast
 
 
-(* Definition 2.6.9 *)
+(*Better  Definition 2.6.9 *)
 definition countable :: "cset \<Rightarrow> bool" where
   "countable X \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> \<nat>\<^sub>c \<and> monomorphism f)"
 
@@ -33,6 +33,22 @@ lemma emptyset_is_countable:
 lemma natural_numbers_are_countably_infinite:
   "(countable \<nat>\<^sub>c) \<and> (is_infinite \<nat>\<^sub>c)"
   by (meson CollectI Peano's_Axioms countable_def injective_imp_monomorphism is_infinite_def successor_type)
+
+
+lemma iso_to_N_is_countably_infinite:
+  assumes "X \<cong> \<nat>\<^sub>c"
+  shows "(countable X) \<and> (is_infinite X)"
+  by (meson assms countable_def is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic isomorphic_is_symmetric larger_than_infinite_is_infinite natural_numbers_are_countably_infinite)
+  
+
+
+
+
+lemma countably_infinite_iso_N:
+  assumes "countable X"
+  assumes "is_infinite X"
+  shows "X \<cong> \<nat>\<^sub>c"
+  sorry
 
 
 
@@ -157,6 +173,19 @@ proof -
   then show "x = y"
     using assms by (simp add:  eq_pred_iff_eq)
 qed
+
+
+lemma iterative_injective_peeling':
+  assumes "g : X \<rightarrow> X"
+  assumes "k \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "p \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "x \<in>\<^sub>c X"
+  assumes "y \<in>\<^sub>c X"
+  assumes "injective g"
+  assumes "(g\<^bsup>\<circ>k +\<^sub>\<nat> p\<^esup>) \<circ>\<^sub>c x =(g\<^bsup>\<circ>k\<^esup>) \<circ>\<^sub>c y"
+  shows "(g\<^bsup>\<circ>p\<^esup>) \<circ>\<^sub>c x=y"
+  sorry
+
 
 definition canonically_finite_set :: "cfunc \<Rightarrow> cset" ("[_]\<^sub>c")where 
   "canonically_finite_set n = (SOME E. \<exists> m. n \<in>\<^sub>c \<nat>\<^sub>c \<and> equalizer E m (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) (leq \<circ>\<^sub>c \<langle>successor, n  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>))"
@@ -326,11 +355,12 @@ qed
 
 
 
-lemma first_canonically_finite_set_empty:
+lemma zero_canonically_finite_set_empty:
   "[zero]\<^sub>c \<cong> \<emptyset>"
-  by(typecheck_cfuncs, metis canonically_finite_morphism_type 
-      comp_type leq_infix_def member_canonically_finite_set
-      nat_strict_total_order no_el_iff_iso_0 nonempty_def zero_is_smallest)
+  by (typecheck_cfuncs, metis is_empty_def canonically_finite_morphism_type comp_type leq_infix_def
+      member_canonically_finite_set nat_strict_total_order no_el_iff_iso_0 zero_is_smallest)
+
+
 
 
 
@@ -523,13 +553,34 @@ lemma inclusion_characteristic_def3:
 
 
 
+
   
 
 (*We probably want these still, but need to relocate them!*)
+
+
+
+
 (*
 lemma size_2_sets:
 "(X \<cong> \<Omega>) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2) \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (x=x1) \<or> (x=x2))  )))"
-  apply typecheck_cfuncs
+proof auto
+  assume "X \<cong> \<Omega>"
+  then obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : X \<rightarrow> \<Omega>" and \<phi>_iso: "isomorphism \<phi>"
+    using is_isomorphic_def by blast
+  obtain x1 x2 where x1_type[type_rule]: "x1 \<in>\<^sub>c X" and x1_def: "\<phi> \<circ>\<^sub>c x1 = \<t>" and
+                     x2_type[type_rule]: "x2 \<in>\<^sub>c X" and x2_def: "\<phi> \<circ>\<^sub>c x2 = \<f>" and
+                     distinct: "x1 \<noteq> x2"
+    by (typecheck_cfuncs, smt (z3) \<phi>_iso cfunc_type_def comp_associative comp_type id_left_unit2 isomorphism_def true_false_distinct)
+  then show  "\<exists>x1. x1 \<in>\<^sub>c X \<and> (\<exists>x2. x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2 \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> x = x1 \<or> x = x2))"
+    by (smt (verit, ccfv_threshold)  \<phi>_iso \<phi>_type cfunc_type_def comp_associative comp_type id_left_unit2 isomorphism_def true_false_only_truth_values)
+next
+  assume "\<And>x1 x2. x1 \<in>\<^sub>c X \<Longrightarrow> x2 \<in>\<^sub>c X \<Longrightarrow> x1 \<noteq> x2 \<Longrightarrow> \<forall>x. x \<in>\<^sub>c X \<longrightarrow> x = x1 \<or> x = x2"
+  then obtain \<phi> x1 x2  where \<phi>_type[type_rule]: "\<phi> : X \<rightarrow> \<Omega>"  and
+                     x1_type[type_rule]: "x1 \<in>\<^sub>c X" and x1_def: "\<phi> \<circ>\<^sub>c x1 = \<t>" and
+                     x2_type[type_rule]: "x2 \<in>\<^sub>c X" and x2_def: "\<phi> \<circ>\<^sub>c x2 = \<f>" and
+                     distinct: "x1 \<noteq> x2"
+    apply typecheck_cfuncs
 
 lemma size_2plus_sets:
   "(\<Omega>  \<le>\<^sub>c  X ) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2)  )))"
@@ -542,16 +593,17 @@ next
     (*This line in the proof was shown under "non_init_non_ter_sets" in the Cardinality.thy file.*)
 qed
 
-
+*)
 
 lemma not_init_not_term:
   "(\<not>(initial_object X) \<and> \<not>(terminal_object X)) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2)  )))"
-  by (metis initial_iso_empty iso_empty_initial iso_to1_is_term no_el_iff_iso_0 nonempty_def single_elem_iso_one terminal_object_def)
+by (metis is_empty_def initial_iso_empty iso_empty_initial iso_to1_is_term no_el_iff_iso_0 single_elem_iso_one terminal_object_def)
 
+(*
 lemma sets_size_3_plus:
   "(\<not>(initial_object X) \<and> \<not>(terminal_object X) \<and> \<not>(X \<cong> \<Omega>)) = (\<exists> x1. (\<exists> x2.  \<exists> x3. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and>  (x3 \<in>\<^sub>c X) \<and> (x1\<noteq>x2) \<and>  (x2\<noteq>x3) \<and> (x1\<noteq>x3) )             ))"
-  by (metis not_init_not_term size_2_sets)
 *)
+
 
 
 
@@ -651,14 +703,25 @@ qed
 
 
 
-lemma second_canonically_finite_set_one:
+lemma one_canonically_finite_set_one:
   "[successor \<circ>\<^sub>c zero]\<^sub>c \<cong> one"
-  by (meson canonically_finite_succ coprod_with_init_obj2 first_canonically_finite_set_empty iso_empty_initial iso_to_term_is_term one_terminal_object terminal_objects_isomorphic zero_type)
+  by (meson canonically_finite_succ coprod_with_init_obj2 zero_canonically_finite_set_empty iso_empty_initial iso_to_term_is_term one_terminal_object terminal_objects_isomorphic zero_type)
 
-lemma third_canonically_finite_set_Omega:
+lemma two_canonically_finite_set_Omega:
   "[successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero]\<^sub>c \<cong> \<Omega>"
-  by (meson canonically_finite_succ coprod_pres_iso isomorphic_is_reflexive isomorphic_is_transitive oneUone_iso_\<Omega> second_canonically_finite_set_one succ_n_type zero_type)
+  by (meson canonically_finite_succ coprod_pres_iso isomorphic_is_reflexive isomorphic_is_transitive oneUone_iso_\<Omega> one_canonically_finite_set_one succ_n_type zero_type)
   
+
+
+
+
+
+
+(*We cannot yet show they are finite*)
+lemma canonicall_finite_sets_are_countable: 
+  assumes n_type[type_rule]:  "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "countable [n]\<^sub>c"
+  by (meson canonically_finite_morph_mono canonically_finite_morphism_type countable_def n_type)
 
 
 lemma sum_of_canonically_finite_sets:
@@ -1231,7 +1294,7 @@ lemma product_of_canonically_finite_sets:
   shows "[n \<cdot>\<^sub>\<nat> m]\<^sub>c \<cong> [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
 proof(cases "m = zero")
   show "m = zero \<Longrightarrow> [n \<cdot>\<^sub>\<nat> m]\<^sub>c \<cong> [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c"
-    by (metis cart_prod_decomp first_canonically_finite_set_empty isomorphic_is_symmetric isomorphic_is_transitive mult_respects_zero_right n_type no_el_iff_iso_0 nonempty_def)
+    by (typecheck_cfuncs, metis is_empty_def cart_prod_decomp isomorphic_is_symmetric isomorphic_is_transitive mult_respects_zero_right no_el_iff_iso_0 zero_canonically_finite_set_empty)
 next
   assume "m \<noteq> zero"
   obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : [n]\<^sub>c \<times>\<^sub>c [m]\<^sub>c \<rightarrow> \<nat>\<^sub>c" and
@@ -1719,6 +1782,25 @@ next
    qed
 qed
 
+theorem Herrlichs_finiteness_criterion': 
+  "is_infinite A = (\<exists> f. f: \<nat>\<^sub>c \<rightarrow> A \<and> injective f)"
+  by (metis Herrlichs_finiteness_criterion either_finite_or_infinite epi_is_surj is_finite_def is_infinite_def iso_imp_epi_and_monic)
+  
+
+
+(*Do we want to explicitly use N?*)
+lemma infinite_set_contain_countable_subset:
+  assumes Infinite_X: "is_infinite X"
+  shows "\<exists> C. (countable C \<and> is_infinite C \<and> C \<le>\<^sub>c X)"
+  by (metis CollectI Herrlichs_finiteness_criterion' assms injective_imp_monomorphism is_smaller_than_def natural_numbers_are_countably_infinite)
+
+
+
+
+
+
+
+
 lemma Infinite_Set_Coprod_One:
   "(is_finite X) = (\<not>(X \<cong> X \<Coprod> one))"
 proof(auto)
@@ -1777,8 +1859,10 @@ thm nat_induction
   (1) Summation facts. 
   (2) [n^m]\<cong>[n]^[m]
   (3) If X is infinite then X \<cong> X U 1
-  Corollary: Canonically finite sets are finite.
-  (4) Theorem: Finite sets are isomorphic to [n] for some n.   (proof uses AC).
+  (4) Iso to a Canonically finite set is finite.
+   Corollary: Canonically finite sets are finite. Proof:
+    Assume X \<cong> [n] for some n then \<not>(X\<cong> X U 1) (for it X \<cong> X U 1 then [n] \<cong> [sn] a contradiction) so X is finite by (3) above.
+  (5) Theorem: Finite sets are isomorphic to [n] for some n .   (proof uses AC).
   Corollary: Finite sets are countable. 
   Corollary: finite sets are closed under coprods, prods, and exps
 *)
@@ -1815,6 +1899,9 @@ lemma iso_pres_infinite:
   shows "is_infinite(Y)"
   using assms either_finite_or_infinite not_finite_and_infinite iso_pres_finite isomorphic_is_symmetric by blast
 
+
+
+
 (*Consider moving the result below*)
 
 lemma coprod_leq_product:
@@ -1825,9 +1912,9 @@ lemma coprod_leq_product:
   shows "(X \<Coprod> Y) \<le>\<^sub>c (X \<times>\<^sub>c Y)"
 proof - 
   obtain x1 x2 where x1x2_def[type_rule]:  "(x1 \<in>\<^sub>c X)" "(x2 \<in>\<^sub>c X)" "(x1 \<noteq> x2)"
-    using X_not_init X_not_term iso_empty_initial iso_to1_is_term no_el_iff_iso_0 nonempty_def single_elem_iso_one by blast
+    using is_empty_def X_not_init X_not_term iso_empty_initial iso_to1_is_term no_el_iff_iso_0 single_elem_iso_one by blast
   obtain y1 y2 where y1y2_def[type_rule]:  "(y1 \<in>\<^sub>c Y)" "(y2 \<in>\<^sub>c Y)" "(y1 \<noteq> y2)"
-    using Y_not_init Y_not_term iso_empty_initial iso_to1_is_term no_el_iff_iso_0 nonempty_def single_elem_iso_one by blast
+    using is_empty_def Y_not_init Y_not_term iso_empty_initial iso_to1_is_term no_el_iff_iso_0 single_elem_iso_one by blast
   then have y1_mono[type_rule]: "monomorphism(y1)"
     using element_monomorphism by blast
   obtain m where m_def: "m = \<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1)"
@@ -2339,13 +2426,13 @@ lemma prod_leq_exp:
   shows "(X \<times>\<^sub>c Y) \<le>\<^sub>c (Y\<^bsup>X\<^esup>)"
 proof(cases "initial_object Y")
   show "initial_object Y \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
-      by (metis initial_iso_empty initial_maps_mono initial_object_def is_smaller_than_def iso_empty_initial no_el_iff_iso_0 prod_with_empty_is_empty2)
-  next
-    assume "\<not> initial_object Y"
-    then obtain y1 y2 where y1_type[type_rule]: "y1 \<in>\<^sub>c Y" and y2_type[type_rule]: "y2 \<in>\<^sub>c Y" and y1_not_y2: "y1\<noteq>y2"
-      using assms not_init_not_term by blast
-    show "(X \<times>\<^sub>c Y) \<le>\<^sub>c (Y\<^bsup>X\<^esup>)"
-    proof(cases "X \<cong> \<Omega>")
+    by (metis X_times_zero initial_iso_empty initial_maps_mono initial_object_def is_smaller_than_def iso_empty_initial isomorphic_is_reflexive isomorphic_is_transitive prod_pres_iso)
+next
+  assume "\<not> initial_object Y"
+  then obtain y1 y2 where y1_type[type_rule]: "y1 \<in>\<^sub>c Y" and y2_type[type_rule]: "y2 \<in>\<^sub>c Y" and y1_not_y2: "y1\<noteq>y2"
+    using assms not_init_not_term by blast
+  show "(X \<times>\<^sub>c Y) \<le>\<^sub>c (Y\<^bsup>X\<^esup>)"
+  proof(cases "X \<cong> \<Omega>")
       assume "X \<cong> \<Omega>"
       have "\<Omega>  \<le>\<^sub>c  Y"
          using \<open>\<not> initial_object Y\<close> assms not_init_not_term size_2plus_sets by blast

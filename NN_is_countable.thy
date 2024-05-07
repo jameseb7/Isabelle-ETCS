@@ -194,7 +194,7 @@ proof -
         then have even: "is_even \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat>  n) = \<t>"
           using exp_closure exp_def f1 k_type mult_evens_is_even2 powers_of_two_are_even succ_n_type t_type zero_type by force
         have "is_odd \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat>  n) = \<t>"
-          by (metis even exp_def exp_respects_Zero_Left mult_evens_is_even2 n_type not_even_and_odd powers_of_three_are_odd s0_is_left_id succ_n_type three_is_odd)
+          by (metis  exp_def n_type powers_of_three_are_odd)
         then have False
           using even exp_closure n_type not_even_and_odd succ_n_type zero_type by auto
         then show ?thesis
@@ -228,7 +228,7 @@ proof -
         then have even: "is_even \<circ>\<^sub>c  ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat>  t) = \<t>"
           by (metis exp_closure exp_def f1 mult_evens_is_even2 n_type p_type powers_of_two_are_even succ_n_type zero_type)
         have "is_odd \<circ>\<^sub>c  ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)^\<^sub>\<nat>  t) = \<t>"
-          by (typecheck_cfuncs, metis comp_associative2 exp_def exp_respects_Zero_Left is_even_def2 is_even_not_is_odd is_odd_def2 powers_of_three_are_odd)
+          by (typecheck_cfuncs, metis exp_def  powers_of_three_are_odd)
         then have False
           using even exp_closure not_even_and_odd succ_n_type t_type zero_type by auto
         then show ?thesis

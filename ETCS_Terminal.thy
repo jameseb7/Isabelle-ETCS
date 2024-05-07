@@ -27,6 +27,9 @@ abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<i
 
 definition nonempty :: "cset \<Rightarrow> bool" where
   "nonempty X \<equiv> (\<exists>x. x \<in>\<^sub>c X)"
+
+definition is_empty :: "cset \<Rightarrow> bool" where
+  "is_empty X \<equiv> \<not>(\<exists>x. x \<in>\<^sub>c X)"
   
 definition terminal_object :: "cset \<Rightarrow> bool" where
   "terminal_object(X) \<longleftrightarrow> (\<forall> Y. \<exists>! f. f : Y \<rightarrow> X)"
@@ -39,16 +42,15 @@ using assms cfunc_prod_comp cfunc_type_def diagonal_def id_left_unit id_type by 
 lemma one_separator_contrapos:
   assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> Y"
   shows "f \<noteq> g \<Longrightarrow> \<exists> x. x : one \<rightarrow> X \<and> f \<circ>\<^sub>c x \<noteq> g \<circ>\<^sub>c x"
-proof -
-  have "(\<forall> x. x : one \<rightarrow> X \<longrightarrow> f \<circ>\<^sub>c x = g \<circ>\<^sub>c x) \<longrightarrow> f = g"
-    using assms(1) assms(2) one_separator by blast
-  then show "f \<noteq> g \<Longrightarrow> \<exists>x. x \<in>\<^sub>c X \<and> f \<circ>\<^sub>c x \<noteq> g \<circ>\<^sub>c x"
-    by blast
-qed
-    
+  using assms one_separator by (typecheck_cfuncs, blast) 
+
+
+
+
+
 
 lemma one_terminal_object: "terminal_object(one)"
-  unfolding terminal_object_def
+  unfolding terminal_object_def 
 proof auto
   fix Y
   have "\<beta>\<^bsub>Y\<^esub> : Y \<rightarrow> one"
@@ -65,13 +67,14 @@ next
 qed
 
 
+
+
 (* Exercise 2.1.15 *)
 lemma terminal_objects_isomorphic:
   assumes "terminal_object X" "terminal_object Y"
   shows "X \<cong> Y"
   unfolding is_isomorphic_def
 proof -
-
   obtain f where f_type: "f : X \<rightarrow> Y" and f_unique: "\<forall>g. g : X \<rightarrow> Y \<longrightarrow> f = g"
     using assms(2) terminal_object_def by force
 
@@ -92,6 +95,8 @@ proof -
   show "\<exists>f. f : X \<rightarrow> Y \<and> isomorphism f"
     using f_isomorphism f_type by auto
 qed
+
+
 
 (* Exercise 2.1.18 *)
 lemma element_monomorphism:
@@ -120,23 +125,29 @@ next
     by (metis id_type terminal_func_unique)
 qed
 
+
+
+
+
 lemma one_cross_one_unique_element:
   "\<exists>! x. x \<in>\<^sub>c one \<times>\<^sub>c one"
 proof (rule_tac a="diagonal one" in ex1I)
   show "diagonal one \<in>\<^sub>c one \<times>\<^sub>c one"
     by (simp add: cfunc_prod_type diagonal_def id_type)
-next
-  fix x
-  assume x_type: "x \<in>\<^sub>c one \<times>\<^sub>c one"
+  next
+    fix x
+    assume x_type: "x \<in>\<^sub>c one \<times>\<^sub>c one"
+    
+    have left_eq: "left_cart_proj one one \<circ>\<^sub>c x = id one"
+      using x_type one_unique_element by (typecheck_cfuncs, blast)
+    have right_eq: "right_cart_proj one one \<circ>\<^sub>c x = id one"
+      using x_type one_unique_element by (typecheck_cfuncs, blast)
   
-  have left_eq: "left_cart_proj one one \<circ>\<^sub>c x = id one"
-    using x_type one_unique_element by (typecheck_cfuncs, blast)
-  have right_eq: "right_cart_proj one one \<circ>\<^sub>c x = id one"
-    using x_type one_unique_element by (typecheck_cfuncs, blast)
-
-  then show "x = diagonal one"
-    unfolding diagonal_def using cfunc_prod_unique id_type left_eq x_type by blast
+    then show "x = diagonal one"
+      unfolding diagonal_def using cfunc_prod_unique id_type left_eq x_type by blast
 qed
+
+
 
 (* Proposition 2.1.19 *)
 lemma single_elem_iso_one:
@@ -147,27 +158,29 @@ proof
     by (simp add: isomorphic_is_symmetric)
   then obtain f where f_type: "f : one \<rightarrow> X" and f_iso: "isomorphism f"
     using is_isomorphic_def by blast
-
   show "\<exists>!x. x \<in>\<^sub>c X"
-  proof (rule_tac a=f in ex1I, auto simp add: f_type)
-    fix x
-    assume x_type: "x \<in>\<^sub>c X"
-    then have \<beta>x_eq_\<beta>f: "\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c f"
-      using f_type terminal_func_comp by auto
+  proof(auto)
+    show "\<exists>x. x \<in>\<^sub>c X"
+      by (meson f_type)
+  next  
+    fix x y
+    assume x_type[type_rule]: "x \<in>\<^sub>c X"
+    assume y_type[type_rule]: "y \<in>\<^sub>c X"
+    have \<beta>x_eq_\<beta>y: "\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c y"
+      using one_unique_element by (typecheck_cfuncs, blast)      
     have "isomorphism (\<beta>\<^bsub>X\<^esub>)"
       using X_iso_one is_isomorphic_def terminal_func_unique by blast
     then have "monomorphism (\<beta>\<^bsub>X\<^esub>)"
       by (simp add: iso_imp_epi_and_monic)
-    then show "x = f"
-      unfolding monomorphism_def using \<beta>x_eq_\<beta>f x_type cfunc_type_def f_type terminal_func_type by auto 
+    then show "x= y"
+      using \<beta>x_eq_\<beta>y  monomorphism_def2 terminal_func_type by (typecheck_cfuncs, blast)      
   qed
 next
   assume "\<exists>!x. x \<in>\<^sub>c X"
   then obtain x where x_type: "x : one \<rightarrow> X" and x_unique: "\<forall> y. y : one \<rightarrow> X \<longrightarrow> x = y"
     by blast
-
   have "terminal_object X"
-    unfolding terminal_object_def
+    unfolding terminal_object_def  
   proof 
     fix Y
     show "\<exists>!f. f : Y \<rightarrow> X"
@@ -207,30 +220,30 @@ lemma iso_to1_is_term:
   unfolding terminal_object_def
 proof 
    fix Y
-   obtain x where x_type: "x : one \<rightarrow> X" and x_unique: "\<forall> y. y : one \<rightarrow> X \<longrightarrow> x = y"
+   obtain x where x_type[type_rule]: "x : one \<rightarrow> X" and x_unique: "\<forall> y. y : one \<rightarrow> X \<longrightarrow> x = y"
       using assms single_elem_iso_one by fastforce 
    show  "\<exists>!f. f : Y \<rightarrow> X"
-      proof (rule_tac a="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" in ex1I)
-         show "x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> : Y \<rightarrow> X"
-           using comp_type terminal_func_type x_type by blast
-      next
-         fix xa
-         assume xa_type: "xa : Y \<rightarrow> X"
-         show "xa = x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-         proof (rule ccontr)
-           assume "xa \<noteq> x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-           then obtain y where elems_neq: "xa \<circ>\<^sub>c y \<noteq> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y" and y_type: "y : one \<rightarrow> Y"
-             using one_separator_contrapos[where f=xa, where g="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>", where X=Y, where Y=X]
-             using comp_type terminal_func_type x_type xa_type by blast
-           have elem1: "xa \<circ>\<^sub>c y \<in>\<^sub>c X"
-             using comp_type xa_type y_type by auto
-           have elem2: "(x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y \<in>\<^sub>c X"
-             using comp_type terminal_func_type x_type y_type by blast
-           show False
-             using elem1 elem2 elems_neq x_unique by blast
-         qed
-      qed
+   proof (rule_tac a="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" in ex1I)
+     show "x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> : Y \<rightarrow> X"
+       by typecheck_cfuncs
+   next
+     fix xa
+     assume xa_type: "xa : Y \<rightarrow> X"
+     show "xa = x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+     proof (rule ccontr)
+       assume "xa \<noteq> x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+       then obtain y where elems_neq: "xa \<circ>\<^sub>c y \<noteq> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y" and y_type: "y : one \<rightarrow> Y"
+         using one_separator_contrapos comp_type terminal_func_type x_type xa_type by blast
+       then show False
+         by (smt (z3) comp_type elems_neq terminal_func_type x_unique xa_type y_type)     
+     qed
+   qed
 qed 
+
+
+
+
+
 
 (* Converse to Exercise 2.1.15: Part 2 *)
 
@@ -246,10 +259,10 @@ lemma X_is_cart_prod1:
   unfolding is_cart_prod_def
 proof auto
   show "id\<^sub>c X : X \<rightarrow> X"
-    by (simp add: id_type)
+    by typecheck_cfuncs
 next
   show "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> one"
-    by (simp add: terminal_func_type)
+    by typecheck_cfuncs
 next
   fix f g Y
   assume f_type: "f : Y \<rightarrow> X" and g_type: "g : Y \<rightarrow> one"
@@ -265,15 +278,17 @@ next
   qed
 qed
 
+
+
 lemma X_is_cart_prod2:
   "is_cart_prod X (\<beta>\<^bsub>X\<^esub>) (id X) one X"
   unfolding is_cart_prod_def
 proof auto
   show "id\<^sub>c X : X \<rightarrow> X"
-    by (simp add: id_type)
+    by typecheck_cfuncs
 next
   show "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> one"
-    by (simp add: terminal_func_type)
+    by typecheck_cfuncs
 next
   fix f g Z
   assume f_type: "f : Z \<rightarrow> one" and g_type: "g : Z \<rightarrow> X"
@@ -297,8 +312,13 @@ lemma one_x_A_iso_A:
   "one \<times>\<^sub>c X \<cong> X"
   by (meson A_x_one_iso_A isomorphic_is_transitive product_commutes)
 
-(* concrete examples of above isomorphisms *)
 
+
+
+
+
+
+(* concrete examples of above isomorphisms *)
 lemma left_cart_proj_one_left_inverse:
   "\<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X one = id (X \<times>\<^sub>c one)"
   by (typecheck_cfuncs, smt (z3) cfunc_prod_comp cfunc_prod_unique id_left_unit2 id_right_unit2 right_cart_proj_type terminal_func_comp terminal_func_unique)
@@ -535,7 +555,7 @@ proof(auto)
   fix y
   assume y_type: "y \<in>\<^sub>c codomain (f \<times>\<^sub>f g)"
   have fg_type: "f \<times>\<^sub>f g: (A \<times>\<^sub>c  B) \<rightarrow> (C \<times>\<^sub>c D)"
-    using assms by typecheck_cfuncs
+    using assms  by typecheck_cfuncs    
   then have "y \<in>\<^sub>c (C \<times>\<^sub>c D)"
     using cfunc_type_def y_type by auto
   then have "\<exists> c d. c \<in>\<^sub>c C \<and> d \<in>\<^sub>c D \<and> y = \<langle>c,d\<rangle>"
@@ -558,6 +578,9 @@ qed
 
 
 
+
+(*Is this true ?  ? ? 
+
 lemma cfunc_cross_prod_surj_converse:
   assumes type_assms: "f : A \<rightarrow> C" "g : B \<rightarrow> D"
   assumes "surjective (f \<times>\<^sub>f g)"
@@ -569,7 +592,7 @@ proof(auto)
   then have y_type2:  "y \<in>\<^sub>c C"
     using cfunc_type_def type_assms(1) by auto
   oops
-
+*)
 
 lemma cfunc_cross_prod_mono_converse:
   assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
@@ -583,7 +606,7 @@ proof (auto)
   assume y_type: "y \<in>\<^sub>c domain f"
   assume equals: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
   have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
-    by (simp add: cfunc_cross_prod_type type_assms)
+    using assms by typecheck_cfuncs
   have x_type2: "x \<in>\<^sub>c X"
     using cfunc_type_def type_assms(1) x_type by auto
   have y_type2: "y \<in>\<^sub>c X"
@@ -608,37 +631,37 @@ proof (auto)
           then show "x = y"
             using b_def element_pair_eq x_type2 y_type2 by auto
         qed
-      next
-fix x y 
+next
+  fix x y 
   assume x_type: "x \<in>\<^sub>c domain g"
   assume y_type: "y \<in>\<^sub>c domain g"
   assume equals: "g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
   have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
-    by (simp add: cfunc_cross_prod_type type_assms)
+    using assms by typecheck_cfuncs
   have x_type2: "x \<in>\<^sub>c Z"
     using cfunc_type_def type_assms(2) x_type by auto
-   have y_type2: "y \<in>\<^sub>c Z"
+  have y_type2: "y \<in>\<^sub>c Z"
     using cfunc_type_def type_assms(2) y_type by auto
-show "x = y"
-        proof - 
-          obtain b where b_def: "b \<in>\<^sub>c X"
-            using nonempty(1) nonempty_def by blast
-          have xb_type: "\<langle>b,x\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
-            by (simp add: b_def cfunc_prod_type x_type2)
-          have yb_type: "\<langle>b,y\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
-            by (simp add: b_def cfunc_prod_type y_type2)
-          have "(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,x\<rangle> = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>"
-            using b_def cfunc_cross_prod_comp_cfunc_prod type_assms(1) type_assms(2) x_type2 by blast
-          also have "... = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>"
-            by (simp add: equals)
-          also have "... = (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,y\<rangle>"
-            using b_def cfunc_cross_prod_comp_cfunc_prod equals type_assms(1) type_assms(2) y_type2 by auto
-          then have "\<langle>b,x\<rangle> = \<langle>b,y\<rangle>"
-            by (metis \<open>(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,x\<rangle> = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>\<close> cfunc_type_def fg_inject fg_type injective_def xb_type yb_type)
-          then show "x = y"
-            using b_def element_pair_eq x_type2 y_type2 by auto
-        qed
-      qed
+  show "x = y"
+    proof - 
+      obtain b where b_def: "b \<in>\<^sub>c X"
+        using nonempty(1) nonempty_def by blast
+      have xb_type: "\<langle>b,x\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
+        by (simp add: b_def cfunc_prod_type x_type2)
+      have yb_type: "\<langle>b,y\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
+        by (simp add: b_def cfunc_prod_type y_type2)
+      have "(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,x\<rangle> = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>"
+        using b_def cfunc_cross_prod_comp_cfunc_prod type_assms(1) type_assms(2) x_type2 by blast
+      also have "... = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>"
+        by (simp add: equals)
+      also have "... = (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,y\<rangle>"
+        using b_def cfunc_cross_prod_comp_cfunc_prod equals type_assms(1) type_assms(2) y_type2 by auto
+      then have "\<langle>b,x\<rangle> = \<langle>b,y\<rangle>"
+        by (metis \<open>(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>b,x\<rangle> = \<langle>f \<circ>\<^sub>c b,g \<circ>\<^sub>c x\<rangle>\<close> cfunc_type_def fg_inject fg_type injective_def xb_type yb_type)
+      then show "x = y"
+        using b_def element_pair_eq x_type2 y_type2 by auto
+    qed
+qed
 
 
 (*The next lemma shows us that unless 
@@ -660,7 +683,7 @@ proof(cases "nonempty(X)", auto)
   then have "\<not>(nonempty(Z))"
     using nonempty assms(3) by blast
   have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
-    by (typecheck_cfuncs, simp add: assms(1) assms(2))
+    by (typecheck_cfuncs, simp add: assms(1,2))
   then have "x  \<in>\<^sub>c (X \<times>\<^sub>c Z)"
     using x_type cfunc_type_def by auto
   then have "\<exists>z. z\<in>\<^sub>c Z"
@@ -675,7 +698,7 @@ next
   assume x_type: "x  \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
   assume "y \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
   have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
-    by (typecheck_cfuncs, simp add: assms(1) assms(2))
+    by (typecheck_cfuncs, simp add: assms(1,2))
   then have "x  \<in>\<^sub>c (X \<times>\<^sub>c Z)"
     using x_type cfunc_type_def by auto
   then have "\<exists>z. z\<in>\<^sub>c X"
@@ -686,6 +709,11 @@ next
     by auto
 qed
 
+
+
+
+
+(*  This is probably NOT true!
 lemma nonempty_cfunc_cross_prod_decomp:
   assumes f_type: "f : A \<times>\<^sub>c B \<rightarrow> C \<times>\<^sub>c D"
   assumes A_nonempty: "a \<in>\<^sub>c A" and B_nonempty: "b \<in>\<^sub>c B"
@@ -795,5 +823,8 @@ proof (rule_tac a="left_cart_proj C D \<circ>\<^sub>c f \<circ>\<^sub>c \<langle
   next
     fix x
     oops
+*)
+
+
 
 end

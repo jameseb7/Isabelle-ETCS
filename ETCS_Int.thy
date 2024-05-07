@@ -38,7 +38,7 @@ definition int_equiv_rel :: "cset \<times> cfunc" ("R\<^sub>\<int>") where
 lemma int_equiv_equalizer: "equalizer int_equiv_set int_equiv_morphism add_outers add_inners"
   unfolding int_equiv_morphism_def
 proof (rule someI_ex)
-  show "\<exists>x. equalizer int_equiv_set x add_outers add_inners"
+  show "\<exists>x. equalizer int_equiv_set x add_outers add_inners"  
     unfolding int_equiv_set_def
   proof (rule someI_ex)
     show "\<exists>x xa. equalizer x xa add_outers add_inners"
@@ -54,11 +54,9 @@ proof -
   have f1: "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> factorsthru int_equiv_morphism"
     using assms(5) unfolding relative_member_def int_equiv_rel_def by auto
   have f2: "add_outers \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> = add_inners  \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle>"
-     using assms apply typecheck_cfuncs
-     by (meson f1 int_equiv_equalizer xfactorthru_equalizer_iff_fx_eq_gx)
+     using assms by (typecheck_cfuncs, meson f1 int_equiv_equalizer xfactorthru_equalizer_iff_fx_eq_gx)
   show  "b +\<^sub>\<nat> c = a +\<^sub>\<nat> d"
-     using assms apply typecheck_cfuncs
-     using add_def add_inners_apply add_outers_apply f2 by auto
+     using assms add_def add_inners_apply add_outers_apply f2 by auto
  qed
 
 lemma elements_of_int_equiv_set2:
@@ -67,21 +65,16 @@ lemma elements_of_int_equiv_set2:
   shows "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> R\<^sub>\<int>"
 proof-
   have f1: "add_outers \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> = add_inners  \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle>"
-     using assms apply typecheck_cfuncs
-     using add_def add_inners_apply add_outers_apply assms(5) by presburger
+     using add_def add_inners_apply add_outers_apply assms by presburger
   have f2: "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> factorsthru int_equiv_morphism"
-     using assms apply typecheck_cfuncs
-     using add_inners_type add_outers_type f1 int_equiv_equalizer xfactorthru_equalizer_iff_fx_eq_gx by blast
-  have f3: "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
-    by (simp add: assms(1) assms(2) assms(3) assms(4) cfunc_prod_type)
-  have f4: "monomorphism(int_equiv_morphism)"
+     using f1 assms add_inners_type add_outers_type  int_equiv_equalizer xfactorthru_equalizer_iff_fx_eq_gx by (typecheck_cfuncs, blast)
+  have f3: "monomorphism(int_equiv_morphism)"
     using equalizer_is_monomorphism int_equiv_equalizer by auto
-  have f5: "int_equiv_morphism: domain(int_equiv_morphism) \<rightarrow> (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
-    by (smt add_inners_type add_outers_type cfunc_type_def codomain_comp f1 f3 factors_through_def int_equiv_equalizer xfactorthru_equalizer_iff_fx_eq_gx)
+  have f4: "int_equiv_morphism: domain(int_equiv_morphism) \<rightarrow> (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)"
+    using add_outers_type cfunc_type_def equalizer_def int_equiv_equalizer by force
   show "\<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<times>\<^sub>c(\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c)\<^esub> R\<^sub>\<int>"
-     using assms apply typecheck_cfuncs
-     using cfunc_type_def equalizer_def f2 f4 f5 int_equiv_equalizer
-     unfolding relative_member_def2 int_equiv_rel_def by force
+     using cfunc_type_def equalizer_def f2 f3 f4 int_equiv_equalizer assms
+     unfolding relative_member_def2 int_equiv_rel_def by (typecheck_cfuncs, force)
  qed
 
 lemma pair_is_subset:
@@ -110,7 +103,6 @@ proof -
     assume rel1: "\<langle>x,y\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> R\<^sub>\<int>"
     assume rel2: "\<langle>y,z\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esub> R\<^sub>\<int>"
 
-(*Now we decompose x, y, and z as x = <a,b> and y = <c,d> and z = <e,f>*)
 
     have x_decomp: "\<exists> a b. x = \<langle>a, b\<rangle> \<and> a \<in>\<^sub>c \<nat>\<^sub>c \<and> b \<in>\<^sub>c \<nat>\<^sub>c"
       by (simp add: cart_prod_decomp x_type)
@@ -316,11 +308,11 @@ lemma quot_map_swap_constant_on_equiv:
   shows "natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle> = natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>c,d\<rangle>"
 proof - 
   have "natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a,b\<rangle>  = natpair2int \<circ>\<^sub>c  \<langle>b,a\<rangle>"
-    using assms(1) assms(2) swap_ap by auto
+    using assms(1,2) swap_ap by auto
   also have "... = natpair2int \<circ>\<^sub>c  \<langle>d,c\<rangle>"
     using assms elements_of_int_equiv_set1 nat_pair_eq by auto
   also have "... = natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>c,d\<rangle>"
-    using assms(3) assms(4) swap_ap by auto
+    using assms(3,4) swap_ap by auto
   then show ?thesis using calculation by auto
 qed
 
@@ -329,8 +321,8 @@ definition liftr_int_func :: "cfunc \<Rightarrow> cfunc" ("liftr\<^sub>\<int>") 
 
 lemma transpose_const_on_int_rel:
   assumes f_const_on_equiv_class:
-    "\<And>x y k. k \<in>\<^sub>c X \<Longrightarrow> x \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> y \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow>
-      natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> f \<circ>\<^sub>c \<langle>k, x\<rangle> = f \<circ>\<^sub>c \<langle>k, y\<rangle>"
+    "\<And>x y k. k \<in>\<^sub>c X \<Longrightarrow> x \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow> y \<in>\<^sub>c \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<Longrightarrow>  
+    natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y \<Longrightarrow> f \<circ>\<^sub>c \<langle>k, x\<rangle> = f \<circ>\<^sub>c \<langle>k, y\<rangle>"
   assumes f_type: "f : X \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<rightarrow> Y"
   shows "const_on_rel (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) R\<^sub>\<int> (f\<^sup>\<sharp>)"
 proof (rule const_on_int_rel_def)
@@ -365,15 +357,11 @@ proof (rule const_on_int_rel_def)
         using f_type transpose_func_def by auto
       then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>k, x\<rangle> = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>k, y\<rangle>"
         using x_type y_type k_type f_type comp_associative2 by (typecheck_cfuncs, auto)
-      then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x)) \<circ>\<^sub>c \<langle>k, id one\<rangle>
-          = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y)) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
-        using x_type y_type k_type f_type cfunc_cross_prod_comp_cfunc_prod id_right_unit2
-        by (typecheck_cfuncs, auto)
-      then have "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c \<langle>k, id one\<rangle>
-          = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
+      then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x)) \<circ>\<^sub>c \<langle>k, id one\<rangle> = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y)) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
+        using x_type y_type k_type f_type cfunc_cross_prod_comp_cfunc_prod id_right_unit2  by (typecheck_cfuncs, auto)
+      then have "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c \<langle>k, id one\<rangle>  = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
         using x_type y_type k_type f_type comp_associative2 by (typecheck_cfuncs, auto)
-      then show "(eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c k_one
-          = (eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c k_one"
+      then show "(eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c k_one  = (eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c k_one"
         by (simp add: k_one_def)
     qed
   qed
@@ -461,20 +449,19 @@ proof (rule const_on_int_rel_def)
       then have "(f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)) \<circ>\<^sub>c \<langle>k, x\<rangle> = (f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)) \<circ>\<^sub>c \<langle>k, y\<rangle>"
         using f_type k_type x_type y_type comp_associative2 by (typecheck_cfuncs, auto)
       then have "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))) \<circ>\<^sub>c \<langle>k, x\<rangle>
-          = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)))  \<circ>\<^sub>c \<langle>k, y\<rangle>"
+               = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)))  \<circ>\<^sub>c \<langle>k, y\<rangle>"
         using f_type transpose_func_def by (typecheck_cfuncs, auto)
       then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>k, x\<rangle>
-          = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))  \<circ>\<^sub>c \<langle>k, y\<rangle>"
+               = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>))  \<circ>\<^sub>c \<langle>k, y\<rangle>"
         using x_type y_type k_type f_type comp_associative2 by (typecheck_cfuncs, auto)
       then have "eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x)) \<circ>\<^sub>c \<langle>k, id one\<rangle>
-          = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y)) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
-        using x_type y_type k_type f_type cfunc_cross_prod_comp_cfunc_prod id_right_unit2
-        by (typecheck_cfuncs, auto)
+               = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y)) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
+        using x_type y_type k_type f_type cfunc_cross_prod_comp_cfunc_prod id_right_unit2 by (typecheck_cfuncs, auto)        
       then have "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c \<langle>k, id one\<rangle>
-          = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
+               = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c \<langle>k, id one\<rangle>"
         using x_type y_type k_type f_type comp_associative2 by (typecheck_cfuncs, auto)
       then show "(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c x))) \<circ>\<^sub>c k_one
-          = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c k_one"
+               = (eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f ((f \<circ>\<^sub>c swap X (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c y))) \<circ>\<^sub>c k_one"
         by (simp add: k_one_def)
     qed
   qed
@@ -696,25 +683,26 @@ proof (rule const_on_int_rel_def)
   assume natpair2int_eq: "natpair2int \<circ>\<^sub>c x = natpair2int \<circ>\<^sub>c y"
 
   show "(natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c x = (natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c y"
-proof -
-obtain cc :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" and cca :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" where
-  f1: "\<forall>x0 x1 x2 x3. (\<exists>v4 v5. x3 = \<langle>v4,v5\<rangle> \<and> v4 : x2 \<rightarrow> x1 \<and> v5 : x2 \<rightarrow> x0) = (x3 = \<langle>cc x0 x1 x2 x3,cca x0 x1 x2 x3\<rangle> \<and> cc x0 x1 x2 x3 : x2 \<rightarrow> x1 \<and> cca x0 x1 x2 x3 : x2 \<rightarrow> x0)"
-  by moura
+  proof -
+  obtain cc :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" and cca :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc" where
+    f1: "\<forall>x0 x1 x2 x3. (\<exists>v4 v5. x3 = \<langle>v4,v5\<rangle> \<and> v4 : x2 \<rightarrow> x1 \<and> v5 : x2 \<rightarrow> x0) =
+        (x3 = \<langle>cc x0 x1 x2 x3,cca x0 x1 x2 x3\<rangle> \<and> cc x0 x1 x2 x3 : x2 \<rightarrow> x1 \<and> cca x0 x1 x2 x3 : x2 \<rightarrow> x0)"
+      by moura
   then have f2: "x = \<langle>cc \<nat>\<^sub>c \<nat>\<^sub>c one x,cca \<nat>\<^sub>c \<nat>\<^sub>c one x\<rangle> \<and> cc \<nat>\<^sub>c \<nat>\<^sub>c one x \<in>\<^sub>c \<nat>\<^sub>c \<and> cca \<nat>\<^sub>c \<nat>\<^sub>c one x \<in>\<^sub>c \<nat>\<^sub>c"
-using cart_prod_decomp x_type by presburger
-have f3: "y = \<langle>cc \<nat>\<^sub>c \<nat>\<^sub>c one y,cca \<nat>\<^sub>c \<nat>\<^sub>c one y\<rangle> \<and> cc \<nat>\<^sub>c \<nat>\<^sub>c one y \<in>\<^sub>c \<nat>\<^sub>c \<and> cca \<nat>\<^sub>c \<nat>\<^sub>c one y \<in>\<^sub>c \<nat>\<^sub>c"
-  using f1 cart_prod_decomp y_type by presburger
+    using cart_prod_decomp x_type by presburger
+  have f3: "y = \<langle>cc \<nat>\<^sub>c \<nat>\<^sub>c one y,cca \<nat>\<^sub>c \<nat>\<^sub>c one y\<rangle> \<and> cc \<nat>\<^sub>c \<nat>\<^sub>c one y \<in>\<^sub>c \<nat>\<^sub>c \<and> cca \<nat>\<^sub>c \<nat>\<^sub>c one y \<in>\<^sub>c \<nat>\<^sub>c"
+    using f1 cart_prod_decomp y_type by presburger
   have f4: "\<forall>c ca cb cc cd ce cf. \<not> c : ca \<rightarrow> cb \<or> \<not> cc : cb \<rightarrow> cd \<or> \<not> ce : cd \<rightarrow> cf \<or> ce \<circ>\<^sub>c cc \<circ>\<^sub>c c = (ce \<circ>\<^sub>c cc) \<circ>\<^sub>c c"
-    using comp_associative2 by satx
-then have f5: "(natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c x = equiv_class R\<^sub>\<int> \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c x"
-  using nat2int_type natpair2int_def swap_type x_type by fastforce
+      using comp_associative2 by satx
+  then have f5: "(natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c x = equiv_class R\<^sub>\<int> \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c x"
+    using nat2int_type natpair2int_def swap_type x_type by fastforce
   have "\<langle>\<langle>cc \<nat>\<^sub>c \<nat>\<^sub>c one x,cca \<nat>\<^sub>c \<nat>\<^sub>c one x\<rangle>,\<langle>cc \<nat>\<^sub>c \<nat>\<^sub>c one y,cca \<nat>\<^sub>c \<nat>\<^sub>c one y\<rangle>\<rangle> \<in>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^esub> R\<^sub>\<int>"
     using f3 f2 by (simp add: cfunc_prod_type equiv_is_natpair2int_eq natpair2int_eq x_type y_type)
   then have "natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>cc \<nat>\<^sub>c \<nat>\<^sub>c one x,cca \<nat>\<^sub>c \<nat>\<^sub>c one x\<rangle> = natpair2int \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>cc \<nat>\<^sub>c \<nat>\<^sub>c one y,cca \<nat>\<^sub>c \<nat>\<^sub>c one y\<rangle>"
-using f3 f2 by (meson quot_map_swap_constant_on_equiv)
+    using f3 f2 by (meson quot_map_swap_constant_on_equiv)
   then show ?thesis
-    using f5 f4 f3 f2 nat2int_type natpair2int_def swap_type y_type by fastforce
-qed
+      using f5 f4 f3 f2 nat2int_type natpair2int_def swap_type y_type by fastforce
+  qed
 qed
 
 
@@ -837,9 +825,8 @@ lemma add2_int_natpair2int_eq:
 lemma add2_int_natpair2int_eq_el_form:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"  "c \<in>\<^sub>c \<nat>\<^sub>c"  "d \<in>\<^sub>c \<nat>\<^sub>c" 
   shows "\<langle>add_lefts, add_rights\<rangle> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,\<langle>c,d\<rangle>\<rangle> = 
-    \<langle>add2 \<circ>\<^sub>c \<langle>a,c\<rangle>, add2 \<circ>\<^sub>c \<langle>b,d\<rangle>\<rangle>"
-  using assms add_lefts_apply add_rights_apply cfunc_prod_comp 
-  by (typecheck_cfuncs, force)
+         \<langle>add2 \<circ>\<^sub>c \<langle>a,c\<rangle>, add2 \<circ>\<^sub>c \<langle>b,d\<rangle>\<rangle>"
+  using assms add_lefts_apply add_rights_apply cfunc_prod_comp by (typecheck_cfuncs, force)
 
 lemma addZtoAddN:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"  "c \<in>\<^sub>c \<nat>\<^sub>c"  "d \<in>\<^sub>c \<nat>\<^sub>c" 
@@ -910,8 +897,7 @@ lemma addZ_respects_zero_right:
   assumes "x \<in>\<^sub>c \<int>\<^sub>c"
   shows "x +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>) = x"
   by (metis addZtoAddN add_respects_zero_on_right assms representation_theorem zero_type)
-
-(*Eventually we should prove that 0 is the unique element with this property*)
+(*Below we show  that 0 is the unique element with this property*)
 
 lemma addZ_associative:
   assumes "x \<in>\<^sub>c \<int>\<^sub>c" "y \<in>\<^sub>c \<int>\<^sub>c" "z \<in>\<^sub>c \<int>\<^sub>c" 
@@ -950,8 +936,7 @@ lemma add_neg:
   assumes "x \<in>\<^sub>c \<int>\<^sub>c"
   shows "x +\<^sub>\<int> (neg_int \<circ>\<^sub>c x) = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
 proof - 
-  obtain n where x_def: "n \<in>\<^sub>c \<nat>\<^sub>c \<and> 
-(x = natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle> \<or> x = natpair2int \<circ>\<^sub>c \<langle>n, zero\<rangle>)"
+  obtain n where x_def: "n \<in>\<^sub>c \<nat>\<^sub>c \<and> (x = natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle> \<or> x = natpair2int \<circ>\<^sub>c \<langle>n, zero\<rangle>)"
     using assms canonical_representation_theorem by blast
   then show ?thesis 
   proof(cases "x = natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle>",auto)
@@ -970,9 +955,9 @@ proof -
     natpair2int \<circ>\<^sub>c \<langle>zero,zero\<rangle>"
       by (simp add: calculation)
   next
- assume "x = natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>"
- assume "n \<in>\<^sub>c \<nat>\<^sub>c"
-have  "(natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) +\<^sub>\<int> (neg_int \<circ>\<^sub>c natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) =
+    assume "x = natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>"
+    assume "n \<in>\<^sub>c \<nat>\<^sub>c"
+    have  "(natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) +\<^sub>\<int> (neg_int \<circ>\<^sub>c natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) =
          (natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>)"
       by (simp add: neg_el x_def zero_type)
     also have "... = add2_int \<circ>\<^sub>c \<langle>natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>,  natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>\<rangle>"
@@ -981,8 +966,7 @@ have  "(natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) +\<^sub>\<int> (ne
       by (metis \<open>(natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>) = add2_int \<circ>\<^sub>c \<langle>natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>,natpair2int \<circ>\<^sub>c \<langle>zero,n\<rangle>\<rangle>\<close> addZtoAddN add_respects_zero_on_left nat_pair_eq x_def zero_type)
     also have "... = natpair2int \<circ>\<^sub>c \<langle>zero,zero\<rangle>"
       by (simp add: nat_pair_eq x_def zero_type)
-    then show "(natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) +\<^sub>\<int> (neg_int \<circ>\<^sub>c natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) =
-    natpair2int \<circ>\<^sub>c \<langle>zero,zero\<rangle>"
+    then show "(natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) +\<^sub>\<int> (neg_int \<circ>\<^sub>c natpair2int \<circ>\<^sub>c \<langle>n,zero\<rangle>) = natpair2int \<circ>\<^sub>c \<langle>zero,zero\<rangle>"
       by (simp add: calculation)
   qed
 qed
@@ -992,6 +976,47 @@ lemma add_inverse_unique:
   assumes "x \<in>\<^sub>c \<int>\<^sub>c" "y \<in>\<^sub>c \<int>\<^sub>c"
   shows "x +\<^sub>\<int> y = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle> \<Longrightarrow> y = neg_int \<circ>\<^sub>c x"
   by (smt addZ_associative addZ_respects_zero_right add_neg assms comp_type neg_cancels_neg2 neg_int_type)
+
+
+lemma zero_class:
+ assumes n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type: "m \<in>\<^sub>c \<nat>\<^sub>c"
+ assumes "natpair2int \<circ>\<^sub>c\<langle>zero, zero\<rangle> =  natpair2int \<circ>\<^sub>c\<langle>n, m\<rangle>"
+ shows "n = m"
+ by (smt add_cancellative nat_pair_eq zero_type assms)
+
+lemma add_int_cancellative:
+  assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c" "c \<in>\<^sub>c \<int>\<^sub>c"
+  shows "(a +\<^sub>\<int> c = b +\<^sub>\<int> c) = (a = b)"
+  by (smt ETCS_Int.add_type addZ_associative add_inverse_unique add_neg assms comp_type neg_cancels_neg2 neg_int_type)
+
+
+lemma only_zero_is_neg_pos: 
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "natpair2int \<circ>\<^sub>c \<langle>zero, a \<rangle> = natpair2int \<circ>\<^sub>c \<langle>b, zero \<rangle>"
+  shows "a = zero \<and> b = zero"
+proof - 
+  have "a +\<^sub>\<nat> b = zero +\<^sub>\<nat> zero"
+    using assms nat_pair_eq zero_type by auto
+  then show "a = zero \<and> b = zero"
+    by (metis add_respects_zero_on_right assms(1,2) exists_implies_leq_true lqe_antisymmetry zero_type)
+qed  
+
+
+
+lemma additive_identity_unique:
+  assumes x_type: "x \<in>\<^sub>c \<int>\<^sub>c"
+  assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes zero_property: "x +\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>n, m\<rangle>) = x"
+  shows "n = m"
+proof- 
+  have "natpair2int \<circ>\<^sub>c \<langle>n, m\<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+    using assms by (typecheck_cfuncs, metis (no_types) addZ_commutative addZ_respects_zero_left add_int_cancellative x_type zero_property)
+  then show "n = m"
+    by (smt zero_class assms)
+qed
+
+
+
 
 section \<open>Integer Multiplication\<close>
 
@@ -1145,8 +1170,7 @@ lemma mult2_int_natpair2int_eq:
 lemma multZ_to_multNN:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" "p \<in>\<^sub>c \<nat>\<^sub>c" "q \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(natpair2int \<circ>\<^sub>c \<langle>m, n\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q\<rangle>) = 
-    natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
-
+          natpair2int \<circ>\<^sub>c \<langle>(m \<cdot>\<^sub>\<nat> q) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> p), (m \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (n \<cdot>\<^sub>\<nat> q)\<rangle>"
 proof - 
   have mn_type: "\<langle>m, n\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
     by (simp add: assms cfunc_prod_type zero_type) 
@@ -1175,7 +1199,7 @@ qed
 lemma multZ_to_multNN_1:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"  
   shows "(natpair2int \<circ>\<^sub>c \<langle>zero, m\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>zero, n\<rangle>) = 
-        natpair2int \<circ>\<^sub>c \<langle>zero, m \<cdot>\<^sub>\<nat> n\<rangle>"
+          natpair2int \<circ>\<^sub>c \<langle>zero, m \<cdot>\<^sub>\<nat> n\<rangle>"
 proof - 
   have zm_type: "\<langle>zero, m\<rangle> \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
     by (simp add: assms(1) cfunc_prod_type zero_type) 
@@ -1346,13 +1370,13 @@ qed
 lemma int_mul_respects_negation_left:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(natpair2int \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c zero,  zero \<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>m,  n \<rangle>)=
-           (natpair2int \<circ>\<^sub>c \<langle>n,  m \<rangle>)"
+          natpair2int \<circ>\<^sub>c \<langle>n,  m \<rangle>"
   using assms by (typecheck_cfuncs, simp add: add_respects_zero_on_right multZ_to_multNN mult_respects_zero_left s0_is_left_id)
 
 lemma int_mul_respects_negation_right:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "  (natpair2int \<circ>\<^sub>c \<langle>m,  n \<rangle>) \<cdot>\<^sub>\<int>   (natpair2int \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c zero,  zero \<rangle>)=
-           (natpair2int \<circ>\<^sub>c \<langle>n,  m \<rangle>)"
+            natpair2int \<circ>\<^sub>c \<langle>n,  m \<rangle>"
   using assms int_mul_commutative int_mul_respects_negation_left by (typecheck_cfuncs, force)
 
 lemma int_mul_associative: 
@@ -1453,29 +1477,15 @@ proof -
     by (simp add: calculation)
 qed
 
-lemma add_int_cancellative:
-  assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c" "c \<in>\<^sub>c \<int>\<^sub>c"
-  shows "(a +\<^sub>\<int> c = b +\<^sub>\<int> c) = (a = b)"
-  by (smt ETCS_Int.add_type addZ_associative add_inverse_unique add_neg assms comp_type neg_cancels_neg2 neg_int_type)
 
 
-lemma only_zero_is_neg_pos: 
-  assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c"
-  assumes "natpair2int \<circ>\<^sub>c \<langle>zero, a \<rangle> = natpair2int \<circ>\<^sub>c \<langle>b, zero \<rangle>"
-  shows "(a = zero) \<and> (b = zero)"
-proof - 
-  have "a +\<^sub>\<nat> b = zero +\<^sub>\<nat> zero"
-    using assms nat_pair_eq zero_type by auto
-  then show "(a = zero) \<and> (b = zero)"
-    by (metis add_respects_zero_on_right assms(1) assms(2) exists_implies_leq_true lqe_antisymmetry zero_type)
-qed  
 
 
 
 lemma mult_int_cancellative:
   assumes "a \<in>\<^sub>c \<int>\<^sub>c" "b \<in>\<^sub>c \<int>\<^sub>c" "c \<in>\<^sub>c \<int>\<^sub>c" "c\<noteq> natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
-  assumes "(a \<cdot>\<^sub>\<int> c = b \<cdot>\<^sub>\<int> c)"
-  shows   "(a = b)"
+  assumes "a \<cdot>\<^sub>\<int> c = b \<cdot>\<^sub>\<int> c"
+  shows   "a = b"
 proof- 
   have a_form:"(\<exists> u. (u \<in>\<^sub>c \<nat>\<^sub>c \<and> ((a = natpair2int \<circ>\<^sub>c \<langle>zero, u \<rangle>) \<or> (a = natpair2int \<circ>\<^sub>c \<langle>u, zero \<rangle>))))"
     by (simp add: assms(1) canonical_representation_theorem)
@@ -1740,33 +1750,59 @@ proof-
           using w_def by linarith
         have "natpair2int \<circ>\<^sub>c \<langle>zero , u \<cdot>\<^sub>\<nat> w \<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
         proof - 
-                    have "natpair2int \<circ>\<^sub>c \<langle>zero,u \<cdot>\<^sub>\<nat> w \<rangle> = 
-                      (natpair2int \<circ>\<^sub>c \<langle>u, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
-                      by (simp add: multZ_to_multNN_2 u_def w_def)
-                    also have "... = a \<cdot>\<^sub>\<int> c"
-                      by (simp add: a_case2 c_case2)
-                    also have "... = b \<cdot>\<^sub>\<int> c"
-                      by (simp add: assms(5))
-                    also have "... = (natpair2int \<circ>\<^sub>c \<langle>v, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
-                      by (simp add: b_case2 c_case2)
-                    also have "... = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
-                      by (simp add: multZ_to_multNN_2 v_def w_def)
-                    then show "natpair2int \<circ>\<^sub>c \<langle>zero , u \<cdot>\<^sub>\<nat> w \<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
-                      by (simp add: calculation)
-                  qed
-                  then have "u \<cdot>\<^sub>\<nat> w = v \<cdot>\<^sub>\<nat> w"
-                       by (metis add_respects_zero_on_left mult_closure nat_pair_eq u_def v_def w_def zero_type)
-                  then have "u = v"
-                    using assms(4) mult_cancellative u_def v_def w_def by auto
-                  then show "a = b"
-                    by (simp add: a_case2 b_case2)
-                qed
-              qed
-            qed
+          have "natpair2int \<circ>\<^sub>c \<langle>zero,u \<cdot>\<^sub>\<nat> w \<rangle> = 
+            (natpair2int \<circ>\<^sub>c \<langle>u, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+            by (simp add: multZ_to_multNN_2 u_def w_def)
+          also have "... = a \<cdot>\<^sub>\<int> c"
+            by (simp add: a_case2 c_case2)
+          also have "... = b \<cdot>\<^sub>\<int> c"
+            by (simp add: assms(5))
+          also have "... = (natpair2int \<circ>\<^sub>c \<langle>v, zero\<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>w, zero\<rangle>)"
+            by (simp add: b_case2 c_case2)
+          also have "... = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+            by (simp add: multZ_to_multNN_2 v_def w_def)
+          then show "natpair2int \<circ>\<^sub>c \<langle>zero , u \<cdot>\<^sub>\<nat> w \<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, v \<cdot>\<^sub>\<nat> w\<rangle>"
+            by (simp add: calculation)
+        qed
+        then have "u \<cdot>\<^sub>\<nat> w = v \<cdot>\<^sub>\<nat> w"
+          by (metis add_respects_zero_on_left mult_closure nat_pair_eq u_def v_def w_def zero_type)
+        then have "u = v"
+          using assms(4) mult_cancellative u_def v_def w_def by auto
+        then show "a = b"
+          by (simp add: a_case2 b_case2)
+      qed
+    qed
+  qed
 qed
 
+lemma multiplicative_identity_class:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" and "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle> = natpair2int \<circ>\<^sub>c \<langle>n, m\<rangle>"
+  shows "m = successor \<circ>\<^sub>c n"
+  by (typecheck_cfuncs, smt add_respects_succ2 add_respects_zero_on_right assms(3) comp_type nat_pair_eq zero_type assms)
 
 
+(*
+lemma multiplicative_identity_unique:
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" "p \<in>\<^sub>c \<nat>\<^sub>c" "q \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes nonzero: "p \<noteq> q"
+  assumes "(natpair2int \<circ>\<^sub>c \<langle>n,  m \<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q \<rangle>)=
+            natpair2int \<circ>\<^sub>c \<langle>p,  q \<rangle>"
+  shows "m = successor \<circ>\<^sub>c n"
+proof - 
+  have f1: "natpair2int \<circ>\<^sub>c \<langle>p, q \<rangle> \<noteq> natpair2int \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+    using assms nonzero zero_class by force
+
+
+  have f2: "(natpair2int \<circ>\<^sub>c \<langle>n, m\<rangle>)                   \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q \<rangle>) = 
+        (natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>) \<cdot>\<^sub>\<int> (natpair2int \<circ>\<^sub>c \<langle>p, q \<rangle>)"
+    using assms by (typecheck_cfuncs, simp add: assms(6) int_mul_respects_one_right)
+  then have "natpair2int \<circ>\<^sub>c \<langle>n, m \<rangle> = natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>"
+    using assms f1  subst mult_int_cancellative[where a =  "(natpair2int \<circ>\<^sub>c \<langle>n, m\<rangle>)", 
+    where b = "(natpair2int \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero \<rangle>)", 
+    where c = "(natpair2int \<circ>\<^sub>c \<langle>p, q \<rangle>)"] apply typecheck_cfuncs
+
+*)
 
 
 

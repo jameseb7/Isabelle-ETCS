@@ -342,7 +342,7 @@ proof(auto)
     proof(cases "x = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)")
       assume case2: "x = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
       then show "x = y"
-        by (smt (verit) AND_false_right_is_false AND_true_true_is_true AND_type NOT_false_is_true NOT_is_pullback cart_prod_eq2 cfunc_type_def codomain_comp comp_associative domain_comp f1 f2 f3 is_pullback_def left_proj_type maps_into_1u1 mx_eqs_my pre_OR_type square_commutes_def terminal_func_unique true_false_distinct y_form)
+        by (typecheck_cfuncs, smt (z3) cart_prod_eq2 case2 f1 f2 f3 false_func_type id_right_unit2 left_proj_type maps_into_1u1 mx_eqs_my terminal_func_comp terminal_func_comp_elem terminal_func_unique true_false_distinct true_func_type y_form)        
     next
       assume not_case2: "x \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one"
       then have case3: "x = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
@@ -409,8 +409,8 @@ proof(rule ccontr)
       by (metis cfunc_coprod_type cfunc_prod_type false_func_type j_def left_coproj_cfunc_coprod true_func_type)
   next
     assume not_case1: "j \<noteq> left_coproj one (one \<Coprod> one)"
-    then have case2_or_3: "j = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)\<or> 
-               j = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)"
+    then have case2_or_3: "j = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c left_coproj one one   \<or> 
+                           j = right_coproj one (one\<Coprod>one) \<circ>\<^sub>c right_coproj one one"
       by (metis coprojs_jointly_surj id_right_unit2 id_type j_def left_proj_type maps_into_1u1 one_unique_element)
     show ?thesis
     proof(cases "j = (right_coproj one (one\<Coprod>one)\<circ>\<^sub>c left_coproj one one)")
@@ -500,7 +500,7 @@ qed
 
 
 
-
+(*
 
 lemma unnamed_special_3:
   assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
@@ -519,7 +519,7 @@ proof-
     apply typecheck_cfuncs
     oops
 
-
+*)
 
 subsection \<open>XOR\<close>
 
@@ -1629,7 +1629,6 @@ proof -
   qed
 qed
 
-thm impE
 
 lemma IMPLIES_elim:
   assumes IMPLIES_true: "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"

@@ -13,6 +13,8 @@ where
   emptyset_is_empty: "\<not>(x \<in>\<^sub>c \<emptyset>)"
 
 
+
+
 (*characteristic_function_exists:
     "\<forall> X m. ((m : B \<rightarrow> X) \<and> monomorphism(m)) \<longrightarrow> (\<exists>! \<chi>. is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi> )"*)
 
@@ -97,15 +99,12 @@ lemma X_times_zero:
 
 (* Proposition  2.4.8 *)
 lemma no_el_iff_iso_0:
-  "\<not>(nonempty(X)) \<longleftrightarrow> X \<cong> \<emptyset>"
+  "is_empty X \<longleftrightarrow> X \<cong> \<emptyset>"
 proof auto
-  assume "X \<cong> \<emptyset>"
-  then show "nonempty X \<Longrightarrow> False "
-    using comp_type emptyset_is_empty is_isomorphic_def nonempty_def by blast
-  have "\<not>(nonempty(X))"
-    using \<open>nonempty X \<Longrightarrow> False\<close> by blast
+  show "X \<cong> \<emptyset> \<Longrightarrow> is_empty X"
+    by (meson is_empty_def comp_type emptyset_is_empty is_isomorphic_def)
 next 
-  assume "\<not>(nonempty(X))"
+  assume "is_empty X"
   obtain f where f_type: "f: \<emptyset> \<rightarrow> X"
     using initial_func_type by blast  (* f = \<alpha>_X *)
  
@@ -114,7 +113,7 @@ next
   then have f_mono: "monomorphism(f)"
     using  cfunc_type_def f_type injective_imp_monomorphism by blast
   have f_surj: "surjective(f)"
-    using \<open>\<not> nonempty X\<close> cfunc_type_def f_type nonempty_def surjective_def by auto
+    using ETCS_Terminal.is_empty_def \<open>is_empty X\<close> f_type surjective_def2 by presburger
   then have epi_f: "epimorphism(f)"
     using surjective_is_epimorphism by blast
   then have iso_f: "isomorphism(f)"
@@ -127,7 +126,7 @@ lemma initial_maps_mono:
   assumes "initial_object(X)"
   assumes "f : X \<rightarrow> Y"
   shows "monomorphism(f)"
-  by (metis UNIV_I assms cfunc_type_def initial_iso_empty injective_def injective_imp_monomorphism no_el_iff_iso_0 nonempty_def)
+  by (metis UNIV_I assms cfunc_type_def initial_iso_empty injective_def injective_imp_monomorphism no_el_iff_iso_0 is_empty_def)
 
 
 
@@ -135,30 +134,32 @@ lemma iso_empty_initial:
   assumes "X \<cong> \<emptyset>"
   shows "initial_object(X)"
   unfolding initial_object_def
-  by (meson assms comp_type is_isomorphic_def isomorphic_is_symmetric isomorphic_is_transitive no_el_iff_iso_0 nonempty_def one_separator terminal_func_type)
+  by (meson assms comp_type is_isomorphic_def isomorphic_is_symmetric isomorphic_is_transitive no_el_iff_iso_0 is_empty_def one_separator terminal_func_type)
  
 
 lemma function_to_empty_set_is_iso:
   assumes "f: X \<rightarrow> Y"
-  assumes "\<not>(nonempty(Y))"
+  assumes "is_empty Y"
   shows "isomorphism(f)"
-  by (metis assms cfunc_type_def comp_type epi_mon_is_iso injective_def injective_imp_monomorphism nonempty_def singletonI surjective_def surjective_is_epimorphism)
+  by (metis assms cfunc_type_def comp_type epi_mon_is_iso injective_def injective_imp_monomorphism is_empty_def singletonI surjective_def surjective_is_epimorphism)
   
 
 
 lemma prod_iso_to_empty_right:
-  assumes "nonempty(X)"
+  assumes "nonempty X"
   assumes "X \<times>\<^sub>c Y \<cong> \<emptyset>"
-  shows "\<not>(nonempty(Y))"
-  by (meson assms cfunc_prod_type no_el_iff_iso_0 nonempty_def)
+  shows "is_empty Y"
+  by (metis emptyset_is_empty is_empty_def cfunc_prod_type epi_is_surj is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric nonempty_def surjective_def2 assms)
+
 
 lemma prod_iso_to_empty_left:
-  assumes "nonempty(Y)"
+  assumes "nonempty Y"
   assumes "X \<times>\<^sub>c Y \<cong> \<emptyset>"
-  shows "\<not>(nonempty(X))"
-  using assms prod_iso_to_empty_right by blast
+  shows "is_empty X"
+  by (meson is_empty_def nonempty_def prod_iso_to_empty_right assms)
+  
 
- 
+
 
 
 lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>c X"
@@ -211,7 +212,7 @@ proof -
           using true_false_distinct by auto
       qed
       then show "X \<cong> \<emptyset>"
-        using no_el_iff_iso_0 nonempty_def by blast
+        using is_empty_def \<open>\<nexists>x. x \<in>\<^sub>c X\<close> no_el_iff_iso_0 by blast
     qed
 
     show "X \<cong> one \<or> X \<cong> \<emptyset>"
@@ -253,6 +254,25 @@ lemma prod_with_term_obj2:
   shows  "X \<times>\<^sub>c Y \<cong> X"
   by (meson assms isomorphic_is_transitive prod_with_term_obj1 product_commutes)
 
+
+
+
+
+(* I don't think this is true.......   
+
+     > X
+    /   \
+   /     \
+  /       \>
+Z ------>  X U Y
+ \       />
+  \     /
+   \> Y 
+
+
+
+
+
 lemma coprojs_jointly_surj':
   assumes z_type[type_rule]: "z : Z \<rightarrow> X \<Coprod> Y"
   shows "(\<exists> x. (x : Z \<rightarrow> X \<and> z = (left_coproj X Y) \<circ>\<^sub>c x))
@@ -260,7 +280,7 @@ lemma coprojs_jointly_surj':
 proof (cases "\<exists> z'. z' \<in>\<^sub>c Z", auto)
   assume Z_empty: "\<forall>z'. \<not> z' \<in>\<^sub>c Z"
   then have "Z \<cong> \<emptyset>"
-    using no_el_iff_iso_0 nonempty_def by auto
+    using no_el_iff_iso_0 is_empty_def by auto
   then have "\<exists> f. f : Z \<rightarrow> \<emptyset>"
     using is_isomorphic_def by blast
   then show "\<forall>y. y : Z \<rightarrow> Y \<longrightarrow> z \<noteq> right_coproj X Y \<circ>\<^sub>c y \<Longrightarrow> \<exists>x. x : Z \<rightarrow> X \<and> z = left_coproj X Y \<circ>\<^sub>c x"
@@ -282,7 +302,7 @@ next
       oops
 
     thm coprojs_jointly_surj[where z="z \<circ>\<^sub>c z'", where X=X, where Y=Y]
-
+*)
 
 
 

@@ -10,8 +10,8 @@ definition indexed_sum :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" where
 lemma indexed_sum_def2:
   assumes f_type[type_rule]: "f : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c" and low_type[type_rule]: "low \<in>\<^sub>c \<nat>\<^sub>c" 
   shows "indexed_sum f low : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c 
-    \<and> indexed_sum f low \<circ>\<^sub>c zero = \<langle>low, f \<circ>\<^sub>c low\<rangle> 
-    \<and> \<langle>successor \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, add2 \<circ>\<^sub>c (f \<times>\<^sub>f id \<nat>\<^sub>c)\<rangle> \<circ>\<^sub>c indexed_sum f low = indexed_sum f low \<circ>\<^sub>c successor"
+    \<and> (indexed_sum f low) \<circ>\<^sub>c zero = \<langle>low, f \<circ>\<^sub>c low\<rangle> 
+    \<and> \<langle>successor \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, add2 \<circ>\<^sub>c (f \<times>\<^sub>f id \<nat>\<^sub>c)\<rangle> \<circ>\<^sub>c indexed_sum f low = (indexed_sum f low) \<circ>\<^sub>c successor"
   unfolding indexed_sum_def
   by (rule theI', typecheck_cfuncs, simp add: natural_number_object_property2)
 
@@ -22,7 +22,7 @@ lemma indexed_sum_type[type_rule]:
 
 lemma indexed_sum_zero:
   assumes f_type[type_rule]: "f : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c" and low_type[type_rule]: "low \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "indexed_sum f low \<circ>\<^sub>c zero = \<langle>low, f \<circ>\<^sub>c low\<rangle>"
+  shows "(indexed_sum f low) \<circ>\<^sub>c zero = \<langle>low, f \<circ>\<^sub>c low\<rangle>"
   using indexed_sum_def2 assms by auto
 
 lemma indexed_sum_successor:
@@ -97,16 +97,23 @@ qed
 lemma add_indexed_sum:
   assumes f_type[type_rule]: "f : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c" and low_type[type_rule]: "low \<in>\<^sub>c \<nat>\<^sub>c"
   assumes n1_type[type_rule]: "n1 \<in>\<^sub>c \<nat>\<^sub>c" and n2_type[type_rule]: "n2 \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c indexed_sum f low \<circ>\<^sub>c n1)
-          +\<^sub>\<nat> (right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c indexed_sum f (successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>low, n1\<rangle>) \<circ>\<^sub>c n2)
-      = right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c indexed_sum f low \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>n1, n2\<rangle>"
-proof -
-  have "add2 \<circ>\<^sub>c \<langle>indexed_sum f low \<circ>\<^sub>c n1 \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, indexed_sum f (successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>low, n1\<rangle>)\<rangle>
-      = indexed_sum f low \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>n1 \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>"
-  proof (rule natural_number_object_func_unique)
-    oops
-
+  shows "(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (indexed_sum f low) \<circ>\<^sub>c n1)
+          +\<^sub>\<nat> (right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(indexed_sum f (successor \<circ>\<^sub>c (low +\<^sub>\<nat> n1))) \<circ>\<^sub>c n2)
+      = right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (indexed_sum f low) \<circ>\<^sub>c (n1 +\<^sub>\<nat> n2)"
+proof(cases "n1 = zero")
+  assume "n1 = zero"
+  show ?thesis
+  proof(cases "n2 = zero")
+    assume "n2 = zero"
     
+    have LHS:  "(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (indexed_sum f low) \<circ>\<^sub>c n1) +\<^sub>\<nat> (right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(indexed_sum f (successor \<circ>\<^sub>c (low +\<^sub>\<nat> n1))) \<circ>\<^sub>c n2) =
+               (f \<circ>\<^sub>c low) +\<^sub>\<nat> (f \<circ>\<^sub>c (successor \<circ>\<^sub>c low))"
+      using \<open>n1 = zero\<close> \<open>n2 = zero\<close> add_respects_zero_on_right indexed_sum_zero right_cart_proj_cfunc_prod by (typecheck_cfuncs, presburger)
+
+    have RHS: "right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c indexed_sum f low \<circ>\<^sub>c (n1 +\<^sub>\<nat> n2) = (f \<circ>\<^sub>c low)"
+      by (typecheck_cfuncs, simp add: \<open>n1 = zero\<close> \<open>n2 = zero\<close> add_respects_zero_on_right indexed_sum_zero right_cart_proj_cfunc_prod)
+
+
 
 
 

@@ -9,7 +9,23 @@ definition section_of :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" (infix "
 
 (*Definition 2.7.1*)
 definition split_epimorphism :: "cfunc \<Rightarrow> bool"
-  where "split_epimorphism(f)\<longleftrightarrow>(\<exists> s. f \<circ>\<^sub>c s = id (codomain f))"
+  where "split_epimorphism(f)\<longleftrightarrow>(\<exists> s.  s : codomain(f) \<rightarrow> domain(f) \<and> f \<circ>\<^sub>c s = id (codomain(f)))"
+
+lemma split_epimorphism_def2: 
+  assumes f_type: "f : X \<rightarrow> Y"
+  assumes f_split_epic: "split_epimorphism f"
+  shows "\<exists> s. ((f \<circ>\<^sub>c s = id Y) \<and> (s: Y \<rightarrow> X))"
+  using cfunc_type_def f_split_epic f_type split_epimorphism_def by auto
+
+lemma sections_define_splits:
+  assumes "s sectionof f"
+  assumes "s : Y \<rightarrow> X"
+  shows "(f : X \<rightarrow> Y) \<and> split_epimorphism(f)"
+  using assms cfunc_type_def section_of_def split_epimorphism_def by auto
+
+
+
+
 
 axiomatization
   where
@@ -22,6 +38,15 @@ lemma epis_give_monos:
   shows "\<exists>g. g: Y \<rightarrow> X \<and> monomorphism(g) \<and> f \<circ>\<^sub>c g = id Y"
   using assms  
   by (typecheck_cfuncs_prems, metis axiom_of_choice cfunc_type_def comp_monic_imp_monic f_epi id_isomorphism iso_imp_epi_and_monic section_of_def)
+
+corollary epis_are_split:
+  assumes f_type: "f : X \<rightarrow> Y"
+  assumes f_epi: "epimorphism(f)"
+  shows "split_epimorphism f"
+  using epis_give_monos cfunc_type_def  f_epi split_epimorphism_def by blast
+  
+
+
 
 (* Proposition 2.6.8 *)
 lemma monos_give_epis:
@@ -101,5 +126,46 @@ proof -
       by (insert comp_associative2 func_f_elem_eq id_left_unit2 f_type, typecheck_cfuncs, rule one_separator, auto)
   qed
 qed
+
+
+  
+
+
+
+
+
+(*Exercise 2.7.2(i)*)
+lemma split_epis_are_regular: 
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  assumes "split_epimorphism f"
+  shows "regular_epimorphism f"
+proof- 
+  obtain s where s_type[type_rule]: "s : Y \<rightarrow> X" and s_splits:  "f \<circ>\<^sub>c s = id Y"
+    by (meson assms(2) f_type split_epimorphism_def2)
+  have sf_right_id: "f  \<circ>\<^sub>c (s  \<circ>\<^sub>c f) = f"
+    by (typecheck_cfuncs, simp add: comp_associative2 id_left_unit2 s_splits)
+  oops
+   
+
+
+
+(*Exercise 2.7.2(ii)*)
+lemma split_epis_are_regular: 
+  assumes "s : Y \<rightarrow> X"
+  assumes "s sectionof f"
+  shows "regular_monomorphism s"
+proof - 
+  have fs_idY: "f \<circ>\<^sub>c s = id Y"
+    using assms cfunc_type_def section_of_def by fastforce
+  then have "(s \<circ>\<^sub>c f) \<circ>\<^sub>c s = s"
+    by (metis assms(1) assms(2) cfunc_type_def comp_associative id_right_unit2 sections_define_splits)
+  oops
+
+
+
+
+
+
+
 
 end

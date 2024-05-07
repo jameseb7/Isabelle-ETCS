@@ -170,7 +170,7 @@ lemma FORALL_true_implies_all_true3:
   shows "\<And> x. x \<in>\<^sub>c X  \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, id one\<rangle> = \<t>"
   using FORALL_p_true FORALL_true_implies_all_true2 id_right_unit2 terminal_func_unique by (typecheck_cfuncs, auto)
 
-thm allE
+
 
 lemma FORALL_elim:
   assumes FORALL_p_true: "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t>" and p_type[type_rule]: "p : X \<times>\<^sub>c one \<rightarrow> \<Omega>"

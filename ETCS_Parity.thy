@@ -329,27 +329,15 @@ qed
 lemma not_even_and_odd:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
   shows "\<not>(is_even \<circ>\<^sub>c m = \<t> \<and> is_odd \<circ>\<^sub>c m = \<t>)"
-proof(auto)
-  assume "is_even \<circ>\<^sub>c m = \<t>"
-  assume "is_odd \<circ>\<^sub>c m = \<t>"
-  have "NOT \<circ>\<^sub>c is_odd \<circ>\<^sub>c m = \<t>"
-    using \<open>is_even \<circ>\<^sub>c m = \<t>\<close> assms comp_associative2 is_even_not_is_odd by (typecheck_cfuncs, auto)
-  then have "is_odd \<circ>\<^sub>c m \<noteq> \<t>"
-    using NOT_true_is_false true_false_distinct by fastforce
-  then show False
-    by (simp add: \<open>is_odd \<circ>\<^sub>c m = \<t>\<close>)
-qed
+  using assms NOT_true_is_false NOT_type comp_associative2 is_even_not_is_odd true_false_distinct by (typecheck_cfuncs, fastforce)
+
 
 
 
 lemma even_or_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(is_even \<circ>\<^sub>c n = \<t>) \<or> (is_odd \<circ>\<^sub>c n = \<t>)"
-proof(auto)
-  assume not_odd: "is_odd \<circ>\<^sub>c n \<noteq> \<t>"
-  show "is_even \<circ>\<^sub>c n = \<t>"
-    using assms by (typecheck_cfuncs, metis NOT_false_is_true NOT_type cfunc_type_def comp_associative is_odd_not_is_even not_odd true_false_only_truth_values)
-qed
+  by (typecheck_cfuncs, metis NOT_false_is_true NOT_type comp_associative2 is_even_not_is_odd true_false_only_truth_values assms)
 
 lemma is_even_nth_even_true:
   "is_even \<circ>\<^sub>c nth_even = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
@@ -368,7 +356,7 @@ proof (rule natural_number_object_func_unique[where f="id \<Omega>", where X=\<O
     also have "... = \<t>"
       by (simp add: is_even_zero nth_even_zero)
     also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
-      by (typecheck_cfuncs, smt beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 successor_type terminal_func_comp)
+      by (typecheck_cfuncs, metis comp_associative2 id_right_unit2 terminal_func_comp_elem)
     then show ?thesis
       using calculation by auto
   qed
@@ -410,7 +398,7 @@ proof (rule natural_number_object_func_unique[where f="id \<Omega>", where X=\<O
     also have "... = \<t>"
       using comp_associative2 is_even_not_is_odd is_even_zero is_odd_def2 nth_odd_def2 successor_type zero_type by auto
     also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
-      by (typecheck_cfuncs, smt beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 successor_type terminal_func_comp)
+      by (typecheck_cfuncs, metis comp_associative2 is_even_nth_even_true is_even_type is_even_zero nth_even_def2)
     then show ?thesis
       using calculation by auto
   qed
@@ -489,8 +477,7 @@ lemma add_mixed_is_odd:
   assumes "j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = m"
   assumes "k \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n"
   shows   "((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (j +\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)) = m +\<^sub>\<nat> n"
-  apply typecheck_cfuncs
-proof -
+proof(typecheck_cfuncs)
 assume a1: "successor \<circ>\<^sub>c zero \<in>\<^sub>c \<nat>\<^sub>c"
 assume a2: "successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero \<in>\<^sub>c \<nat>\<^sub>c"
 have "\<forall>c ca. \<not> c \<in>\<^sub>c \<nat>\<^sub>c \<or> \<not> ca \<in>\<^sub>c \<nat>\<^sub>c \<or> c \<cdot>\<^sub>\<nat> ca \<in>\<^sub>c \<nat>\<^sub>c"
@@ -569,7 +556,7 @@ proof -
         = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero"
         by (typecheck_cfuncs, simp add: comp_associative2)
       also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c zero, zero\<rangle>"
-        by (typecheck_cfuncs, smt beta_N_succ_mEqs_Id1 cfunc_prod_comp comp_associative2 id_right_unit2 successor_type terminal_func_comp)
+        by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
       also have "... = \<t>"
         using eq_pred_iff_eq nth_even_zero by (typecheck_cfuncs, blast)
       then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = \<t>"
@@ -583,8 +570,7 @@ qed
 lemma not_EXISTS_zero_nth_odd:
   "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = \<f>"
 proof -
-  have  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero
-      = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
+  have  "(EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c zero = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
     by (typecheck_cfuncs, simp add: comp_associative2)
   also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero))\<^sup>\<sharp>"
     by (typecheck_cfuncs, simp add: comp_associative2 sharp_comp)
@@ -981,7 +967,6 @@ proof -
   proof auto
     fix m
     assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
-
     assume "halve_with_parity \<circ>\<^sub>c n = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
     then have "((nth_even \<amalg> nth_odd) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c n = ((nth_even \<amalg> nth_odd) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c m"
       by (typecheck_cfuncs, smt assms comp_associative2)
@@ -992,7 +977,6 @@ proof -
   next
     fix m
     assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
-
     assume "halve_with_parity \<circ>\<^sub>c n = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
     then have "((nth_even \<amalg> nth_odd) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c n = ((nth_even \<amalg> nth_odd) \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c m"
       by (typecheck_cfuncs, smt assms comp_associative2)
@@ -1036,7 +1020,7 @@ qed
 lemma not_even_and_odd2:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "\<not>((\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = successor \<circ>\<^sub>c((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)) \<and> 
-         (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n =              (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)) "
+           (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n =              (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m))"
   by (smt (z3) assms comp_associative2 halve_nth_even halve_nth_odd halve_type id_left_unit2 n_neq_succ_n nth_even_is_times_twoB nth_even_type nth_odd_def2 nth_odd_is_succ_times_twoB)
 
 
@@ -1162,7 +1146,7 @@ lemma mult_evens_is_even2:
   shows "is_even \<circ>\<^sub>c (m \<cdot>\<^sub>\<nat> n) = \<t>"
 proof - 
   obtain p where m_def: "p \<in>\<^sub>c \<nat>\<^sub>c \<and> m = nth_even \<circ>\<^sub>c p"
-    using assms(1) assms(3) is_even_exists_nth_even by blast
+    using assms(1,3) is_even_exists_nth_even by blast
   have m_def2: "m = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p)"
     by (simp add: m_def nth_even_is_times_twoB)
   then have mn_def: "m \<cdot>\<^sub>\<nat> n = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (p \<cdot>\<^sub>\<nat> n))"
@@ -1189,9 +1173,9 @@ lemma mult_odds_is_odd2:
   shows "is_odd \<circ>\<^sub>c (m \<cdot>\<^sub>\<nat> n) = \<t>"
 proof - 
   obtain p where m_def: "p \<in>\<^sub>c \<nat>\<^sub>c \<and> m = nth_odd \<circ>\<^sub>c p"
-    using assms(1) assms(3) is_odd_exists_nth_odd by blast
+    using assms(1,3) is_odd_exists_nth_odd by blast
   obtain q where n_def: "q \<in>\<^sub>c \<nat>\<^sub>c \<and> n = nth_odd \<circ>\<^sub>c q"
-    using assms(2) assms(4) is_odd_exists_nth_odd by blast
+    using assms(2,4) is_odd_exists_nth_odd by blast
   have m_def2: "m = successor \<circ>\<^sub>c ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p) "
     using m_def nth_odd_is_succ_times_twoB by blast
   then have m_def3: "m = ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> p) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)"
@@ -1242,7 +1226,7 @@ lemma powers_of_two_are_even:
   shows "is_even \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero,n\<rangle>) = \<t>"
 proof - 
   obtain j where j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c" and j_def: "n = successor \<circ>\<^sub>c j"
-    using assms(1) assms(2) nonzero_is_succ by blast
+    using assms nonzero_is_succ by blast
   have "exp_uncurried \<circ>\<^sub>c   \<langle>successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero,n\<rangle> = exp_uncurried \<circ>\<^sub>c  \<langle>successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero, (successor  \<circ>\<^sub>c zero) +\<^sub>\<nat> j\<rangle>"
     by (typecheck_cfuncs, metis add_commutes add_respects_succ3 add_respects_zero_on_right j_def)
   also have "... = ((successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero) ^\<^sub>\<nat> (successor  \<circ>\<^sub>c zero)) \<cdot>\<^sub>\<nat> ((successor \<circ>\<^sub>csuccessor  \<circ>\<^sub>c zero) ^\<^sub>\<nat> j)"
@@ -1282,7 +1266,7 @@ proof -
       also have "... = is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero ,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero\<rangle> "
         using cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, force)
       also have "... = is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero, zero\<rangle>"
-        by (typecheck_cfuncs, metis beta_N_succ_mEqs_Id1 id_left_unit2 id_right_unit2 terminal_func_comp)
+        by (typecheck_cfuncs, metis beta_N_succ_nEqs_Id1 id_left_unit2 id_right_unit2 terminal_func_comp)
       also have "... = is_odd \<circ>\<^sub>c (successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero)"
         by (typecheck_cfuncs, metis even_or_odd exp_def exp_respects_Zero_Left mult_evens_is_even2 not_even_and_odd s0_is_left_id three_is_odd)
       also have "... = \<t>"
@@ -1290,8 +1274,7 @@ proof -
       then show ?thesis
         by (metis calculation cfunc_type_def comp_associative is_even_def2 is_even_nth_even_true nth_even_def2 zero_type)
     qed
-    show "(is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor =
-    id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>"
+    show "(is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor =  id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>"
     proof(rule one_separator[where X = "\<nat>\<^sub>c", where Y = "\<Omega>"])
       show "(is_odd \<circ>\<^sub>c exp_uncurried \<circ>\<^sub>c \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
         by typecheck_cfuncs
@@ -1360,7 +1343,7 @@ proof -
         (is_odd \<circ>\<^sub>c (exp_uncurried \<circ>\<^sub>c   \<langle>(successor \<circ>\<^sub>c successor \<circ>\<^sub>c successor  \<circ>\<^sub>c zero) \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id \<nat>\<^sub>c\<rangle>)) \<circ>\<^sub>c n"
     using assms cfunc_type_def comp_associative exp_apply1 exp_def by (typecheck_cfuncs, fastforce)
   then show ?thesis
-    by (typecheck_cfuncs, smt (z3) main_result assms beta_N_succ_mEqs_Id1 comp_associative2 id_right_unit2 terminal_func_comp terminal_func_type)
+    by (typecheck_cfuncs, smt (z3) main_result assms beta_N_succ_nEqs_Id1 comp_associative2 id_right_unit2 terminal_func_comp terminal_func_type)
 qed
 
 

@@ -333,6 +333,8 @@ lemma ETCS_bool_eq_implies':
      \<Longrightarrow> (\<And>x. x : one \<rightarrow> X \<Longrightarrow> q \<circ>\<^sub>c x = \<t> \<Longrightarrow> p \<circ>\<^sub>c x = \<t>) \<Longrightarrow> p = q"
   by (etcs_rule one_separator, smt comp_type p_type q_type ETCS_bool_eq_implies)
 
+(*
+(*We have a copy of nat_induction under Nat.thy*)
 
 lemma 
   assumes p_type[type_rule]: "p : \<nat>\<^sub>c \<rightarrow> \<Omega>" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -367,6 +369,10 @@ proof -
  
   have "left_cart_proj \<Omega> \<nat>\<^sub>c \<circ>\<^sub>c induct_p = p"
     proof (etcs_rule natural_number_object_func_unique[where f="id \<Omega>"])
+*)
+
+
+
 
 thm type_rule
 
@@ -522,6 +528,10 @@ apply ((etcs_assocr, etcs_subst sharp_comp)
 
 ML_val Subgoal.focus
 
+
+
+
+(*  We have a copy of Well Ordering Theorem under Nat.thy
 lemma "n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> = \<t> \<Longrightarrow> Q"
   apply (etcs_erule EXISTS_elim)
 
@@ -974,5 +984,10 @@ next
           \<equiv>
         \<langle>eq_pred (\<Omega> \<Coprod> \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>u,right_coproj \<Omega> \<nat>\<^sub>c\<rangle>,id\<^sub>c \<nat>\<^sub>c\<rangle> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
       unfolding v1_def v2_def by auto
-    
+
+*)
+
+
+
+
 end

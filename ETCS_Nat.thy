@@ -17,6 +17,31 @@ axiomatization
    triangle_commutes one \<nat>\<^sub>c X zero u q \<and>
    square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X u f successor u)"
 
+
+
+(*These typing lemmas seem to be necessary when the formulas become very complicated...*)
+lemma succ_n_type[type_rule]:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "successor \<circ>\<^sub>c n \<in>\<^sub>c \<nat>\<^sub>c"
+  using assms by typecheck_cfuncs
+
+
+lemma n_beta_type[type_rule]: 
+  assumes "n \<in>\<^sub>c  \<nat>\<^sub>c" 
+  shows "n  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+  using assms by typecheck_cfuncs
+
+lemma s0b_id_type[type_rule]: 
+  "\<langle>successor \<circ>\<^sub>c zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+  by typecheck_cfuncs
+
+lemma beta_N_succ_nEqs_Id1: 
+  assumes "n \<in>\<^sub>c  \<nat>\<^sub>c" 
+  shows "\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n = id one"
+  using assms by (typecheck_cfuncs, meson terminal_func_comp_elem)
+
+
+
 lemma natural_number_object_property2:
   assumes "q : one \<rightarrow> X" "f: X \<rightarrow> X"
   shows "\<exists>!u. u: \<nat>\<^sub>c \<rightarrow> X \<and> u \<circ>\<^sub>c zero = q \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
@@ -42,14 +67,12 @@ proof -
    square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X w f successor w \<Longrightarrow> w = u"
     using u_zero_type triangle_commutes_u square_commutes_u
     using natural_number_object_property square_commutes_def by blast
-
   have v_zero_type: "v \<circ>\<^sub>c zero : one \<rightarrow> X"
     using v_type zero_type comp_type by auto
   have triangle_commutes_v: "triangle_commutes one \<nat>\<^sub>c X zero v (u \<circ>\<^sub>c zero)"
     by (simp add: triangle_commutes_def v_type v_zero_type zero_type zeros_eq)
   have square_commutes_v: "square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X v f successor v"
     by (simp add: f_type square_commutes_def successor_type v_successor_eq v_type)
-
   from uniqueness show "u = v"
     using square_commutes_v triangle_commutes_v v_type by blast
 qed
@@ -133,14 +156,11 @@ proof -
     using assms is_isomorphic_def by auto 
   obtain j where j_type: "j: \<nat>\<^sub>c \<rightarrow> N \<and> isomorphism(j) \<and> i \<circ>\<^sub>c j = id(\<nat>\<^sub>c) \<and> j \<circ>\<^sub>c i = id(N)"
     using cfunc_type_def i_type isomorphism_def by fastforce
-  obtain z where z_form: "z = j \<circ>\<^sub>c zero"
-    by simp
-  obtain s where s_form: "s = (j \<circ>\<^sub>c successor)  \<circ>\<^sub>c i"
-    by simp
-  have z_type: "z: one \<rightarrow> N"
-    using comp_type j_type z_form zero_type by blast
-  have s_type: "s: N \<rightarrow> N"
-    using cfunc_type_def codomain_comp domain_comp i_type j_type s_form successor_type by auto
+  obtain z where z_form: "z = j \<circ>\<^sub>c zero" and z_type: "z: one \<rightarrow> N"
+    using j_type by (typecheck_cfuncs, blast)
+  obtain s where s_form: "s = (j \<circ>\<^sub>c successor)  \<circ>\<^sub>c i" and s_type: "s: N \<rightarrow> N"
+    using i_type j_type by (typecheck_cfuncs, blast)
+
   have "is_NNO N z s"
     unfolding is_NNO_def
   proof auto
@@ -153,10 +173,8 @@ proof -
    triangle_commutes one \<nat>\<^sub>c X zero u q \<and>
    square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X u f successor u)"
       using f_type natural_number_object_property q_type by blast
-    obtain v where v_Eqs_ui: "v = u \<circ>\<^sub>c i"
-      by simp
-    then have v_type: "v: N \<rightarrow> X"
-      using comp_type i_type u_properties by blast
+    obtain v where v_Eqs_ui: "v = u \<circ>\<^sub>c i" and v_type: "v: N \<rightarrow> X"
+      using i_type u_properties by (typecheck_cfuncs, blast)
     then have D2_triangle: "v \<circ>\<^sub>c z = q"
       by (metis cfunc_type_def comp_associative i_type id_right_unit2 j_type triangle_commutes_def u_properties v_Eqs_ui z_form)
       
@@ -219,6 +237,8 @@ proof -
   then show "\<exists>z s. is_NNO N z s"
     by auto
 qed
+
+
 
 lemma zero_is_not_successor:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -514,12 +534,10 @@ proof -
     using right_coproj_cfunc_coprod successor_type zero_type by auto
   then have succ_mono: "monomorphism(successor)"
     by (metis cfunc_coprod_type cfunc_type_def composition_of_monic_pair_is_monic i1_mono iso_imp_epi_and_monic oneUN_iso_N_isomorphism right_proj_type successor_type zero_type)
-  have f_fact: "(\<f>\<circ>\<^sub>c\<beta>\<^bsub>\<Omega>\<^esub>): \<Omega> \<rightarrow> \<Omega>"
-    using comp_type false_func_type terminal_func_type by blast
-  then obtain u where u_form: "(u:  \<nat>\<^sub>c  \<rightarrow> \<Omega>) \<and>
+  obtain u where u_form: "(u:  \<nat>\<^sub>c  \<rightarrow> \<Omega>) \<and>
    (triangle_commutes one  \<nat>\<^sub>c \<Omega> zero u \<t>) \<and>
    (square_commutes \<nat>\<^sub>c \<Omega> \<nat>\<^sub>c \<Omega> u (\<f>\<circ>\<^sub>c\<beta>\<^bsub>\<Omega>\<^esub>) successor u)"
-    using natural_number_object_property true_func_type by blast
+    by (typecheck_cfuncs, meson natural_number_object_property)
   have s_not_surj: "\<not>(surjective(successor))"
     proof (rule ccontr, auto)
       assume BWOC : "surjective(successor)"
@@ -558,89 +576,43 @@ definition fixed_point_property :: "cset \<Rightarrow> bool" where
 lemma inject_into_powerset: 
   "(\<exists> f.((f : X \<rightarrow> \<P> X) \<and> injective(f)))"
 proof -
-  obtain \<delta> where delta_def: "\<delta> = diagonal(X)"
-    by simp
-  have \<delta>_type: "\<delta> : X \<rightarrow> X \<times>\<^sub>c X"
-    by (simp add: cfunc_prod_type delta_def diagonal_def id_type)
-  have \<delta>_mono: "monomorphism(\<delta>)"
-    by (metis \<delta>_type cfunc_type_def comp_monic_imp_monic delta_def diagonal_def id_isomorphism id_type iso_imp_epi_and_monic right_cart_proj_cfunc_prod right_cart_proj_type)
-  obtain \<chi>\<^sub>\<delta> where chi_delta_def: "is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> \<delta> \<chi>\<^sub>\<delta>"
-    using \<delta>_mono \<delta>_type characteristic_function_exists by blast 
-  have helpful_fact: "\<forall> x y. (x\<in>\<^sub>c X \<and> y\<in>\<^sub>c X \<longrightarrow> (x=y \<longleftrightarrow> \<chi>\<^sub>\<delta> \<circ>\<^sub>c \<langle>x,y\<rangle> = \<t>))"
+  have "injective((eq_pred X)\<^sup>\<sharp>)"
+    unfolding injective_def
   proof (auto)
-    fix y 
-    assume y_type: "y \<in>\<^sub>c X"
-    have "\<chi>\<^sub>\<delta> \<circ>\<^sub>c \<langle>y,y\<rangle> = \<chi>\<^sub>\<delta> \<circ>\<^sub>c (\<delta> \<circ>\<^sub>c y)"
-      by (simp add: delta_def diag_on_elements y_type)
-    also have "... =  \<t> \<circ>\<^sub>c (\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c y)"
-      using y_type \<delta>_type chi_delta_def comp_associative2 is_pullback_def square_commutes_def
-      by (typecheck_cfuncs, auto)
-    also have "... = \<t>"
-      by (metis cfunc_type_def comp_type id_right_unit id_type one_unique_element terminal_func_type true_func_type y_type)
-    then show "\<chi>\<^sub>\<delta> \<circ>\<^sub>c \<langle>y,y\<rangle> = \<t>"
-      by (simp add: calculation)
-  next
-    fix x y
-    assume x_type: "x\<in>\<^sub>c X" 
-    assume y_type: "y\<in>\<^sub>c X" 
-    assume chi_xxEq_t: "\<chi>\<^sub>\<delta> \<circ>\<^sub>c \<langle>x,y\<rangle> = \<t>"
-     
-    have xy_prod_type: "\<langle>x,y\<rangle> : one \<rightarrow> X \<times>\<^sub>c X"
-          by (simp add: cfunc_prod_type x_type y_type)
-    have pullbackProp: "is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> \<delta> \<chi>\<^sub>\<delta>"
-      using chi_delta_def by blast
-    then obtain k where k_type: "k : one \<rightarrow> X \<and> \<delta> \<circ>\<^sub>c k = \<langle>x,y\<rangle>"
-      unfolding is_pullback_def
-      by (metis chi_xxEq_t id_right_unit2 id_type true_func_type xy_prod_type)
-    then have "x = (left_cart_proj X X) \<circ>\<^sub>c \<langle>x,y\<rangle>"
-          using left_cart_proj_cfunc_prod x_type y_type by auto
-    also have "... = (left_cart_proj X X) \<circ>\<^sub>c (\<delta> \<circ>\<^sub>c k)"
-          using k_type by auto
-    also have "... = ((left_cart_proj X X) \<circ>\<^sub>c \<langle>id(X),id(X)\<rangle>) \<circ>\<^sub>c k"
-      using \<delta>_type comp_associative2 delta_def diagonal_def k_type left_cart_proj_type by fastforce
-    also have "... = id(X) \<circ>\<^sub>c k"
-          by (metis id_type left_cart_proj_cfunc_prod)
-    also have "... = y"
-          by (metis calculation cfunc_prod_comp cfunc_type_def delta_def diagonal_def id_left_unit id_type k_type right_cart_proj_cfunc_prod y_type)
-    then show "x = y"
-         using calculation by blast
-    qed
+    fix x y 
+    assume "x \<in>\<^sub>c domain ((eq_pred X)\<^sup>\<sharp>)"
+    then have x_type[type_rule]: "x \<in>\<^sub>c X"
+      using cfunc_type_def eq_pred_type transpose_func_type by force
+    assume "y \<in>\<^sub>c domain ((eq_pred X)\<^sup>\<sharp>)"
+    then have y_type[type_rule]: "y \<in>\<^sub>c X"
+      using cfunc_type_def eq_pred_type transpose_func_type by force
+    assume eqs: "(eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c x = (eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c y"
   
-  have  \<chi>\<^sub>\<delta>sharp_type: "\<chi>\<^sub>\<delta>\<^sup>\<sharp> : X \<rightarrow> \<Omega>\<^bsup>X\<^esup>"
-    using chi_delta_def is_pullback_def square_commutes_def transpose_func_type by auto
-  have \<chi>\<^sub>\<delta>sharp_injective: "injective(\<chi>\<^sub>\<delta>\<^sup>\<sharp>)"
-      unfolding injective_def
-  proof (auto)
-      fix x y 
-      assume "x \<in>\<^sub>c domain (\<chi>\<^sub>\<delta>\<^sup>\<sharp>)"
-      then have x_type: "x \<in>\<^sub>c X"
-        using \<chi>\<^sub>\<delta>sharp_type cfunc_type_def by auto
-      assume "y \<in>\<^sub>c domain (\<chi>\<^sub>\<delta>\<^sup>\<sharp>)"
-      then have y_type: "y \<in>\<^sub>c X"
-        using \<chi>\<^sub>\<delta>sharp_type cfunc_type_def by auto
-      assume chixEqschiy: "\<chi>\<^sub>\<delta>\<^sup>\<sharp> \<circ>\<^sub>c x = \<chi>\<^sub>\<delta>\<^sup>\<sharp> \<circ>\<^sub>c y"
-      
-      have "\<chi>\<^sub>\<delta> \<circ>\<^sub>c \<langle>x,x\<rangle> = ((eval_func \<Omega> X) \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<chi>\<^sub>\<delta>\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>x,x\<rangle>"
-        using chi_delta_def is_pullback_def square_commutes_def transpose_func_def by auto
-      also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c ((id(X) \<times>\<^sub>f \<chi>\<^sub>\<delta>\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x,x\<rangle>)"
-        using \<chi>\<^sub>\<delta>sharp_type x_type by (typecheck_cfuncs, simp add: comp_associative2)
-      also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c x, \<chi>\<^sub>\<delta>\<^sup>\<sharp> \<circ>\<^sub>c x\<rangle>"
-        using \<chi>\<^sub>\<delta>sharp_type cfunc_cross_prod_comp_cfunc_prod cfunc_type_def id_type x_type by auto
-      also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c x, \<chi>\<^sub>\<delta>\<^sup>\<sharp> \<circ>\<^sub>c y\<rangle>"
-        using chixEqschiy by auto
-      also have "... =  (eval_func \<Omega> X) \<circ>\<^sub>c ((id(X) \<times>\<^sub>f \<chi>\<^sub>\<delta>\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x,y\<rangle>)"
-        using \<chi>\<^sub>\<delta>sharp_type cfunc_cross_prod_comp_cfunc_prod cfunc_type_def id_type x_type y_type by auto
-      also have "... = \<chi>\<^sub>\<delta> \<circ>\<^sub>c \<langle>x,y\<rangle>"
-        using \<chi>\<^sub>\<delta>sharp_type x_type y_type chi_delta_def comp_associative2 is_pullback_def
-          square_commutes_def transpose_func_def by (typecheck_cfuncs, auto)
-      then have computation: "\<chi>\<^sub>\<delta> \<circ>\<^sub>c \<langle>x,x\<rangle> = \<chi>\<^sub>\<delta> \<circ>\<^sub>c \<langle>x,y\<rangle>"
-        by (simp add: calculation)
-      then show "x=y"
-        using \<chi>\<^sub>\<delta>sharp_type cfunc_type_def helpful_fact x_type y_type by fastforce
-    qed
+    have "eq_pred X \<circ>\<^sub>c \<langle>x,x\<rangle> = ((eval_func \<Omega> X) \<circ>\<^sub>c (id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>x,x\<rangle>"
+      by (typecheck_cfuncs, metis flat_cancels_sharp inv_transpose_func_def2)
+    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c ((id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x,x\<rangle>)"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c x, (eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c x\<rangle>"
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c x,(eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c y\<rangle>"
+      using eqs by auto
+    also have "... =  (eval_func \<Omega> X) \<circ>\<^sub>c ((id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x,y\<rangle>)"
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+    also have "... = eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle>"
+      by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
+    then have computation: "eq_pred X \<circ>\<^sub>c \<langle>x,x\<rangle> = eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle>"
+      by (simp add: calculation)
+    then show "x=y"
+      by (typecheck_cfuncs, metis computation eq_pred_iff_eq_conv)
+  qed
   then show "(\<exists> f.((f : X \<rightarrow> \<P> X) \<and> injective(f)))"
-    using \<chi>\<^sub>\<delta>sharp_type powerset_def by auto
+    by (metis eq_pred_type powerset_def transpose_func_type)
 qed
+
+
+
+
+
 
 theorem nat_induction:
   assumes p_type[type_rule]: "p : \<nat>\<^sub>c \<rightarrow> \<Omega>" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -711,7 +683,6 @@ definition ITER_curried :: "cset \<Rightarrow> cfunc" where
   "ITER_curried U = (THE u . u : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  u \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp> \<and>
     ((meta_comp U U U) \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>    \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
 
-thm theI'
 
 lemma ITER_curried_def2: 
 "ITER_curried U : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  ITER_curried U \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp> \<and>
@@ -743,9 +714,6 @@ lemma ITER_type[type_rule]:
 
 
  
-
-
-thm cfunc_cross_prod_comp_cfunc_prod
 
 
 
@@ -890,14 +858,14 @@ lemma zero_iters:
   shows "g\<^bsup>\<circ>zero\<^esup> = id\<^sub>c X"
 proof(rule one_separator[where X=X, where Y=X])
   show "g\<^bsup>\<circ>zero\<^esup> : X \<rightarrow> X"
-    by (simp add: assms iter_comp_type zero_type)
+    using assms by typecheck_cfuncs
   show "id\<^sub>c X : X \<rightarrow> X"
     by typecheck_cfuncs
 next 
   fix x 
   assume x_type[type_rule]: "x \<in>\<^sub>c X"
   have "(g\<^bsup>\<circ>zero\<^esup>) \<circ>\<^sub>c x = (cnufatem (ITER X \<circ>\<^sub>c \<langle>metafunc g,zero\<rangle>)) \<circ>\<^sub>c x"
-    using assms cfunc_type_def iter_comp_def2 by force
+    using assms iter_comp_def3 by (typecheck_cfuncs, auto)
   also have "... = cnufatem (metafunc (id X)) \<circ>\<^sub>c x"
     by (simp add: ITER_zero' assms metafunc_type)
   also have "... = id\<^sub>c X \<circ>\<^sub>c x"
@@ -936,8 +904,8 @@ qed
 
 
 
-thm ITER_succ
-    
+
+
 lemma succ_iters:
   assumes "g : X \<rightarrow> X"
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"

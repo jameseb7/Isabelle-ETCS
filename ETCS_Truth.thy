@@ -32,7 +32,7 @@ proof -
     show "is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m \<chi>"
       using assms(1) cfunc_type_def chi_is_pullback by auto
     show "\<And>x. monomorphism m \<longrightarrow> is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m x \<Longrightarrow> x = \<chi>"
-      using assms(1) assms(2) cfunc_type_def characteristic_function_exists chi_is_pullback by fastforce
+      using assms(1,2) cfunc_type_def characteristic_function_exists chi_is_pullback by fastforce
   qed
   then show "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
     using assms cfunc_type_def by auto
@@ -58,8 +58,6 @@ lemma characteristic_func_true_relative_member:
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
   shows "x \<in>\<^bsub>X\<^esub> (B,m)"
 proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
-  thm is_pullback_def
-
   have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
     by (simp add: assms characteristic_func_is_pullback)
   then have "\<exists>j. j : one \<rightarrow> B \<and> \<beta>\<^bsub>B\<^esub> \<circ>\<^sub>c j = id one \<and> m \<circ>\<^sub>c j = x"
@@ -80,7 +78,7 @@ proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
 
   assume "h : domain (m \<circ>\<^sub>c h) \<rightarrow> domain m"
   then have h_type: "h \<in>\<^sub>c B"
-    using assms(1) assms(3) cfunc_type_def x_def by auto
+    using assms(1,3) cfunc_type_def x_def by auto
 
   have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
     by (simp add: assms characteristic_func_is_pullback)
@@ -171,7 +169,7 @@ qed
 lemma eq_pred_iff_eq_conv2:
   assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
   shows "(x \<noteq> y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> \<noteq> \<t>)"
-  using assms(1) assms(2) eq_pred_iff_eq by presburger
+  using assms eq_pred_iff_eq by presburger
 
 
 
@@ -224,17 +222,23 @@ next
   qed
 qed
 
+
+
+
 (* Proposition 2.2.1: see under Axiom 8 *)
 
 (* Proposition 2.2.2 *)
 lemma "card {x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>} = 4"
 proof -
   have "{x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>} = {\<langle>\<t>,\<t>\<rangle>, \<langle>\<t>,\<f>\<rangle>, \<langle>\<f>,\<t>\<rangle>, \<langle>\<f>,\<f>\<rangle>}"
-    apply (auto simp add: cfunc_prod_type true_func_type false_func_type)
-    by (smt cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type true_false_only_truth_values)
+    by (auto simp add: cfunc_prod_type true_func_type false_func_type,
+        smt cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type true_false_only_truth_values)
   then show "card {x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>} = 4"
     using element_pair_eq false_func_type true_false_distinct true_func_type by auto
 qed
+
+
+
 
 (* Exercise 2.2.3 *)
 lemma regmono_is_mono: "regular_monomorphism(m) \<Longrightarrow> monomorphism(m)"
@@ -257,7 +261,7 @@ proof -
     unfolding equalizer_def
   proof (rule_tac x="codomain(m)" in exI, rule_tac x="\<Omega>" in exI, auto)
     show tbeta_type: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub> : codomain(m) \<rightarrow>  \<Omega>"
-      using comp_type terminal_func_type true_func_type by blast
+      by typecheck_cfuncs
     show chi_type: "\<chi> : codomain(m) \<rightarrow>  \<Omega>"
       using chi_pullback is_pullback_def square_commutes_def by auto
     show m_type: "m : domain m \<rightarrow> codomain m"
@@ -283,6 +287,9 @@ proof -
   then show "\<exists>g h. domain g = codomain m \<and> domain h = codomain m \<and> equalizer (domain m) m g h"
     by (metis cfunc_type_def equalizer_def)
 qed
+
+
+
 
 (*Proposition 2.2.5*)
 lemma epi_mon_is_iso:
@@ -340,8 +347,8 @@ proof -
   have nonempty: "nonempty(Y)"
     using assms(1) assms(2) cfunc_type_def nonempty_def surjective_def by auto
   obtain y0 where y0_type[type_rule]: "y0 \<in>\<^sub>c Y" "\<forall> x. x \<in>\<^sub>c X \<longrightarrow> p\<circ>\<^sub>c x \<noteq> y0"
-    using assms(1) assms(2) cfunc_type_def surjective_def by auto
-  (* then have "is_pullback (p\<^sup>-\<^sup>1{y0}) one X Y (\<beta>\<^bsub>p\<^sup>-\<^sup>1{y0}\<^esub>) (y0) m p" *)
+    using assms cfunc_type_def surjective_def by auto
+
   have "\<not>nonempty(p\<^sup>-\<^sup>1{y0})"
   proof (rule ccontr,auto)
     assume a1: "nonempty(p\<^sup>-\<^sup>1{y0})"
@@ -390,7 +397,7 @@ proof(rule ccontr)
     by simp
   have g_right_arg_type: "\<langle>y0 \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> : Y \<rightarrow> (Y\<times>\<^sub>cY)"
     by (meson cfunc_prod_type comp_type id_type terminal_func_type y_def)
-  then have g_type: "g: Y \<rightarrow> \<Omega>"
+  then have g_type[type_rule]: "g: Y \<rightarrow> \<Omega>"
     using comp_type eq_pred_type g_def by blast
 
   have gpx_Eqs_f: "\<forall>x. (x \<in>\<^sub>c X \<longrightarrow> g \<circ>\<^sub>c p \<circ>\<^sub>c x = \<f>)"
@@ -398,26 +405,20 @@ proof(rule ccontr)
     fix x
     assume x_type: "x \<in>\<^sub>c X" 
     assume bwoc: "g \<circ>\<^sub>c p \<circ>\<^sub>c x \<noteq> \<f>"
-    (*
-    have contradiction: "\<exists>s. s \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}"
-      by (smt assms(1) bwoc cfunc_type_def char_of_singleton2 comp_associative comp_type eq_pred_type g_def g_right_arg_type x_type y_def)
-    *)
-    (*Incidently the above is not necessary and the justification is the same in both cases.*)
-     show False
+   (* have contradiction: "\<exists>s. s \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}" *)
+    show False  
       by (smt assms(1) bwoc cfunc_type_def char_of_singleton2 comp_associative comp_type eq_pred_type g_def g_right_arg_type x_type y_def)
   qed
-  obtain h where h_def: "h = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-    by simp
-  have h_type: "h: Y \<rightarrow> \<Omega>"
-    using comp_type false_func_type h_def terminal_func_type by blast
+  obtain h where h_def: "h = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" and h_type[type_rule]:"h: Y \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
   have hpx_eqs_f: "\<forall>x. (x \<in>\<^sub>c X \<longrightarrow> h \<circ>\<^sub>c p \<circ>\<^sub>c x = \<f>)"
     by (smt assms(1) cfunc_type_def codomain_comp comp_associative false_func_type h_def id_right_unit2 id_type terminal_func_comp terminal_func_type terminal_func_unique)
   have gp_eqs_hp: "g \<circ>\<^sub>c p = h \<circ>\<^sub>c p"
   proof(rule one_separator[where X=X,where Y=\<Omega>])
     show "g \<circ>\<^sub>c p : X \<rightarrow> \<Omega>"
-      using assms(1) comp_type g_type by auto
+      using assms by typecheck_cfuncs
     show "h \<circ>\<^sub>c p : X \<rightarrow> \<Omega>"
-      using assms(1) comp_type h_type by blast
+      using assms by typecheck_cfuncs
     show "\<And>x. x \<in>\<^sub>c X \<Longrightarrow> (g \<circ>\<^sub>c p) \<circ>\<^sub>c x = (h \<circ>\<^sub>c p) \<circ>\<^sub>c x"
       using assms(1) comp_associative2 g_type gpx_Eqs_f h_type hpx_eqs_f by auto
   qed
@@ -439,7 +440,7 @@ proof(rule ccontr)
     using f1 by (metis (no_types) cfunc_type_def comp_associative false_func_type h_def id_right_unit2 id_type one_unique_element terminal_func_type y_def)
 qed
   then show False
-    using gp_eqs_hp assms(1) assms(2) cfunc_type_def epimorphism_def g_type h_type by auto
+    using gp_eqs_hp assms(1,2) cfunc_type_def epimorphism_def g_type h_type by auto
 qed
 
 
@@ -458,7 +459,7 @@ proof -
     fix y
     assume y_type: "y \<in>\<^sub>c codomain q0"
     then have codomain_gy: "g \<circ>\<^sub>c y \<in>\<^sub>c Z"
-      using assms(3) cfunc_type_def comp_type is_pullback_def square_commutes_def by auto
+      using assms(3) cfunc_type_def is_pullback_def square_commutes_def by (typecheck_cfuncs, auto)
     then have z_exists: "\<exists> z. z \<in>\<^sub>c Y \<and> f \<circ>\<^sub>c z = g \<circ>\<^sub>c y"
       using assms(1) cfunc_type_def surj_f surjective_def by auto
     then obtain z where z_def: "z \<in>\<^sub>c Y \<and> f \<circ>\<^sub>c z = g \<circ>\<^sub>c y"
@@ -467,8 +468,7 @@ proof -
       by (smt (verit) assms(3) cfunc_type_def is_pullback_def square_commutes_def y_type z_def)
     then show "\<exists>x. x \<in>\<^sub>c domain q0 \<and> q0 \<circ>\<^sub>c x = y"
       using assms(3) cfunc_type_def is_pullback_def square_commutes_def by auto
-  qed
- 
+  qed 
   then show ?thesis
     using surjective_is_epimorphism by blast
 qed
@@ -511,19 +511,19 @@ proof(unfold monomorphism_def2, auto)
   fix u v Q a x
   assume u_type: "u : Q \<rightarrow> a"  (*Q is arbitrary while "a" is actually just A, and we will establish this soon.*)
   assume v_type: "v : Q \<rightarrow> a"
-  assume q0_type: "q0 :  a \<rightarrow> x" (* y is actually just Y*)
+  assume q0_type: "q0 :  a \<rightarrow> x"    (*x is actually just X*)
   assume equals: "q0 \<circ>\<^sub>c u = q0 \<circ>\<^sub>c v" 
 
   have a_is_A: "a = A"
     using assms(3) cfunc_type_def is_pullback_def q0_type square_commutes_def by force
-  have y_is_Y: "x = X"
+  have x_is_X: "x = X"
     using assms(3) cfunc_type_def is_pullback_def q0_type square_commutes_def by fastforce
   have u_type2[type_rule]: "u : Q \<rightarrow> A"
     using a_is_A u_type by blast
   have v_type2[type_rule]: "v : Q \<rightarrow> A"
     using a_is_A v_type by blast
   have q1_type2[type_rule]: "q0 : A \<rightarrow> X"
-    using a_is_A q0_type y_is_Y by blast
+    using a_is_A q0_type x_is_X by blast
 
   have eqn1: "g \<circ>\<^sub>c (q0 \<circ>\<^sub>c u) = f \<circ>\<^sub>c (q1 \<circ>\<^sub>c v)"
   proof - 
@@ -598,10 +598,8 @@ proof(unfold monomorphism_def2, auto)
     then show ?thesis
       by (typecheck_cfuncs, smt (verit, ccfv_threshold) f1 assms(2) assms(3) eqn1 is_pullback_def monomorphism_def3 square_commutes_def)
   qed
-
   have uniqueness: "\<exists>! j. (j : Q \<rightarrow> A \<and> q0 \<circ>\<^sub>c j = q0 \<circ>\<^sub>c v \<and> q1 \<circ>\<^sub>c j = q1 \<circ>\<^sub>c u)"
    by (typecheck_cfuncs, smt (verit, ccfv_threshold) assms(3) eqn1 is_pullback_def square_commutes_def)
-
   then show "u = v"
     using eqn2 equals uniqueness by (typecheck_cfuncs, auto)
 qed
@@ -624,6 +622,8 @@ proof -
     using assms fibered_product_right_proj_type id_type is_isomorphic_def by blast
 qed
 
+
+
 lemma fib_prod_right_id_iso:
   assumes "f : X \<rightarrow> Y"
   shows  "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>id(Y)\<^esub> Y) \<cong> X"
@@ -640,6 +640,9 @@ proof -
   then show ?thesis
     using assms fibered_product_left_proj_type id_type is_isomorphic_def by blast
 qed
+
+
+
 
 (*Can we give this a better name?*)
 lemma pullback_iff_product:
@@ -695,8 +698,9 @@ next
   qed
 qed
 
-(*Now we use the previous lemma together with the fact that a Cartesian product of X and Y is 
-  isomorphic to X \<times>\<^sub>c Y  to prove the next two lemmas*)
+
+
+
 
 lemma terminal_fib_prod_iso:
   "(X \<^bsub>\<beta>\<^bsub>X\<^esub>\<^esub>\<times>\<^sub>c\<^bsub>\<beta>\<^bsub>Y\<^esub>\<^esub> Y) \<cong> X \<times>\<^sub>c Y"
@@ -1027,3 +1031,8 @@ lemma set_subtraction_left_cong:
   oops
 
 end
+
+
+
+
+

@@ -79,9 +79,11 @@ proof -
     using assms(2) equalizer_def id_right_unit2 id_type by blast
 
   show "\<exists>k. k : E \<rightarrow> E' \<and> isomorphism k \<and> m = m' \<circ>\<^sub>c k"
-    apply (rule_tac x="k'" in exI)
-    using cfunc_type_def isomorphism_def k'_type k'k_eq_id k_type kk'_eq_id m'k_eq_m by auto
+    using cfunc_type_def isomorphism_def k'_type k'k_eq_id k_type kk'_eq_id m'k_eq_m by (rule_tac x="k'" in exI, auto)
 qed
+
+
+
 
 (*What do we name this lemma?  Equalizers exist3?*)
 lemma 
@@ -146,31 +148,30 @@ proof -
     using assms(1,2) cfunc_type_def isomorphism_def by auto
 
   have equalizes: "f \<circ>\<^sub>c m \<circ>\<^sub>c \<phi> = g \<circ>\<^sub>c m \<circ>\<^sub>c \<phi>"
-    using assms apply typecheck_cfuncs
-  using assms(3) comp_associative2 equalizer_def by force
-    have "(\<forall>h F. h : F \<rightarrow> X \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E' \<and> (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = h))"
-    proof(auto)
-      fix h F
-      assume h_type[type_rule]: "h : F \<rightarrow> X"
-      assume h_equalizes: "f \<circ>\<^sub>c h = g \<circ>\<^sub>c h"
-      have k_exists_uniquely: "\<exists>! k. k: F  \<rightarrow> E \<and> m \<circ>\<^sub>c k = h"
-        using assms equalizer_def2 h_equalizes by (typecheck_cfuncs, auto)
-      then obtain k where k_type[type_rule]: "k: F  \<rightarrow> E" and k_def: "m \<circ>\<^sub>c k = h"
-        by blast
-      then show "\<exists>k. k : F \<rightarrow> E' \<and> (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = h"
-        using assms by (typecheck_cfuncs, smt (z3) \<phi>\<phi>_inv \<phi>_inv_type comp_associative2 comp_type id_right_unit2 k_exists_uniquely)
-    next
-      fix F k y
-      assume "(m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k : F \<rightarrow> X"
-      assume "f \<circ>\<^sub>c (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = g \<circ>\<^sub>c (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k"
-      assume k_type[type_rule]: "k : F \<rightarrow> E'"
-      assume y_type[type_rule]: "y : F \<rightarrow> E'"
-      assume "(m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c y = (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k"
-      then show "k = y"
-        by (typecheck_cfuncs, smt (verit, ccfv_threshold) assms(1,2,3) cfunc_type_def comp_associative comp_type equalizer_def id_left_unit2 isomorphism_def)
-    qed
-    then show ?thesis
-      by (smt (verit, best) assms(1,4,5,6) comp_type equalizer_def equalizes)
+    using assms comp_associative2 equalizer_def by force
+  have "(\<forall>h F. h : F \<rightarrow> X \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E' \<and> (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = h))"
+  proof(auto)
+    fix h F
+    assume h_type[type_rule]: "h : F \<rightarrow> X"
+    assume h_equalizes: "f \<circ>\<^sub>c h = g \<circ>\<^sub>c h"
+    have k_exists_uniquely: "\<exists>! k. k: F  \<rightarrow> E \<and> m \<circ>\<^sub>c k = h"
+      using assms equalizer_def2 h_equalizes by (typecheck_cfuncs, auto)
+    then obtain k where k_type[type_rule]: "k: F  \<rightarrow> E" and k_def: "m \<circ>\<^sub>c k = h"
+      by blast
+    then show "\<exists>k. k : F \<rightarrow> E' \<and> (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = h"
+      using assms by (typecheck_cfuncs, smt (z3) \<phi>\<phi>_inv \<phi>_inv_type comp_associative2 comp_type id_right_unit2 k_exists_uniquely)
+  next
+    fix F k y
+    assume "(m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k : F \<rightarrow> X"
+    assume "f \<circ>\<^sub>c (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = g \<circ>\<^sub>c (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k"
+    assume k_type[type_rule]: "k : F \<rightarrow> E'"
+    assume y_type[type_rule]: "y : F \<rightarrow> E'"
+    assume "(m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c y = (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k"
+    then show "k = y"
+      by (typecheck_cfuncs, smt (verit, ccfv_threshold) assms(1,2,3) cfunc_type_def comp_associative comp_type equalizer_def id_left_unit2 isomorphism_def)
+  qed
+  then show ?thesis
+    by (smt (verit, best) assms(1,4,5,6) comp_type equalizer_def equalizes)
 qed
 
 
@@ -202,11 +203,12 @@ proof auto
     using cfunc_type_def comp_associative f_type fm_gm g_type m_ga_mh m_type relation_h by auto
   then obtain z where "z: domain(ga) \<rightarrow> E \<and> m \<circ>\<^sub>c z = m \<circ>\<^sub>c ga \<and> 
     (\<forall> j. j:domain(ga) \<rightarrow> E \<and>  m \<circ>\<^sub>c j = m \<circ>\<^sub>c ga \<longrightarrow> j = z)"
-    using uniqueness apply (erule_tac x="m \<circ>\<^sub>c ga" in allE, erule_tac x="domain(ga)" in allE)
-    by (smt cfunc_type_def codomain_comp domain_comp m_ga_mh m_type relation_ga)
+    using uniqueness by (erule_tac x="m \<circ>\<^sub>c ga" in allE, erule_tac x="domain(ga)" in allE,
+                         smt cfunc_type_def codomain_comp domain_comp m_ga_mh m_type relation_ga)
   then show "ga = h"
     by (metis cfunc_type_def domain_comp m_ga_mh m_type relation_ga relation_h)
 qed
+
 
 
 (* Definition 2.1.35 *)
@@ -241,6 +243,8 @@ proof -
     by (metis domain_comp id_domain isomorphism_def k_type)  
 qed
 
+
+
 (*Definition 2.1.37*)
 definition subobject_of :: "cset \<times> cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<subseteq>\<^sub>c" 50)
   where "B \<subseteq>\<^sub>c X \<longleftrightarrow> (snd B : fst B \<rightarrow> X \<and> monomorphism (snd B))"
@@ -272,7 +276,7 @@ lemma inverse_image_is_equalizer:
   shows "\<exists>k. equalizer (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
 proof -
   obtain A k where "equalizer A k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
-    by (meson assms(1) assms(2) comp_type equalizer_exists left_cart_proj_type right_cart_proj_type)
+    by (meson assms(1,2) comp_type equalizer_exists left_cart_proj_type right_cart_proj_type)
   then have "\<exists> X Y k. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer (inverse_image f B m) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
     unfolding inverse_image_def apply (rule_tac someI_ex, auto)
@@ -469,6 +473,9 @@ proof auto
     by (rule_tac x="k \<circ>\<^sub>c a" in exI, auto)
 qed
 
+
+
+
 (* Proposition 2.1.41 *)
 lemma in_inverse_image:
   assumes "f : X \<rightarrow> Y" "(B,m) \<subseteq>\<^sub>c Y" "x \<in>\<^sub>c X"
@@ -516,6 +523,9 @@ next
     by (typecheck_cfuncs, simp add: inverse_image_monomorphism)
 qed
 
+
+
+
 (* Definition 2.1.42 *)
 definition fibered_product :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" ("_ \<^bsub>_\<^esub>\<times>\<^sub>c\<^bsub>_\<^esub> _" [66,50,50,65]65) where
   "X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y = (SOME E. \<exists> Z m. f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z \<and>
@@ -525,22 +535,21 @@ lemma fibered_product_equalizer:
   assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> Z"
   shows "\<exists> m. equalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) m (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
 proof -
-  have type1: "f \<circ>\<^sub>c left_cart_proj X Y : X \<times>\<^sub>c Y \<rightarrow> Z"
-    using assms(1) comp_type left_cart_proj_type by blast
-  have type2: "g \<circ>\<^sub>c right_cart_proj X Y : X \<times>\<^sub>c Y \<rightarrow> Z"
-    using assms(2) comp_type right_cart_proj_type by blast
-
   obtain E m where "equalizer E m (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
-    using equalizer_exists type1 type2 by blast
+    using assms equalizer_exists by (typecheck_cfuncs, blast)
   then have "\<exists>x Z m. f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z \<and>
       equalizer x m (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
-    using assms(1) assms(2) by blast
+    using assms by blast
   then have "\<exists> Z m. f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z \<and> 
       equalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) m (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
     unfolding fibered_product_def by (rule someI_ex)
   then show "\<exists>m. equalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) m (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
     by auto
 qed
+
+
+
+
 
 definition fibered_product_morphism :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cfunc" where
   "fibered_product_morphism X f g Y = (SOME m. \<exists> Z. f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z \<and>
@@ -550,16 +559,22 @@ lemma fibered_product_morphism_equalizer:
   assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> Z"
   shows "equalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) (fibered_product_morphism X f g Y) (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
 proof -
-
   have "\<exists>x Z. f : X \<rightarrow> Z \<and>
       g : Y \<rightarrow> Z \<and> equalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) x (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
     using assms fibered_product_equalizer by blast
   then have "\<exists>Z. f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z \<and>
     equalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) (fibered_product_morphism X f g Y) (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
-    unfolding fibered_product_morphism_def apply - by (rule someI_ex, auto)
+    unfolding fibered_product_morphism_def by (rule someI_ex)
   then show "equalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) (fibered_product_morphism X f g Y) (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
     by auto
 qed
+
+
+
+
+
+
+
 
 lemma fibered_product_morphism_type[type_rule]:
   assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> Z"
@@ -587,6 +602,8 @@ lemma fibered_product_right_proj_type[type_rule]:
   shows "fibered_product_right_proj X f g Y : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<rightarrow> Y"
   by (metis assms comp_type fibered_product_right_proj_def fibered_product_morphism_type right_cart_proj_type)
 
+
+
 lemma pair_factorsthru_fibered_product_morphism:
   assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> Z" "x : A \<rightarrow> X" "y : A \<rightarrow> Y"
   shows "f \<circ>\<^sub>c x = g \<circ>\<^sub>c y \<Longrightarrow> \<langle>x,y\<rangle> factorsthru fibered_product_morphism X f g Y"
@@ -601,8 +618,12 @@ proof -
     using cfunc_prod_type cfunc_type_def domain_comp left_cart_proj_type by auto
   then show "\<exists>h. h : domain \<langle>x,y\<rangle> \<rightarrow> domain (fibered_product_morphism X f g Y) \<and>
         fibered_product_morphism X f g Y \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
-    by (metis assms(1) assms(2) cfunc_type_def domain_comp fibered_product_morphism_type)
+    by (metis assms(1,2) cfunc_type_def domain_comp fibered_product_morphism_type)
 qed
+
+
+
+
 
 lemma fibered_product_is_pullback:
   assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> Z"
@@ -680,7 +701,7 @@ proof
   then obtain h where
     h_type: "h \<in>\<^sub>c X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub>Y" and h_eq: "fibered_product_morphism X f g Y \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
     unfolding relative_member_def2 factors_through_def
-    using assms(3) assms(4) cfunc_prod_type cfunc_type_def by auto
+    using assms(3,4) cfunc_prod_type cfunc_type_def by auto
   
   have left_eq: "fibered_product_left_proj X f g Y \<circ>\<^sub>c h = x"
     unfolding fibered_product_left_proj_def
@@ -705,7 +726,7 @@ next
     show "\<langle>x,y\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Y"
       using assms by typecheck_cfuncs
     show "monomorphism (fibered_product_morphism X f g Y)"
-      using assms(1) assms(2) fibered_product_morphism_monomorphism by auto
+      using assms(1,2) fibered_product_morphism_monomorphism by auto
     show "fibered_product_morphism X f g Y : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<rightarrow> X \<times>\<^sub>c Y"
       using assms by typecheck_cfuncs
 
@@ -764,7 +785,7 @@ proof(auto)
     by (typecheck_cfuncs, metis (full_types) a3 comp_associative2 h_eq h_type relative_member_def2 right_cart_proj_cfunc_prod x_type)
 
   then show "g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
-    using assms(1) assms(2) assms(5) cfunc_type_def comp_associative fibered_product_left_proj_type fibered_product_right_proj_type h_type left_eq right_eq by fastforce
+    using assms(1,2,5) cfunc_type_def comp_associative fibered_product_left_proj_type fibered_product_right_proj_type h_type left_eq right_eq by fastforce
 qed
 
 
@@ -777,7 +798,7 @@ lemma kernel_pair_subset:
 
 
 
-(*
+(*  This may not be true......
   Below is yet to be proved.
 lemma terminal_pullback_iso_to_product:
   assumes "f : X \<rightarrow> T"
@@ -837,6 +858,9 @@ next
   then show "fibered_product_left_proj X f f X = fibered_product_right_proj X f f X"
     using assms fibered_product_left_proj_type fibered_product_right_proj_type one_separator by blast
 qed
+
+
+
 
 (* Exercise 2.1.44 Part 2 *)
 lemma kern_pair_proj_iso_TFAE2:
@@ -955,15 +979,13 @@ proof -
     q0_assms: "q0 : X \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"
       "fibered_product_left_proj X f f X \<circ>\<^sub>c q0 = id X"
       "q0 \<circ>\<^sub>c fibered_product_left_proj X f f X = id (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X)"
-    using assms(2) unfolding isomorphism_def
-    using assms(1) cfunc_type_def fibered_product_left_proj_type by auto
+    using assms(1,2) cfunc_type_def isomorphism_def by (typecheck_cfuncs, force)
 
   obtain q1 where 
     q1_assms: "q1 : X \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"
       "fibered_product_right_proj X f f X \<circ>\<^sub>c q1 = id X"
       "q1 \<circ>\<^sub>c fibered_product_right_proj X f f X = id (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X)"
-    using assms(3) unfolding isomorphism_def
-    using assms(1) cfunc_type_def fibered_product_right_proj_type by auto
+    using assms(1,3) cfunc_type_def isomorphism_def by (typecheck_cfuncs, force)
 
   have "\<And>x. x \<in>\<^sub>c domain f \<Longrightarrow> q0 \<circ>\<^sub>c x = q1 \<circ>\<^sub>c x"
   proof -
