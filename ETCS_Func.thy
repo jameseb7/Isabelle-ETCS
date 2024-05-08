@@ -750,10 +750,10 @@ qed
 
 
 
-(*Is the following statement true?.... seems it is *)
 
-(*
-lemma transpose_mono:
+
+
+lemma transpose_inj_is_inj:
   assumes "g: X \<rightarrow> Y"
   assumes "injective(g)"
   shows "injective(g\<^bsup>A\<^esup>\<^sub>f)"
@@ -763,36 +763,26 @@ proof(auto)
   assume x_type[type_rule]: "x \<in>\<^sub>c domain (g\<^bsup>A\<^esup>\<^sub>f)" 
   assume y_type[type_rule]:"y \<in>\<^sub>c domain (g\<^bsup>A\<^esup>\<^sub>f)"
   assume eqs: "g\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c x = g\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c y"
-  
- 
+  have mono_g: "monomorphism g"
+    by (meson CollectI assms(2) injective_imp_monomorphism) 
   have x_type'[type_rule]: "x \<in>\<^sub>c  X\<^bsup>A\<^esup>"
     using assms(1) cfunc_type_def exp_func_type by (typecheck_cfuncs, force)
   have y_type'[type_rule]: "y \<in>\<^sub>c  X\<^bsup>A\<^esup>"
-    using cfunc_type_def x_type x_type' y_type by presburger
-  have "(g \<circ>\<^sub>c eval_func X A)\<^sup>\<sharp> : X\<^bsup>A\<^esup> \<rightarrow> Y\<^bsup>A\<^esup>"
-    using assms exp_func_type by typecheck_cfuncs
-  
-
-  then have "(g \<circ>\<^sub>c eval_func X A)\<^sup>\<sharp> \<circ>\<^sub>c x = (g \<circ>\<^sub>c eval_func X A)\<^sup>\<sharp> \<circ>\<^sub>c y"
-    unfolding exp_func_def using assms
-    using eqs exp_func_def2 by force 
-
-
-
-
-
-
-
-  then have "((g \<circ>\<^sub>c eval_func X A)\<^sup>\<sharp> \<circ>\<^sub>c x)\<^sup>\<flat> = ((g \<circ>\<^sub>c eval_func X A)\<^sup>\<sharp> \<circ>\<^sub>c y)\<^sup>\<flat>"
-    by force
-
-  then have "(g \<circ>\<^sub>c eval_func X A) \<circ>\<^sub>c(id X \<times>\<^sub>f  x) = (g \<circ>\<^sub>c eval_func X A) \<circ>\<^sub>c (id X \<times>\<^sub>f  y)"
-    using assms apply typecheck_cfuncs
-
+    using cfunc_type_def x_type x_type' y_type by presburger  
+  have "(g \<circ>\<^sub>c eval_func X A)\<^sup>\<sharp> \<circ>\<^sub>c x = (g \<circ>\<^sub>c eval_func X A)\<^sup>\<sharp> \<circ>\<^sub>c y"
+    unfolding exp_func_def using assms eqs exp_func_def2 by force 
+  then have "g \<circ>\<^sub>c (eval_func X A \<circ>\<^sub>c(id(A) \<times>\<^sub>f  x)) = g \<circ>\<^sub>c (eval_func X A \<circ>\<^sub>c (id(A) \<times>\<^sub>f  y))"
+    by (smt (z3) assms(1) comp_type eqs flat_cancels_sharp flat_type inv_transpose_func_def2 sharp_cancels_flat transpose_of_comp x_type' y_type')
+  then have "eval_func X A \<circ>\<^sub>c(id(A) \<times>\<^sub>f  x) =   eval_func X A \<circ>\<^sub>c (id(A) \<times>\<^sub>f  y)"  
+    by (metis assms(1) mono_g flat_type inv_transpose_func_def2  monomorphism_def2 x_type' y_type')
   then show "x = y"
-    apply typecheck_cfuncs
+    by (meson same_evals_equal x_type' y_type')
+qed
 
-*)
+
+
+
+
 
 
 
