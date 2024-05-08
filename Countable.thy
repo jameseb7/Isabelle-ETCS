@@ -561,10 +561,11 @@ lemma inclusion_characteristic_def3:
 
 
 
-(*
+
+
 lemma size_2_sets:
 "(X \<cong> \<Omega>) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2) \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (x=x1) \<or> (x=x2))  )))"
-proof auto
+proof 
   assume "X \<cong> \<Omega>"
   then obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : X \<rightarrow> \<Omega>" and \<phi>_iso: "isomorphism \<phi>"
     using is_isomorphic_def by blast
@@ -572,38 +573,60 @@ proof auto
                      x2_type[type_rule]: "x2 \<in>\<^sub>c X" and x2_def: "\<phi> \<circ>\<^sub>c x2 = \<f>" and
                      distinct: "x1 \<noteq> x2"
     by (typecheck_cfuncs, smt (z3) \<phi>_iso cfunc_type_def comp_associative comp_type id_left_unit2 isomorphism_def true_false_distinct)
-  then show  "\<exists>x1. x1 \<in>\<^sub>c X \<and> (\<exists>x2. x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2 \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> x = x1 \<or> x = x2))"
-    by (smt (verit, ccfv_threshold)  \<phi>_iso \<phi>_type cfunc_type_def comp_associative comp_type id_left_unit2 isomorphism_def true_false_only_truth_values)
+  then show  "\<exists>x1 x2. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2 \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> x = x1 \<or> x = x2)"
+    by (smt (verit, best)  \<phi>_iso \<phi>_type cfunc_type_def comp_associative2 comp_type id_left_unit2 isomorphism_def true_false_only_truth_values)
 next
-  assume "\<And>x1 x2. x1 \<in>\<^sub>c X \<Longrightarrow> x2 \<in>\<^sub>c X \<Longrightarrow> x1 \<noteq> x2 \<Longrightarrow> \<forall>x. x \<in>\<^sub>c X \<longrightarrow> x = x1 \<or> x = x2"
-  then obtain \<phi> x1 x2  where \<phi>_type[type_rule]: "\<phi> : X \<rightarrow> \<Omega>"  and
-                     x1_type[type_rule]: "x1 \<in>\<^sub>c X" and x1_def: "\<phi> \<circ>\<^sub>c x1 = \<t>" and
-                     x2_type[type_rule]: "x2 \<in>\<^sub>c X" and x2_def: "\<phi> \<circ>\<^sub>c x2 = \<f>" and
-                     distinct: "x1 \<noteq> x2"
-    apply typecheck_cfuncs
+  assume exactly_two: "\<exists>x1 x2. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2 \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> x = x1 \<or> x = x2)"
+  then obtain x1 x2  where x1_type[type_rule]: "x1 \<in>\<^sub>c X" and x2_type[type_rule]: "x2 \<in>\<^sub>c X" and distinct: "x1 \<noteq> x2"
+    by force
+  have iso_type: "((x1 \<amalg> x2) \<circ>\<^sub>c case_bool) : \<Omega> \<rightarrow> X"
+    by typecheck_cfuncs
+  have surj: "surjective ((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
+    by (typecheck_cfuncs, smt (verit, best) exactly_two cfunc_type_def coprod_case_bool_false
+                coprod_case_bool_true distinct false_func_type surjective_def true_func_type)
+  have inj: "injective ((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG) distinct case_bool_true_and_false comp_associative2 
+        coprod_case_bool_false injective_def2 left_coproj_cfunc_coprod true_false_only_truth_values)
+  then have "isomorphism ((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
+    by (meson epi_mon_is_iso injective_imp_monomorphism singletonI surj surjective_is_epimorphism)
+  then show "X \<cong> \<Omega>"
+    using is_isomorphic_def iso_type isomorphic_is_symmetric by blast
+qed
+
+
+
+
 
 lemma size_2plus_sets:
   "(\<Omega>  \<le>\<^sub>c  X ) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2)  )))"
-proof(auto, unfold is_smaller_than_def)
-  show "\<exists>m. m : \<Omega> \<rightarrow> X \<and> monomorphism m \<Longrightarrow> \<exists>x1. x1 \<in>\<^sub>c X \<and> (\<exists>x2. x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2)"
-    by (meson comp_type false_func_type monomorphism_def3 true_false_distinct true_func_type)
+proof(auto)
+  show "\<Omega> \<le>\<^sub>c X \<Longrightarrow> \<exists>x1. x1 \<in>\<^sub>c X \<and> (\<exists>x2. x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2)"
+    by (meson comp_type false_func_type is_smaller_than_def monomorphism_def3 true_false_distinct true_func_type)
 next
-  show "\<And>x1 x2. x1 \<in>\<^sub>c X \<Longrightarrow> x2 \<in>\<^sub>c X \<Longrightarrow> x1 \<noteq> x2 \<Longrightarrow> \<exists>m. m : \<Omega> \<rightarrow> X \<and> monomorphism m"
-    sorry
-    (*This line in the proof was shown under "non_init_non_ter_sets" in the Cardinality.thy file.*)
+  fix x1 x2 
+  assume x1_type[type_rule]: "x1 \<in>\<^sub>c X"
+  assume x2_type[type_rule]: "x2 \<in>\<^sub>c X"
+  assume distinct: "x1 \<noteq> x2"  
+  have mono_type: "((x1 \<amalg> x2) \<circ>\<^sub>c case_bool) : \<Omega> \<rightarrow> X"
+    by typecheck_cfuncs
+  have inj: "injective ((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG) distinct case_bool_true_and_false comp_associative2 
+        coprod_case_bool_false injective_def2 left_coproj_cfunc_coprod true_false_only_truth_values)    
+  then show "\<Omega> \<le>\<^sub>c X"
+    using injective_imp_monomorphism is_smaller_than_def mono_type by blast
 qed
 
-*)
+
+    (*See "non_init_non_ter_sets" in the Cardinality.thy file.*)
+
 
 lemma not_init_not_term:
   "(\<not>(initial_object X) \<and> \<not>(terminal_object X)) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2)  )))"
 by (metis is_empty_def initial_iso_empty iso_empty_initial iso_to1_is_term no_el_iff_iso_0 single_elem_iso_one terminal_object_def)
 
-(*
 lemma sets_size_3_plus:
   "(\<not>(initial_object X) \<and> \<not>(terminal_object X) \<and> \<not>(X \<cong> \<Omega>)) = (\<exists> x1. (\<exists> x2.  \<exists> x3. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and>  (x3 \<in>\<^sub>c X) \<and> (x1\<noteq>x2) \<and>  (x2\<noteq>x3) \<and> (x1\<noteq>x3) )             ))"
-*)
-
+by (metis not_init_not_term size_2_sets)
 
 
 

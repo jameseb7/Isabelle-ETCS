@@ -4,7 +4,7 @@ begin
 
 
 
-
+(*Compare with the similar results in the Countable.thy*)
 lemma non_init_non_ter_sets:
   assumes "\<not>(terminal_object X)"
   assumes "\<not>(initial_object X)"

@@ -463,7 +463,7 @@ proof -
           also have "... = \<langle>id X, \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>  \<circ>\<^sub>c ry"
             unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
           also have "... = \<langle>ry, \<f>\<rangle>"
-            by (typecheck_cfuncs, metis cart_prod_extract_left ry_def)
+            by (typecheck_cfuncs, metis cart_prod_extract_left)
           then show ?thesis
             by (simp add: calculation)
         qed
