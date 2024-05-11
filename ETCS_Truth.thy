@@ -853,7 +853,7 @@ proof - (*there are serious errors in the diagram in the book!*)
      using g_epi g_type pullback_of_epi_is_epi1 by blast
    then show ?thesis
      using fid_epi cfunc_type_def composition_of_epi_pair_is_epi decompose_fxg is_pullback_def pullback pullback2 square_commutes_def by auto
- qed
+qed
 
 definition set_subtraction :: "cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> cset" (infix "\<setminus>" 60) where
   "Y \<setminus> X = (SOME E. \<exists> m'.  equalizer E m' (characteristic_func (snd X)) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
@@ -1010,7 +1010,12 @@ proof -
     by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
   
   have "(\<chi>m \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c) = (\<chi>mi \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c)"
-    using \<chi>m_\<chi>mi_conv apply typecheck_cfuncs
+  proof(auto)
+    show "\<chi>m \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c \<Longrightarrow> \<chi>mi \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c"
+      using assms  by (typecheck_cfuncs, simp add: \<chi>mi_def complement_morphism_eq mi_mono)
+(*   using \<chi>m_\<chi>mi_conv apply typecheck_cfuncs*)
+    show "\<chi>mi \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c \<Longrightarrow> \<chi>m \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c"
+      using assms apply typecheck_cfuncs
 
   (*thm complement_morphism_eq
   have "characteristic_func (m \<circ>\<^sub>c i) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c"

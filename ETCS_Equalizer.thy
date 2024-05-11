@@ -123,7 +123,7 @@ next
   assume RHS: "f \<circ>\<^sub>c x = g  \<circ>\<^sub>c x"
   then show "x factorsthru m"
     unfolding cfunc_type_def factors_through_def
-    by (metis RHS assms(1) assms(3) assms(4) cfunc_type_def equalizer_def)
+    by (metis RHS assms(1,3,4) cfunc_type_def equalizer_def)
 qed
 
 

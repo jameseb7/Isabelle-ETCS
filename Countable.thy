@@ -1492,6 +1492,7 @@ qed
 
 
 
+(*I think we also have the following:   "A \<cong> A \<setminus> (\<nat>\<^sub>c,f)" .... or maybe we want A \<cong> h(A)  *)
 
 
 theorem Herrlichs_finiteness_criterion: 
@@ -1641,6 +1642,13 @@ proof(auto)
   qed
 
 
+
+
+
+
+
+
+
   have "\<not>(surjective h)"
   proof(rule ccontr, auto)
     assume h_surj: "surjective h"
@@ -1667,6 +1675,8 @@ proof(auto)
         using c_type complement_disjoint f_inj f_type injective_imp_monomorphism zero_type by blast 
     qed
   qed
+
+
 
   then show False
     using A_finite \<open>injective h\<close> epi_is_surj h_type injective_imp_monomorphism is_finite_def iso_imp_epi_and_monic by blast
@@ -2482,7 +2492,9 @@ next
       show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
       proof(cases "initial_object X")
         show "initial_object X \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
-          by (metis initial_iso_empty initial_maps_mono initial_object_def is_smaller_than_def iso_empty_initial no_el_iff_iso_0 prod_with_empty_is_empty1)
+          by (metis is_empty_def initial_iso_empty initial_maps_mono initial_object_def 
+              is_smaller_than_def isomorphic_is_transitive no_el_iff_iso_0 nonempty_def 
+              not_init_not_term prod_with_empty_is_empty2 product_commutes terminal_object_def)
       next
       assume "\<not> initial_object X"
       show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"

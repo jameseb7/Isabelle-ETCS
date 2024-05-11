@@ -546,6 +546,7 @@ qed
 
 subsection \<open>More Results on Cartesian Products\<close>
 
+(*Proposition 2.2.10*)
 lemma cfunc_cross_prod_surj:
   assumes type_assms: "f : A \<rightarrow> C" "g : B \<rightarrow> D"
   assumes f_surj: "surjective f" and g_surj: "surjective g"
@@ -579,20 +580,52 @@ qed
 
 
 
-(*Is this true ?  ? ? 
+(*Inverse to Proposition 2.2.10*)
 
 lemma cfunc_cross_prod_surj_converse:
   assumes type_assms: "f : A \<rightarrow> C" "g : B \<rightarrow> D"
+  assumes nonempty: "nonempty C \<and> nonempty D"
   assumes "surjective (f \<times>\<^sub>f g)"
-  shows "(surjective (f)) \<and> (surjective (g))"
+  shows "surjective f \<and> surjective g"
   unfolding surjective_def
 proof(auto)
-  fix y 
-  assume y_type: "y \<in>\<^sub>c codomain f"
-  then have y_type2:  "y \<in>\<^sub>c C"
+  fix c 
+  assume c_type[type_rule]: "c \<in>\<^sub>c codomain f"
+  then have c_type2:  "c \<in>\<^sub>c C"
     using cfunc_type_def type_assms(1) by auto
-  oops
-*)
+  obtain d where d_type[type_rule]: "d  \<in>\<^sub>c D" 
+    using nonempty nonempty_def by blast
+  then obtain ab where ab_type[type_rule]: "ab \<in>\<^sub>c A \<times>\<^sub>c B" and ab_def: "(f \<times>\<^sub>f g) \<circ>\<^sub>c ab = \<langle>c, d\<rangle>"
+    using assms by (typecheck_cfuncs, metis assms(4) cfunc_type_def surjective_def2)
+  then obtain a b where a_type[type_rule]: "a \<in>\<^sub>c A" and b_type[type_rule]: "b \<in>\<^sub>c B" and ab_def2: "ab = \<langle>a,b\<rangle>"
+    using cart_prod_decomp by blast
+  have  "a \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c a = c"
+    using ab_def ab_def2 b_type cfunc_cross_prod_comp_cfunc_prod cfunc_type_def
+          comp_type d_type element_pair_eq type_assms by (typecheck_cfuncs, auto)
+  then show "\<exists>x. x \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = c"
+    by blast
+next
+  fix d 
+  assume d_type[type_rule]: "d \<in>\<^sub>c codomain g"
+  then have y_type2:  "d \<in>\<^sub>c D"
+    using cfunc_type_def type_assms(2) by auto
+  obtain c where d_type[type_rule]: "c  \<in>\<^sub>c C" 
+    using nonempty nonempty_def by blast
+  then obtain ab where ab_type[type_rule]: "ab \<in>\<^sub>c A \<times>\<^sub>c B" and ab_def: "(f \<times>\<^sub>f g) \<circ>\<^sub>c ab = \<langle>c, d\<rangle>"
+    using assms by (typecheck_cfuncs, metis assms(4) cfunc_type_def surjective_def2)
+  then obtain a b where a_type[type_rule]: "a \<in>\<^sub>c A" and b_type[type_rule]: "b \<in>\<^sub>c B" and ab_def2: "ab = \<langle>a,b\<rangle>"
+    using cart_prod_decomp by blast
+  then obtain a b where a_type[type_rule]: "a \<in>\<^sub>c A" and b_type[type_rule]: "b \<in>\<^sub>c B" and ab_def2: "ab = \<langle>a,b\<rangle>"
+    using cart_prod_decomp by blast
+  have  "b \<in>\<^sub>c domain g \<and> g \<circ>\<^sub>c b = d"
+    using a_type ab_def ab_def2 cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_type d_type element_pair_eq type_assms by (typecheck_cfuncs, force)
+  then show "\<exists>x. x \<in>\<^sub>c domain g \<and> g \<circ>\<^sub>c x = d"
+    by blast
+qed
+
+
+
+
 
 lemma cfunc_cross_prod_mono_converse:
   assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
