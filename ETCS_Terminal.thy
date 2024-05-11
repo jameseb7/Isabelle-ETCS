@@ -625,6 +625,12 @@ qed
 
 
 
+lemma cfunc_cross_prod_mono:
+  assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
+  assumes "injective f \<and> injective g"
+  shows "injective (f \<times>\<^sub>f g)"
+  by (typecheck_cfuncs, metis assms cfunc_cross_prod_mono injective_imp_monomorphism mem_Collect_eq monomorphism_imp_injective)
+ 
 
 
 lemma cfunc_cross_prod_mono_converse:
