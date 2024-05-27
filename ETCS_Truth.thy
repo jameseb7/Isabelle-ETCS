@@ -1008,7 +1008,6 @@ proof -
     using \<chi>m_type \<chi>mi_type comp_type true_false_only_truth_values by fastforce
   then have \<chi>m_\<chi>mi_conv: "\<And> c. c \<in>\<^sub>c C \<Longrightarrow> (\<chi>m \<circ>\<^sub>c c = \<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c c) = (\<chi>mi \<circ>\<^sub>c c = \<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c c)"
     by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
-  
   have "(\<chi>m \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c) = (\<chi>mi \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c)"
   proof(auto)
     show "\<chi>m \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c \<Longrightarrow> \<chi>mi \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub>) \<circ>\<^sub>c (m \<circ>\<^sub>c i)\<^sup>c"

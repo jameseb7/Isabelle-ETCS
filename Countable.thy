@@ -641,7 +641,19 @@ lemma strange_elems_of_can_finite_sets:
   using assms by (metis elem_canon_finite_set_representation)
 *)
 
+thm image_self
 
+lemma
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes \<iota>_type[type_rule]: "\<iota> : [n]\<^sub>c \<rightarrow> [successor \<circ>\<^sub>c n]\<^sub>c" and \<iota>_mono: "monomorphism \<iota>"
+  shows "[successor \<circ>\<^sub>c n]\<^sub>c \<setminus> ([n]\<^sub>c, \<iota>) \<cong> one"
+proof -
+  (* have \<iota>\<restriction>\<^bsub>([n]\<^sub>c, id)\<^esub> : [n]\<^sub>c \<rightarrow> \<iota>[[n]\<^sub>c]\<^bsub>id\<^esub> iso *)
+  (* obtain its inverse, g : \<iota>[[n]\<^sub>c]\<^bsub>id\<^esub> \<rightarrow> [n]\<^sub>c *)
+  obtain m where m_type[type_rule]: "m : ([successor \<circ>\<^sub>c n]\<^sub>c \<setminus> ([n]\<^sub>c, \<iota>)) \<rightarrow> [successor \<circ>\<^sub>c n]\<^sub>c" and
+                      m_def: "equalizer ([successor \<circ>\<^sub>c n]\<^sub>c \<setminus> ([n]\<^sub>c, \<iota>)) m (characteristic_func \<iota>) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>[successor \<circ>\<^sub>c n]\<^sub>c\<^esub>)"
+    using \<iota>_mono \<iota>_type complement_morphism_equalizer complement_morphism_type by blast
+  have chi_i: "(characteristic_func \<iota>) \<circ>\<^sub>c \<lbrakk>n:successor \<circ>\<^sub>c n\<rbrakk>\<^sub>c = \<f>"
 
 (*Should we delete this now that we have the summation version which is more general?*)
 lemma canonically_finite_succ:
