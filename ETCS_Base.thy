@@ -101,6 +101,8 @@ ML \<open>fun extract_type_rule_term rule =
 ML \<open>fun certify_instantiations ctxt bound_typs = 
       List.map (fn (x : indexname, t) => ((x, fastype_of1 (bound_typs, t)), Thm.cterm_of ctxt t)) \<close>
 
+ML_val \<open>TVars.empty\<close>
+
 (* match_type_rule checks if a given type rule is applicable to a given term,
   returning an instantiated version of the rule if it is *)
 ML \<open>fun match_type_rule ctxt bound_typs t rule = 
@@ -110,7 +112,7 @@ ML \<open>fun match_type_rule ctxt bound_typs t rule =
                 | NONE => NONE
               val opt_insts' = Option.map (certify_instantiations ctxt bound_typs) opt_insts
           in case opt_insts' of
-              SOME insts => SOME (Thm.instantiate ([], insts) rule)
+              SOME insts => SOME (Thm.instantiate (TVars.empty, Vars.make insts) rule)
             | NONE => NONE
           end\<close>
 
@@ -138,7 +140,7 @@ ML \<open>fun elim_type_rule_prem _ _ _ [] = NONE (* no lemmas match the premise
           case match_term [] prem (Thm.prop_of lem) of
             SOME insts => 
               let val insts' = certify_instantiations ctxt [] insts
-                  val inst_thm = Thm.instantiate ([], insts') thm
+                  val inst_thm = Thm.instantiate (TVars.empty, Vars.make insts') thm
               in SOME (Thm.implies_elim inst_thm lem)
               end
           | NONE => elim_type_rule_prem ctxt thm prem lems\<close>
@@ -308,7 +310,7 @@ ML \<open>fun ETCS_resolve_subtac ctxt type_rules thm i (foc : Subgoal.focus) =
               (* certify any instantiations that result *)
           let val insts' = certify_instantiations ctxt [] insts
               (* instantiate the given theorem *)
-              val inst_thm = Thm.instantiate ([], insts') thm
+              val inst_thm = Thm.instantiate (TVars.empty, Vars.make insts') thm
               (* generate typing lemmas and eliminate any typing premises required *)
               val type_lems =
                 construct_cfunc_type_lemmas ctxt ((#prems foc) @ type_rules) (Thm.prop_of inst_thm)
@@ -381,7 +383,7 @@ ML \<open>fun match_nested_term bound_typs pat (t1 $ t2) = (
 
 ML \<open>fun instantiate_typecheck ctxt thm type_rules insts =
       let val cinsts = certify_instantiations ctxt [] insts
-          val inst_thm = Thm.instantiate ([], cinsts) thm
+          val inst_thm = Thm.instantiate (TVars.empty, Vars.make cinsts) thm
           val gen_type_lems = construct_cfunc_type_lemmas ctxt type_rules
           val type_lems = flat (map (gen_type_lems o snd) insts)
       in elim_type_rule_prems_opt ctxt inst_thm type_lems
@@ -389,7 +391,7 @@ ML \<open>fun instantiate_typecheck ctxt thm type_rules insts =
 
 ML \<open>fun instantiate_typecheck' ctxt thm type_rules insts =
       let val cinsts = certify_instantiations ctxt [] insts
-          val inst_thm = Thm.instantiate ([], cinsts) thm
+          val inst_thm = Thm.instantiate (TVars.empty, Vars.make cinsts) thm
           val gen_type_lems = construct_cfunc_type_lemmas ctxt type_rules
           val type_lems = flat (map (gen_type_lems o snd) insts)
       in elim_type_rule_prems_opt' ctxt inst_thm type_lems
@@ -487,7 +489,7 @@ ML \<open>fun ETCS_subst_asm_subtac type_rules thm i (foc : Subgoal.focus) =
           SOME (inst_thm, selected_prem) =>
                 (* generalize selected premise for use outside of focus *)
             let val names_to_generalize = map (string_of_var o Thm.term_of o snd) (#params foc)
-                val generalized_prem = Thm.generalize_cterm ([], names_to_generalize) 0 (Thm.cprop_of selected_prem)
+                val generalized_prem = Thm.generalize_cterm (Names.empty, Names.make_set names_to_generalize) 0 (Thm.cprop_of selected_prem)
                 (* insert selected premise and substitute it using the instantiated theorem *)
             in ((cut_tac selected_prem i) THEN (EqSubst.eqsubst_asm_tac ctxt [0] [inst_thm] i),
                 SOME generalized_prem)
@@ -549,7 +551,7 @@ ML \<open>fun ETCS_eresolve_subtac type_rules thm i (foc : Subgoal.focus) =
          SOME (inst_thm, selected_prem) =>
                 (* generalize selected premise for use outside of focus *)
             let val names_to_generalize = map (string_of_var o Thm.term_of o snd) (#params foc)
-                val generalized_prem = Thm.generalize_cterm ([], names_to_generalize) 0 (Thm.cprop_of selected_prem)
+                val generalized_prem = Thm.generalize_cterm (Names.empty, Names.make_set names_to_generalize) 0 (Thm.cprop_of selected_prem)
                 (* insert selected premise and substitute it using the instantiated theorem *)
             in ((cut_tac selected_prem i) THEN (eresolve_tac ctxt [inst_thm] i),
                 SOME generalized_prem)
