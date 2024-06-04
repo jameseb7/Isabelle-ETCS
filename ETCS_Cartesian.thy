@@ -52,10 +52,6 @@ next
 
 qed
 
-
-
-
-
 (*Proposition 2.1.8*: Suppose that both (W,\<pi>_0,\<pi>_1) and (W',\<pi>'_0,\<pi>'_1) are 
 Cartesian products of X and Y.  Then there is an isomorphism f:W\<rightarrow>W' such that 
 \<pi>'_0f = \<pi>_0 and \<pi>'_1f = \<pi>_1.*)

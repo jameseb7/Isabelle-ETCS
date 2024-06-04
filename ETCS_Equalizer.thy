@@ -15,6 +15,19 @@ lemma equalizer_def2:
     \<and> (\<forall> h F. ((h : F \<rightarrow> X) \<and> (f \<circ>\<^sub>c h = g \<circ>\<^sub>c h)) \<longrightarrow> (\<exists>! k. (k : F \<rightarrow> E) \<and> m \<circ>\<^sub>c k = h)))"
   using assms unfolding equalizer_def by (auto simp add: cfunc_type_def)
 
+lemma equalizer_eq:
+  assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> Y" "m : E \<rightarrow> X"
+  assumes "equalizer E m f g"
+  shows "f \<circ>\<^sub>c m = g \<circ>\<^sub>c m"
+  using assms equalizer_def2 by auto
+
+lemma similar_equalizers:
+  assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> Y" "m : E \<rightarrow> X"
+  assumes "equalizer E m f g"
+  assumes "h : F \<rightarrow> X" "f \<circ>\<^sub>c h = g \<circ>\<^sub>c h"
+  shows "\<exists>! k. k : F \<rightarrow> E \<and> m \<circ>\<^sub>c k = h"
+  using assms equalizer_def2 by auto
+
 axiomatization where
   equalizer_exists: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> \<exists> E m. equalizer E m f g"
 
@@ -236,7 +249,7 @@ proof -
   then have "f \<circ>\<^sub>c id(domain(f)) = f \<circ>\<^sub>c (k \<circ>\<^sub>c f)"
     by (metis comp_associative domain_comp id_domain id_left_unit id_right_unit)
   then have "monomorphism f \<Longrightarrow> k \<circ>\<^sub>c f = id(domain(f))"
-    by (metis (mono_tags, hide_lams) codomain_comp domain_comp id_codomain id_domain k_type monomorphism_def)
+    by (metis (mono_tags) codomain_comp domain_comp id_codomain id_domain k_type monomorphism_def)
   then have "k \<circ>\<^sub>c f = id(domain(f))"
     using equalizer_is_monomorphism f_equalizer by blast
   then show "isomorphism(f)"
@@ -279,8 +292,7 @@ proof -
     by (meson assms(1,2) comp_type equalizer_exists left_cart_proj_type right_cart_proj_type)
   then have "\<exists> X Y k. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer (inverse_image f B m) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
-    unfolding inverse_image_def apply (rule_tac someI_ex, auto)
-    by (rule_tac x="A" in exI, rule_tac x="X" in exI, rule_tac x="Y" in exI, auto simp add: assms)
+    unfolding inverse_image_def by (rule_tac someI_ex, auto, rule_tac x="A" in exI, rule_tac x="X" in exI, rule_tac x="Y" in exI, auto simp add: assms)
   then show "\<exists>k. equalizer (inverse_image f B m) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
     using assms(2) cfunc_type_def by auto
 qed
@@ -609,13 +621,14 @@ lemma pair_factorsthru_fibered_product_morphism:
   shows "f \<circ>\<^sub>c x = g \<circ>\<^sub>c y \<Longrightarrow> \<langle>x,y\<rangle> factorsthru fibered_product_morphism X f g Y"
   unfolding factors_through_def
 proof -
+  have equalizer: "equalizer (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) (fibered_product_morphism X f g Y) (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y)"
+    using fibered_product_morphism_equalizer assms by (typecheck_cfuncs, auto)
+
   assume "f \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
   then have "(f \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c \<langle>x,y\<rangle> = (g \<circ>\<^sub>c right_cart_proj X Y) \<circ>\<^sub>c \<langle>x,y\<rangle>"
     using assms by (typecheck_cfuncs, smt comp_associative2 left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
-  then have "\<exists>h. h : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and> fibered_product_morphism X f g Y \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
-    using fibered_product_morphism_equalizer[where f=f, where g=g, where X=X, where Y=Y, where Z=Z] assms
-    unfolding equalizer_def apply (auto, erule_tac x="\<langle>x,y\<rangle>" in allE, erule_tac x="A" in allE, auto)
-    using cfunc_prod_type cfunc_type_def domain_comp left_cart_proj_type by auto
+  then have "\<exists>! h. h : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and> fibered_product_morphism X f g Y \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
+    using assms similar_equalizers by (typecheck_cfuncs, smt (verit, del_insts)  cfunc_type_def equalizer equalizer_def)
   then show "\<exists>h. h : domain \<langle>x,y\<rangle> \<rightarrow> domain (fibered_product_morphism X f g Y) \<and>
         fibered_product_morphism X f g Y \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
     by (metis assms(1,2) cfunc_type_def domain_comp fibered_product_morphism_type)

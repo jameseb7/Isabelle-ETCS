@@ -1257,7 +1257,7 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
   then show "g = h"
   proof -
     have "monomorphism (m \<times>\<^sub>f id\<^sub>c Z)"
-      using assms cfunc_cross_prod_mono id_isomorphism id_type iso_imp_epi_and_monic by blast
+      using assms cfunc_cross_prod_mono id_isomorphism iso_imp_epi_and_monic by (typecheck_cfuncs, blast)
     then show "(m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c g = (m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c h \<Longrightarrow> g = h"
       using assms g_type h_type unfolding monomorphism_def2 by (typecheck_cfuncs, blast)
   qed

@@ -171,7 +171,7 @@ proof (cases "\<exists>x. x \<in>\<^sub>c X")
   then have "(id X \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)) \<circ>\<^sub>c left_coproj X Y = id X"
     by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
   then show "monomorphism (left_coproj X Y)"
-    by (typecheck_cfuncs, metis (mono_tags, hide_lams) cfunc_coprod_type comp_monic_imp_monic'
+    by (typecheck_cfuncs, metis (mono_tags) cfunc_coprod_type comp_monic_imp_monic'
         comp_type id_isomorphism id_type iso_imp_epi_and_monic terminal_func_type x_type)
 next
   show "\<nexists>x. x \<in>\<^sub>c X \<Longrightarrow> monomorphism (left_coproj X Y)"
@@ -190,7 +190,7 @@ proof (cases "\<exists>y. y \<in>\<^sub>c Y")
   have "((y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> id Y) \<circ>\<^sub>c right_coproj X Y = id Y"
     by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
   then show "monomorphism (right_coproj X Y)"
-    by (typecheck_cfuncs, metis (mono_tags, hide_lams) cfunc_coprod_type comp_monic_imp_monic'
+    by (typecheck_cfuncs, metis (mono_tags) cfunc_coprod_type comp_monic_imp_monic'
         comp_type id_isomorphism id_type iso_imp_epi_and_monic terminal_func_type y_type)
 next
   show "\<nexists>y. y \<in>\<^sub>c Y \<Longrightarrow> monomorphism (right_coproj X Y)"

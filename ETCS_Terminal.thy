@@ -625,7 +625,7 @@ qed
 
 
 
-lemma cfunc_cross_prod_mono:
+lemma cfunc_cross_prod_inj:
   assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
   assumes "injective f \<and> injective g"
   shows "injective (f \<times>\<^sub>f g)"
