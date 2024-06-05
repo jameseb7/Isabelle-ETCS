@@ -681,8 +681,7 @@ lemma right_param_def2:
   shows "k\<^bsub>[-,q]\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
 proof - 
   have "\<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> right_param k q = k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
-    unfolding right_param_def apply (rule theI', auto)
-    using assms by (blast, metis cfunc_type_def exp_set_inj transpose_func_type) 
+    unfolding right_param_def by (rule theI', insert assms, auto, metis cfunc_type_def exp_set_inj transpose_func_type) 
   then show "k\<^bsub>[-,q]\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>id\<^sub>c P,q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>"
     by (smt (z3) assms cfunc_type_def exp_set_inj transpose_func_type)
 qed
