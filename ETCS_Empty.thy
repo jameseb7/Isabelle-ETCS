@@ -166,7 +166,7 @@ lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>
   by (metis UNIV_I cfunc_type_def emptyset_is_empty initial_func_type injective_def injective_imp_monomorphism subobject_of_def2)
 
 (* Proposition 2.2.1 *)
-lemma "card ({(X,m). (X,m) \<subseteq>\<^sub>c one}//{((X,m1),(Y,m2)). X \<cong> Y}) = 2"
+lemma "card ({(X,m). (X,m) \<subseteq>\<^sub>c one}//{((X1,m1),(X2,m2)). X1 \<cong> X2}) = 2"
 proof -
   have one_subobject: "(one, id one) \<subseteq>\<^sub>c one"
     using element_monomorphism id_type subobject_of_def2 by blast
@@ -222,13 +222,15 @@ proof -
   have classes_distinct: "{(X, m). X \<cong> \<emptyset>} \<noteq> {(X, m). X \<cong> one}"
     by (metis case_prod_eta curry_case_prod emptyset_is_empty id_isomorphism id_type is_isomorphic_def mem_Collect_eq)
 
-  have "{(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X, m1), Y, m2). X \<cong> Y} = {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> one}}"
-    unfolding quotient_def apply auto
-    using isomorphic_is_symmetric isomorphic_is_transitive subobject_one_or_empty apply blast+
-    using empty_subobject apply (rule_tac x=\<emptyset> in exI, auto simp add: isomorphic_is_symmetric)
-    using one_subobject apply (rule_tac x=one in exI, auto simp add: isomorphic_is_symmetric)
-    done
-  then show "card ({(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X, m1), Y, m2). X \<cong> Y}) = 2"
+  have "{(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X1, m1), (X2, m2)). X1 \<cong> X2} = {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> one}}"
+  proof
+    show "{(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X1, m1), (X2, m2)). X1 \<cong> X2} \<subseteq> {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> one}}"
+      by (unfold quotient_def, auto, insert isomorphic_is_symmetric isomorphic_is_transitive subobject_one_or_empty, blast+)
+  next
+    show "{{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> one}} \<subseteq> {(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X1, m1), X2, m2). X1 \<cong> X2}"
+      by (unfold quotient_def, insert empty_subobject one_subobject, auto simp add: isomorphic_is_symmetric)
+  qed
+  then show "card ({(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X, m1), (Y, m2)). X \<cong> Y}) = 2"
     by (simp add: classes_distinct)
 qed
 
