@@ -654,6 +654,61 @@ definition isomorphism :: "cfunc \<Rightarrow> bool" where
   "isomorphism(f) \<longleftrightarrow> (\<exists> g. domain(g) = codomain(f) \<and> codomain(g) = domain(f) \<and> 
     (g \<circ>\<^sub>c f = id(domain(f))) \<and> (f \<circ>\<^sub>c g = id(domain(g))))"
 
+lemma isomorphism_def2:
+  "isomorphism(f) \<longleftrightarrow> (\<exists> g X Y. f : X \<rightarrow> Y \<and> g : Y \<rightarrow> X \<and> g \<circ>\<^sub>c f = id X \<and> f \<circ>\<^sub>c g = id Y)"
+  unfolding isomorphism_def cfunc_type_def by auto
+
+lemma isomorphism_def3:
+  assumes "f : X \<rightarrow> Y"
+  shows "isomorphism(f) \<longleftrightarrow> (\<exists> g. g : Y \<rightarrow> X \<and> g \<circ>\<^sub>c f = id X \<and> f \<circ>\<^sub>c g = id Y)"
+  using assms unfolding isomorphism_def2 cfunc_type_def by auto
+
+definition inverse :: "cfunc \<Rightarrow> cfunc" ("_\<^bold>\<inverse>" [1000] 999) where
+  "inverse(f) = (THE g. g : codomain(f) \<rightarrow> domain(f) \<and> g \<circ>\<^sub>c f = id(domain(f)) \<and> f \<circ>\<^sub>c g = id(codomain(f)))"
+
+lemma inverse_def2:
+  assumes "isomorphism(f)"
+  shows "f\<^bold>\<inverse> : codomain(f) \<rightarrow> domain(f) \<and> f\<^bold>\<inverse> \<circ>\<^sub>c f = id(domain(f)) \<and> f \<circ>\<^sub>c f\<^bold>\<inverse> = id(codomain(f))"
+proof (unfold inverse_def, rule theI', auto)
+  show "\<exists>g. g : codomain f \<rightarrow> domain f \<and> g \<circ>\<^sub>c f = id\<^sub>c (domain f) \<and> f \<circ>\<^sub>c g = id\<^sub>c (codomain f)"
+    using assms unfolding isomorphism_def cfunc_type_def by auto
+next
+  fix g1 g2
+  assume g1_f: "g1 \<circ>\<^sub>c f = id\<^sub>c (domain f)" and f_g1: "f \<circ>\<^sub>c g1 = id\<^sub>c (codomain f)"
+  assume g2_f: "g2 \<circ>\<^sub>c f = id\<^sub>c (domain f)" and f_g2: "f \<circ>\<^sub>c g2 = id\<^sub>c (codomain f)"
+  assume "g1 : codomain f \<rightarrow> domain f" "g2 : codomain f \<rightarrow> domain f"
+  then have "codomain(g1) = domain(f)" "domain(g2) = codomain(f)"
+    unfolding cfunc_type_def by auto
+  then show "g1 = g2"
+    by (metis comp_associative f_g1 g2_f id_left_unit id_right_unit)
+qed
+
+lemma inverse_type[type_rule]:
+  assumes "isomorphism(f)" "f : X \<rightarrow> Y"
+  shows "f\<^bold>\<inverse> : Y \<rightarrow> X"
+  using assms inverse_def2 unfolding cfunc_type_def by auto
+
+lemma inv_left:
+  assumes "isomorphism(f)" "f : X \<rightarrow> Y"
+  shows "f\<^bold>\<inverse> \<circ>\<^sub>c f = id X"
+  using assms inverse_def2 unfolding cfunc_type_def by auto
+
+lemma inv_right:
+  assumes "isomorphism(f)" "f : X \<rightarrow> Y"
+  shows "f \<circ>\<^sub>c f\<^bold>\<inverse> = id Y"
+  using assms inverse_def2 unfolding cfunc_type_def by auto
+
+lemma inv_iso:
+  assumes "isomorphism(f)"
+  shows "isomorphism(f\<^bold>\<inverse>)"
+  using assms inverse_def2 unfolding isomorphism_def cfunc_type_def by (rule_tac x=f in exI, auto)
+
+lemma inv_idempotent:
+  assumes "isomorphism(f)"
+  shows "(f\<^bold>\<inverse>)\<^bold>\<inverse> = f"
+  by (smt assms cfunc_type_def comp_associative id_left_unit inv_iso inverse_def2)
+  
+
 definition is_isomorphic :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<cong>" 50)  where
   "X \<cong> Y \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> Y \<and> isomorphism(f))"
 
@@ -916,17 +971,10 @@ lemma isomorphism_sandwich:
   assumes hgf_iso: "isomorphism(h \<circ>\<^sub>c g \<circ>\<^sub>c f)"
   shows "isomorphism(g)"
 proof -
-  obtain cc :: "cfunc \<Rightarrow> cfunc" where
-    f1: "\<forall>c. (\<not> isomorphism c \<or> domain (cc c) = codomain c \<and> codomain (cc c) = domain c \<and> cc c \<circ>\<^sub>c c = id\<^sub>c (domain c) \<and> c \<circ>\<^sub>c cc c = id\<^sub>c (domain (cc c))) \<and> (isomorphism c \<or> (\<forall>ca. domain ca \<noteq> codomain c \<or> codomain ca \<noteq> domain c \<or> ca \<circ>\<^sub>c c \<noteq> id\<^sub>c (domain c) \<or> c \<circ>\<^sub>c ca \<noteq> id\<^sub>c (domain ca)))"
-    using isomorphism_def by moura
-  have f2: "\<forall>c ca cb. (c : ca \<rightarrow> cb) = (domain c = ca \<and> codomain c = cb)"
-    using cfunc_type_def by blast
-  have f3: "\<forall>c ca. domain c \<noteq> codomain ca \<or> codomain (c \<circ>\<^sub>c ca) = codomain c"
-    using codomain_comp by blast
-  have "domain (cc f) = codomain f \<and> codomain (cc f) = domain f \<and> cc f \<circ>\<^sub>c f = id\<^sub>c (domain f) \<and> f \<circ>\<^sub>c cc f = id\<^sub>c (domain (cc f))"
-    using f1 f_iso by blast
-  then show ?thesis
-    using f3 f2 f1 by (smt (z3) comp_associative domain_comp f_type g_type h_iso h_type hgf_iso id_left_unit2 id_right_unit2)
+  have "isomorphism(h\<^bold>\<inverse> \<circ>\<^sub>c (h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<circ>\<^sub>c f\<^bold>\<inverse>)"
+    using assms by (typecheck_cfuncs, simp add: f_iso h_iso hgf_iso inv_iso isomorphism_comp')
+  then show "isomorphism(g)"
+    using assms by (typecheck_cfuncs_prems, smt comp_associative2 id_left_unit2 id_right_unit2 inv_left inv_right)
 qed
 
   
