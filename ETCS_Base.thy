@@ -727,56 +727,7 @@ lemma isomorphic_is_symmetric: "X \<cong> Y \<longrightarrow> Y \<cong> X"
 
 lemma isomorphism_comp: 
   "domain f = codomain g \<Longrightarrow> isomorphism f \<Longrightarrow> isomorphism g \<Longrightarrow> isomorphism (f \<circ>\<^sub>c g)"
-  unfolding isomorphism_def
-proof (auto, rule_tac x="gaa \<circ>\<^sub>c ga" in exI, auto)
-  fix ga gaa
-  assume domain_f: "domain f = codomain g"
-  assume domain_ga: "domain ga = codomain f"
-  assume domain_gaa: "domain gaa = codomain g"
-  assume codomain_ga: "codomain ga = codomain g"
-  assume codomain_gaa: "codomain gaa = domain g"
-
-  show "domain (gaa \<circ>\<^sub>c ga) = codomain (f \<circ>\<^sub>c g)"
-    by (simp add: codomain_comp codomain_ga domain_comp domain_f domain_ga domain_gaa)
-  show "codomain (gaa \<circ>\<^sub>c ga) = domain (f \<circ>\<^sub>c g)"
-    by (simp add: codomain_comp codomain_ga codomain_gaa domain_comp domain_f domain_gaa)
-next
-  fix ga gaa
-  assume domain_f: "domain f = codomain g"
-  assume domain_ga: "domain ga = codomain f"
-  assume domain_gaa: "domain gaa = codomain g"
-  assume codomain_ga: "codomain ga = codomain g"
-  assume codomain_gaa: "codomain gaa = domain g"
-  assume ga_comp_f: "ga \<circ>\<^sub>c f = id (codomain g)"
-  assume gaa_comp_g: "gaa \<circ>\<^sub>c g = id (domain g)"
-
-  have "(gaa \<circ>\<^sub>c ga) \<circ>\<^sub>c f \<circ>\<^sub>c g =  gaa \<circ>\<^sub>c id (domain f) \<circ>\<^sub>c g"
-    by (metis codomain_comp codomain_ga comp_associative domain_f domain_ga domain_gaa ga_comp_f)
-  also have "... = gaa \<circ>\<^sub>c g"
-    by (simp add: domain_f id_left_unit)
-  also have "... = id (domain (f \<circ>\<^sub>c g))"
-    by (simp add: domain_comp domain_f gaa_comp_g)
-  then show "(gaa \<circ>\<^sub>c ga) \<circ>\<^sub>c f \<circ>\<^sub>c g = id (domain (f \<circ>\<^sub>c g))"
-    using calculation by auto
-next
-  fix ga gaa
-  assume domain_f: "domain f = codomain g"
-  assume domain_ga: "domain ga = codomain f"
-  assume domain_gaa: "domain gaa = codomain g"
-  assume codomain_ga: "codomain ga = codomain g"
-  assume codomain_gaa: "codomain gaa = domain g"
-  assume f_comp_ga: "f \<circ>\<^sub>c ga = id (codomain f)"
-  assume g_comp_gaa: "g \<circ>\<^sub>c gaa = id (codomain g)"
-
-  have "(f \<circ>\<^sub>c g) \<circ>\<^sub>c gaa \<circ>\<^sub>c ga = f \<circ>\<^sub>c id (codomain g) \<circ>\<^sub>c ga"
-    by (metis codomain_comp codomain_ga codomain_gaa comp_associative domain_f domain_gaa g_comp_gaa)
-  also have "... = f \<circ>\<^sub>c ga"
-    by (metis codomain_ga id_left_unit)
-  also have "... = id (domain (gaa \<circ>\<^sub>c ga))"
-    by (simp add: codomain_ga domain_comp domain_ga domain_gaa f_comp_ga)
-  then show "(f \<circ>\<^sub>c g) \<circ>\<^sub>c gaa \<circ>\<^sub>c ga = id (domain (gaa \<circ>\<^sub>c ga))"
-    using calculation by auto
-qed
+  unfolding isomorphism_def by (auto, smt codomain_comp comp_associative domain_comp id_right_unit)
 
 lemma isomorphism_comp': 
   assumes "f : Y \<rightarrow> Z" "g : X \<rightarrow> Y"
@@ -784,8 +735,7 @@ lemma isomorphism_comp':
   using assms cfunc_type_def isomorphism_comp by auto
 
 lemma isomorphic_is_transitive: "(X \<cong> Y \<and> Y \<cong> Z) \<longrightarrow> X \<cong> Z"
-  unfolding is_isomorphic_def 
-  by (auto, rule_tac x="fa \<circ>\<^sub>c f" in exI, auto simp add: isomorphism_comp' comp_type)
+  unfolding is_isomorphic_def by (auto, metis cfunc_type_def comp_type isomorphism_comp)
 
 lemma is_isomorphic_equiv:
   "equiv UNIV {(X, Y). X \<cong> Y}"
