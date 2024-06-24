@@ -53,6 +53,29 @@ lemma characteristic_func_eq:
   shows "characteristic_func m \<circ>\<^sub>c m = \<t> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>"
   using assms characteristic_func_is_pullback unfolding is_pullback_def square_commutes_def by auto
 
+lemma monomorphism_equalizes_char_func:
+  assumes m_type[type_rule]: "m : B \<rightarrow> X" and m_mono[type_rule]: "monomorphism m"
+  shows "equalizer B m (characteristic_func m) (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>)"
+  unfolding equalizer_def
+proof (typecheck_cfuncs, rule_tac x="X" in exI, rule_tac x="\<Omega>" in exI, auto)
+  have comm: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub> = characteristic_func m \<circ>\<^sub>c m"
+    using characteristic_func_eq m_mono m_type by auto
+  then have "\<beta>\<^bsub>B\<^esub> = \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c m"
+    using m_type terminal_func_comp by auto
+  then show "characteristic_func m \<circ>\<^sub>c m = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c m"
+    using comm comp_associative2 by (typecheck_cfuncs, auto)
+next
+  fix h F
+  assume  "h : F \<rightarrow> X" "characteristic_func m \<circ>\<^sub>c h = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c h"
+  then show "\<exists>k. k : F \<rightarrow> B \<and> m \<circ>\<^sub>c k = h"
+    by (smt (verit) assms cfunc_type_def characteristic_func_is_pullback comp_associative is_pullback_def terminal_func_comp terminal_func_type true_func_type)
+next
+  fix F k y
+  assume "k : F \<rightarrow> B" "y : F \<rightarrow> B"
+  then show "m \<circ>\<^sub>c y = m \<circ>\<^sub>c k \<Longrightarrow> k = y"
+    using m_mono m_type monomorphism_def3 by blast 
+qed
+
 lemma characteristic_func_true_relative_member:
   assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
@@ -247,49 +270,9 @@ lemma regmono_is_mono: "regular_monomorphism(m) \<Longrightarrow> monomorphism(m
 (* Proposition 2.2.4 *)
 lemma mono_is_regmono:
   shows "monomorphism(m) \<Longrightarrow> regular_monomorphism(m)"
-  unfolding regular_monomorphism_def
-proof - 
-  assume m_mono: "monomorphism(m)"
-  then obtain \<chi> where chi_pullback: "is_pullback (domain(m)) one  (codomain(m)) \<Omega> (\<beta>\<^bsub>domain(m)\<^esub>) \<t> m \<chi> "
-    using cfunc_type_def characteristic_function_exists by blast
-
-  have pullback: "\<And>k h Z. k : Z \<rightarrow> one \<and> h : Z \<rightarrow> codomain m \<and> \<t> \<circ>\<^sub>c k = \<chi> \<circ>\<^sub>c h \<longrightarrow>
-     (\<exists>!j. j : Z \<rightarrow> domain m \<and> \<beta>\<^bsub>domain m\<^esub> \<circ>\<^sub>c j = k \<and> m \<circ>\<^sub>c j = h)"
-    using chi_pullback unfolding is_pullback_def by auto
-
-  have "equalizer (domain(m)) m (\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub>) \<chi>"
-    unfolding equalizer_def
-  proof (rule_tac x="codomain(m)" in exI, rule_tac x="\<Omega>" in exI, auto)
-    show tbeta_type: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub> : codomain(m) \<rightarrow>  \<Omega>"
-      by typecheck_cfuncs
-    show chi_type: "\<chi> : codomain(m) \<rightarrow>  \<Omega>"
-      using chi_pullback is_pullback_def square_commutes_def by auto
-    show m_type: "m : domain m \<rightarrow> codomain m"
-      by (simp add: cfunc_type_def)
-
-    have comm: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>domain m\<^esub> = \<chi> \<circ>\<^sub>c m"
-      using chi_pullback unfolding is_pullback_def square_commutes_def by auto
-    then have "\<beta>\<^bsub>domain m\<^esub> = \<beta>\<^bsub>codomain m\<^esub> \<circ>\<^sub>c m"
-      by (simp add: cfunc_type_def terminal_func_comp)
-    then show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>) \<circ>\<^sub>c m = \<chi> \<circ>\<^sub>c m"
-      using cfunc_type_def comm comp_associative terminal_func_type true_func_type by auto
-  next
-    fix h F
-    assume  "h : F \<rightarrow> codomain m" "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>) \<circ>\<^sub>c h = \<chi> \<circ>\<^sub>c h"
-    then show "\<exists>k. k : F \<rightarrow> domain m \<and> m \<circ>\<^sub>c k = h"
-      by (metis cfunc_type_def comp_associative pullback terminal_func_comp terminal_func_type true_func_type)
-  next
-    fix F k y
-    assume "k : F \<rightarrow> domain m" "y : F \<rightarrow> domain m"
-    then show "m \<circ>\<^sub>c y = m \<circ>\<^sub>c k \<Longrightarrow> k = y"
-      using m_mono unfolding monomorphism_def by (simp add: cfunc_type_def)
-  qed
-  then show "\<exists>g h. domain g = codomain m \<and> domain h = codomain m \<and> equalizer (domain m) m g h"
-    by (metis cfunc_type_def equalizer_def)
-qed
-
-
-
+  unfolding monomorphism_def regular_monomorphism_def
+  using cfunc_type_def characteristic_func_type monomorphism_def domain_comp terminal_func_type true_func_type monomorphism_equalizes_char_func
+  by (rule_tac x="characteristic_func m" in exI, rule_tac x="\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub>" in exI, auto)
 
 (*Proposition 2.2.5*)
 lemma epi_mon_is_iso:

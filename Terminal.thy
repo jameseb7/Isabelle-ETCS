@@ -98,7 +98,7 @@ lemma iso_to1_is_term:
 proof 
   fix Y
   obtain x where x_type[type_rule]: "x : one \<rightarrow> X" and x_unique: "\<forall> y. y : one \<rightarrow> X \<longrightarrow> x = y"
-     using assms single_elem_iso_one by fastforce 
+    by (smt assms is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric monomorphism_def2 terminal_func_comp terminal_func_unique)
   show  "\<exists>!f. f : Y \<rightarrow> X"
   proof (rule_tac a="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" in ex1I)
     show "x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> : Y \<rightarrow> X"
@@ -182,8 +182,6 @@ next
   then show "X \<cong> one"
     by (simp add: one_terminal_object terminal_objects_isomorphic)
 qed
-
-
 
 subsection \<open>Injectivity\<close>
 
@@ -398,7 +396,7 @@ next
     by (metis empty cfunc_type_def codomain_comp nonempty_def one_separator)
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.2.10 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.10 in Halvorson.\<close>
 lemma cfunc_cross_prod_surj:
   assumes type_assms: "f : A \<rightarrow> C" "g : B \<rightarrow> D"
   assumes f_surj: "surjective f" and g_surj: "surjective g"

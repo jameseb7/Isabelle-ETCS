@@ -202,23 +202,23 @@ lemma equalizer_is_monomorphism:
 "equalizer E m f g \<Longrightarrow>  monomorphism(m)"
   unfolding equalizer_def monomorphism_def
 proof auto
-  fix ga h X Y
+  fix h1 h2 X Y
   assume f_type: "f : X \<rightarrow> Y"
   assume g_type: "g : X \<rightarrow> Y"
   assume m_type: "m : E \<rightarrow> X"
   assume fm_gm: "f \<circ>\<^sub>c m = g \<circ>\<^sub>c m"
   assume uniqueness: "\<forall>h F. h : F \<rightarrow> X \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E \<and> m \<circ>\<^sub>c k = h)"
-  assume relation_ga: "codomain ga = domain m"
-  assume relation_h: "codomain h = domain m" 
-  assume m_ga_mh: "m \<circ>\<^sub>c ga = m \<circ>\<^sub>c h" 
+  assume relation_ga: "codomain h1 = domain m"
+  assume relation_h: "codomain h2 = domain m" 
+  assume m_ga_mh: "m \<circ>\<^sub>c h1 = m \<circ>\<^sub>c h2" 
   
-  have  "f \<circ>\<^sub>c m \<circ>\<^sub>c ga =  g \<circ>\<^sub>c m \<circ>\<^sub>c h"
+  have  "f \<circ>\<^sub>c m \<circ>\<^sub>c h1 =  g \<circ>\<^sub>c m \<circ>\<^sub>c h2"
     using cfunc_type_def comp_associative f_type fm_gm g_type m_ga_mh m_type relation_h by auto
-  then obtain z where "z: domain(ga) \<rightarrow> E \<and> m \<circ>\<^sub>c z = m \<circ>\<^sub>c ga \<and> 
-    (\<forall> j. j:domain(ga) \<rightarrow> E \<and>  m \<circ>\<^sub>c j = m \<circ>\<^sub>c ga \<longrightarrow> j = z)"
-    using uniqueness by (erule_tac x="m \<circ>\<^sub>c ga" in allE, erule_tac x="domain(ga)" in allE,
+  then obtain z where "z: domain(h1) \<rightarrow> E \<and> m \<circ>\<^sub>c z = m \<circ>\<^sub>c h1 \<and> 
+    (\<forall> j. j:domain(h1) \<rightarrow> E \<and>  m \<circ>\<^sub>c j = m \<circ>\<^sub>c h1 \<longrightarrow> j = z)"
+    using uniqueness by (erule_tac x="m \<circ>\<^sub>c h1" in allE, erule_tac x="domain(ga)" in allE,
                          smt cfunc_type_def codomain_comp domain_comp m_ga_mh m_type relation_ga)
-  then show "ga = h"
+  then show "h1 = h2"
     by (metis cfunc_type_def domain_comp m_ga_mh m_type relation_ga relation_h)
 qed
 
@@ -228,6 +228,12 @@ qed
 definition regular_monomorphism :: "cfunc \<Rightarrow> bool"
   where "regular_monomorphism f  \<longleftrightarrow>  
           (\<exists> g h. (domain(g) = codomain(f) \<and> domain(h) = codomain(f) \<and> equalizer (domain f) f g h))"
+
+lemma regular_monomorphism_def2:
+  assumes "f : X \<rightarrow> Y"
+  shows "regular_monomorphism f  \<longleftrightarrow> (\<exists> g h Z. g : Y \<rightarrow> Z \<and> h : Y \<rightarrow> Z \<and> equalizer (domain f) f g h)"
+  unfolding regular_monomorphism_def
+  using assms cfunc_type_def equalizer_def by auto 
 
 (*Exercise 2.1.36*)
 lemma epi_regmon_is_iso:
@@ -461,7 +467,7 @@ lemma relative_member_def2:
   unfolding relative_member_def by auto
 
 (* Proposition 2.1.40 *)
-lemma 
+lemma relative_subobject_member:
   assumes "(A,n) \<subseteq>\<^bsub>X\<^esub> (B,m)" "x \<in>\<^sub>c X"
   shows "x \<in>\<^bsub>X\<^esub> (A,n) \<Longrightarrow> x \<in>\<^bsub>X\<^esub> (B,m)"
   using assms unfolding relative_member_def2 relative_subset_def2
@@ -893,7 +899,6 @@ proof auto
       using x_type2 y_type2 by (typecheck_cfuncs)
     have fibered_product_type: "fibered_product_morphism X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X \<times>\<^sub>c X"
       using assms by typecheck_cfuncs
-
 
     assume "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
     then have factorsthru: "\<langle>x,y\<rangle> factorsthru fibered_product_morphism X f f X"
