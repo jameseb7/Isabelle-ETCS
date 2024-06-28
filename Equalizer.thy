@@ -282,6 +282,60 @@ definition is_pullback :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarr
     (\<forall> Z k h. (k : Z \<rightarrow> B \<and> h : Z \<rightarrow> C \<and> bd \<circ>\<^sub>c k = cd \<circ>\<^sub>c h)  \<longrightarrow>
       (\<exists>! j. j : Z \<rightarrow> A \<and> ab \<circ>\<^sub>c j = k \<and> ac \<circ>\<^sub>c j = h)))"
 
+lemma pullback_iff_product:
+  assumes "terminal_object(T)"
+  assumes f_type[type_rule]: "f : Y \<rightarrow> T" 
+  assumes g_type[type_rule]: "g : X \<rightarrow> T"
+  shows "(is_pullback P Y X T (pY) f (pX) g) = (is_cart_prod P pX pY X Y)"
+proof(auto)
+  assume pullback: "is_pullback P Y X T pY f pX g"
+  have f_type[type_rule]: "f : Y \<rightarrow> T"
+    using is_pullback_def pullback by force
+  have g_type[type_rule]: "g : X \<rightarrow> T"
+    using is_pullback_def pullback by force
+  show "is_cart_prod P pX pY X Y"
+  proof(unfold is_cart_prod_def, auto)
+    show pX_type[type_rule]: "pX : P \<rightarrow> X"
+      using pullback is_pullback_def by force
+    show pY_type[type_rule]: "pY : P \<rightarrow> Y"
+      using pullback is_pullback_def by force
+    show "\<And>x y Z.
+       x : Z \<rightarrow> X \<Longrightarrow>
+       y : Z \<rightarrow> Y \<Longrightarrow>
+       \<exists>h. h : Z \<rightarrow> P \<and>
+           pX \<circ>\<^sub>c h = x \<and> pY \<circ>\<^sub>c h = y \<and> (\<forall>h2. h2 : Z \<rightarrow> P \<and> pX \<circ>\<^sub>c h2 = x \<and> pY \<circ>\<^sub>c h2 = y \<longrightarrow> h2 = h)"
+    proof - 
+      fix x y Z
+      assume x_type[type_rule]: "x : Z \<rightarrow> X"
+      assume y_type[type_rule]: "y : Z \<rightarrow> Y"
+      have  "\<And>Z k h. k : Z \<rightarrow> Y \<Longrightarrow> h : Z \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c k = g \<circ>\<^sub>c h \<Longrightarrow> \<exists>j. j : Z \<rightarrow> P \<and> pY \<circ>\<^sub>c j = k \<and> pX \<circ>\<^sub>c j = h"
+        using is_pullback_def pullback by blast
+      then have "\<exists>h. h : Z \<rightarrow> P \<and>
+           pX \<circ>\<^sub>c h = x \<and> pY \<circ>\<^sub>c h = y"
+        by (smt (verit, ccfv_threshold) assms cfunc_type_def codomain_comp domain_comp f_type g_type terminal_object_def x_type y_type)
+      then show "\<exists>h. h : Z \<rightarrow> P \<and>
+           pX \<circ>\<^sub>c h = x \<and> pY \<circ>\<^sub>c h = y \<and> (\<forall>h2. h2 : Z \<rightarrow> P \<and> pX \<circ>\<^sub>c h2 = x \<and> pY \<circ>\<^sub>c h2 = y \<longrightarrow> h2 = h)"
+        by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 is_pullback_def pullback)
+    qed
+  qed
+next
+  assume prod: "is_cart_prod P pX pY X Y"
+  then show "is_pullback P Y X T pY f pX g"
+  proof(unfold is_cart_prod_def is_pullback_def, typecheck_cfuncs, auto)
+    assume pX_type[type_rule]: "pX : P \<rightarrow> X"
+    assume pY_type[type_rule]: "pY : P \<rightarrow> Y"
+    show "f \<circ>\<^sub>c pY = g \<circ>\<^sub>c pX"
+      using assms(1) terminal_object_def by (typecheck_cfuncs, auto)  
+    show "\<And>Z k h. k : Z \<rightarrow> Y \<Longrightarrow> h : Z \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c k = g \<circ>\<^sub>c h \<Longrightarrow> \<exists>j. j : Z \<rightarrow> P \<and> pY \<circ>\<^sub>c j = k \<and> pX \<circ>\<^sub>c j = h"
+      using is_cart_prod_def prod by blast
+    show "\<And>Z j y.
+       pY \<circ>\<^sub>c j : Z \<rightarrow> Y \<Longrightarrow>
+       pX \<circ>\<^sub>c j : Z \<rightarrow> X \<Longrightarrow>
+       f \<circ>\<^sub>c pY \<circ>\<^sub>c j = g \<circ>\<^sub>c pX \<circ>\<^sub>c j \<Longrightarrow> j : Z \<rightarrow> P \<Longrightarrow> y : Z \<rightarrow> P \<Longrightarrow> pY \<circ>\<^sub>c y = pY \<circ>\<^sub>c j \<Longrightarrow> pX \<circ>\<^sub>c y = pX \<circ>\<^sub>c j \<Longrightarrow> j = y"
+      using is_cart_prod_def prod by blast
+  qed
+qed
+
 section \<open>Inverse Image\<close>
 
 definition inverse_image :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>" [101,0,0]100) where
@@ -933,6 +987,20 @@ proof -
   then show "fibered_product_left_proj X f f X = fibered_product_right_proj X f f X"
     by (smt assms(1) comp_associative2 fibered_product_left_proj_type fibered_product_right_proj_type
         id_left_unit2 id_right_unit2 q0_assms q1_assms)
+qed
+
+lemma terminal_fib_prod_iso:
+  assumes "terminal_object(T)"
+  assumes f_type: "f : Y \<rightarrow> T" 
+  assumes g_type: "g : X \<rightarrow> T"
+  shows "(X \<^bsub>g\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> Y) \<cong> X \<times>\<^sub>c Y"
+proof - 
+  have "(is_pullback (X \<^bsub>g\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> Y) Y X T (fibered_product_right_proj X g f Y) f (fibered_product_left_proj X g f Y) g)"
+    using assms pullback_iff_product fibered_product_is_pullback by (typecheck_cfuncs, blast)
+  then have "(is_cart_prod (X \<^bsub>g\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> Y) (fibered_product_left_proj X g f Y) (fibered_product_right_proj X g f Y)  X Y)"
+    using assms by (meson one_terminal_object pullback_iff_product terminal_func_type)
+  then show ?thesis
+    using assms by (metis canonical_cart_prod_is_cart_prod cart_prods_isomorphic fst_conv is_isomorphic_def snd_conv)
 qed
 
 end

@@ -148,7 +148,7 @@ qed
 
 
 
-subsection \<open>Equality Predicate\<close>
+section \<open>Equality Predicate\<close>
 
 definition eq_pred :: "cset \<Rightarrow> cfunc" where
   "eq_pred X = (THE \<chi>. is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) \<chi>)"
@@ -256,89 +256,6 @@ next
   qed
 qed
 
-
-
-
-subsection \<open>Fiber Over an Element\<close>
-
-definition fiber :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1{_}" [100,100]100) where
-  "f\<^sup>-\<^sup>1{y} = (f\<^sup>-\<^sup>1[one]\<^bsub>y\<^esub>)"
-
-definition fiber_morphism :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" where
-  "fiber_morphism f y = left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
-
-lemma fiber_morphism_type[type_rule]:
-  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
-  shows "fiber_morphism f y : f\<^sup>-\<^sup>1{y} \<rightarrow> X"
-  unfolding fiber_def fiber_morphism_def
-  using assms cfunc_type_def element_monomorphism inverse_image_subobject subobject_of_def2
-  by (typecheck_cfuncs, auto)
-
-lemma fiber_subset: 
-  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
-  shows "(f\<^sup>-\<^sup>1{y}, fiber_morphism f y) \<subseteq>\<^sub>c X"
-  unfolding fiber_def fiber_morphism_def
-  using assms cfunc_type_def element_monomorphism inverse_image_subobject inverse_image_subobject_mapping_def
-  by (typecheck_cfuncs, auto)
-
-lemma fiber_morphism_monomorphism:
-  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
-  shows "monomorphism (fiber_morphism f y)"
-  using assms cfunc_type_def element_monomorphism fiber_morphism_def inverse_image_monomorphism by auto
-
-lemma fiber_morphism_eq:
-  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
-  shows "f \<circ>\<^sub>c fiber_morphism f y  = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
-proof -
-  have "f \<circ>\<^sub>c fiber_morphism f y = f \<circ>\<^sub>c left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
-    unfolding fiber_morphism_def by auto
-  also have "... = y \<circ>\<^sub>c right_cart_proj X one \<circ>\<^sub>c inverse_image_mapping f one y"
-    using assms cfunc_type_def element_monomorphism inverse_image_mapping_eq by auto
-  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1[one]\<^bsub>y\<^esub>\<^esub>"
-    using assms by (typecheck_cfuncs, metis element_monomorphism terminal_func_unique)
-  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
-    unfolding fiber_def by auto
-  then show ?thesis
-    using calculation by auto
-qed
-
-
-
-text \<open>The lemma below corresponds to Proposition 2.2.7 in Halvorson.\<close>
-lemma not_surjective_has_some_empty_preimage:
-  assumes p_type[type_rule]: "p: X \<rightarrow> Y" and p_not_surj: "\<not>surjective(p)"
-  shows "\<exists> y. (y\<in>\<^sub>c Y \<and>  \<not>nonempty(p\<^sup>-\<^sup>1{y}))"
-proof -
-  have nonempty: "nonempty(Y)"
-    using assms(1) assms(2) cfunc_type_def nonempty_def surjective_def by auto
-  obtain y0 where y0_type[type_rule]: "y0 \<in>\<^sub>c Y" "\<forall> x. x \<in>\<^sub>c X \<longrightarrow> p\<circ>\<^sub>c x \<noteq> y0"
-    using assms cfunc_type_def surjective_def by auto
-
-  have "\<not>nonempty(p\<^sup>-\<^sup>1{y0})"
-  proof (rule ccontr,auto)
-    assume a1: "nonempty(p\<^sup>-\<^sup>1{y0})"
-    obtain z where z_type[type_rule]: "z \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}"
-      using a1 nonempty_def by blast
-    have fiber_z_type: "fiber_morphism p y0 \<circ>\<^sub>c z \<in>\<^sub>c X"
-      using assms(1) comp_type fiber_morphism_type y0_type z_type by auto
-    have contradiction: "p \<circ>\<^sub>c (fiber_morphism p y0 \<circ>\<^sub>c z) = y0"
-      by (typecheck_cfuncs, smt (z3) comp_associative2 fiber_morphism_eq id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
-    have "p \<circ>\<^sub>c (fiber_morphism p y0 \<circ>\<^sub>c z) \<noteq> y0"
-      by (simp add: fiber_z_type y0_type)
-    then show False
-      using contradiction by blast
-  qed
-  then show ?thesis
-    using y0_type by blast
-qed
-
-
-
-
-
-
-
-
 lemma eq_pred_true_extract_right: 
     assumes "x \<in>\<^sub>c X" 
     shows  "eq_pred X \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>, id X\<rangle> \<circ>\<^sub>c x = \<t>"
@@ -349,15 +266,11 @@ lemma eq_pred_false_extract_right:
     shows  "eq_pred X \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>, id X\<rangle> \<circ>\<^sub>c y = \<f>"
     using assms cart_prod_extract_right eq_pred_iff_eq true_false_only_truth_values  by (typecheck_cfuncs, fastforce)
 
-
-
-
-subsection \<open>Properties of Monomorphisms and Epimorphisms\<close>
+section \<open>Properties of Monomorphisms and Epimorphisms\<close>
 
 text \<open>The lemma below corresponds to Exercise 2.2.3 in Halvorson.\<close>
 lemma regmono_is_mono: "regular_monomorphism(m) \<Longrightarrow> monomorphism(m)"
   using equalizer_is_monomorphism regular_monomorphism_def by blast
-
 
 text \<open>The lemma below corresponds to Proposition 2.2.4 in Halvorson.\<close>
 lemma mono_is_regmono:
@@ -371,8 +284,6 @@ lemma epi_mon_is_iso:
   assumes "epimorphism(f)" "monomorphism(f)"
   shows "isomorphism(f)"
   using assms epi_regmon_is_iso mono_is_regmono by auto
-
-
 
 text \<open>The lemma below corresponds to Proposition 2.2.8 in Halvorson.\<close>
 lemma epi_is_surj:
@@ -437,8 +348,6 @@ qed
     using gp_eqs_hp assms(1,2) cfunc_type_def epimorphism_def g_type h_type by auto
 qed
 
-
-
 text \<open>The lemma below corresponds to Proposition 2.2.9 in Halvorson.\<close>
 lemma pullback_of_epi_is_epi1:
 assumes "f: Y \<rightarrow> Z" "epimorphism f" "is_pullback A Y X Z q1 f q0 g "
@@ -465,7 +374,6 @@ proof -
   then show ?thesis
     using surjective_is_epimorphism by blast
 qed
-
 
 (*This isn't quite true... there is no "part b" etc....! *)
 text \<open>The lemma below corresponds to Proposition 2.2.9b in Halvorson.\<close>
@@ -494,8 +402,6 @@ proof -
   then show ?thesis
     using surjective_is_epimorphism by blast
 qed
-
-
 
 text \<open>The lemma below corresponds to Proposition 2.2.9c in Halvorson.\<close>
 lemma pullback_of_mono_is_mono1:
@@ -547,7 +453,6 @@ proof(unfold monomorphism_def2, auto)
     using eqn2 equals uniqueness by (typecheck_cfuncs, auto)
 qed
 
-
 text \<open>The lemma below corresponds to Proposition 2.2.9d in Halvorson.\<close>
 lemma pullback_of_mono_is_mono2:
 assumes "g: X \<rightarrow> Z" "monomorphism g" "is_pullback A Y X Z q1 f q0 g "
@@ -580,7 +485,6 @@ proof(unfold monomorphism_def2, auto)
       by (simp add: calculation)
   qed 
 
-
   have eqn2: "q0 \<circ>\<^sub>c u =  q0  \<circ>\<^sub>c v"
   proof - 
     have f1: "g \<circ>\<^sub>c q0 \<circ>\<^sub>c u = f \<circ>\<^sub>c q1 \<circ>\<^sub>c u"
@@ -598,9 +502,83 @@ proof(unfold monomorphism_def2, auto)
     using eqn2 equals uniqueness by (typecheck_cfuncs, auto)
 qed
 
+section \<open>Fiber Over an Element and its Connection to the Fibered Product\<close>
 
-subsection \<open>More Facts about Fibered Products\<close>
+(* Definition 2.2.6 *)
+definition fiber :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1{_}" [100,100]100) where
+  "f\<^sup>-\<^sup>1{y} = (f\<^sup>-\<^sup>1[one]\<^bsub>y\<^esub>)"
 
+definition fiber_morphism :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" where
+  "fiber_morphism f y = left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
+
+lemma fiber_morphism_type[type_rule]:
+  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
+  shows "fiber_morphism f y : f\<^sup>-\<^sup>1{y} \<rightarrow> X"
+  unfolding fiber_def fiber_morphism_def
+  using assms cfunc_type_def element_monomorphism inverse_image_subobject subobject_of_def2
+  by (typecheck_cfuncs, auto)
+
+lemma fiber_subset: 
+  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
+  shows "(f\<^sup>-\<^sup>1{y}, fiber_morphism f y) \<subseteq>\<^sub>c X"
+  unfolding fiber_def fiber_morphism_def
+  using assms cfunc_type_def element_monomorphism inverse_image_subobject inverse_image_subobject_mapping_def
+  by (typecheck_cfuncs, auto)
+
+lemma fiber_morphism_monomorphism:
+  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
+  shows "monomorphism (fiber_morphism f y)"
+  using assms cfunc_type_def element_monomorphism fiber_morphism_def inverse_image_monomorphism by auto
+
+lemma fiber_morphism_eq:
+  assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
+  shows "f \<circ>\<^sub>c fiber_morphism f y  = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
+proof -
+  have "f \<circ>\<^sub>c fiber_morphism f y = f \<circ>\<^sub>c left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
+    unfolding fiber_morphism_def by auto
+  also have "... = y \<circ>\<^sub>c right_cart_proj X one \<circ>\<^sub>c inverse_image_mapping f one y"
+    using assms cfunc_type_def element_monomorphism inverse_image_mapping_eq by auto
+  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1[one]\<^bsub>y\<^esub>\<^esub>"
+    using assms by (typecheck_cfuncs, metis element_monomorphism terminal_func_unique)
+  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
+    unfolding fiber_def by auto
+  then show ?thesis
+    using calculation by auto
+qed
+
+text \<open>The lemma below corresponds to Proposition 2.2.7 in Halvorson.\<close>
+lemma not_surjective_has_some_empty_preimage:
+  assumes p_type[type_rule]: "p: X \<rightarrow> Y" and p_not_surj: "\<not>surjective(p)"
+  shows "\<exists> y. (y\<in>\<^sub>c Y \<and>  is_empty(p\<^sup>-\<^sup>1{y}))"
+proof -
+  have nonempty: "nonempty(Y)"
+    using assms(1) assms(2) cfunc_type_def nonempty_def surjective_def by auto
+  obtain y0 where y0_type[type_rule]: "y0 \<in>\<^sub>c Y" "\<forall> x. x \<in>\<^sub>c X \<longrightarrow> p\<circ>\<^sub>c x \<noteq> y0"
+    using assms cfunc_type_def surjective_def by auto
+
+  have "\<not>nonempty(p\<^sup>-\<^sup>1{y0})"
+  proof (rule ccontr,auto)
+    assume a1: "nonempty(p\<^sup>-\<^sup>1{y0})"
+    obtain z where z_type[type_rule]: "z \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}"
+      using a1 nonempty_def by blast
+    have fiber_z_type: "fiber_morphism p y0 \<circ>\<^sub>c z \<in>\<^sub>c X"
+      using assms(1) comp_type fiber_morphism_type y0_type z_type by auto
+    have contradiction: "p \<circ>\<^sub>c (fiber_morphism p y0 \<circ>\<^sub>c z) = y0"
+      by (typecheck_cfuncs, smt (z3) comp_associative2 fiber_morphism_eq id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+    have "p \<circ>\<^sub>c (fiber_morphism p y0 \<circ>\<^sub>c z) \<noteq> y0"
+      by (simp add: fiber_z_type y0_type)
+    then show False
+      using contradiction by blast
+  qed
+  then show ?thesis
+    using is_empty_def nonempty_def y0_type by blast
+qed
+
+lemma fiber_iso_fibered_prod:
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
+  assumes y_type[type_rule]: "y : one \<rightarrow> Y"
+  shows "f\<^sup>-\<^sup>1{y} \<cong> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>y\<^esub>one"
+  using element_monomorphism equalizers_isomorphic f_type fiber_def fibered_product_equalizer inverse_image_is_equalizer is_isomorphic_def y_type by moura
 
 lemma fib_prod_left_id_iso:
   assumes "g : Y \<rightarrow> X"
@@ -617,8 +595,6 @@ proof -
   then show ?thesis
     using assms fibered_product_right_proj_type id_type is_isomorphic_def by blast
 qed
-
-
 
 lemma fib_prod_right_id_iso:
   assumes "f : X \<rightarrow> Y"
@@ -637,17 +613,126 @@ proof -
     using assms fibered_product_left_proj_type id_type is_isomorphic_def by blast
 qed
 
+section \<open>Set Subtraction\<close>
 
-subsection \<open>Other Stuff\<close>
+definition set_subtraction :: "cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> cset" (infix "\<setminus>" 60) where
+  "Y \<setminus> X = (SOME E. \<exists> m'.  equalizer E m' (characteristic_func (snd X)) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
 
+lemma set_subtraction_equalizer:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "\<exists> m'.  equalizer (Y \<setminus> (X,m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+proof -
+  have "\<exists> E m'. equalizer E m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    using assms equalizer_exists by (typecheck_cfuncs, auto)
+  then have "\<exists> m'.  equalizer (Y \<setminus> (X,m)) m' (characteristic_func (snd (X,m))) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    by (unfold set_subtraction_def, rule_tac someI_ex, auto)
+  then show "\<exists> m'.  equalizer (Y \<setminus> (X,m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    by auto
+qed
 
+definition complement_morphism :: "cfunc \<Rightarrow> cfunc" ("_\<^sup>c" [1000]) where
+  "m\<^sup>c = (SOME m'.  equalizer (codomain m \<setminus> (domain m, m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>))"
 
+lemma complement_morphism_equalizer:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "equalizer (Y \<setminus> (X,m)) m\<^sup>c (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+proof -
+  have "\<exists> m'. equalizer (codomain m \<setminus> (domain m, m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>)"
+    by (simp add: assms cfunc_type_def set_subtraction_equalizer)
+  then have "equalizer (codomain m \<setminus> (domain m, m)) m\<^sup>c (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>)"
+    by (unfold complement_morphism_def, rule_tac someI_ex, auto)
+  then show "equalizer (Y \<setminus> (X, m)) m\<^sup>c (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+    using assms unfolding cfunc_type_def by auto
+qed
 
+lemma complement_morphism_type[type_rule]:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "m\<^sup>c : Y \<setminus> (X,m) \<rightarrow> Y"
+  using assms cfunc_type_def characteristic_func_type complement_morphism_equalizer equalizer_def by auto
 
+lemma complement_morphism_mono:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "monomorphism m\<^sup>c"
+  using assms complement_morphism_equalizer equalizer_is_monomorphism by blast
 
+lemma complement_morphism_eq:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  shows "characteristic_func m \<circ>\<^sub>c m\<^sup>c  = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c m\<^sup>c"
+  using assms complement_morphism_equalizer unfolding equalizer_def by auto
 
+lemma characteristic_func_true_not_complement_member:
+  assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
+  assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
+  shows "\<not> x \<in>\<^bsub>X\<^esub> (X \<setminus> (B, m),m\<^sup>c)"
+proof
+  assume in_complement: "x \<in>\<^bsub>X\<^esub> (X \<setminus> (B, m), m\<^sup>c)"
+  then obtain x' where x'_type: "x' \<in>\<^sub>c X \<setminus> (B,m)" and x'_def: "m\<^sup>c \<circ>\<^sub>c x' = x"
+    using assms cfunc_type_def complement_morphism_type factors_through_def relative_member_def2
+    by auto
+  then have "characteristic_func m \<circ>\<^sub>c m\<^sup>c = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c m\<^sup>c"
+    using assms complement_morphism_equalizer equalizer_def by blast
+  then have "characteristic_func m \<circ>\<^sub>c x = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x"
+    using assms x'_type complement_morphism_type
+    by (typecheck_cfuncs, smt x'_def assms cfunc_type_def comp_associative domain_comp)
+  then have "characteristic_func m \<circ>\<^sub>c x = \<f>"
+    using assms by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+  then show False
+    using characteristic_func_true true_false_distinct by auto
+qed
 
+lemma characteristic_func_false_complement_member:
+  assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
+  assumes characteristic_func_false: "characteristic_func m \<circ>\<^sub>c x = \<f>"
+  shows "x \<in>\<^bsub>X\<^esub> (X \<setminus> (B, m),m\<^sup>c)"
+proof -
+  have x_equalizes: "characteristic_func m \<circ>\<^sub>c x = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x"
+    by (metis assms(3) characteristic_func_false false_func_type id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
+  have "\<And>h F. h : F \<rightarrow> X \<and> characteristic_func m \<circ>\<^sub>c h = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c h \<longrightarrow>
+                  (\<exists>!k. k : F \<rightarrow> X \<setminus> (B, m) \<and> m\<^sup>c \<circ>\<^sub>c k = h)"
+    using assms complement_morphism_equalizer unfolding equalizer_def
+    by (smt cfunc_type_def characteristic_func_type) 
+  then obtain x' where x'_type: "x' \<in>\<^sub>c X \<setminus> (B, m)" and x'_def: "m\<^sup>c \<circ>\<^sub>c x' = x"
+    by (metis assms(3) cfunc_type_def comp_associative false_func_type terminal_func_type x_equalizes)
+  then show "x \<in>\<^bsub>X\<^esub> (X \<setminus> (B, m),m\<^sup>c)"
+    unfolding relative_member_def factors_through_def
+    using assms complement_morphism_mono complement_morphism_type cfunc_type_def by auto
+qed
 
+lemma in_complement_not_in_subset:
+  assumes "m : X \<rightarrow> Y" "monomorphism m" "x \<in>\<^sub>c Y"
+  assumes "x \<in>\<^bsub>Y\<^esub> (Y \<setminus> (X,m), m\<^sup>c)"
+  shows "\<not> x \<in>\<^bsub>Y\<^esub> (X, m)"
+  using assms characteristic_func_false_not_relative_member
+    characteristic_func_true_not_complement_member characteristic_func_type comp_type
+    true_false_only_truth_values by blast
 
+lemma not_in_subset_in_complement:
+  assumes "m : X \<rightarrow> Y" "monomorphism m" "x \<in>\<^sub>c Y"
+  assumes "\<not> x \<in>\<^bsub>Y\<^esub> (X, m)"
+  shows "x \<in>\<^bsub>Y\<^esub> (Y \<setminus> (X,m), m\<^sup>c)"
+  using assms characteristic_func_false_complement_member characteristic_func_true_relative_member
+    characteristic_func_type comp_type true_false_only_truth_values by blast
 
+lemma complement_disjoint:
+  assumes "m : X \<rightarrow> Y" "monomorphism m"
+  assumes "x \<in>\<^sub>c X" "x' \<in>\<^sub>c Y \<setminus> (X,m)"
+  shows "m \<circ>\<^sub>c x \<noteq> m\<^sup>c \<circ>\<^sub>c x'"
+proof 
+  assume "m \<circ>\<^sub>c x = m\<^sup>c \<circ>\<^sub>c x'"
+  then have "characteristic_func m \<circ>\<^sub>c m \<circ>\<^sub>c x = characteristic_func m \<circ>\<^sub>c m\<^sup>c \<circ>\<^sub>c x'"
+    by auto
+  then have "(characteristic_func m \<circ>\<^sub>c m) \<circ>\<^sub>c x = (characteristic_func m \<circ>\<^sub>c m\<^sup>c) \<circ>\<^sub>c x'"
+    using assms comp_associative2 by (typecheck_cfuncs, auto)
+  then have "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c x = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c m\<^sup>c) \<circ>\<^sub>c x'"
+    using assms characteristic_func_eq complement_morphism_eq by auto
+  then have "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c m\<^sup>c \<circ>\<^sub>c x'"
+    using assms comp_associative2 by (typecheck_cfuncs, smt terminal_func_comp terminal_func_type)
+  then have "\<t> \<circ>\<^sub>c id one = \<f> \<circ>\<^sub>c id one"
+    using assms by (smt cfunc_type_def comp_associative complement_morphism_type id_type one_unique_element terminal_func_comp terminal_func_type)
+  then have "\<t> = \<f>"
+    using false_func_type id_right_unit2 true_func_type by auto
+  then show False
+    using true_false_distinct by auto
+qed
 
+end
