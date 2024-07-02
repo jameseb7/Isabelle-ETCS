@@ -1319,6 +1319,7 @@ proof-
 qed
 
 
+
 lemma coprod_eq:
   assumes "a : X \<Coprod> Y \<rightarrow> Z" "b : X \<Coprod> Y \<rightarrow>  Z"
   shows "a = b \<longleftrightarrow> 

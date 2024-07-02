@@ -550,6 +550,13 @@ lemma one_x_A_iso_A:
   "one \<times>\<^sub>c X \<cong> X"
   by (meson A_x_one_iso_A isomorphic_is_transitive product_commutes)
 
+
+
+
+
+
+
+
 text \<open>The following four lemmas provide some concrete examples of above isomorphisms\<close>
 lemma left_cart_proj_one_left_inverse:
   "\<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X one = id (X \<times>\<^sub>c one)"
@@ -637,15 +644,7 @@ proof -
   qed
 qed
 
-lemma prod_with_empty_is_empty1:
-  assumes "\<not>(nonempty A)"
-  shows "\<not>(nonempty (A \<times>\<^sub>c B))"
-  by (meson assms comp_type left_cart_proj_type nonempty_def)
 
-lemma prod_with_empty_is_empty2:
-  assumes "\<not>(nonempty B)"
-  shows "\<not>(nonempty (A \<times>\<^sub>c B))"
-  using assms cart_prod_decomp nonempty_def by blast
 
 lemma cart_prod_extract_left:
   assumes "f : one \<rightarrow> X" "g : one \<rightarrow> Y"
