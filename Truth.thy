@@ -88,6 +88,7 @@ proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
     using assms(1,3) cfunc_type_def by auto
 qed
 
+
 lemma characteristic_func_false_not_relative_member:
   assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<f>"
@@ -129,6 +130,8 @@ lemma not_rel_mem_char_func_false:
   assumes "\<not> (x \<in>\<^bsub>X\<^esub> (B,m))"
   shows "characteristic_func m \<circ>\<^sub>c x = \<f>"
   by (meson assms characteristic_func_true_relative_member characteristic_func_type comp_type true_false_only_truth_values)
+
+
 
 
 

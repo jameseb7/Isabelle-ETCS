@@ -18,6 +18,10 @@ axiomatization
    f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
 
 
+lemma beta_N_succ_nEqs_Id1:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n = id one"
+  by (typecheck_cfuncs, simp add: terminal_func_comp_elem)
 
 
 lemma natural_number_object_property2:
@@ -447,6 +451,11 @@ lemma succ_inject:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c" "m \<in>\<^sub>c \<nat>\<^sub>c"
   shows "successor \<circ>\<^sub>c n = successor \<circ>\<^sub>c m \<Longrightarrow> n=m"
   by (metis Peano's_Axioms assms cfunc_type_def injective_def successor_type) 
+
+
+
+
+
 
 (* Definition 2.6.9 is in Countable.thy *)
 
