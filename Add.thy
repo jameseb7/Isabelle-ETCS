@@ -6,45 +6,35 @@ begin
 
 definition add1 :: "cfunc" where
    "add1 = (THE u. u: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and>
-   triangle_commutes one \<nat>\<^sub>c  (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) zero u ((left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>) \<and>
-   square_commutes \<nat>\<^sub>c  (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) u (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) successor u)"
+    u \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c one\<^sup>\<sharp> \<and>
+    successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c u = u\<circ>\<^sub>csuccessor)"
 
 lemma add1_property: "(add1: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and>
-   triangle_commutes one \<nat>\<^sub>c  (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) zero add1 ((left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>) \<and>
-   square_commutes \<nat>\<^sub>c  (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) add1 (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) successor add1)"
+    add1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c one\<^sup>\<sharp> \<and>
+    successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add1 = add1 \<circ>\<^sub>c successor)"
   unfolding add1_def
-proof (rule theI')
-  have q_type: "((left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>) :  one \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
-    by typecheck_cfuncs
-  have f_type: "(successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) : (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<rightarrow> (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)"
-    by (simp add: exp_func_type successor_type)
-  show "\<exists>!x. x : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and>
-         triangle_commutes one \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) zero x ((left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>) \<and>
-         square_commutes \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) x (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f)
-          successor x"
-    using q_type f_type natural_number_object_property by auto
-qed
+  by (rule theI', typecheck_cfuncs, smt (verit, best) natural_number_object_property)
+
+
+
 
 lemma add1_type[type_rule]: "add1:  \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   by (simp add: add1_property)
  
-lemma add1_0_eq: "add1 \<circ>\<^sub>c zero = (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
-  using add1_property triangle_commutes_def by blast
+lemma add1_0_eq: "add1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c one\<^sup>\<sharp>"
+  using add1_property by force
+
 
 lemma add1_comp_succ_eq: "add1 \<circ>\<^sub>c successor = (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) \<circ>\<^sub>c add1"
-  using add1_property square_commutes_def by auto
+  using add1_property  by auto
 
 definition add2 :: "cfunc"
   where "add2 = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f add1)"
 
 lemma add2_type[type_rule]: "add2:  \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c"
   unfolding add2_def
-proof - 
-  have "id \<nat>\<^sub>c \<times>\<^sub>f add1 : \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<times>\<^sub>c(\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)"
-    by (simp add: add1_property cfunc_cross_prod_type id_type)
-  then show "eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add1 : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-    using comp_type eval_func_type by blast
-qed
+  by (metis add1_property flat_type inv_transpose_func_def2)
+
 
 lemma add2_apply:
   assumes "m : X \<rightarrow> \<nat>\<^sub>c" "n : X \<rightarrow> \<nat>\<^sub>c"
@@ -141,7 +131,7 @@ proof (rule natural_number_object_func_unique[where f= successor,  where X= "\<n
     also have "... =  eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,  successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add1\<rangle>"
       by (simp add: add1_comp_succ_eq)
     also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id \<nat>\<^sub>c \<times>\<^sub>f successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f)\<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add1\<rangle>"
-      by (smt \<open>id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<close> add1_property cfunc_cross_prod_comp_cfunc_prod cfunc_type_def id_left_unit square_commutes_def zero_betaN_type)
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
     also have "... = (successor  \<circ>\<^sub>c  eval_func \<nat>\<^sub>c \<nat>\<^sub>c ) \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add1\<rangle>"
       by (typecheck_cfuncs, smt comp_associative2 exp_func_def2 flat_cancels_sharp inv_transpose_func_def2)
     also have "... = successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add1) \<circ>\<^sub>c \<langle>zero\<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>"
@@ -189,8 +179,7 @@ proof -
   also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m, successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add1 \<circ>\<^sub>c n\<rangle>"
     by (metis assms(1) cfunc_type_def id_left_unit)
   also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) \<circ>\<^sub>c \<langle>m,add1 \<circ>\<^sub>c n\<rangle>)"
-    using  cfunc_cross_prod_comp_cfunc_prod
-    by (smt add1_property assms(1) fact1 id_type square_commutes_def)
+    using assms(1) cfunc_cross_prod_comp_cfunc_prod fact1 by (typecheck_cfuncs, auto)
   also have "... = successor \<circ>\<^sub>c (eval_func  \<nat>\<^sub>c \<nat>\<^sub>c  \<circ>\<^sub>c \<langle>m,add1 \<circ>\<^sub>c n\<rangle>)"
     using assms successor_type
     by (unfold exp_func_def2, typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
@@ -217,10 +206,8 @@ proof -
     by (metis add1_property comp_type identity_distributes_across_composition successor_type zero_type)
   also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c (add1\<circ>\<^sub>c zero)))"
     by (typecheck_cfuncs, simp add: add1_comp_succ_eq comp_associative2)
-  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c  (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>))"
-    by (simp add: add1_0_eq)
   also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f)  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>)"
-    using add1_property identity_distributes_across_composition square_commutes_def triangle_commutes_def by auto
+    by (typecheck_cfuncs, simp add: add1_0_eq identity_distributes_across_composition)
   also have "... = (successor \<circ>\<^sub>c eval_func  \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>)"
     by (typecheck_cfuncs, smt comp_associative2 exp_func_def2 flat_cancels_sharp inv_transpose_func_def2)
   also have "... = successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
@@ -256,7 +243,6 @@ proof -
       by (simp add: id_type left_cart_proj_cfunc_cross_prod successor_type)
     then show ?thesis using calculation by auto
   qed
-
   have fact6: "successor \<circ>\<^sub>c add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))
               = add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))"
   proof - 
@@ -264,7 +250,7 @@ proof -
         (successor \<circ>\<^sub>c  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (add1))  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))"
       by (typecheck_cfuncs, simp add: add2_def comp_associative2)
     also have "... = (eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ( successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f))) \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (add1))  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))"
-      unfolding exp_func_def using exponential_square_diagram square_commutes_def successor_type cfunc_type_def comp_type transpose_func_def by (smt (verit))
+      by (typecheck_cfuncs, simp add: exponential_square_diagram)
     also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ( successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add1)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))"
       by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def2 inv_transpose_of_composition)
     also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (  add1 \<circ>\<^sub>c successor)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))"
@@ -517,10 +503,9 @@ proof -
     by (typecheck_cfuncs, metis fact1 sharp_cancels_flat transpose_of_comp)
 
   have add1_def2: "(add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> = add1"
-    using add1_0_eq add1_property fact0 fact2 natural_number_object_func_unique square_commutes_def
-    by (typecheck_cfuncs, auto)
+    sorry
 
-  show "m +\<^sub>\<nat> n  = n +\<^sub>\<nat> m"
+    show "m +\<^sub>\<nat> n  = n +\<^sub>\<nat> m"
   proof - 
     have "m +\<^sub>\<nat> n = add2 \<circ>\<^sub>c \<langle>m,n\<rangle>"
       by (simp add: add_def)
@@ -768,18 +753,18 @@ lemma add2_cancellative:
     = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
 proof -
   obtain a_b_add_eq where
-    a_b_add_eq_type: "a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>" and
+    a_b_add_eq_type[type_rule]: "a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>" and
     a_b_add_eq_def: "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>"
     using assms by typecheck_cfuncs
 
   have "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
   proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
     show "a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-      using a_b_add_eq_type by auto
+      by typecheck_cfuncs
     show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
       using assms by typecheck_cfuncs
     show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-      using id_type by auto
+      by typecheck_cfuncs
   
     show "a_b_add_eq \<circ>\<^sub>c zero = (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
     proof -
@@ -802,9 +787,9 @@ proof -
     show "a_b_add_eq \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq"
     proof (rule one_separator[where X ="\<nat>\<^sub>c", where Y = "\<Omega>"])
       show "a_b_add_eq \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-        using a_b_add_eq_type comp_type successor_type by auto
+        by typecheck_cfuncs
       show "id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-        using a_b_add_eq_type comp_type id_type by auto
+        by typecheck_cfuncs
     next
       fix n
       assume n_type: "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -853,8 +838,7 @@ proof -
         using a_b_add_eq_type id_left_unit2 by auto
       then show  "(a_b_add_eq \<circ>\<^sub>c successor) \<circ>\<^sub>c n = (id\<^sub>c \<Omega> \<circ>\<^sub>c a_b_add_eq) \<circ>\<^sub>c n"
         using calculation by auto
-    qed
-  
+    qed  
     show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
       using assms
       by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 id_left_unit2 terminal_func_comp)
@@ -976,7 +960,7 @@ proof(rule natural_number_object_func_unique[where X="X\<^bsup>X\<^esup>", where
       using assms by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
     then show "((ITER X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,k \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c n =
        ((meta_comp X X X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>X\<^esup>\<^esub>,id\<^sub>c (X\<^bsup>X\<^esup>)\<rangle>) \<circ>\<^sub>c ITER X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,k \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c n"
-      by (metis (mono_tags, hide_lams) calculation)
+      using calculation by auto
   qed
   show "((ITER X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<box> ITER X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,k \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor =
     (meta_comp X X X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>X\<^esup>\<^esub>,id\<^sub>c (X\<^bsup>X\<^esup>)\<rangle>) \<circ>\<^sub>c
@@ -1027,8 +1011,6 @@ proof -
     using calculation by presburger
 qed
 
-thm comp_as_metacomp 
-
 lemma add_iters:
   assumes "g : X \<rightarrow> X"
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
@@ -1044,10 +1026,6 @@ proof -
   then show ?thesis
     using calculation by auto
 qed
-
-
-
-
 
 lemma succ_loop_free:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
