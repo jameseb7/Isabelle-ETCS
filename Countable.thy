@@ -1,7 +1,6 @@
 theory Countable
-  imports ETCS_Axioms ETCS_Add ETCS_Mult ETCS_Exp ETCS_Pred ETCS_Parity ETCS_Comparison
+  imports  Parity Inequality
 begin
-
 
 
 
