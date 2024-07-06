@@ -2,7 +2,7 @@ theory Equivalence
   imports Truth
 begin
 
-section  \<open>Axiom 6: Equivalence Classes\<close>
+section  \<open>Equivalence Classes\<close>
  
 
 definition reflexive_on :: "cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" where
@@ -62,11 +62,59 @@ lemma transitive_def2:
   using assms unfolding transitive_on_def relative_member_def factors_through_def2
   by (metis cfunc_prod_type factors_through_def2 fst_conv snd_conv subobject_of_def2)
 
+text \<open>The lemma below corresponds to Exercise 2.3.3 in Halvorson.\<close>
+lemma kernel_pair_equiv_rel:
+  assumes "f : X \<rightarrow> Y"
+  shows "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+proof (unfold equiv_rel_on_def, auto)
 
-   
+  show "reflexive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+  proof (unfold reflexive_on_def, auto)
+    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
+      using assms kernel_pair_subset by auto
+  next
+    fix x
+    assume x_type: "x \<in>\<^sub>c X"
+    then show "\<langle>x,x\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+      by (smt assms comp_type diag_on_elements diagonal_type fibered_product_morphism_monomorphism
+          fibered_product_morphism_type pair_factorsthru_fibered_product_morphism relative_member_def2)
+  qed
 
+  show "symmetric_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+  proof (unfold symmetric_on_def, auto)
+    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
+      using assms kernel_pair_subset by auto
+  next 
+    fix x y
+    assume x_type: "x \<in>\<^sub>c X" and y_type: "y \<in>\<^sub>c X"
+    assume xy_in: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    then have "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+      using assms fibered_product_pair_member x_type y_type by blast
+    
+    then show "\<langle>y,x\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+      using assms fibered_product_pair_member x_type y_type by auto
+  qed
 
+  show "transitive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+  proof (unfold transitive_on_def, auto)
+    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
+      using assms kernel_pair_subset by auto
+  next 
+    fix x y z 
+    assume x_type: "x \<in>\<^sub>c X" and y_type: "y \<in>\<^sub>c X" and z_type: "z \<in>\<^sub>c X"
+    assume xy_in: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+    assume yz_in: "\<langle>y,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
 
+   have eqn1: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+     using assms fibered_product_pair_member x_type xy_in y_type by blast
+
+   have eqn2: "f \<circ>\<^sub>c y = f \<circ>\<^sub>c z"
+     using assms fibered_product_pair_member y_type yz_in z_type by blast
+
+   show "\<langle>x,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+     using assms eqn1 eqn2 fibered_product_pair_member x_type z_type by auto
+ qed
+qed
 
 axiomatization 
   quotient_set :: "cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> cset" and
@@ -85,10 +133,9 @@ where
     h : quotient_set X R \<rightarrow> Y \<Longrightarrow> h \<circ>\<^sub>c equiv_class R = f \<Longrightarrow> h = quotient_func f R"
 (*Note that quotient_func f R is just f_bar *)
 
+section  \<open>Coequalizers and Epimorphisms\<close>
 
-
-
-subsection  \<open>Coequalizers\<close>
+subsection \<open>Coequalizers\<close>
 
 definition coequalizer :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
   "coequalizer E m f g \<longleftrightarrow> (\<exists> X Y. (f : Y \<rightarrow> X) \<and> (g : Y \<rightarrow> X) \<and> (m : X \<rightarrow> E)
@@ -102,9 +149,7 @@ lemma coequalizer_def2:
       \<and> (\<forall> h F. ((h : X \<rightarrow> F) \<and> (h \<circ>\<^sub>c f = h \<circ>\<^sub>c g)) \<longrightarrow> (\<exists>! k. (k : E \<rightarrow> F) \<and> k \<circ>\<^sub>c m = h))"
   using assms unfolding coequalizer_def cfunc_type_def by auto
 
-
-
-(* Exercise 2.3.1 *)
+text \<open>The lemma below corresponds to Exercise 2.3.1 in Halvorson.\<close>
 lemma coequalizer_unique:
   assumes "coequalizer E m f g" "coequalizer F n f g"
   shows "E \<cong> F"
@@ -115,7 +160,6 @@ proof -
      by (typecheck_cfuncs, smt assms cfunc_type_def coequalizer_def)
   obtain k'' where k''_def: "k'': F \<rightarrow> F \<and> k'' \<circ>\<^sub>c n =  n"
     by (typecheck_cfuncs, smt (verit) assms(2)  cfunc_type_def coequalizer_def)
-
 
   have k''_def2: "k'' = id F"
     using assms(2) coequalizer_def id_left_unit2 k''_def by (typecheck_cfuncs, blast)
@@ -128,9 +172,7 @@ proof -
     using cfunc_type_def is_isomorphic_def isomorphism_def k'_def k'k_idE k_def kk'_idF by fastforce
 qed
 
-
-
-(* Exercise 2.3.2 *) 
+text \<open>The lemma below corresponds to Exercise 2.3.2 in Halvorson.\<close>
 lemma coequalizer_is_epimorphism:
   "coequalizer E m f g \<Longrightarrow>  epimorphism(m)"
   unfolding coequalizer_def epimorphism_def
@@ -285,67 +327,13 @@ lemma canonical_quot_map_is_epi:
   shows "epimorphism((equiv_class (R,m)))"
   by (meson assms canonical_quotient_map_is_coequalizer coequalizer_is_epimorphism)
 
-section  \<open>Unclassified\<close>
+subsection  \<open>Regular Epimorphisms\<close>
 
-(* Exercise 2.3.3 *)
-lemma kernel_pair_equiv_rel:
-  assumes "f : X \<rightarrow> Y"
-  shows "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-proof (unfold equiv_rel_on_def, auto)
-
-  show "reflexive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-  proof (unfold reflexive_on_def, auto)
-    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
-      using assms kernel_pair_subset by auto
-  next
-    fix x
-    assume x_type: "x \<in>\<^sub>c X"
-    then show "\<langle>x,x\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-      by (smt assms comp_type diag_on_elements diagonal_type fibered_product_morphism_monomorphism
-          fibered_product_morphism_type pair_factorsthru_fibered_product_morphism relative_member_def2)
-  qed
-
-  show "symmetric_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-  proof (unfold symmetric_on_def, auto)
-    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
-      using assms kernel_pair_subset by auto
-  next 
-    fix x y
-    assume x_type: "x \<in>\<^sub>c X" and y_type: "y \<in>\<^sub>c X"
-    assume xy_in: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-    then have "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
-      using assms fibered_product_pair_member x_type y_type by blast
-    
-    then show "\<langle>y,x\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-      using assms fibered_product_pair_member x_type y_type by auto
-  qed
-
-  show "transitive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-  proof (unfold transitive_on_def, auto)
-    show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
-      using assms kernel_pair_subset by auto
-  next 
-    fix x y z 
-    assume x_type: "x \<in>\<^sub>c X" and y_type: "y \<in>\<^sub>c X" and z_type: "z \<in>\<^sub>c X"
-    assume xy_in: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-    assume yz_in: "\<langle>y,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-
-   have eqn1: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
-     using assms fibered_product_pair_member x_type xy_in y_type by blast
-
-   have eqn2: "f \<circ>\<^sub>c y = f \<circ>\<^sub>c z"
-     using assms fibered_product_pair_member y_type yz_in z_type by blast
-
-   show "\<langle>x,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-     using assms eqn1 eqn2 fibered_product_pair_member x_type z_type by auto
- qed
-qed
-
-(* Definition 2.3.4 *)
+text \<open>The definition below corresponds to Definition 2.3.4 in Halvorson.\<close>
 definition regular_epimorphism :: "cfunc \<Rightarrow> bool" where
   "regular_epimorphism f = (\<exists> g h. coequalizer (codomain f) f g h)"
 
-(* Exercise 2.3.5 *)
+text \<open>The lemma below corresponds to Exercise 2.3.5 in Halvorson.\<close>
 lemma reg_epi_and_mono_is_iso:
   assumes "f : X \<rightarrow> Y" "regular_epimorphism f" "monomorphism f"
   shows "isomorphism f"
@@ -370,10 +358,7 @@ proof -
     using  assms(1) cfunc_type_def isomorphism_def j_def by fastforce  
 qed
 
-
-
-
-(* Proposition 2.3.6 *)
+text \<open>The two lemmas below correspond to Proposition 2.3.6 in Halvorson.\<close>
 lemma epimorphism_coequalizer_kernel_pair:
   assumes "f : X \<rightarrow> Y" "epimorphism f"
   shows "coequalizer Y f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
@@ -392,8 +377,6 @@ next
   assume g_type: "g : X \<rightarrow> E"
 
   assume g_eq: "g \<circ>\<^sub>c fibered_product_left_proj X f f X = g \<circ>\<^sub>c fibered_product_right_proj X f f X"
-
-  
 
   obtain F where F_def: "F = quotient_set X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
     by auto
@@ -538,11 +521,12 @@ next
     using assms epimorphism_def2 by blast
 qed
 
-(* Proposition 2.3.6b *)
 lemma epimorphisms_are_regular:
   assumes "f : X \<rightarrow> Y" "epimorphism f"
   shows "regular_epimorphism f"
   by (meson assms(2) cfunc_type_def epimorphism_coequalizer_kernel_pair regular_epimorphism_def)
+
+subsection \<open>Epi-monic Factorization\<close>
 
 lemma epi_monic_factorization:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"
@@ -629,7 +613,7 @@ lemma epi_monic_factorization2:
 
 section  \<open>Image of a Function\<close>
 
-(* Definition 2.3.7 *)
+text \<open>The definition below corresponds to Definition 2.3.7 in Halvorson.\<close>
 definition image_of :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_[_]\<^bsub>_\<^esub>" [101,0,0]100) where
   "image_of f A n = (SOME fA. \<exists>g m.
    g : A \<rightarrow> fA \<and>
@@ -664,8 +648,6 @@ definition image_restriction_mapping :: "cfunc \<Rightarrow> cset \<times> cfunc
   "image_restriction_mapping f An = (SOME g. \<exists> m. g : fst An \<rightarrow> f[fst An]\<^bsub>snd An\<^esub> \<and> m : f[fst An]\<^bsub>snd An\<^esub> \<rightarrow> codomain f \<and>
     coequalizer (f[fst An]\<^bsub>snd An\<^esub>) g (fibered_product_left_proj (fst An) (f \<circ>\<^sub>c snd An) (f \<circ>\<^sub>c snd An) (fst An)) (fibered_product_right_proj (fst An) (f \<circ>\<^sub>c snd An) (f \<circ>\<^sub>c snd An) (fst An)) \<and>
     monomorphism m \<and> f \<circ>\<^sub>c snd An = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f[fst An]\<^bsub>snd An\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c snd An = x \<circ>\<^sub>c g \<longrightarrow> x = m))"
-
-
 
 lemma image_restriction_mapping_def2:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
@@ -1045,9 +1027,7 @@ proof -
 qed
 
 
-section  \<open>Unclassified II\<close>
-
-
+section  \<open>@{term distribute_left} and @{term distribute_right} as Equivalence Relations\<close>
 
 lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
@@ -1073,9 +1053,6 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
   qed
 qed
 
-
-
-
 lemma right_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
   shows "(Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<subseteq>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c (Z \<times>\<^sub>c X)"
@@ -1100,7 +1077,6 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
   qed
 qed
 
-   
 lemma left_pair_reflexive:
   assumes "reflexive_on X (Y, m)"
   shows "reflexive_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))"
@@ -1583,25 +1559,14 @@ lemma right_pair_equiv_rel:
   using assms right_pair_reflexive right_pair_symmetric right_pair_transitive
   by (unfold equiv_rel_on_def, auto)
 
-
-
-
-
-
-
-
 section  \<open>Graphs\<close>
-
-
 
 definition functional_on :: "cset \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" where
   "functional_on X Y R = (R  \<subseteq>\<^sub>c X \<times>\<^sub>c Y \<and>
     (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (\<exists>! y.  y \<in>\<^sub>c Y \<and>  
       (\<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> R))))" 
 
-
-(*Definition 2.3.12*)
-
+text \<open>The definition below corresponds to Definition 2.3.12 in Halvorson.\<close>
 definition graph :: "cfunc \<Rightarrow> cset" where
  "graph f = (SOME E. \<exists> m. equalizer E m (f \<circ>\<^sub>c left_cart_proj (domain f) (codomain f)) (right_cart_proj (domain f) (codomain f)))"
 
@@ -1613,7 +1578,6 @@ lemma graph_equalizer2:
   assumes "f : X \<rightarrow> Y"
   shows "\<exists> m. equalizer (graph f) m (f \<circ>\<^sub>c left_cart_proj X Y) (right_cart_proj X Y)"
   using assms by (typecheck_cfuncs, metis cfunc_type_def graph_equalizer)
-
 
 definition graph_morph :: "cfunc \<Rightarrow> cfunc" where
  "graph_morph f = (SOME m. equalizer (graph f) m (f \<circ>\<^sub>c left_cart_proj (domain f) (codomain f)) (right_cart_proj (domain f) (codomain f)))"
@@ -1627,15 +1591,17 @@ lemma graph_equalizer4:
   shows "equalizer (graph f) (graph_morph f) (f \<circ>\<^sub>c left_cart_proj X Y) (right_cart_proj X Y)"
   using assms cfunc_type_def graph_equalizer3 by auto
 
-
 lemma graph_subobject:
   assumes "f : X \<rightarrow> Y"
-  shows "(graph f, graph_morph f)  \<subseteq>\<^sub>c (X\<times>\<^sub>c Y)"
+  shows "(graph f, graph_morph f) \<subseteq>\<^sub>c (X \<times>\<^sub>c Y)"
   by (metis assms cfunc_type_def equalizer_def equalizer_is_monomorphism graph_equalizer3 right_cart_proj_type subobject_of_def2)
 
+lemma graph_morph_type[type_rule]:
+  assumes "f : X \<rightarrow> Y"
+  shows "graph_morph(f) : graph f \<rightarrow> X \<times>\<^sub>c Y"
+  using graph_subobject subobject_of_def2 assms by auto
 
-
-(*Exercise 2.3.13*)
+text \<open>The lemma below corresponds to Exercise 2.3.7 in Halvorson.\<close>
 lemma graphs_are_functional:
   assumes "f : X \<rightarrow> Y"
   shows "functional_on X Y (graph f, graph_morph f)"
@@ -1691,8 +1657,7 @@ qed
 
 
 (*Proposition 2.3.14*)
-
-
+text \<open>The lemma below corresponds to Proposition 2.3.14 in Halvorson.\<close>
 lemma functional_relations_are_graphs_isomorphism_clause:
   assumes "functional_on X Y (R,m)"
   shows "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
@@ -1781,8 +1746,90 @@ proof(auto)
 qed
 
 
+lemma
+  assumes "functional_on X Y (R,m)"
+  shows "\<exists>! f. f : X \<rightarrow> Y \<and> 
+    (\<exists> i. i : R \<rightarrow> graph(f) \<and> isomorphism(i) \<and> m = graph_morph(f) \<circ>\<^sub>c i)"
+proof auto
+  have m_type[type_rule]: "m : R \<rightarrow> X \<times>\<^sub>c Y"
+    using assms unfolding functional_on_def subobject_of_def2 by auto
+  have m_mono[type_rule]: "monomorphism(m)"
+    using assms functional_on_def subobject_of_def2 by blast
+  have isomorphism[type_rule]: "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
+    using assms functional_relations_are_graphs_isomorphism_clause by force
+  
+  obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_def: "h = (left_cart_proj X Y \<circ>\<^sub>c m)\<^bold>\<inverse>"
+    by typecheck_cfuncs
+  obtain f where f_def: "f = (right_cart_proj X Y) \<circ>\<^sub>c m \<circ>\<^sub>c h"
+    by auto
+  then have f_type[type_rule]: "f : X \<rightarrow> Y"
+    by (metis assms comp_type f_def functional_on_def h_type right_cart_proj_type subobject_of_def2)
 
+  have eq: "f \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = right_cart_proj X Y \<circ>\<^sub>c m"
+    unfolding f_def h_def by (typecheck_cfuncs, smt comp_associative2 id_right_unit2 inv_left isomorphism)
 
+  show "\<exists>f. f : X \<rightarrow> Y \<and> (\<exists>i. i : R \<rightarrow> graph f \<and> isomorphism i \<and> m = graph_morph f \<circ>\<^sub>c i)"
+  proof (rule_tac x=f in exI, auto, typecheck_cfuncs)
+
+    have graph_equalizer: "equalizer (graph f) (graph_morph f) (f \<circ>\<^sub>c left_cart_proj X Y) (right_cart_proj X Y)"
+      by (simp add: f_type graph_equalizer4)
+    then have "\<forall>h F. h : F \<rightarrow> X \<times>\<^sub>c Y \<and> (f \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c h = right_cart_proj X Y \<circ>\<^sub>c h \<longrightarrow>
+          (\<exists>!k. k : F \<rightarrow> graph f \<and> graph_morph f \<circ>\<^sub>c k = h)"
+      unfolding equalizer_def using cfunc_type_def by (typecheck_cfuncs, auto)
+    then obtain i where i_type[type_rule]: "i : R \<rightarrow> graph f" and i_eq: "graph_morph f \<circ>\<^sub>c i = m"
+      by (typecheck_cfuncs, smt comp_associative2 eq left_cart_proj_type)
+    have "surjective i"
+    proof (etcs_subst surjective_def2, auto)
+      fix y'
+      assume y'_type[type_rule]: "y' \<in>\<^sub>c graph f"
+
+      define x where "x = left_cart_proj X Y \<circ>\<^sub>c graph_morph(f) \<circ>\<^sub>c y'"
+      then have x_type[type_rule]: "x \<in>\<^sub>c X"
+        unfolding x_def by typecheck_cfuncs
+
+      obtain y where y_type[type_rule]: "y \<in>\<^sub>c Y" and x_y_in_R: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (R, m)"
+        and y_unique: "\<forall> z. (z \<in>\<^sub>c Y \<and> \<langle>x,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (R, m)) \<longrightarrow> z = y"
+        by (metis assms functional_on_def x_type)
+
+      obtain x' where x'_type[type_rule]: "x' \<in>\<^sub>c R" and x'_eq: "m \<circ>\<^sub>c x' = \<langle>x, y\<rangle>"
+        using x_y_in_R unfolding relative_member_def2 by (-, etcs_subst_asm factors_through_def2, auto)
+
+      have "graph_morph(f) \<circ>\<^sub>c i \<circ>\<^sub>c x' = graph_morph(f) \<circ>\<^sub>c y'"
+      proof (typecheck_cfuncs, rule cart_prod_eqI, auto)
+        show left: "left_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c i \<circ>\<^sub>c x' = left_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
+        proof -
+          have "left_cart_proj X Y \<circ>\<^sub>c graph_morph(f) \<circ>\<^sub>c i \<circ>\<^sub>c x' = left_cart_proj X Y \<circ>\<^sub>c m \<circ>\<^sub>c x'"
+            by (typecheck_cfuncs, smt comp_associative2 i_eq)
+          also have "... = x"
+            unfolding x'_eq using left_cart_proj_cfunc_prod by (typecheck_cfuncs, blast)
+          also have "... = left_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
+            unfolding x_def by auto
+          then show ?thesis using calculation by auto
+        qed
+
+        show "right_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c i \<circ>\<^sub>c x' = right_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
+        proof -
+          have "right_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c i \<circ>\<^sub>c x' = f \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c i \<circ>\<^sub>c x'"
+            by (etcs_assocl, typecheck_cfuncs, metis graph_equalizer equalizer_eq)
+          also have "... = f \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
+            by (subst left, simp)
+          also have "... = right_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
+            by (etcs_assocl, typecheck_cfuncs, metis graph_equalizer equalizer_eq)
+          then show ?thesis using calculation by auto
+        qed
+      qed
+      then have "i \<circ>\<^sub>c x' = y'"
+        using equalizer_is_monomorphism graph_equalizer monomorphism_def2 by (typecheck_cfuncs_prems, blast)
+      then show "\<exists>x'. x' \<in>\<^sub>c R \<and> i \<circ>\<^sub>c x' = y'"
+        by (rule_tac x=x' in exI, simp add: x'_type)
+    qed
+    then have "isomorphism i"
+      by (metis comp_monic_imp_monic' epi_mon_is_iso f_type graph_morph_type i_eq i_type m_mono surjective_is_epimorphism)
+    then show "\<exists>i. i : R \<rightarrow> graph f \<and> isomorphism i \<and> m = graph_morph f \<circ>\<^sub>c i"
+      by (rule_tac x=i in exI, simp add: i_type i_eq)
+  qed
+next
+  oops
 
 lemma functional_relations_are_graphs:
   assumes "functional_on X Y (R,m)"

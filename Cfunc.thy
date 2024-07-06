@@ -666,7 +666,6 @@ lemma inv_idempotent:
   shows "(f\<^bold>\<inverse>)\<^bold>\<inverse> = f"
   by (smt assms cfunc_type_def comp_associative id_left_unit inv_iso inverse_def2)
   
-
 definition is_isomorphic :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<cong>" 50)  where
   "X \<cong> Y \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> Y \<and> isomorphism(f))"
 
