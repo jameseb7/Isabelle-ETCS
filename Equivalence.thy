@@ -1564,7 +1564,7 @@ section  \<open>Graphs\<close>
 definition functional_on :: "cset \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" where
   "functional_on X Y R = (R  \<subseteq>\<^sub>c X \<times>\<^sub>c Y \<and>
     (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (\<exists>! y.  y \<in>\<^sub>c Y \<and>  
-      (\<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> R))))" 
+      \<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> R)))" 
 
 text \<open>The definition below corresponds to Definition 2.3.12 in Halvorson.\<close>
 definition graph :: "cfunc \<Rightarrow> cset" where
@@ -1765,6 +1765,7 @@ proof auto
   then have f_type[type_rule]: "f : X \<rightarrow> Y"
     by (metis assms comp_type f_def functional_on_def h_type right_cart_proj_type subobject_of_def2)
 
+
   have eq: "f \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = right_cart_proj X Y \<circ>\<^sub>c m"
     unfolding f_def h_def by (typecheck_cfuncs, smt comp_associative2 id_right_unit2 inv_left isomorphism)
 
@@ -1829,7 +1830,30 @@ proof auto
       by (rule_tac x=i in exI, simp add: i_type i_eq)
   qed
 next
-  oops
+  fix f1 f2 i1 i2
+  assume f1_type[type_rule]: "f1 : X \<rightarrow> Y"
+  assume f2_type[type_rule]: "f2 : X \<rightarrow> Y"
+  assume i1_type[type_rule]: "i1 : R \<rightarrow> graph f1"
+  assume i2_type[type_rule]: "i2 : R \<rightarrow> graph f2"
+  assume i1_iso: "isomorphism i1"
+  assume i2_iso: "isomorphism i2"
+  assume eq1: "m = graph_morph f2 \<circ>\<^sub>c i2"
+  assume eq2: "graph_morph f1 \<circ>\<^sub>c i1 = graph_morph f2 \<circ>\<^sub>c i2" 
+
+  have m_type[type_rule]: "m : R \<rightarrow> X \<times>\<^sub>c Y"
+    using assms unfolding functional_on_def subobject_of_def2 by auto
+  have isomorphism[type_rule]: "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
+    using assms functional_relations_are_graphs_isomorphism_clause by force  
+  obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_def: "h = (left_cart_proj X Y \<circ>\<^sub>c m)\<^bold>\<inverse>"
+    by typecheck_cfuncs  
+  have "f1 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = f2 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
+    by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 eq1 eq2 equalizer_def graph_equalizer4 i1_type i2_type)
+  then show "f1 = f2"
+    by (typecheck_cfuncs, metis cfunc_type_def comp_associative h_def h_type id_right_unit2 inverse_def2 isomorphism)
+qed
+
+
+
 
 lemma functional_relations_are_graphs:
   assumes "functional_on X Y (R,m)"
