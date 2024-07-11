@@ -1847,7 +1847,22 @@ next
   obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_def: "h = (left_cart_proj X Y \<circ>\<^sub>c m)\<^bold>\<inverse>"
     by typecheck_cfuncs  
   have "f1 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = f2 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
+  proof - 
+    have "f1 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = (f1 \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c graph_morph f1 \<circ>\<^sub>c i1"
+      using comp_associative2 eq1 eq2 by (typecheck_cfuncs, force)
+    also have "... = (right_cart_proj X Y) \<circ>\<^sub>c graph_morph f1 \<circ>\<^sub>c i1"
+      by (typecheck_cfuncs, smt comp_associative2 equalizer_def graph_equalizer4)
+    also have "... = (right_cart_proj X Y) \<circ>\<^sub>c graph_morph f2 \<circ>\<^sub>c i2"
+      by (simp add: eq2)
+    also have "... = (f2 \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c graph_morph f2 \<circ>\<^sub>c i2"
+      by (typecheck_cfuncs, smt comp_associative2 equalizer_eq graph_equalizer4)
+    also have "... = f2 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
+      by (typecheck_cfuncs, metis comp_associative2 eq1)
+    then show ?thesis using calculation by auto
+  qed
+(* OLD PROOF
     by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 eq1 eq2 equalizer_def graph_equalizer4 i1_type i2_type)
+*)
   then show "f1 = f2"
     by (typecheck_cfuncs, metis cfunc_type_def comp_associative h_def h_type id_right_unit2 inverse_def2 isomorphism)
 qed
