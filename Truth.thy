@@ -954,5 +954,14 @@ proof -
 qed
 
 
+lemma set_subtraction_left_cong:
+  assumes m_type[type_rule]: "m : C \<rightarrow> A" and m_mono[type_rule]: "monomorphism m"
+  assumes i_type[type_rule]: "i : A \<rightarrow> B" and i_iso: "isomorphism i"
+  shows "A \<setminus> (C,m) \<cong> B \<setminus> (C, i \<circ>\<^sub>c m)"
+proof -
+  have im_mono[type_rule]: "monomorphism (i \<circ>\<^sub>c m)"
+    using cfunc_type_def composition_of_monic_pair_is_monic i_iso i_type iso_imp_epi_and_monic m_mono m_type by presburger
+
+  oops
 
 end
