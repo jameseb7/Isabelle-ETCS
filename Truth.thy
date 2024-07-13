@@ -916,4 +916,43 @@ proof
     using true_false_distinct by auto
 qed
 
+
+
+lemma set_subtraction_right_cong:
+  assumes m_type[type_rule]: "m : A \<rightarrow> C" and m_mono[type_rule]: "monomorphism m"
+  assumes i_type[type_rule]: "i : B \<rightarrow> A" and i_iso: "isomorphism i"
+  shows "C \<setminus> (A,m) \<cong> C \<setminus> (B, m \<circ>\<^sub>c i)"
+proof -
+  have mi_mono[type_rule]: "monomorphism (m \<circ>\<^sub>c i)"
+    using cfunc_type_def composition_of_monic_pair_is_monic i_iso i_type iso_imp_epi_and_monic m_mono m_type by presburger
+  obtain \<chi>m where \<chi>m_type[type_rule]: "\<chi>m : C \<rightarrow> \<Omega>" and \<chi>m_def: "\<chi>m = characteristic_func m"
+    using characteristic_func_type m_mono m_type by blast
+  obtain \<chi>mi where \<chi>mi_type[type_rule]: "\<chi>mi : C \<rightarrow> \<Omega>" and \<chi>mi_def: "\<chi>mi = characteristic_func (m \<circ>\<^sub>c i)"
+    by (typecheck_cfuncs)
+  have "\<And> c. c \<in>\<^sub>c C \<Longrightarrow> (\<chi>m \<circ>\<^sub>c c = \<t>) = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
+  proof -
+    fix c
+    assume c_type[type_rule]: "c \<in>\<^sub>c C"
+    have "(\<chi>m \<circ>\<^sub>c c = \<t>) = (c \<in>\<^bsub>C\<^esub> (A,m))"
+      by (typecheck_cfuncs, metis \<chi>m_def m_mono not_rel_mem_char_func_false rel_mem_char_func_true true_false_distinct)
+    also have "... = (\<exists> a. a \<in>\<^sub>c A \<and> c = m \<circ>\<^sub>c a)"
+      using cfunc_type_def factors_through_def m_mono relative_member_def2 by (typecheck_cfuncs, auto)
+    also have "... = (\<exists> b. b \<in>\<^sub>c B \<and> c = m \<circ>\<^sub>c i \<circ>\<^sub>c b)"
+      by (typecheck_cfuncs, smt (z3) cfunc_type_def comp_type epi_is_surj i_iso iso_imp_epi_and_monic surjective_def)
+    also have "... = (c \<in>\<^bsub>C\<^esub> (B,m \<circ>\<^sub>c i))"
+      using cfunc_type_def comp_associative2 composition_of_monic_pair_is_monic factors_through_def2 i_iso iso_imp_epi_and_monic m_mono relative_member_def2
+      by (typecheck_cfuncs, auto)
+    also have "... = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
+      by (typecheck_cfuncs, metis \<chi>mi_def mi_mono not_rel_mem_char_func_false rel_mem_char_func_true true_false_distinct)
+    then show "(\<chi>m \<circ>\<^sub>c c = \<t>) = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
+      using calculation by auto
+  qed
+  then have "\<chi>m = \<chi>mi"
+    by (typecheck_cfuncs, smt (verit, best) comp_type one_separator true_false_only_truth_values) 
+  then show "C \<setminus> (A,m) \<cong> C \<setminus> (B, m \<circ>\<^sub>c i)"
+    using \<chi>m_def \<chi>mi_def isomorphic_is_reflexive set_subtraction_def by auto
+qed
+
+
+
 end
