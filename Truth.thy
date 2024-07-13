@@ -918,10 +918,10 @@ qed
 
 
 
-lemma set_subtraction_right_cong:
+lemma set_subtraction_right_iso:
   assumes m_type[type_rule]: "m : A \<rightarrow> C" and m_mono[type_rule]: "monomorphism m"
   assumes i_type[type_rule]: "i : B \<rightarrow> A" and i_iso: "isomorphism i"
-  shows "C \<setminus> (A,m) \<cong> C \<setminus> (B, m \<circ>\<^sub>c i)"
+  shows "C \<setminus> (A,m) = C \<setminus> (B, m \<circ>\<^sub>c i)"
 proof -
   have mi_mono[type_rule]: "monomorphism (m \<circ>\<^sub>c i)"
     using cfunc_type_def composition_of_monic_pair_is_monic i_iso i_type iso_imp_epi_and_monic m_mono m_type by presburger
@@ -949,19 +949,82 @@ proof -
   qed
   then have "\<chi>m = \<chi>mi"
     by (typecheck_cfuncs, smt (verit, best) comp_type one_separator true_false_only_truth_values) 
-  then show "C \<setminus> (A,m) \<cong> C \<setminus> (B, m \<circ>\<^sub>c i)"
+  then show "C \<setminus> (A,m) = C \<setminus> (B, m \<circ>\<^sub>c i)"
     using \<chi>m_def \<chi>mi_def isomorphic_is_reflexive set_subtraction_def by auto
 qed
 
 
-lemma set_subtraction_left_cong:
+lemma set_subtraction_left_iso:
   assumes m_type[type_rule]: "m : C \<rightarrow> A" and m_mono[type_rule]: "monomorphism m"
   assumes i_type[type_rule]: "i : A \<rightarrow> B" and i_iso: "isomorphism i"
   shows "A \<setminus> (C,m) \<cong> B \<setminus> (C, i \<circ>\<^sub>c m)"
 proof -
   have im_mono[type_rule]: "monomorphism (i \<circ>\<^sub>c m)"
     using cfunc_type_def composition_of_monic_pair_is_monic i_iso i_type iso_imp_epi_and_monic m_mono m_type by presburger
+  obtain \<chi>m where \<chi>m_type[type_rule]: "\<chi>m : A \<rightarrow> \<Omega>" and \<chi>m_def: "\<chi>m = characteristic_func m"
+    using characteristic_func_type m_mono m_type by blast
+  obtain \<chi>im where \<chi>im_type[type_rule]: "\<chi>im : B \<rightarrow> \<Omega>" and \<chi>im_def: "\<chi>im = characteristic_func (i \<circ>\<^sub>c m)"
+    by (typecheck_cfuncs)
+  have \<chi>im_pullback: "is_pullback C one B \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> (i \<circ>\<^sub>c m) \<chi>im"
+    using \<chi>im_def characteristic_func_is_pullback comp_type i_type im_mono m_type by blast
+  have "is_pullback C one A \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> m (\<chi>im \<circ>\<^sub>c i)"
+  proof (unfold is_pullback_def, typecheck_cfuncs, auto)
+    show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub> = (\<chi>im \<circ>\<^sub>c i) \<circ>\<^sub>c m"
+      by (typecheck_cfuncs, etcs_assocr, metis \<chi>im_def characteristic_func_eq comp_type im_mono)
+  next
+    fix Z k h
+    assume k_type[type_rule]: "k : Z \<rightarrow> one" and h_type[type_rule]: "h : Z \<rightarrow> A"
+    assume eq: "\<t> \<circ>\<^sub>c k = (\<chi>im \<circ>\<^sub>c i) \<circ>\<^sub>c h"
+    then obtain j where j_type[type_rule]: "j : Z \<rightarrow> C" and j_def: "i \<circ>\<^sub>c h = (i \<circ>\<^sub>c m) \<circ>\<^sub>c j"
+      using \<chi>im_pullback unfolding is_pullback_def by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 k_type)
+    then show "\<exists>j. j : Z \<rightarrow> C \<and> \<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c j = k \<and> m \<circ>\<^sub>c j = h"
+      by (rule_tac x="j" in exI, typecheck_cfuncs, smt comp_associative2 i_iso iso_imp_epi_and_monic monomorphism_def2 terminal_func_unique)
+  next
+    fix Z j y
+    assume j_type[type_rule]: "j : Z \<rightarrow> C" and y_type[type_rule]: "y : Z \<rightarrow> C"
+    assume "\<t> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c j = (\<chi>im \<circ>\<^sub>c i) \<circ>\<^sub>c m \<circ>\<^sub>c j" "\<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c y = \<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c j" "m \<circ>\<^sub>c y = m \<circ>\<^sub>c j"
+    then show "j = y"
+      using m_mono monomorphism_def2 by (typecheck_cfuncs_prems, blast)
+  qed
+  then have \<chi>im_i_eq_\<chi>m: "\<chi>im \<circ>\<^sub>c i = \<chi>m"
+    using \<chi>m_def characteristic_func_is_pullback characteristic_function_exists m_mono m_type by blast
+  then have "\<chi>im \<circ>\<^sub>c (i \<circ>\<^sub>c m\<^sup>c) = \<f> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub> \<circ>\<^sub>c (i \<circ>\<^sub>c m\<^sup>c)"
+    by (etcs_assocl, typecheck_cfuncs, smt (verit, best) \<chi>m_def comp_associative2 complement_morphism_eq m_mono terminal_func_comp)
+  then obtain i' where i'_type[type_rule]: "i' : A \<setminus> (C, m) \<rightarrow> B \<setminus> (C, i \<circ>\<^sub>c m)" and i'_def: "i \<circ>\<^sub>c m\<^sup>c = (i \<circ>\<^sub>c m)\<^sup>c \<circ>\<^sub>c i'"
+    using complement_morphism_equalizer[where m="i \<circ>\<^sub>c m", where X=C, where Y=B] unfolding equalizer_def
+    by (-, typecheck_cfuncs, smt \<chi>im_def cfunc_type_def comp_associative2 im_mono)
 
-  oops
+  have "\<chi>m \<circ>\<^sub>c (i\<^bold>\<inverse> \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c) = \<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub> \<circ>\<^sub>c (i\<^bold>\<inverse> \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c)"
+  proof -
+    have "\<chi>m \<circ>\<^sub>c (i\<^bold>\<inverse> \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c) = \<chi>im \<circ>\<^sub>c (i \<circ>\<^sub>c i\<^bold>\<inverse>) \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c"
+      by (typecheck_cfuncs, simp add: \<chi>im_i_eq_\<chi>m cfunc_type_def comp_associative i_iso)
+    also have "... = \<chi>im \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c"
+      using i_iso id_left_unit2 inv_right by (typecheck_cfuncs, auto)
+    also have "... = \<f> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub> \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c"
+      by (typecheck_cfuncs, simp add: \<chi>im_def comp_associative2 complement_morphism_eq im_mono)
+    also have "... = \<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub> \<circ>\<^sub>c (i\<^bold>\<inverse> \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c)"
+      by (typecheck_cfuncs, metis i_iso terminal_func_unique)
+    then show ?thesis using calculation by auto
+  qed
+  then obtain i'_inv where i'_inv_type[type_rule]: "i'_inv : B \<setminus> (C, i \<circ>\<^sub>c m) \<rightarrow> A \<setminus> (C, m)"
+    and i'_inv_def: "(i \<circ>\<^sub>c m)\<^sup>c = (i \<circ>\<^sub>c m\<^sup>c) \<circ>\<^sub>c i'_inv"
+    using complement_morphism_equalizer[where m="m", where X=C, where Y=A] unfolding equalizer_def
+    by (-, typecheck_cfuncs, smt (z3) \<chi>m_def cfunc_type_def comp_associative2 i_iso id_left_unit2 inv_right m_mono)
 
+  have "isomorphism i'"
+  proof (etcs_subst isomorphism_def3, rule_tac x="i'_inv" in exI, typecheck_cfuncs, auto)
+    have "i \<circ>\<^sub>c m\<^sup>c = (i \<circ>\<^sub>c m\<^sup>c) \<circ>\<^sub>c i'_inv \<circ>\<^sub>c i'"
+      using i'_inv_def by (etcs_subst i'_def, etcs_assocl, auto)
+    then show "i'_inv \<circ>\<^sub>c i' = id\<^sub>c (A \<setminus> (C, m))"
+      by (typecheck_cfuncs_prems, smt (verit, best) cfunc_type_def complement_morphism_mono composition_of_monic_pair_is_monic i_iso id_right_unit2 id_type iso_imp_epi_and_monic m_mono monomorphism_def3)
+  next
+    have "(i \<circ>\<^sub>c m)\<^sup>c = (i \<circ>\<^sub>c m)\<^sup>c \<circ>\<^sub>c i' \<circ>\<^sub>c i'_inv"
+      using i'_def by (etcs_subst i'_inv_def, etcs_assocl, auto)
+    then show "i' \<circ>\<^sub>c i'_inv = id\<^sub>c (B \<setminus> (C, i \<circ>\<^sub>c m))"
+      by (typecheck_cfuncs_prems, metis complement_morphism_mono id_right_unit2 id_type im_mono monomorphism_def3)
+  qed
+  then show "A \<setminus> (C, m) \<cong> B \<setminus> (C, i \<circ>\<^sub>c m)"
+    using i'_type is_isomorphic_def by blast
+qed
+    
 end
