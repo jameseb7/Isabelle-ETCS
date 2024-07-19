@@ -23,14 +23,9 @@ lemma sections_define_splits:
   shows "(f : X \<rightarrow> Y) \<and> split_epimorphism(f)"
   using assms cfunc_type_def section_of_def split_epimorphism_def by auto
 
-
-
-
-
 axiomatization
   where
-  axiom_of_choice :"epimorphism(f) \<longrightarrow> (\<exists> g . g sectionof f)"
-
+  axiom_of_choice: "epimorphism(f) \<longrightarrow> (\<exists> g . g sectionof f)"
 
 lemma epis_give_monos:  
   assumes f_type: "f : X \<rightarrow> Y"
@@ -44,9 +39,6 @@ corollary epis_are_split:
   assumes f_epi: "epimorphism(f)"
   shows "split_epimorphism f"
   using epis_give_monos cfunc_type_def  f_epi split_epimorphism_def by blast
-  
-
-
 
 (* Proposition 2.6.8 *)
 lemma monos_give_epis:
@@ -127,10 +119,6 @@ proof -
   qed
 qed
 
-
-  
-
-
 (*Exercise 2.7.2(i)*)
 lemma split_epis_are_regular: 
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"
@@ -147,20 +135,18 @@ proof -
     using assms coequalizer_is_epimorphism epimorphisms_are_regular by blast
 qed
 
-
 (*Exercise 2.7.2(ii)*)
 lemma sections_are_regular_monos: 
   assumes s_type:  "s : Y \<rightarrow> X"
   assumes "s sectionof f"
   shows "regular_monomorphism s"
 proof -   
- have "coequalizer Y f (s  \<circ>\<^sub>c f) (id(X))"
-      unfolding coequalizer_def 
-      by (rule_tac x="X" in exI, rule_tac x="X" in exI, typecheck_cfuncs,
-          smt (z3) assms cfunc_type_def comp_associative2 comp_type id_left_unit id_right_unit2 section_of_def)
- then show ?thesis
+  have "coequalizer Y f (s  \<circ>\<^sub>c f) (id(X))"
+    unfolding coequalizer_def 
+    by (rule_tac x="X" in exI, rule_tac x="X" in exI, typecheck_cfuncs,
+        smt (z3) assms cfunc_type_def comp_associative2 comp_type id_left_unit id_right_unit2 section_of_def)
+  then show ?thesis
     by (metis assms(2) cfunc_type_def comp_monic_imp_monic' id_isomorphism iso_imp_epi_and_monic mono_is_regmono section_of_def)
 qed
-
 
 end

@@ -154,15 +154,11 @@ lemma prod_iso_to_empty_left:
   assumes "X \<times>\<^sub>c Y \<cong> \<emptyset>"
   shows "is_empty X"
   by (meson is_empty_def nonempty_def prod_iso_to_empty_right assms)
-  
-
-
-
 
 lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>c X"
   by (metis UNIV_I cfunc_type_def emptyset_is_empty initial_func_type injective_def injective_imp_monomorphism subobject_of_def2)
 
-(* Proposition 2.2.1 *)
+text \<open>The lemma below corresponds to Proposition 2.2.1 in Halvorson\<close>
 lemma "card ({(X,m). (X,m) \<subseteq>\<^sub>c one}//{((X1,m1),(X2,m2)). X1 \<cong> X2}) = 2"
 proof -
   have one_subobject: "(one, id one) \<subseteq>\<^sub>c one"

@@ -45,7 +45,7 @@ lemma id_coprod:
   "id(A \<Coprod> B) = (left_coproj A B) \<amalg> (right_coproj A B)"
     by (typecheck_cfuncs, simp add: cfunc_coprod_unique id_left_unit2)
 
-(* Proposition 2.4.1 *)
+text \<open>The lemma below corresponds to Proposition 2.4.1 in Halvorson.\<close>
 lemma coproducts_disjoint:
   " x\<in>\<^sub>c X \<Longrightarrow>  y \<in>\<^sub>c Y \<Longrightarrow>  (left_coproj X Y) \<circ>\<^sub>c x \<noteq> (right_coproj X Y) \<circ>\<^sub>c y"
 proof (rule ccontr, auto)
@@ -73,7 +73,7 @@ proof (rule ccontr, auto)
     using calculation true_false_distinct by auto
 qed
 
-(*Proposition 2.4.2*)
+text \<open>The lemma below corresponds to Proposition 2.4.2 in Halvorson.\<close>
 lemma left_coproj_are_monomorphisms:
   "monomorphism(left_coproj X Y)"
 proof (cases "\<exists>x. x \<in>\<^sub>c X")
@@ -106,7 +106,7 @@ next
     by (typecheck_cfuncs, metis cfunc_type_def injective_def injective_imp_monomorphism singletonI)
 qed
 
-(*Proposition 2.4.3*)
+text \<open>The lemma below corresponds to Exercise 2.4.3 in Halvorson.\<close>
 lemma coprojs_jointly_surj:
   assumes "z \<in>\<^sub>c X \<Coprod> Y"
   shows "(\<exists> x. (x \<in>\<^sub>c X \<and> z = (left_coproj X Y) \<circ>\<^sub>c x))
@@ -259,7 +259,7 @@ proof (rule_tac x="a \<circ>\<^sub>c left_coproj X Y" in exI, rule_tac x="a \<ci
     by (meson assms comp_type right_proj_type)
 qed
 
-(*Proposition 2.4.4*)
+text \<open>The lemma below corresponds to Proposition 2.4.4 in Halvorson\<close>
 lemma truth_value_set_iso_1u1:
   "isomorphism(\<t>\<amalg>\<f>)"
   by (typecheck_cfuncs, smt (verit, best) CollectI epi_mon_is_iso injective_def2
@@ -964,7 +964,7 @@ next
  qed
 qed
 
-subsection  \<open>Case Bool\<close>
+subsection \<open>Case Bool\<close>
 
 definition case_bool :: "cfunc" where
   "case_bool = (THE f. f : \<Omega> \<rightarrow> (one \<Coprod> one) \<and>  
@@ -1058,8 +1058,9 @@ proof -
     by (simp add: calculation)
 qed
 
-subsection  \<open>Distribute Product Over Coproduct Auxillary Mapping\<close>
+subsection \<open>Distribution of Products over Coproducts\<close>
 
+subsubsection \<open>Distribute Product Over Coproduct Auxillary Mapping\<close>
 
 definition dist_prod_coprod :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "dist_prod_coprod A B C = (id(A) \<times>\<^sub>f (left_coproj B C)) \<amalg> (id(A) \<times>\<^sub>f (right_coproj B C))"
@@ -1348,7 +1349,12 @@ lemma dist_prod_coprod_iso:
   "isomorphism(dist_prod_coprod A B C)"
   by (simp add: dist_prod_coprod_epi dist_prod_coprod_mono epi_mon_is_iso)
 
-subsection  \<open>Inverse Distribute Product Over Coproduct Auxillary Mapping\<close>
+(* Proposition 2.5.10 *)
+lemma prod_distribute_coprod:
+  "A \<times>\<^sub>c (X \<Coprod> Y) \<cong> (A \<times>\<^sub>c X) \<Coprod> (A \<times>\<^sub>c Y)"
+  using dist_prod_coprod_iso dist_prod_coprod_type is_isomorphic_def isomorphic_is_symmetric by blast
+
+subsubsection  \<open>Inverse Distribute Product Over Coproduct Auxillary Mapping\<close>
 
 definition dist_prod_coprod_inv :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "dist_prod_coprod_inv A B C = (THE f. f : A \<times>\<^sub>c (B \<Coprod> C) \<rightarrow> (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C)
@@ -1415,7 +1421,7 @@ lemma dist_prod_coprod_inv_right_ap:
   shows "dist_prod_coprod_inv A B C \<circ>\<^sub>c \<langle>a,right_coproj B C \<circ>\<^sub>c c\<rangle> = right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a,c\<rangle>"
   using assms by (typecheck_cfuncs, smt comp_associative2 dist_prod_coprod_inv_def2 dist_prod_coprod_right_ap dist_prod_coprod_type id_left_unit2)
 
-subsection  \<open>Distribute Product Over Coproduct Auxillary Mapping 2\<close>
+subsubsection  \<open>Distribute Product Over Coproduct Auxillary Mapping 2\<close>
 definition dist_prod_coprod2 :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "dist_prod_coprod2 A B C = swap C (A \<Coprod> B) \<circ>\<^sub>c dist_prod_coprod C A B \<circ>\<^sub>c (swap A C \<bowtie>\<^sub>f swap B C)"
 
@@ -1469,7 +1475,7 @@ proof -
     using calculation by auto
 qed
 
-subsection  \<open>Inverse Distribute Product Over Coproduct Auxillary Mapping 2\<close>
+subsubsection  \<open>Inverse Distribute Product Over Coproduct Auxillary Mapping 2\<close>
 
 definition dist_prod_coprod_inv2 :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "dist_prod_coprod_inv2 A B C = (swap C A \<bowtie>\<^sub>f swap C B) \<circ>\<^sub>c dist_prod_coprod_inv C A B \<circ>\<^sub>c swap (A \<Coprod> B) C"
@@ -1551,8 +1557,11 @@ lemma dist_prod_coprod2_iso:
   "isomorphism(dist_prod_coprod2 A B C)"
   by (metis cfunc_type_def dist_prod_coprod2_inv2_id dist_prod_coprod2_type dist_prod_coprod_inv2_inv_id dist_prod_coprod_inv2_type isomorphism_def)
 
-subsection  \<open>Into Super or Proposition 2.4.5\<close>
-(*This entire section IS Proposition 2.4.5*)
+subsection \<open>Casting between sets\<close>
+
+subsubsection  \<open>Going from a set or its complement to the superset\<close>
+
+text \<open>This subsection corresponds to Proposition 2.4.5 in Halvorson.\<close>
 definition into_super :: "cfunc \<Rightarrow> cfunc" where
   "into_super m = m \<amalg> m\<^sup>c"
 
@@ -1690,7 +1699,7 @@ lemma into_super_iso:
   shows "isomorphism (into_super m)"
   using assms epi_mon_is_iso into_super_epi into_super_mono by auto
 
-subsection  \<open>Try Cast\<close>
+subsubsection \<open>Going from a set to a subset or its complement\<close>
 
 definition try_cast :: "cfunc \<Rightarrow> cfunc" where
   "try_cast m = (THE m'. m' : (codomain m) \<rightarrow> (domain m) \<Coprod> ((codomain m) \<setminus> ((domain m),m))
@@ -1867,8 +1876,7 @@ proof -
     by (metis cfunc_type_def fact5 fact6 g_type is_isomorphic_def isomorphism_def k_type)
 qed
 
-
-(* Proposition 2.5.10 *)
+text \<open>The lemma below corresponds to Proposition 2.5.10\<close>
 lemma product_distribute_over_coproduct_left:
   "A \<times>\<^sub>c (X \<Coprod> Y) \<cong> (A \<times>\<^sub>c X) \<Coprod> (A \<times>\<^sub>c Y)"
   using dist_prod_coprod_type dist_prod_coprod_iso is_isomorphic_def isomorphic_is_symmetric by blast

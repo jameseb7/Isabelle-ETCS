@@ -3,7 +3,13 @@ theory Countable
 begin
 
 
-
+(* Definition 2.6.12 *)
+definition fixed_point :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
+  "fixed_point a g \<longleftrightarrow> (\<exists> A. g : A \<rightarrow> A \<and> a \<in>\<^sub>c A \<and> g \<circ>\<^sub>c a = g)"
+definition has_fixed_point :: "cfunc \<Rightarrow> bool" where
+  "has_fixed_point g \<longleftrightarrow> (\<exists> a. fixed_point a g)"
+definition fixed_point_property :: "cset \<Rightarrow> bool" where
+  "fixed_point_property A \<longleftrightarrow> (\<forall> g. g : A \<rightarrow> A \<longrightarrow> has_fixed_point g)"
 
 (* Definition 2.6.9 *)
 definition epi_countable :: "cset \<Rightarrow> bool" where

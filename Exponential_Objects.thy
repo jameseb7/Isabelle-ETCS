@@ -3,6 +3,8 @@ theory Exponential_Objects
 begin
 
 
+section \<open>Exponential Objects, Transposes and Evaluation\<close>
+
 axiomatization
   exp_set :: "cset \<Rightarrow> cset \<Rightarrow> cset" ("_\<^bsup>_\<^esup>" [100,100]100) and
   eval_func  :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" and
@@ -14,10 +16,6 @@ where
   transpose_func_def: "f : A \<times>\<^sub>c Z \<rightarrow> X \<Longrightarrow> (eval_func X A) \<circ>\<^sub>c (id A \<times>\<^sub>f f\<^sup>\<sharp>) = f" and
   transpose_func_unique: 
     "f : A\<times>\<^sub>cZ \<rightarrow> X \<Longrightarrow> g: Z \<rightarrow> X\<^bsup>A\<^esup> \<Longrightarrow> (eval_func X A) \<circ>\<^sub>c (id A \<times>\<^sub>f g) = f \<Longrightarrow> g = f\<^sup>\<sharp>"
-
-
-section \<open>Sharp, Flat, Evaluation, and Exponentiation Operators\<close>
-
 
 lemma eval_func_surj:
   assumes "nonempty(A)"
@@ -47,9 +45,18 @@ proof(auto)
     using calculation needed_type by (typecheck_cfuncs, auto)
 qed
 
+(* Note above Definition 2.5.1 *)
+lemma exponential_object_identity:
+  "(eval_func X A)\<^sup>\<sharp> = id\<^sub>c(X\<^bsup>A\<^esup>)"
+  by (metis cfunc_type_def eval_func_type id_cross_prod id_right_unit id_type transpose_func_unique)
 
+lemma eval_func_X_empty_injective:
+  assumes "is_empty Y"
+  shows "injective (eval_func X Y)"
+  unfolding injective_def
+  by (typecheck_cfuncs,metis assms cfunc_type_def comp_type left_cart_proj_type is_empty_def)
 
-
+subsection \<open>Lifting Functions\<close>
 
 (* Definition 2.5.1 *)
 definition exp_func :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc" ("(_)\<^bsup>_\<^esup>\<^sub>f" [100,100]100) where
@@ -64,11 +71,6 @@ lemma exp_func_type[type_rule]:
   assumes "g : X \<rightarrow> Y"
   shows "g\<^bsup>A\<^esup>\<^sub>f : X\<^bsup>A\<^esup> \<rightarrow> Y\<^bsup>A\<^esup>"
   using assms by (unfold exp_func_def2, typecheck_cfuncs)
-
-(* Note above Definition 2.5.1 *)
-lemma exponential_object_identity:
-  "(eval_func X A)\<^sup>\<sharp> = id\<^sub>c(X\<^bsup>A\<^esup>)"
-  by (metis cfunc_type_def eval_func_type id_cross_prod id_right_unit id_type transpose_func_unique)
 
 lemma exp_of_id_is_id_of_exp:
   "id(X\<^bsup>A\<^esup>) = (id(X))\<^bsup>A\<^esup>\<^sub>f"
@@ -104,6 +106,10 @@ proof auto
     using assms by (typecheck_cfuncs, metis right_eq transpose_func_unique)
 qed
 
+lemma exponential_object_identity2: 
+  "id(X)\<^bsup>A\<^esup>\<^sub>f = id\<^sub>c(X\<^bsup>A\<^esup>)"
+  by (metis eval_func_type exp_func_def exponential_object_identity id_domain id_left_unit2)
+
 (*Comments below Proposition 2.5.2 and above Definition 2.5.3*)
 lemma eval_of_id_cross_id_sharp1:
   "(eval_func (A \<times>\<^sub>c X) A) \<circ>\<^sub>c (id(A) \<times>\<^sub>f (id(A \<times>\<^sub>c X))\<^sup>\<sharp>)  = id(A \<times>\<^sub>c X)"
@@ -113,6 +119,14 @@ lemma eval_of_id_cross_id_sharp2:
   shows "((eval_func (A \<times>\<^sub>c X) A) \<circ>\<^sub>c (id(A) \<times>\<^sub>f (id(A \<times>\<^sub>c X))\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>a,x\<rangle> = \<langle>a,x\<rangle>"
   by (smt assms cfunc_cross_prod_comp_cfunc_prod eval_of_id_cross_id_sharp1 id_cross_prod id_left_unit2 id_type)
 
+lemma transpose_factors: 
+  assumes "f: X \<rightarrow> Y"
+  assumes "g: Y \<rightarrow> Z"
+  shows "(g \<circ>\<^sub>c f)\<^bsup>A\<^esup>\<^sub>f = (g\<^bsup>A\<^esup>\<^sub>f) \<circ>\<^sub>c (f\<^bsup>A\<^esup>\<^sub>f)"
+  using assms by (typecheck_cfuncs, smt comp_associative2 comp_type eval_func_type exp_func_def2 transpose_of_comp)
+
+
+subsection "Inverse Transpose Function (flat)"
 
 (* Definition 2.5.3 *)
 definition inv_transpose_func :: "cfunc \<Rightarrow> cfunc" ("_\<^sup>\<flat>" [100]100) where
@@ -204,8 +218,6 @@ proof -
     using f_type uniqueness by auto
 qed
 
-
-
 lemma same_evals_equal:
   assumes "f : Z \<rightarrow> X\<^bsup>A\<^esup>" "g: Z \<rightarrow> X\<^bsup>A\<^esup>"
   shows "eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f f) = eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f g) \<Longrightarrow> f = g"
@@ -231,26 +243,6 @@ proof (rule same_evals_equal[where Z=W, where X=X, where A=A])
     using calculation by auto
 qed
 
-
-
-
-lemma exponential_object_identity2: 
-  "id(X)\<^bsup>A\<^esup>\<^sub>f = id\<^sub>c(X\<^bsup>A\<^esup>)"
-  by (metis eval_func_type exp_func_def exponential_object_identity id_domain id_left_unit2)
-
-lemma transpose_factors: 
-  assumes "f: X \<rightarrow> Y"
-  assumes "g: Y \<rightarrow> Z"
-  shows "(g \<circ>\<^sub>c f)\<^bsup>A\<^esup>\<^sub>f = (g\<^bsup>A\<^esup>\<^sub>f) \<circ>\<^sub>c (f\<^bsup>A\<^esup>\<^sub>f)"
-  using assms by (typecheck_cfuncs, smt comp_associative2 comp_type eval_func_type exp_func_def2 transpose_of_comp)
-
-
-lemma eval_func_X_empty_injective:
-  assumes "is_empty Y"
-  shows "injective (eval_func X Y)"
-  unfolding injective_def
-  by (typecheck_cfuncs,metis assms cfunc_type_def comp_type left_cart_proj_type is_empty_def)
-  
 lemma flat_pres_epi:
   assumes "nonempty(A)"
   assumes "f : Z \<rightarrow> X\<^bsup>A\<^esup>"
@@ -268,13 +260,6 @@ proof -
   then show ?thesis
     by (simp add: composition_of_epi_pair_is_epi equals eval_epi idA_f_epi)
 qed
-
-
-
-
-
-
-
 
 
 lemma transpose_inj_is_inj:
@@ -303,16 +288,6 @@ proof(auto)
     by (meson same_evals_equal x_type' y_type')
 qed
 
-
-
-
-
-
-
-
-
-
-
 lemma eval_func_X_one_injective:
   "injective (eval_func X one)"
 proof (cases "\<exists> x. x \<in>\<^sub>c X")
@@ -339,34 +314,25 @@ proof (cases "\<exists> x. x \<in>\<^sub>c X")
     obtain B where b_def: "B \<in>\<^sub>c (X\<^bsup>one\<^esup>) \<and> b = \<langle>id(one), B\<rangle>"
       by (typecheck_cfuncs, metis b_type cart_prod_decomp eval_dom terminal_func_unique)
 
-    
-
-    have A_doppelganger: "A = (A\<^sup>\<flat>)\<^sup>\<sharp>"
-      using a_def sharp_cancels_flat by auto
-
-    have B_doppelganger: "B = (B\<^sup>\<flat>)\<^sup>\<sharp>"
-      using b_def sharp_cancels_flat by auto
     have "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
     proof - 
       have "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = (eval_func X one) \<circ>\<^sub>c (id (one) \<times>\<^sub>f (A\<^sup>\<flat>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
-            using A_doppelganger a_def comp_associative2 inv_transpose_func_def2 by (typecheck_cfuncs, fastforce)
+        by (typecheck_cfuncs, smt (verit, best) a_def comp_associative2 inv_transpose_func_def2 sharp_cancels_flat)
       also have "... = eval_func X one \<circ>\<^sub>c a"
-            using A_doppelganger a_def cfunc_cross_prod_comp_cfunc_prod id_right_unit2 by (typecheck_cfuncs, auto)
+        using a_def cfunc_cross_prod_comp_cfunc_prod id_right_unit2 sharp_cancels_flat by (typecheck_cfuncs, force)
       also have "... = eval_func X one \<circ>\<^sub>c b"
         by (simp add: evals_equal)
       also have "... = (eval_func X one) \<circ>\<^sub>c (id (one) \<times>\<^sub>f (B\<^sup>\<flat>)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
-            using B_doppelganger b_def cfunc_cross_prod_comp_cfunc_prod id_right_unit2 by (typecheck_cfuncs, auto)
+        using b_def cfunc_cross_prod_comp_cfunc_prod id_right_unit2 sharp_cancels_flat by (typecheck_cfuncs, auto)
       also have "... = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
-            using B_doppelganger b_def comp_associative2 inv_transpose_func_def2 by (typecheck_cfuncs, fastforce)
+        by (typecheck_cfuncs, smt (verit) b_def comp_associative2 inv_transpose_func_def2 sharp_cancels_flat)
       then show "A\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle> = B\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(one), id(one)\<rangle>"
         using calculation by auto
     qed
     then have "A\<^sup>\<flat> = B\<^sup>\<flat>"
       by (typecheck_cfuncs, smt swap_def a_def b_def cfunc_prod_comp comp_associative2 diagonal_def diagonal_type id_right_unit2 id_type left_cart_proj_type right_cart_proj_type swap_idempotent swap_type terminal_func_comp terminal_func_unique)
-
     then have "A = B"
-      using A_doppelganger B_doppelganger by auto
-
+      by (metis a_def b_def sharp_cancels_flat)
     then show "a = b"
       by (simp add: a_def b_def)
   qed
@@ -376,8 +342,8 @@ next
     by (typecheck_cfuncs, metis  cfunc_type_def comp_type injective_def)
 qed
 
-
-
+text \<open>In the lemma below, the nonempty assumption is required.
+      Consider, for example, @{term "X = \<Omega>"} and @{term "A = \<emptyset>"}\<close>
 lemma sharp_pres_mono:
   assumes "f : A \<times>\<^sub>c Z \<rightarrow> X"
   assumes "monomorphism(f)"
@@ -441,18 +407,10 @@ proof(auto)
     using epic epimorphism_def2 g_type2 h_type2 right_cart_proj_type by blast
 qed
 
-
-(*non empty is required, consider when X = Omega and A = empty set*)
-
-
-
-
-section \<open>Metafunctions and the Cnufatems\<close>
+section \<open>Metafunctions and their Inverses (Cnufatems)\<close>
 
 subsection \<open>Metafunctions\<close>
 
-
-(*Meta-function Definition *)
 definition metafunc :: "cfunc \<Rightarrow> cfunc" where
   "metafunc f \<equiv> (f \<circ>\<^sub>c (left_cart_proj (domain f) one))\<^sup>\<sharp>"
 
@@ -460,9 +418,6 @@ lemma metafunc_def2:
   assumes "f : X \<rightarrow> Y"
   shows "metafunc f = (f \<circ>\<^sub>c (left_cart_proj X one))\<^sup>\<sharp>"
   using assms unfolding metafunc_def cfunc_type_def by auto
-
-
-
 
 lemma metafunc_type[type_rule]:
   assumes "f : X \<rightarrow> Y"
@@ -486,13 +441,10 @@ proof -
     by (simp add: calculation)
 qed
 
-subsection \<open>Cnufatems\<close>
-
-(*Noitcnuf-atem Definition*)
+subsection \<open>Inverse Metafunctions (Cnufatems)\<close>
 
 definition cnufatem :: "cfunc \<Rightarrow> cfunc" where
   "cnufatem f = (THE g. \<forall> Y X. f : one \<rightarrow> Y\<^bsup>X\<^esup> \<longrightarrow> g = eval_func Y X \<circ>\<^sub>c \<langle>id X, f \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>)"
-
 
 lemma cnufatem_def2:
   assumes "f \<in>\<^sub>c Y\<^bsup>X\<^esup>"
@@ -505,9 +457,6 @@ lemma cnufatem_type[type_rule]:
   shows "cnufatem f : X  \<rightarrow> Y"
   using assms cnufatem_def2 
   by (auto, typecheck_cfuncs)
-
-
-  
 
 lemma cnufatem_metafunc:
   assumes "f : X \<rightarrow> Y"
@@ -533,12 +482,10 @@ proof(rule one_separator[where X = X, where Y = Y])
   qed
 qed
 
-
 lemma metafunc_cnufatem:
   assumes "f \<in>\<^sub>c Y\<^bsup>X\<^esup>"
   shows "metafunc (cnufatem f) = f"
-proof
-(rule same_evals_equal[where Z = one, where X = Y, where A = X])
+proof (rule same_evals_equal[where Z = one, where X = Y, where A = X])
   show "metafunc (cnufatem f) \<in>\<^sub>c Y\<^bsup>X\<^esup>"
     using assms by typecheck_cfuncs
   show "f \<in>\<^sub>c Y\<^bsup>X\<^esup>"
@@ -576,11 +523,7 @@ proof
   qed
 qed
 
-
-subsection \<open>Meta Composition\<close>
-
-
-(*Meta-function Composition *)
+subsection \<open>Metafunction Composition\<close>
 
 definition meta_comp :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc"  where 
   "meta_comp X Y Z  =  (eval_func Z Y \<circ>\<^sub>c swap  (Z\<^bsup>Y\<^esup>) Y    \<circ>\<^sub>c (id(Z\<^bsup>Y\<^esup>) \<times>\<^sub>f (eval_func Y X \<circ>\<^sub>c  swap (Y\<^bsup>X\<^esup>)  X )  )  \<circ>\<^sub>c (associate_right (Z\<^bsup>Y\<^esup>) (Y\<^bsup>X\<^esup>) X)  \<circ>\<^sub>c swap X ((Z\<^bsup>Y\<^esup>) \<times>\<^sub>c (Y\<^bsup>X\<^esup>)) )\<^sup>\<sharp> "
@@ -589,13 +532,8 @@ lemma meta_comp_type[type_rule]:
   "meta_comp X Y Z : Z\<^bsup>Y\<^esup> \<times>\<^sub>c Y\<^bsup>X\<^esup> \<rightarrow> Z\<^bsup>X\<^esup>"
   unfolding meta_comp_def by typecheck_cfuncs
 
-
-
-
-
 definition meta_comp2 :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<box>" 55)
   where "meta_comp2 f g = (THE h. \<exists> W X Y. g : W \<rightarrow> Y\<^bsup>X\<^esup> \<and> h = (f\<^sup>\<flat>  \<circ>\<^sub>c \<langle>g\<^sup>\<flat>, right_cart_proj X W\<rangle>)\<^sup>\<sharp>)"
-
 
 lemma meta_comp2_def2: 
   assumes "f: W \<rightarrow> Z\<^bsup>Y\<^esup>"
@@ -603,8 +541,6 @@ lemma meta_comp2_def2:
   shows "f \<box> g  = (f\<^sup>\<flat>  \<circ>\<^sub>c \<langle>g\<^sup>\<flat>, right_cart_proj X W\<rangle>)\<^sup>\<sharp>"
   using assms unfolding meta_comp2_def
   by (smt (z3) cfunc_type_def exp_set_inj the_equality)
-  
- 
 
 lemma meta_comp2_type[type_rule]: 
   assumes "f: W \<rightarrow> Z\<^bsup>Y\<^esup>"
@@ -616,8 +552,6 @@ proof -
   then show ?thesis 
     using assms by (simp add: meta_comp2_def2)
 qed
-
-
 
 lemma meta_comp2_elements_aux: 
   assumes "f \<in>\<^sub>c Z\<^bsup>Y\<^esup>"
@@ -642,10 +576,6 @@ proof-
     then show "(f\<^sup>\<flat> \<circ>\<^sub>c \<langle>g\<^sup>\<flat>,right_cart_proj X one\<rangle>) \<circ>\<^sub>c \<langle>x,id\<^sub>c one\<rangle> = eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c \<langle>x,g\<rangle>,f\<rangle>"
       by (simp add: calculation)
 qed
-
-
-
-
 
 lemma meta_comp2_def3: 
   assumes "f \<in>\<^sub>c Z\<^bsup>Y\<^esup>"
@@ -682,9 +612,6 @@ proof(unfold meta_comp2_def2 cnufatem_def2 metafunc_def meta_comp_def)
   then show "(f\<^sup>\<flat> \<circ>\<^sub>c \<langle>g\<^sup>\<flat>,right_cart_proj X one\<rangle>)\<^sup>\<sharp> = (((eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj (domain ((eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>)) one)\<^sup>\<sharp>"
     using assms cfunc_type_def cnufatem_def2 cnufatem_type domain_comp by force
 qed
-
-
-
 
 lemma meta_comp2_def4:
   assumes "f \<in>\<^sub>c Z\<^bsup>Y\<^esup>"
@@ -750,30 +677,29 @@ proof(unfold meta_comp2_def2 cnufatem_def2 metafunc_def meta_comp_def)
     using assms cfunc_type_def cnufatem_def2 cnufatem_type domain_comp meta_comp2_def2 meta_comp2_def3 metafunc_def by force
 qed
 
-
 lemma meta_comp_on_els:
   assumes "f : W \<rightarrow> Z\<^bsup>Y\<^esup>"
   assumes "g : W \<rightarrow> Y\<^bsup>X\<^esup>"
   assumes "w \<in>\<^sub>c W"
-  shows "(f \<box> g) \<circ>\<^sub>c w    = (f\<circ>\<^sub>c w) \<box> (g \<circ>\<^sub>c w)"
+  shows "(f \<box> g) \<circ>\<^sub>c w = (f \<circ>\<^sub>c w) \<box> (g \<circ>\<^sub>c w)"
 proof - 
-  have "(f \<box> g) \<circ>\<^sub>c w = (f\<^sup>\<flat>  \<circ>\<^sub>c \<langle>g\<^sup>\<flat>, right_cart_proj X W\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c w"
+  have "(f \<box> g) \<circ>\<^sub>c w = (f\<^sup>\<flat> \<circ>\<^sub>c \<langle>g\<^sup>\<flat>, right_cart_proj X W\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c w"
     using assms by (typecheck_cfuncs, simp add: meta_comp2_def2)
-  also have "... = (eval_func Z Y \<circ>\<^sub>c (id Y \<times>\<^sub>f f)  \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g) , right_cart_proj X W\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c w"
+  also have "... = (eval_func Z Y \<circ>\<^sub>c (id Y \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g), right_cart_proj X W\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c w"
     using assms comp_associative2 inv_transpose_func_def2 by (typecheck_cfuncs, force)
-  also have "... = (eval_func Z Y \<circ>\<^sub>c  \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g) , f \<circ>\<^sub>c right_cart_proj X W\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c w"
+  also have "... = (eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g), f \<circ>\<^sub>c right_cart_proj X W\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c w"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
-  also have "... = (eval_func Z Y  \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)) , (f \<circ>\<^sub>c w) \<circ>\<^sub>c right_cart_proj X one\<rangle>)\<^sup>\<sharp>"
+  also have "... = (eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)), (f \<circ>\<^sub>c w) \<circ>\<^sub>c right_cart_proj X one\<rangle>)\<^sup>\<sharp>"
   proof - 
-    have "(eval_func Z Y \<circ>\<^sub>c  \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g) , f \<circ>\<^sub>c right_cart_proj X W\<rangle>)\<^sup>\<sharp>\<^sup>\<flat> \<circ>\<^sub>c (id X \<times>\<^sub>f w) = 
-          eval_func Z Y \<circ>\<^sub>c  \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)) , f \<circ>\<^sub>c right_cart_proj X W \<circ>\<^sub>c (id X \<times>\<^sub>f w)\<rangle>"
+    have "(eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g), f \<circ>\<^sub>c right_cart_proj X W\<rangle>)\<^sup>\<sharp>\<^sup>\<flat> \<circ>\<^sub>c (id X \<times>\<^sub>f w) = 
+          eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)), f \<circ>\<^sub>c right_cart_proj X W \<circ>\<^sub>c (id X \<times>\<^sub>f w)\<rangle>"
     proof - 
-      have "eval_func Z Y \<circ>\<^sub>c  \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g) , f \<circ>\<^sub>c right_cart_proj X W\<rangle> \<circ>\<^sub>c (id X \<times>\<^sub>f w) 
-          =  eval_func Z Y \<circ>\<^sub>c  \<langle>(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g)) \<circ>\<^sub>c (id X \<times>\<^sub>f w) , (f \<circ>\<^sub>c right_cart_proj X W) \<circ>\<^sub>c (id X \<times>\<^sub>f w)\<rangle>"
+      have "eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g), f \<circ>\<^sub>c right_cart_proj X W\<rangle> \<circ>\<^sub>c (id X \<times>\<^sub>f w) 
+          =  eval_func Z Y \<circ>\<^sub>c \<langle>(eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g)) \<circ>\<^sub>c (id X \<times>\<^sub>f w), (f \<circ>\<^sub>c right_cart_proj X W) \<circ>\<^sub>c (id X \<times>\<^sub>f w)\<rangle>"
          using assms cfunc_prod_comp by (typecheck_cfuncs, force)
-       also have "... = eval_func Z Y \<circ>\<^sub>c  \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c (id X \<times>\<^sub>f w) , f \<circ>\<^sub>c right_cart_proj X W \<circ>\<^sub>c (id X \<times>\<^sub>f w)\<rangle>"
+       also have "... = eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g) \<circ>\<^sub>c (id X \<times>\<^sub>f w), f \<circ>\<^sub>c right_cart_proj X W \<circ>\<^sub>c (id X \<times>\<^sub>f w)\<rangle>"
          using assms comp_associative2 by (typecheck_cfuncs, auto)
-       also have "... = eval_func Z Y \<circ>\<^sub>c  \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)) , f \<circ>\<^sub>c right_cart_proj X W \<circ>\<^sub>c (id X \<times>\<^sub>f w)\<rangle>"
+       also have "... = eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)), f \<circ>\<^sub>c right_cart_proj X W \<circ>\<^sub>c (id X \<times>\<^sub>f w)\<rangle>"
          using assms by (typecheck_cfuncs, metis identity_distributes_across_composition)
        then show ?thesis
          using assms calculation comp_associative2 flat_cancels_sharp by (typecheck_cfuncs, auto)
@@ -782,25 +708,21 @@ proof -
        using assms by (typecheck_cfuncs, smt (z3) comp_associative2 inv_transpose_func_def2 
        inv_transpose_of_composition right_cart_proj_cfunc_cross_prod transpose_func_unique)
   qed
-  also have "... = (eval_func Z Y \<circ>\<^sub>c (id\<^sub>c Y  \<times>\<^sub>f ((f \<circ>\<^sub>c w) \<circ>\<^sub>c right_cart_proj X one)) \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)) , id (X\<times>\<^sub>c one)\<rangle>)\<^sup>\<sharp>"
+  also have "... = (eval_func Z Y \<circ>\<^sub>c (id\<^sub>c Y \<times>\<^sub>f ((f \<circ>\<^sub>c w) \<circ>\<^sub>c right_cart_proj X one)) \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)), id (X\<times>\<^sub>c one)\<rangle>)\<^sup>\<sharp>"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
-  also have "... = (eval_func Z Y \<circ>\<^sub>c (id\<^sub>c Y \<times>\<^sub>f (f \<circ>\<^sub>c w)) \<circ>\<^sub>c (id (Y) \<times>\<^sub>f right_cart_proj X one) \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)) , id (X\<times>\<^sub>c one)\<rangle>)\<^sup>\<sharp>"
+  also have "... = (eval_func Z Y \<circ>\<^sub>c (id\<^sub>c Y \<times>\<^sub>f (f \<circ>\<^sub>c w)) \<circ>\<^sub>c (id (Y) \<times>\<^sub>f right_cart_proj X one) \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)), id (X\<times>\<^sub>c one)\<rangle>)\<^sup>\<sharp>"
     using assms comp_associative2 identity_distributes_across_composition by (typecheck_cfuncs, force)
-  also have "... = ((f\<circ>\<^sub>cw)\<^sup>\<flat> \<circ>\<^sub>c (id (Y) \<times>\<^sub>f right_cart_proj X one) \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)) , id (X\<times>\<^sub>c one)\<rangle>)\<^sup>\<sharp>"
+  also have "... = ((f\<circ>\<^sub>cw)\<^sup>\<flat> \<circ>\<^sub>c (id (Y) \<times>\<^sub>f right_cart_proj X one) \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f (g\<circ>\<^sub>c w)), id (X\<times>\<^sub>c one)\<rangle>)\<^sup>\<sharp>"
     using assms by (typecheck_cfuncs, smt (z3) comp_associative2 inv_transpose_func_def2)
-  also have "... = ((f\<circ>\<^sub>cw)\<^sup>\<flat> \<circ>\<^sub>c (id (Y) \<times>\<^sub>f right_cart_proj X one) \<circ>\<^sub>c \<langle>(g\<circ>\<^sub>c w)\<^sup>\<flat> , id (X\<times>\<^sub>c one)\<rangle>)\<^sup>\<sharp>"
+  also have "... = ((f\<circ>\<^sub>cw)\<^sup>\<flat> \<circ>\<^sub>c (id (Y) \<times>\<^sub>f right_cart_proj X one) \<circ>\<^sub>c \<langle>(g\<circ>\<^sub>c w)\<^sup>\<flat>, id (X\<times>\<^sub>c one)\<rangle>)\<^sup>\<sharp>"
     using assms inv_transpose_func_def2 by (typecheck_cfuncs, force)
-  also have "... = ((f\<circ>\<^sub>c w)\<^sup>\<flat>  \<circ>\<^sub>c \<langle>(g\<circ>\<^sub>c w)\<^sup>\<flat>, right_cart_proj X one\<rangle>)\<^sup>\<sharp>"
+  also have "... = ((f\<circ>\<^sub>c w)\<^sup>\<flat> \<circ>\<^sub>c \<langle>(g\<circ>\<^sub>c w)\<^sup>\<flat>, right_cart_proj X one\<rangle>)\<^sup>\<sharp>"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
   also have "... = (f\<circ>\<^sub>c w) \<box> (g \<circ>\<^sub>c w)"
     using assms by (typecheck_cfuncs, simp add: meta_comp2_def2)
   then show ?thesis
     by (simp add: calculation)
 qed
-
-
-
-
 
 lemma meta_comp2_def5:
   assumes "f : W \<rightarrow> Z\<^bsup>Y\<^esup>"
@@ -826,20 +748,15 @@ next
     by (simp add: calculation)
 qed
 
-  
-
 lemma meta_left_identity:
   assumes "g \<in>\<^sub>c X\<^bsup>X\<^esup>"
   shows "g \<box> metafunc (id X) = g"
   using assms by (typecheck_cfuncs, metis cfunc_type_def cnufatem_metafunc cnufatem_type id_right_unit meta_comp2_def3 metafunc_cnufatem)
   
-
 lemma meta_right_identity:
   assumes "g \<in>\<^sub>c X\<^bsup>X\<^esup>"
   shows "metafunc(id X) \<box> g = g"
   using assms by (typecheck_cfuncs, smt (z3) cnufatem_metafunc cnufatem_type id_left_unit2 meta_comp2_def3 metafunc_cnufatem)
-
-
 
 lemma comp_as_metacomp:
   assumes "g : X \<rightarrow> Y"
@@ -847,15 +764,11 @@ lemma comp_as_metacomp:
   shows "f \<circ>\<^sub>c g = cnufatem(metafunc f \<box> metafunc g)"
   using assms by (typecheck_cfuncs, simp add: cnufatem_metafunc meta_comp2_def3)
 
-lemma comp_as_metacomp2:
+lemma metacomp_as_comp:
   assumes "g \<in>\<^sub>c Y\<^bsup>X\<^esup>"
   assumes "f \<in>\<^sub>c Z\<^bsup>Y\<^esup>"
   shows "cnufatem f \<circ>\<^sub>c cnufatem g = cnufatem(f \<box> g)"
   using assms by (typecheck_cfuncs, simp add: comp_as_metacomp metafunc_cnufatem)
-
-
-
-
 
 lemma meta_comp_assoc:
   assumes "e : W \<rightarrow> A\<^bsup>Z\<^esup>"
@@ -881,17 +794,10 @@ proof -
     by (simp add: calculation)
 qed
 
-
-
-section \<open>Parameterized Functions\<close>
-
-
-(*Parameterized Functions*)
+section \<open>Partially Parameterized Functions on Pairs\<close>
 
 definition left_param :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsub>[_,-]\<^esub>" [100,0]100) where
   "left_param k p \<equiv> (THE f.  \<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> f = k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>)"
-
-  
 
 lemma left_param_def2:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
@@ -902,7 +808,6 @@ proof -
   then show "k\<^bsub>[p,-]\<^esub> \<equiv> k \<circ>\<^sub>c \<langle>p \<circ>\<^sub>c \<beta>\<^bsub>Q\<^esub>, id Q\<rangle>"
     by (smt (z3) assms cfunc_type_def transpose_func_type)
 qed
-
 
 lemma left_param_type[type_rule]:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
@@ -924,11 +829,8 @@ proof -
     by (simp add: calculation)
 qed
 
-
-
 definition right_param :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsub>[-,_]\<^esub>" [100,0]100) where
   "right_param k q \<equiv> (THE f.  \<exists> P Q R. k : P \<times>\<^sub>c Q \<rightarrow> R \<and> f = k \<circ>\<^sub>c \<langle>id P, q \<circ>\<^sub>c \<beta>\<^bsub>P\<^esub>\<rangle>)"
-
 
 lemma right_param_def2:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
@@ -945,7 +847,6 @@ lemma right_param_type[type_rule]:
   assumes "q \<in>\<^sub>c Q"
   shows "k\<^bsub>[-,q]\<^esub> : P \<rightarrow> R"
   using assms by (unfold right_param_def2, typecheck_cfuncs)
-  
 
 lemma right_param_on_el:
   assumes "k : P \<times>\<^sub>c Q \<rightarrow> R"
@@ -961,31 +862,25 @@ proof -
     by (simp add: calculation)
 qed
 
-
-
-
 section \<open>Exponential Set Facts\<close>
-
-
 
 (* Proposition 2.5.7 *)
 lemma set_to_power_one:
   "X\<^bsup>one\<^esup> \<cong> X"
- proof -
+proof -
   obtain e where e_defn: "e = eval_func X one" and e_type: "e : one \<times>\<^sub>c X\<^bsup>one\<^esup> \<rightarrow> X"
     using eval_func_type by auto
   obtain i where i_type: "i: one \<times>\<^sub>c one \<rightarrow> one"
     using terminal_func_type by blast
   obtain i_inv where i_iso: "i_inv: one\<rightarrow>  one \<times>\<^sub>c one \<and> 
-                                  i\<circ>\<^sub>c i_inv = id(one) \<and>  
-                                  i_inv\<circ>\<^sub>c i = id(one \<times>\<^sub>c one)"
+                             i\<circ>\<^sub>c i_inv = id(one) \<and>  
+                             i_inv\<circ>\<^sub>c i = id(one \<times>\<^sub>c one)"
     by (smt cfunc_cross_prod_comp_cfunc_prod cfunc_cross_prod_comp_diagonal cfunc_cross_prod_def cfunc_prod_type cfunc_type_def diagonal_def i_type id_cross_prod id_left_unit id_type left_cart_proj_type right_cart_proj_cfunc_prod right_cart_proj_type terminal_func_unique)
   then have i_inv_type: "i_inv: one\<rightarrow>  one \<times>\<^sub>c one"
     by auto
-        
+
   have inj: "injective(e)"
     by (simp add: e_defn eval_func_X_one_injective)
-
 
   have surj: "surjective(e)"
      unfolding surjective_def
@@ -994,7 +889,6 @@ lemma set_to_power_one:
     assume "y \<in>\<^sub>c codomain e"
     then have y_type: "y \<in>\<^sub>c X"
       using cfunc_type_def e_type by auto
-
 
     have witness_type: "(id\<^sub>c one \<times>\<^sub>f (y \<circ>\<^sub>c i)\<^sup>\<sharp>) \<circ>\<^sub>c i_inv \<in>\<^sub>c one \<times>\<^sub>c X\<^bsup>one\<^esup>"
       using y_type i_type i_inv_type by typecheck_cfuncs
@@ -1054,8 +948,6 @@ proof -
   show "one\<^bsup>X\<^esup> \<cong> one"
     using ex1 single_elem_iso_one by auto
 qed
-
-
 
 (* Proposition 2.5.9 *)
 lemma power_rule:
@@ -1130,20 +1022,8 @@ proof -
   then show "(X \<times>\<^sub>c Y)\<^bsup>A\<^esup> \<cong> X\<^bsup>A\<^esup> \<times>\<^sub>c Y\<^bsup>A\<^esup>"
     using canonical_cart_prod_is_cart_prod cart_prods_isomorphic fst_conv is_isomorphic_def by fastforce
 qed
-  
 
-
-
-
-
-
-
-
-
-
-
-(*Consider renaming this lemma*)
-lemma exponential_distribution:
+lemma exponential_coprod_distribution:
   "(Z\<^bsup>(X \<Coprod> Y)\<^esup>) \<cong> (Z\<^bsup>X\<^esup>) \<times>\<^sub>c (Z\<^bsup>Y\<^esup>)"
 proof - 
   have "is_cart_prod (Z\<^bsup>(X \<Coprod> Y)\<^esup>) ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c (left_coproj X Y) \<times>\<^sub>f (id(Z\<^bsup>(X \<Coprod> Y)\<^esup>)) )\<^sup>\<sharp>) ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c (right_coproj X Y) \<times>\<^sub>f (id(Z\<^bsup>(X \<Coprod> Y)\<^esup>)) )\<^sup>\<sharp>) (Z\<^bsup>X\<^esup>) (Z\<^bsup>Y\<^esup>)"
@@ -1313,70 +1193,6 @@ proof-
     using function_to_empty_is_iso is_isomorphic_def iso_type by blast
 qed
 
-
-(*This is an unnecessarily long proof...... We have a 1 line proof in Coproduct.thy*)
-(*In the coproduct theory, we call it "product_distribute_over_coproduct_left"*)
-(* Proposition 2.5.10 *)
-lemma prod_distribute_coprod:
-  "A \<times>\<^sub>c (X \<Coprod> Y) \<cong> (A \<times>\<^sub>c X) \<Coprod> (A \<times>\<^sub>c Y)"
-proof - 
-  obtain \<phi> where phi_def: "\<phi> = (id(A) \<times>\<^sub>f left_coproj X Y) \<amalg> (id(A) \<times>\<^sub>f right_coproj X Y)" and 
-       \<phi>_type[type_rule]: "\<phi> : (A \<times>\<^sub>c X) \<Coprod> (A \<times>\<^sub>c Y) \<rightarrow> A \<times>\<^sub>c (X \<Coprod> Y)"
-    by typecheck_cfuncs
-  obtain \<psi> where psi_def: "\<psi> = ((left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp> \<amalg> (right_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp>)\<^sup>\<flat>" and
-       \<psi>_type[type_rule]: "\<psi> : A \<times>\<^sub>c (X \<Coprod> Y) \<rightarrow> (A \<times>\<^sub>c X) \<Coprod> (A \<times>\<^sub>c Y)"
-    by typecheck_cfuncs
-
-
-   (*Below is first centered eqn on page 52*)
-  have FirstCenteredEqn1: "(id(A \<times>\<^sub>c (X \<Coprod> Y))\<^sup>\<sharp> \<circ>\<^sub>c left_coproj X Y)\<^sup>\<flat> =  id A \<times>\<^sub>f left_coproj X Y"
-    by (typecheck_cfuncs, simp add: flat_cancels_sharp id_left_unit2 inv_transpose_of_composition)
-  have FirstCenteredEqn2: "(id(A \<times>\<^sub>c (X \<Coprod> Y))\<^sup>\<sharp> \<circ>\<^sub>c right_coproj X Y)\<^sup>\<flat> = id A \<times>\<^sub>f right_coproj X Y"
-    by (typecheck_cfuncs, simp add: flat_cancels_sharp id_left_unit2 inv_transpose_of_composition)
-  have SecondCenteredEqn: "id(A \<times>\<^sub>c X \<Coprod> Y)\<^sup>\<sharp> = ((id A \<times>\<^sub>f left_coproj X Y)\<^sup>\<sharp>) \<amalg> (id A \<times>\<^sub>f right_coproj X Y)\<^sup>\<sharp>"
-    by (typecheck_cfuncs, smt (z3) cfunc_coprod_comp id_coprod id_left_unit2 id_right_unit2 sharp_comp)
-  have AlsoHaveEquation1: "(id(A) \<times>\<^sub>f (left_coproj X Y))\<^sup>\<sharp> = (\<phi>\<^bsup>A\<^esup>\<^sub>f)  \<circ>\<^sub>c  (left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp>"
-    by (typecheck_cfuncs, metis cfunc_cross_prod_type left_coproj_cfunc_coprod phi_def right_proj_type transpose_of_comp)
-  have AlsoHaveEquation2: "(id(A) \<times>\<^sub>f (right_coproj X Y))\<^sup>\<sharp> = (\<phi>\<^bsup>A\<^esup>\<^sub>f)  \<circ>\<^sub>c  (right_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp>"
-    by (typecheck_cfuncs, metis cfunc_cross_prod_type left_proj_type phi_def right_coproj_cfunc_coprod transpose_of_comp)
-  then have ThirdCenteredEqn: "(id(A \<times>\<^sub>c (X \<Coprod> Y)))\<^sup>\<sharp> =
-      (\<phi>\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp>) 
-       \<amalg>
-      (\<phi>\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp>) "
-    by (simp add: AlsoHaveEquation1 SecondCenteredEqn)
-  also have ThirdCenteredEqnb: " ... =  \<phi>\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c ((left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp> \<amalg> (right_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp>)"
-    using cfunc_coprod_comp by (typecheck_cfuncs, blast)
-  have computation1:
-    "(\<phi> \<circ>\<^sub>c \<psi>)\<^sup>\<sharp> 
-      = \<phi>\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp> \<amalg> (right_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp>"
-    by (typecheck_cfuncs, metis psi_def sharp_cancels_flat transpose_of_comp)
-  have computation2:  "... = (id(A \<times>\<^sub>c (X \<Coprod> Y)))\<^sup>\<sharp>"
-    by (simp add:  ThirdCenteredEqnb calculation)
-  have HalfInverse: 
-      "\<phi> \<circ>\<^sub>c \<psi> =  id(A \<times>\<^sub>c (X \<Coprod> Y))"
-    by (typecheck_cfuncs, metis computation1 computation2 flat_cancels_sharp)
-  have FifthCenteredEquation: 
-    "(\<psi> \<circ>\<^sub>c \<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y)))\<^sup>\<sharp>  = (left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y))\<^sup>\<sharp>"
-    by (typecheck_cfuncs, smt (z3) HalfInverse comp_associative2 dist_prod_coprod_def 
-        dist_prod_coprod_inv_left dist_prod_coprod_inv_type id_left_unit2 phi_def)
-  have PsiPhiJ0EqsJ0 :
-    "\<psi> \<circ>\<^sub>c \<phi> \<circ>\<^sub>c (left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y)) = left_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y)"
-    by (typecheck_cfuncs, metis FifthCenteredEquation flat_cancels_sharp)
-  have PsiPhiJ1EqsJ1: "\<psi> \<circ>\<^sub>c \<phi> \<circ>\<^sub>c (right_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y)) = right_coproj (A \<times>\<^sub>c X) (A \<times>\<^sub>c Y)"
-    by (typecheck_cfuncs, smt (z3) HalfInverse comp_associative2 dist_prod_coprod_def dist_prod_coprod_inv_def2 id_left_unit2 phi_def)
-
-  have fullinverse: "\<psi> \<circ>\<^sub>c \<phi> = id((A \<times>\<^sub>c X) \<Coprod> A \<times>\<^sub>c Y)"
-    by (typecheck_cfuncs, smt (z3) PsiPhiJ0EqsJ0 PsiPhiJ1EqsJ1 cfunc_coprod_comp comp_associative2 id_coprod id_right_unit2 left_proj_type right_proj_type)
-      
-  show "A \<times>\<^sub>c X \<Coprod> Y \<cong> (A \<times>\<^sub>c X) \<Coprod> A \<times>\<^sub>c Y"
-    unfolding is_isomorphic_def isomorphism_def 
-    using HalfInverse  \<psi>_type cfunc_type_def fullinverse phi_def
-    by (rule_tac x="\<psi>" in exI, auto, simp add: \<psi>_type, typecheck_cfuncs, fastforce)
-qed
-
-
-
-
 lemma exp_pres_iso_left:
   assumes "A \<cong> X" 
   shows "A\<^bsup>Y\<^esup> \<cong>  X\<^bsup>Y\<^esup>"
@@ -1391,7 +1207,6 @@ proof -
     using \<phi>_def by (typecheck_cfuncs, blast)
   have psi_eval_type: "(\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp>: A\<^bsup>Y\<^esup> \<rightarrow> X\<^bsup>Y\<^esup>"
     using \<psi>_def by (typecheck_cfuncs, blast)
-
 
   have idXY: "(\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp> \<circ>\<^sub>c  (\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp> = id(X\<^bsup>Y\<^esup>)"
   proof - 
@@ -1436,14 +1251,11 @@ proof -
       by (simp add: exponential_object_identity2)
     then show "(\<phi> \<circ>\<^sub>c eval_func X Y)\<^sup>\<sharp> \<circ>\<^sub>c (\<psi> \<circ>\<^sub>c eval_func A Y)\<^sup>\<sharp>  = id(A\<^bsup>Y\<^esup>)"
       by (simp add: calculation)
-qed
-
+  qed
   show  "A\<^bsup>Y\<^esup> \<cong>  X\<^bsup>Y\<^esup>"
     by (metis cfunc_type_def comp_epi_imp_epi comp_monic_imp_monic epi_mon_is_iso idAY idXY id_isomorphism is_isomorphic_def iso_imp_epi_and_monic phi_eval_type psi_eval_type)
 qed
 
-
- 
 lemma expset_power_tower:
   "((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>) \<cong> (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)"
 proof - 
@@ -1466,17 +1278,17 @@ proof -
     show "id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>) : A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>\<^bsup>C\<^esup>"
       by typecheck_cfuncs
     show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> =
-    eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
+          eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
     proof(rule same_evals_equal[where Z= "C \<times>\<^sub>c ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)", where X = "A", where A = "B"])
       show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> : C \<times>\<^sub>c A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>"
         by typecheck_cfuncs
       show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>) : C \<times>\<^sub>c A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>"
         by typecheck_cfuncs
       show "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp>)) =
-    eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
+            eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
       proof - 
         have "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp>)) =
-             eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
+              eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
           by (typecheck_cfuncs, metis identity_distributes_across_composition)
         also have "... = eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f ((eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<psi>\<^sup>\<sharp>))"
           by (typecheck_cfuncs, simp add: comp_associative2)
@@ -1510,8 +1322,8 @@ proof -
       qed
     qed
   qed
-  have "  \<psi>\<^sup>\<sharp> \<circ>\<^sub>c (\<phi>\<^sup>\<sharp>)\<^sup>\<sharp>=  id(A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)"
-  proof(rule same_evals_equal[where Z= "A\<^bsup>(B\<times>\<^sub>c C)\<^esup>", where X = "A", where A = "(B\<times>\<^sub>c C)"])
+  have "\<psi>\<^sup>\<sharp> \<circ>\<^sub>c (\<phi>\<^sup>\<sharp>)\<^sup>\<sharp> = id(A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)"
+  proof(rule same_evals_equal[where Z= "A\<^bsup>(B \<times>\<^sub>c C)\<^esup>", where X = "A", where A = "(B \<times>\<^sub>c C)"])
     show "\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp> : A\<^bsup>(B \<times>\<^sub>c C)\<^esup> \<rightarrow> A\<^bsup>(B \<times>\<^sub>c C)\<^esup>"
       by typecheck_cfuncs
     show "id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>) : A\<^bsup>(B \<times>\<^sub>c C)\<^esup> \<rightarrow> A\<^bsup>(B \<times>\<^sub>c C)\<^esup>"
@@ -1520,19 +1332,19 @@ proof -
           eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)"
     proof -
       have "eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) =
-              eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c ((id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp>)) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f\<phi>\<^sup>\<sharp>\<^sup>\<sharp>))"
+            eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c ((id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp>)) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>))"
         by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
-      also have "... = ( eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp>))) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f\<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
+      also have "... = ( eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp>))) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
         using comp_associative2 by (typecheck_cfuncs, blast)
       also have "... = \<psi> \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
         by (typecheck_cfuncs, simp add: transpose_func_def)
-      also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c (associate_right B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>))  \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
+      also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c (associate_right B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
         by (typecheck_cfuncs, smt \<psi>_def cfunc_type_def comp_associative domain_comp)
-      also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c (associate_right B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>))  \<circ>\<^sub>c ((id\<^sub>c (B) \<times>\<^sub>f id( C)) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
+      also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c (associate_right B C ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)) \<circ>\<^sub>c ((id\<^sub>c (B) \<times>\<^sub>f id( C)) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)"
         by (typecheck_cfuncs, simp add: id_cross_prod)
-      also have "... =(eval_func A B) \<circ>\<^sub>c ((id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c    ((id\<^sub>c (B) \<times>\<^sub>f (id(C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))))"
+      also have "... =(eval_func A B) \<circ>\<^sub>c ((id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c ((id\<^sub>c (B) \<times>\<^sub>f (id(C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))))"
         using associate_right_crossprod_ap by (typecheck_cfuncs, auto)
-      also have "... =(eval_func A B) \<circ>\<^sub>c ((id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c    (id\<^sub>c (B) \<times>\<^sub>f (id(C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>))) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))"
+      also have "... =(eval_func A B) \<circ>\<^sub>c ((id(B)\<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C) \<circ>\<^sub>c (id\<^sub>c (B) \<times>\<^sub>f (id(C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>))) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))"
         by (typecheck_cfuncs, simp add: comp_associative2)
       also have "... =(eval_func A B) \<circ>\<^sub>c (id(B)\<times>\<^sub>f ((eval_func (A\<^bsup>B\<^esup>) C)\<circ>\<^sub>c (id(C) \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp>))) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>))"
         using identity_distributes_across_composition by (typecheck_cfuncs, auto)
@@ -1544,7 +1356,7 @@ proof -
         by (typecheck_cfuncs, simp add: transpose_func_def)
       also have "... = (eval_func A (B\<times>\<^sub>c C)) \<circ>\<^sub>c ((associate_left B C (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>)) \<circ>\<^sub>c (associate_right B C (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)))"
         by (typecheck_cfuncs, simp add: \<phi>_def comp_associative2)  
-      also have "... = eval_func A (B\<times>\<^sub>c C) \<circ>\<^sub>c id ((B \<times>\<^sub>c C) \<times>\<^sub>c  (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>))"
+      also have "... = eval_func A (B\<times>\<^sub>c C) \<circ>\<^sub>c id ((B \<times>\<^sub>c C) \<times>\<^sub>c (A\<^bsup>(B\<times>\<^sub>c C)\<^esup>))"
         by (typecheck_cfuncs, simp add: left_right)
       also have "... = eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)"
         by (typecheck_cfuncs, simp add: id_cross_prod)
@@ -1554,9 +1366,6 @@ proof -
   show ?thesis
     by (metis \<open>\<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> = id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)\<close> \<open>\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp> = id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)\<close> \<phi>dbsharp_type \<psi>sharp_type cfunc_type_def is_isomorphic_def isomorphism_def)
 qed
-
-
-
 
 lemma exp_pres_iso_right:
   assumes "A \<cong> X" 
@@ -1572,9 +1381,6 @@ proof -
     using \<psi>_def transpose_func_type by (typecheck_cfuncs, presburger)
   obtain g where g_def: "g = (eval_func Y A) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))" and  g_type[type_rule]: "g: X\<times>\<^sub>c (Y\<^bsup>A\<^esup>) \<rightarrow> Y" and gsharp_type[type_rule]: "g\<^sup>\<sharp> : Y\<^bsup>A\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>"
     using \<phi>_def transpose_func_type by (typecheck_cfuncs, presburger)
-
-
-
 
   have fsharp_gsharp_id: "(f\<^sup>\<sharp>) \<circ>\<^sub>c (g\<^sup>\<sharp>) = id(Y\<^bsup>A\<^esup>)"
   proof(rule same_evals_equal[where Z = "Y\<^bsup>A\<^esup>", where X = Y, where A = A])
@@ -1603,7 +1409,6 @@ proof -
     qed
   qed
 
-
   have gsharp_fsharp_id: "(g\<^sup>\<sharp>) \<circ>\<^sub>c (f\<^sup>\<sharp>) = id(Y\<^bsup>X\<^esup>)"
   proof(rule same_evals_equal[where Z = "Y\<^bsup>X\<^esup>", where X = Y, where A = X])
     show "g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> : Y\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>"
@@ -1612,7 +1417,7 @@ proof -
       by typecheck_cfuncs
     show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)"
     proof - 
-      have "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp>)  \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
+      have "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
         using fsharp_type gsharp_type identity_distributes_across_composition by auto
       also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
         using \<phi>_def cfunc_type_def comp_associative fsharp_type g_def g_type transpose_func_def by (typecheck_cfuncs, smt)
@@ -1634,23 +1439,15 @@ proof -
     by (metis cfunc_type_def comp_epi_imp_epi comp_monic_imp_monic epi_mon_is_iso fsharp_gsharp_id fsharp_type gsharp_fsharp_id gsharp_type id_isomorphism is_isomorphic_def iso_imp_epi_and_monic)
 qed
 
-
 lemma exp_pres_iso:
   assumes "A \<cong> X" "B \<cong> Y" 
   shows "A\<^bsup>B\<^esup> \<cong>  X\<^bsup>Y\<^esup>"
   by (meson assms exp_pres_iso_left exp_pres_iso_right isomorphic_is_transitive)
 
-
-
-
-
-
 lemma empty_to_nonempty:
   assumes "nonempty X" "is_empty Y" 
   shows "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
   by (meson assms exp_pres_iso_left isomorphic_is_transitive no_el_iff_iso_0 zero_to_X)
-
-
 
 lemma Y_to_empty:
   assumes "is_empty X" 
@@ -1667,21 +1464,48 @@ lemma empty_to_nonempty_converse:
   shows "is_empty Y \<and> nonempty X"
   by (metis is_empty_def Y_to_empty assms no_el_iff_iso_0 nonempty_def nonempty_to_nonempty single_elem_iso_one)
 
-
-
-
-
-
-
-
-
-section \<open>Fininte and Infinite Sets and Subsets\<close>
-
-
-
 (* Definition 2.5.11 *)
 definition powerset :: "cset \<Rightarrow> cset" ("\<P>_" [101]100) where
   "\<P> X = \<Omega>\<^bsup>X\<^esup>"
+
+(* Exercise 2.6.15 *)
+lemma inject_into_powerset: 
+  "(\<exists> f.((f : X \<rightarrow> \<P> X) \<and> injective(f)))"
+proof -
+  have "injective((eq_pred X)\<^sup>\<sharp>)"
+    unfolding injective_def
+  proof (auto)
+    fix x y 
+    assume "x \<in>\<^sub>c domain ((eq_pred X)\<^sup>\<sharp>)"
+    then have x_type[type_rule]: "x \<in>\<^sub>c X"
+      using cfunc_type_def eq_pred_type transpose_func_type by force
+    assume "y \<in>\<^sub>c domain ((eq_pred X)\<^sup>\<sharp>)"
+    then have y_type[type_rule]: "y \<in>\<^sub>c X"
+      using cfunc_type_def eq_pred_type transpose_func_type by force
+    assume eqs: "(eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c x = (eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c y"
+  
+    have "eq_pred X \<circ>\<^sub>c \<langle>x,x\<rangle> = ((eval_func \<Omega> X) \<circ>\<^sub>c (id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>x,x\<rangle>"
+      by (typecheck_cfuncs, metis flat_cancels_sharp inv_transpose_func_def2)
+    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c ((id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x,x\<rangle>)"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c x, (eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c x\<rangle>"
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c x,(eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c y\<rangle>"
+      using eqs by auto
+    also have "... =  (eval_func \<Omega> X) \<circ>\<^sub>c ((id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x,y\<rangle>)"
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
+    also have "... = eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle>"
+      by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
+    then have computation: "eq_pred X \<circ>\<^sub>c \<langle>x,x\<rangle> = eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle>"
+      by (simp add: calculation)
+    then show "x=y"
+      by (typecheck_cfuncs, metis computation eq_pred_iff_eq_conv)
+  qed
+  then show "(\<exists> f.((f : X \<rightarrow> \<P> X) \<and> injective(f)))"
+    by (metis eq_pred_type powerset_def transpose_func_type)
+qed
+
+section \<open>Cardinality and Finiteness\<close>
 
 (* Definition 2.6.1: Finite and Infinite Sets *)
 definition is_finite :: "cset \<Rightarrow> bool"  where
@@ -1694,26 +1518,16 @@ lemma either_finite_or_infinite:
   "is_finite(X) \<or> is_infinite(X)"
   using epi_mon_is_iso is_finite_def is_infinite_def surjective_is_epimorphism by blast
 
-
-
-
-
-
 (* Definition 2.6.2 *)
 definition is_smaller_than :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<le>\<^sub>c" 50) where
    "X \<le>\<^sub>c Y \<longleftrightarrow> (\<exists> m. m : X \<rightarrow> Y \<and> monomorphism(m))"
-
-
 
 (*The point of the following lemma is simply to unify the two notations used in the book.*)
 lemma subobject_iff_smaller_than:
   "(X \<le>\<^sub>c Y) = (\<exists>m. (X,m) \<subseteq>\<^sub>c Y)"
   using is_smaller_than_def subobject_of_def2 by auto
 
-
-
 (*Proposition 2.6.3*)
-
 lemma smaller_than_coproduct1:
   "X \<le>\<^sub>c (X\<Coprod>Y)"
   using is_smaller_than_def left_coproj_are_monomorphisms left_proj_type by blast
@@ -1748,7 +1562,6 @@ proof-
       by (metis (full_types) comp_type left_cart_proj_cfunc_prod terminal_func_type)
   qed
 
-
   show "\<exists>m. m : X \<rightarrow> X \<times>\<^sub>c Y \<and> monomorphism m"
     using mono map_type by auto
 qed
@@ -1770,18 +1583,10 @@ proof -
     by blast
 qed
 
-
-
-
-
 lemma all_emptysets_are_finite:
   assumes "is_empty X"
   shows "is_finite(X)"
   by (metis assms epi_mon_is_iso epimorphism_def3 is_finite_def is_empty_def one_separator)
-
-
-
-
 
 lemma emptyset_is_smallest_set:
   "\<emptyset> \<le>\<^sub>c X"
@@ -1831,18 +1636,6 @@ proof -
     using f_type injective_imp_monomorphism is_smaller_than_def by blast
 qed
 
-
-
-(* Proved elsewhere.....
-lemma setprod_le_setexp:
-  assumes "nonempty(Y)"
-  assumes "Y \<cong> one"
-  shows "(X \<times>\<^sub>c Y) \<le>\<^sub>cY\<^bsup>X\<^esup>"
-  sorry
-*)
-
-
-
 lemma truth_set_is_finite:
   "is_finite(\<Omega>)"
   unfolding is_finite_def
@@ -1863,8 +1656,6 @@ proof(auto)
   then show "isomorphism m"
     by (simp add: epi_mon_is_iso m_mono surjective_is_epimorphism)
 qed
-
-
 
 lemma smaller_than_finite_is_finite:
   assumes "X \<le>\<^sub>c Y" "is_finite(Y)" 
@@ -1914,14 +1705,10 @@ proof(auto)
     by (simp add: epi_mon_is_iso x_mono)
 qed
 
-
-
 lemma larger_than_infinite_is_infinite:
   assumes "X \<le>\<^sub>c Y" "is_infinite(X)" 
   shows "is_infinite(Y)"
   using assms either_finite_or_infinite epi_is_surj is_finite_def is_infinite_def
     iso_imp_epi_and_monic smaller_than_finite_is_finite by blast
-
-
 
 end
