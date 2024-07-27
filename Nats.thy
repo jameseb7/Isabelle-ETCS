@@ -91,89 +91,74 @@ lemma Iso_to_N_is_NNO:
   assumes "N \<cong> \<nat>\<^sub>c"
   shows "\<exists> z s. is_NNO N z s"
 proof - 
-  obtain i where i_type[type_rule]: "i: N \<rightarrow> \<nat>\<^sub>c" and i_iso: "isomorphism(i)"
-    using assms is_isomorphic_def by auto 
-  obtain j where j_type[type_rule]: "j: \<nat>\<^sub>c \<rightarrow> N" and  j_def: "isomorphism(j) \<and> i \<circ>\<^sub>c j = id(\<nat>\<^sub>c) \<and> j \<circ>\<^sub>c i = id(N)"
-    using cfunc_type_def i_type i_iso isomorphism_def by fastforce
-  obtain z where z_type[type_rule]: "z \<in>\<^sub>c N" and z_def: "z = j \<circ>\<^sub>c zero"
+  obtain i where i_type[type_rule]: "i: \<nat>\<^sub>c \<rightarrow> N" and i_iso: "isomorphism(i)"
+    using assms isomorphic_is_symmetric is_isomorphic_def by blast 
+  obtain z where z_type[type_rule]: "z \<in>\<^sub>c N" and z_def: "z = i \<circ>\<^sub>c zero"
     by typecheck_cfuncs
-  obtain s where s_type[type_rule]: "s: N \<rightarrow> N" and s_def: "s = (j \<circ>\<^sub>c successor)  \<circ>\<^sub>c i"
-    by typecheck_cfuncs
+  obtain s where s_type[type_rule]: "s: N \<rightarrow> N" and s_def: "s = (i \<circ>\<^sub>c successor) \<circ>\<^sub>c i\<^bold>\<inverse>"
+    using i_iso by typecheck_cfuncs
   have "is_NNO N z s"
-  proof(unfold is_NNO_def)
+  proof(unfold is_NNO_def, typecheck_cfuncs, clarify)
     fix X q f 
     assume q_type[type_rule]: "q: one \<rightarrow> X"
     assume f_type[type_rule]: "f:   X \<rightarrow> X"
 
     obtain u where u_type[type_rule]: "u: \<nat>\<^sub>c \<rightarrow> X" and u_def:  "u \<circ>\<^sub>c zero =  q \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
       using natural_number_object_property2 by (typecheck_cfuncs, blast)
-    obtain v where v_type[type_rule]: "v: N \<rightarrow> X" and v_def: "v = u \<circ>\<^sub>c i"
-      by typecheck_cfuncs
+    obtain v where v_type[type_rule]: "v: N \<rightarrow> X" and v_def: "v = u \<circ>\<^sub>c i\<^bold>\<inverse>"
+      using i_iso by typecheck_cfuncs
     then have bottom_triangle: "v \<circ>\<^sub>c z = q"
-      by (smt (verit, best) comp_associative2 i_type id_right_unit2 j_def j_type u_def u_type v_def z_def zero_type)
+      unfolding v_def u_def z_def using i_iso
+      by (typecheck_cfuncs, metis cfunc_type_def comp_associative id_right_unit2 inv_left u_def)
     have bottom_square: "v \<circ>\<^sub>c s = f \<circ>\<^sub>c v"
-      by (smt (verit, ccfv_SIG) comp_associative2 comp_type f_type i_type id_left_unit2 j_def j_type s_def successor_type u_def u_type v_def)
-    
-    oops
-
-(*
-
-    show unique_v: "\<And> w y. w : N \<rightarrow> X \<Longrightarrow> y : N \<rightarrow> X \<Longrightarrow>
-       triangle_commutes one N X z w q \<Longrightarrow> square_commutes N X N X w f s w \<Longrightarrow>
-       triangle_commutes one N X z y q \<Longrightarrow> square_commutes N X N X y f s y \<Longrightarrow> w = y"
-    proof -
+      unfolding v_def u_def s_def using i_iso
+      by (typecheck_cfuncs, smt (verit, ccfv_SIG) comp_associative2 id_right_unit2 inv_left u_def)
+    show "\<exists>!u. u : N \<rightarrow> X \<and> q = u \<circ>\<^sub>c z \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c s"
+    proof auto
+      show "\<exists>u. u : N \<rightarrow> X \<and> q = u \<circ>\<^sub>c z \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c s"
+        by (rule_tac x=v in exI, auto simp add: bottom_triangle bottom_square v_type)
+    next
       fix w y
-      assume w_type: "w: N \<rightarrow> X"
-      assume "square_commutes N X N X w f s w"
-      then have w_square:"w \<circ>\<^sub>c s = f \<circ>\<^sub>c w"
-        by (simp add: square_commutes_def)
-      assume "triangle_commutes one N X z w q"
-      then have w_triangle: "q = w \<circ>\<^sub>c z"
-        by (simp add: triangle_commutes_def)
+      assume w_type[type_rule]: "w : N \<rightarrow> X"
+      assume y_type[type_rule]: "y : N \<rightarrow> X"
+      assume w_y_z: "w \<circ>\<^sub>c z = y \<circ>\<^sub>c z"
+      assume q_def: "q = y \<circ>\<^sub>c z"
+      assume f_w: "f \<circ>\<^sub>c w = w \<circ>\<^sub>c s"
+      assume f_y: "f \<circ>\<^sub>c y = y \<circ>\<^sub>c s"
 
-      assume y_type: "y: N \<rightarrow> X"
-      assume "square_commutes N X N X y f s y"
-      then have y_square:"y \<circ>\<^sub>c s = f \<circ>\<^sub>c y"
-        by (simp add: square_commutes_def)
-      assume "triangle_commutes one N X z y q"
-      then have y_triangle: "q = y \<circ>\<^sub>c z"
-        by (simp add: triangle_commutes_def)
-
-      have "\<And> w. w: N \<rightarrow> X \<Longrightarrow> w \<circ>\<^sub>c s = f \<circ>\<^sub>c w \<Longrightarrow> q = w \<circ>\<^sub>c z \<Longrightarrow> w = v"
-      proof -
-        fix w 
-        assume w_type: "w: N \<rightarrow> X"
-        assume w_square:"w \<circ>\<^sub>c s = f \<circ>\<^sub>c w"
-        assume w_triangle: "q = w \<circ>\<^sub>c z"
-
-        have fact1: "(w \<circ>\<^sub>c j): \<nat>\<^sub>c \<rightarrow> X"
-          by (meson comp_type j_type w_type)
-        then have fact2: "triangle_commutes one \<nat>\<^sub>c X zero (w \<circ>\<^sub>c j) q"
-          using comp_associative2 j_type q_type triangle_commutes_def w_triangle w_type z_form zero_type by auto
-        then have fact3: "square_commutes \<nat>\<^sub>c X \<nat>\<^sub>c X (w \<circ>\<^sub>c j) f successor (w \<circ>\<^sub>c j)"
-        proof -
-          have "successor = successor \<circ>\<^sub>c i \<circ>\<^sub>c j"
-            by (metis (no_types) cfunc_type_def id_right_unit j_type successor_type)
-          then show ?thesis
-            by (metis cfunc_type_def codomain_comp comp_associative domain_comp f_type i_type j_type s_form square_commutes_def successor_type w_square w_type)
-        qed
-        then have fact4: "(w \<circ>\<^sub>c j)\<circ>\<^sub>c successor = (f \<circ>\<^sub>c w) \<circ>\<^sub>c j"
-          using comp_associative2 j_type square_commutes_def w_type by auto
-        then have wj_Eqs_u: "w \<circ>\<^sub>c j = u"
-          using f_type fact1 fact2 fact3 natural_number_object_property q_type u_properties by blast
-        then show "w = v"
-          by (smt comp_associative2 i_type id_right_unit2 j_type v_Eqs_ui w_type)
+      have "w \<circ>\<^sub>c i = u"
+      proof (etcs_rule natural_number_object_func_unique[where f=f])
+        show "(w \<circ>\<^sub>c i) \<circ>\<^sub>c zero = u \<circ>\<^sub>c zero"
+          using q_def u_def w_y_z z_def by (etcs_assocr, argo)
+        show "(w \<circ>\<^sub>c i) \<circ>\<^sub>c successor = f \<circ>\<^sub>c w \<circ>\<^sub>c i"
+          using i_iso by (typecheck_cfuncs, smt (verit, best) comp_associative2 comp_type f_w id_right_unit2 inv_left inverse_type s_def)
+        show "u \<circ>\<^sub>c successor = f \<circ>\<^sub>c u"
+          by (simp add: u_def)
       qed
-      then show "w = y"
-        using w_square w_triangle w_type y_square y_triangle y_type by blast
+      then have w_eq_v: "w = v"
+        unfolding v_def using i_iso
+        by (typecheck_cfuncs, smt (verit, best) comp_associative2 id_right_unit2 inv_right)
+
+      have "y \<circ>\<^sub>c i = u"
+      proof (etcs_rule natural_number_object_func_unique[where f=f])
+        show "(y \<circ>\<^sub>c i) \<circ>\<^sub>c zero = u \<circ>\<^sub>c zero"
+          using q_def u_def w_y_z z_def by (etcs_assocr, argo)
+        show "(y \<circ>\<^sub>c i) \<circ>\<^sub>c successor = f \<circ>\<^sub>c y \<circ>\<^sub>c i"
+          using i_iso by (typecheck_cfuncs, smt (verit, best) comp_associative2 comp_type f_y id_right_unit2 inv_left inverse_type s_def)
+        show "u \<circ>\<^sub>c successor = f \<circ>\<^sub>c u"
+          by (simp add: u_def)
+      qed
+      then have y_eq_v: "y = v"
+        unfolding v_def using i_iso
+        by (typecheck_cfuncs, smt (verit, best) comp_associative2 id_right_unit2 inv_right)
+
+      show "w = y"
+        using w_eq_v y_eq_v by auto
     qed
-    show "\<exists>u. u : N \<rightarrow> X \<and> triangle_commutes one N X z u q \<and> square_commutes N X N X u f s u"
-      using D2_square D2_triangle f_type q_type s_type square_commutes_def triangle_commutes_def v_type z_type by auto
   qed
-  then show "\<exists>z s. is_NNO N z s"
+  then show ?thesis
     by auto
 qed
-*)
 
 section \<open>Zero and Successor\<close>
 
@@ -507,7 +492,7 @@ next
   also have "... = ITER U \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,zero\<rangle>"
     using assms by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (id\<^sub>c (U\<^bsup>U\<^esup>) \<times>\<^sub>f ITER_curried U) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,zero\<rangle>"
-    using assms ITER_def comp_associative2 inv_transpose_func_def2 by (typecheck_cfuncs, auto)
+    using assms ITER_def comp_associative2 inv_transpose_func_def3 by (typecheck_cfuncs, auto)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,ITER_curried U \<circ>\<^sub>c zero\<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,(metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>\<rangle>"
@@ -550,7 +535,7 @@ next
   also have "... = ITER U \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, successor \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (id\<^sub>c (U\<^bsup>U\<^esup>) \<times>\<^sub>f ITER_curried U) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, successor \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
-    using assms by (typecheck_cfuncs, simp add: ITER_def comp_associative2 inv_transpose_func_def2)
+    using assms by (typecheck_cfuncs, simp add: ITER_def comp_associative2 inv_transpose_func_def3)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, ITER_curried U \<circ>\<^sub>c (successor \<circ>\<^sub>c (n  \<circ>\<^sub>c z))\<rangle>"
     using assms cfunc_cross_prod_comp_cfunc_prod id_left_unit2 by (typecheck_cfuncs, force)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, (ITER_curried U \<circ>\<^sub>c successor) \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
@@ -572,7 +557,7 @@ next
   also have "... = meta_comp U U U \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) \<circ>\<^sub>c (id(U\<^bsup>U\<^esup>) \<times>\<^sub>f ITER_curried U )\<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,  (n  \<circ>\<^sub>c z)\<rangle>     \<rangle>"
     using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
   also have "... = meta_comp U U U \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, ITER U \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, n \<circ>\<^sub>c z\<rangle>\<rangle>"
-    using assms by (typecheck_cfuncs, smt (z3) ITER_def comp_associative2 inv_transpose_func_def2)
+    using assms by (typecheck_cfuncs, smt (z3) ITER_def comp_associative2 inv_transpose_func_def3)
   also have "... = meta_comp U U U \<circ>\<^sub>c \<langle>f, ITER U \<circ>\<^sub>c \<langle>f , n\<rangle>\<rangle> \<circ>\<^sub>c z"
     using assms by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
   also have "... = (meta_comp U U U \<circ>\<^sub>c \<langle>f, ITER U \<circ>\<^sub>c \<langle>f , n\<rangle>\<rangle>) \<circ>\<^sub>c z"
