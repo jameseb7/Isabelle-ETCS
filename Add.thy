@@ -15,15 +15,11 @@ lemma add1_property: "(add1: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup
   unfolding add1_def
   by (rule theI', typecheck_cfuncs, smt (verit, best) natural_number_object_property)
 
-
-
-
 lemma add1_type[type_rule]: "add1:  \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   by (simp add: add1_property)
  
 lemma add1_0_eq: "add1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c one\<^sup>\<sharp>"
   using add1_property by force
-
 
 lemma add1_comp_succ_eq: "add1 \<circ>\<^sub>c successor = (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) \<circ>\<^sub>c add1"
   using add1_property  by auto
@@ -33,8 +29,7 @@ definition add2 :: "cfunc"
 
 lemma add2_type[type_rule]: "add2:  \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c"
   unfolding add2_def
-  by (metis add1_property flat_type inv_transpose_func_def2)
-
+  by (metis add1_property flat_type inv_transpose_func_def3)
 
 lemma add2_apply:
   assumes "m : X \<rightarrow> \<nat>\<^sub>c" "n : X \<rightarrow> \<nat>\<^sub>c"
@@ -89,7 +84,6 @@ lemma add_apply1_left:
   shows "m +\<^sub>\<nat> n = add2 \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<circ>\<^sub>c m"
   unfolding add_def using assms cart_prod_extract_left by auto 
 
-
 (*We make this unusual result its own lemma since it will be used in the commutativity proof*)
 lemma id_N_def2:
   shows  "add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle> = id \<nat>\<^sub>c"
@@ -133,7 +127,7 @@ proof (rule natural_number_object_func_unique[where f= successor,  where X= "\<n
     also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id \<nat>\<^sub>c \<times>\<^sub>f successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f)\<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add1\<rangle>"
       by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
     also have "... = (successor  \<circ>\<^sub>c  eval_func \<nat>\<^sub>c \<nat>\<^sub>c ) \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add1\<rangle>"
-      by (typecheck_cfuncs, smt comp_associative2 exp_func_def2 flat_cancels_sharp inv_transpose_func_def2)
+      by (typecheck_cfuncs, smt comp_associative2 exp_func_def2 flat_cancels_sharp inv_transpose_func_def3)
     also have "... = successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add1) \<circ>\<^sub>c \<langle>zero\<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>"
       by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 id_right_unit2)
     also have "... = successor \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>"
@@ -143,8 +137,6 @@ proof (rule natural_number_object_func_unique[where f= successor,  where X= "\<n
   show " id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
     by (metis cfunc_type_def id_left_unit id_right_unit successor_type)
 qed
-
-
 
 lemma add2_respects_zero_on_left:
   assumes "f : X \<rightarrow> \<nat>\<^sub>c"
@@ -209,7 +201,7 @@ proof -
   also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f)  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>)"
     by (typecheck_cfuncs, simp add: add1_0_eq identity_distributes_across_composition)
   also have "... = (successor \<circ>\<^sub>c eval_func  \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>)"
-    by (typecheck_cfuncs, smt comp_associative2 exp_func_def2 flat_cancels_sharp inv_transpose_func_def2)
+    by (typecheck_cfuncs, smt comp_associative2 exp_func_def2 flat_cancels_sharp inv_transpose_func_def3)
   also have "... = successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
     by (typecheck_cfuncs, metis cfunc_type_def comp_associative transpose_func_def)
   then have fact2: " eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ((add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor))\<^sup>\<sharp> \<circ>\<^sub>c zero)) = 
@@ -252,7 +244,7 @@ proof -
     also have "... = (eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ( successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f))) \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (add1))  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))"
       by (typecheck_cfuncs, simp add: exponential_square_diagram)
     also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ( successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add1)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))"
-      by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def2 inv_transpose_of_composition)
+      by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def3 inv_transpose_of_composition)
     also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (  add1 \<circ>\<^sub>c successor)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))"
       by (simp add: add1_comp_succ_eq)
     also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f   add1)\<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  successor) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f  successor)"
@@ -263,7 +255,7 @@ proof -
   qed
   have fact6b: "successor \<circ>\<^sub>c add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor))
     = (( add2 \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>"
-    by (typecheck_cfuncs, smt comp_associative2 fact6 inv_transpose_func_def2 inv_transpose_of_composition transpose_func_def)
+    by (typecheck_cfuncs, smt comp_associative2 fact6 inv_transpose_func_def3 inv_transpose_of_composition transpose_func_def)
 
   have fact6c: "(add2 \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp> \<circ>\<^sub>c successor
     = successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f  \<circ>\<^sub>c (add2  \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor)))\<^sup>\<sharp>"
@@ -316,11 +308,9 @@ proof -
     also have "... = (add2 \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor))"
       by (smt cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2 id_type successor_type)
     also have "... = ((add2 \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>"
-      by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def2 inv_transpose_of_composition transpose_func_def)
+      by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def3 inv_transpose_of_composition transpose_func_def)
     then show ?thesis using calculation by auto
   qed
-
-
   have fact6e: "(add2 \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c successor = 
                 successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c (add2 \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>" 
   proof - 
@@ -368,14 +358,10 @@ proof -
   qed
 qed
 
-
-
-
 lemma add_respects_succ1:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
   shows "m +\<^sub>\<nat> (successor  \<circ>\<^sub>c n)  =  successor\<circ>\<^sub>c (m +\<^sub>\<nat> n)"
   using add_def add2_respects_succ_right assms by auto
-
 
 lemma add_respects_succ2:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
@@ -391,7 +377,6 @@ lemma add_respects_succ3:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c" 
   shows "(successor\<circ>\<^sub>c m) +\<^sub>\<nat> n = successor\<circ>\<^sub>c (m +\<^sub>\<nat> n)"
   using add_respects_succ1 add_respects_succ2 assms(1) assms(2) by auto
-
 
 (*Terrible name, needs to be changed*)
 lemma add_pi1_pi0_1xsEqs_s_add_pi1_pi_0:
@@ -423,7 +408,6 @@ proof -
     using swap_def assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod swap_ap by auto
   then show ?thesis using calculation by auto
 qed
-
 
 (*Terrible name, needs to be changed*)
 lemma pointfree_add_pi1_pi0_1xsEqs_s_add_pi1_pi_0:
@@ -479,11 +463,9 @@ proof -
     also have "... = left_cart_proj \<nat>\<^sub>c one"
       by (metis cfunc_type_def id_left_unit left_cart_proj_type)
     then show ?thesis using calculation by auto
-  qed
-  
+  qed  
   then have fact0: "((add2  \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero) = (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
       by (typecheck_cfuncs, simp add: transpose_func_unique)
-
   have fact1: "((add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat> = 
                    successor \<circ>\<^sub>c  add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>"
   proof - 
@@ -497,15 +479,13 @@ proof -
     then show ?thesis
       using calculation by auto
   qed
-
   have fact2: "((add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor) = 
         successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c (add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp>"
     by (typecheck_cfuncs, metis fact1 sharp_cancels_flat transpose_of_comp)
 
   have add1_def2: "(add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> = add1"
-    sorry
-
-    show "m +\<^sub>\<nat> n  = n +\<^sub>\<nat> m"
+    by (typecheck_cfuncs, metis add1_property exp_func_type fact0 fact2 natural_number_object_func_unique successor_type)    
+  show "m +\<^sub>\<nat> n  = n +\<^sub>\<nat> m"
   proof - 
     have "m +\<^sub>\<nat> n = add2 \<circ>\<^sub>c \<langle>m,n\<rangle>"
       by (simp add: add_def)
@@ -539,8 +519,7 @@ proof -
     show lhs_type: "?lhs : one \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
       by typecheck_cfuncs
     show rhs_type: "?rhs : one \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
-      by typecheck_cfuncs
-    
+      by typecheck_cfuncs    
     have lhs_eval: "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ?lhs)
       = (add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) one)"
     (is "?lhs1 = ?rhs1")
@@ -563,7 +542,7 @@ proof -
             (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f
               (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c
             (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
-          using a_type b_type by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def2 inv_transpose_of_composition transpose_func_def)
+          using a_type b_type by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def3 inv_transpose_of_composition transpose_func_def)
         also have "... = (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
                                       ((id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>)"
           using a_type b_type by (typecheck_cfuncs, smt comp_associative2 transpose_func_def)
@@ -587,7 +566,6 @@ proof -
           using calculation by auto
       qed
     qed
-
     have rhs_eval: "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ?rhs) 
       = (add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) one)"
     (is "?lhs1 = ?rhs1")
@@ -616,7 +594,7 @@ proof -
           using a_type b_type by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
         also have "... = add2 \<circ>\<^sub>c ((add2 \<times>\<^sub>f  id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,zero\<rangle>)"
           using a_type b_type
-          by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod comp_associative2 flat_cancels_sharp id_left_unit2 id_right_unit2 inv_transpose_func_def2)
+          by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod comp_associative2 flat_cancels_sharp id_left_unit2 id_right_unit2 inv_transpose_func_def3)
         also have "... = add2 \<circ>\<^sub>c \<langle> add2 \<circ>\<^sub>c \<langle>a,b\<rangle>,zero\<rangle>"
           using a_type b_type by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
         also have "... = add2 \<circ>\<^sub>c \<langle>a,b\<rangle>"
@@ -627,12 +605,10 @@ proof -
           using calculation by auto
       qed
     qed
-
     show "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ?lhs)
         = eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ?rhs)"
       by (simp add: lhs_eval rhs_eval)
   qed
-
 
   have square1: "(add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor 
       = successor\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>\<^sub>f \<circ>\<^sub>c (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
@@ -677,7 +653,6 @@ proof -
     then have "((add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat>
           = successor \<circ>\<^sub>c (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)"
         by (typecheck_cfuncs, simp add: inv_transpose_of_composition)
-
     then show "(add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor
         = successor\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>\<^sub>f \<circ>\<^sub>c (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
       by (typecheck_cfuncs, metis sharp_cancels_flat transpose_of_comp)
@@ -726,8 +701,6 @@ proof -
     then show ?thesis
       by auto
   qed
-
-  thm triangle square1 square2
   have "(add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>
       = (add2 \<circ>\<^sub>c add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>"
     by (typecheck_cfuncs, metis exp_func_type natural_number_object_func_unique square1 square2 successor_type triangle)
@@ -764,8 +737,7 @@ proof -
     show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
       using assms by typecheck_cfuncs
     show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
-  
+      by typecheck_cfuncs  
     show "a_b_add_eq \<circ>\<^sub>c zero = (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero"
     proof -
       have "a_b_add_eq \<circ>\<^sub>c zero = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c zero"
@@ -916,10 +888,6 @@ proof(rule ccontr, auto)
     using zero_is_not_successor zero_type by blast
 qed
    
-
-
-
-
 subsection \<open>More Facts on Iter\<close>
 
 lemma ITER_add_aux:
@@ -992,7 +960,6 @@ proof(rule natural_number_object_func_unique[where X="X\<^bsup>X\<^esup>", where
   qed
 qed
 
-
 lemma ITER_add:
  assumes "g : X \<rightarrow> X"
  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
@@ -1020,7 +987,7 @@ proof -
   have "g\<^bsup>\<circ>(m +\<^sub>\<nat> n)\<^esup> = cnufatem ((ITER X \<circ>\<^sub>c \<langle>metafunc g, m \<rangle>) \<box> (ITER X \<circ>\<^sub>c \<langle>metafunc g, n \<rangle>))"
     using assms ITER_add iter_comp_def3 by (typecheck_cfuncs, presburger)
   also have "... = cnufatem (ITER X \<circ>\<^sub>c \<langle>metafunc g, m \<rangle>) \<circ>\<^sub>c cnufatem (ITER X \<circ>\<^sub>c \<langle>metafunc g, n \<rangle>)"
-    using assms by (typecheck_cfuncs, metis comp_as_metacomp2)
+    using assms by (typecheck_cfuncs, metis metacomp_as_comp)
   also have "... = (g\<^bsup>\<circ>m\<^esup>) \<circ>\<^sub>c (g\<^bsup>\<circ>n\<^esup>)"
     using assms iter_comp_def3 by presburger
   then show ?thesis
@@ -1040,10 +1007,8 @@ proof -
   also have "... = j +\<^sub>\<nat> n"
     using assms by (typecheck_cfuncs, simp add: n_accessible_by_succ_iter)
   then show ?thesis
-    by (metis add_cancellative add_respects_zero_on_left assms(1) assms(2) calculation zero_type)
+    by (metis add_cancellative add_respects_zero_on_left assms(1,2) calculation zero_type)
 qed
-
-
 
 (*
 lemma iterative_injective_peeling:
@@ -1075,10 +1040,6 @@ definition meta_add :: "cset \<Rightarrow> cfunc"
 lemma meta_add_type[type_rule]:
   "meta_add X : (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<rightarrow> \<nat>\<^sub>c\<^bsup>X\<^esup>"
   unfolding meta_add_def by typecheck_cfuncs
-
-
-
-
 
 lemma madd_commutes:
   assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
@@ -1261,6 +1222,5 @@ proof(unfold meta_add_def)
     \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>"
     using assms by(typecheck_cfuncs, metis sharp_cancels_flat)
 qed
-
 
 end

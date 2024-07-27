@@ -1,5 +1,5 @@
 theory Exponential_Objects
-  imports Empty Axiom_Of_Choice
+  imports Empty 
 begin
 
 section \<open>Exponential Objects, Transposes and Evaluation\<close>
@@ -1725,22 +1725,17 @@ proof -
     using  is_smaller_than_def map_type by blast
 qed
 
-
-
-
 lemma exp_set_smaller_than1:
   assumes "A \<le>\<^sub>c B"
-  assumes "nonempty(X)"   (*This seems like the appropriate assumption
-                            since if A \<cong> \<emptyset> and X \<cong> \<emptyset> and B nonempty then 
-                            X\<^bsup>A\<^esup> \<cong> 1 but X\<^bsup>B\<^esup> \<cong> \<emptyset> so the conclusion does not follow*)
+  assumes "nonempty(X)"   
   shows "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
 proof (unfold is_smaller_than_def)
 
   obtain x where x_type[type_rule]: "x \<in>\<^sub>c X"
-    using assms unfolding nonempty_def by auto
+    using assms(2) unfolding nonempty_def by auto
 
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
-    using assms unfolding is_smaller_than_def by auto
+    using assms(1) unfolding is_smaller_than_def by auto
 
   show "\<exists>m. m : X\<^bsup>A\<^esup> \<rightarrow> X\<^bsup>B\<^esup> \<and> monomorphism m"
   proof (rule_tac x="(((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>))
@@ -1757,7 +1752,6 @@ proof (unfold is_smaller_than_def)
       fix g h Z
       assume g_type[type_rule]: "g : Z \<rightarrow> X\<^bsup>A\<^esup>"
       assume h_type[type_rule]: "h : Z \<rightarrow> X\<^bsup>A\<^esup>"
-
       assume eq: "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
           dist_prod_coprod_inv (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
           swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c g
@@ -1768,7 +1762,6 @@ proof (unfold is_smaller_than_def)
 
       show "g = h"
       proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=A, where X=X], auto)
-
         show "eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f g = eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f h"
         proof (typecheck_cfuncs, rule one_separator[where X="A \<times>\<^sub>c Z", where Y="X"], auto)
           fix az
@@ -1887,8 +1880,6 @@ proof (unfold is_smaller_than_def)
   qed
 qed
 
-
-
 lemma exp_set_smaller_than2:
   assumes "A \<le>\<^sub>c B"
   shows "A\<^bsup>X\<^esup> \<le>\<^sub>c B\<^bsup>X\<^esup>"
@@ -1924,18 +1915,11 @@ proof (unfold is_smaller_than_def)
   qed
 qed
 
-
-(*Rename..... this sounds too much like an ordinal arithmetic fact*)
-lemma leq_transitive:
+lemma set_card_transitive:
   assumes "A \<le>\<^sub>c B"
   assumes "B \<le>\<^sub>c C"
   shows   "A \<le>\<^sub>c C"
   by (typecheck_cfuncs, metis (full_types) assms cfunc_type_def comp_type composition_of_monic_pair_is_monic is_smaller_than_def)
-
-
-
-
-
 
 lemma exp_set_smaller_than3:
   assumes "A \<le>\<^sub>c B"
@@ -1948,9 +1932,8 @@ proof -
   have leq2: "X\<^bsup>B\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
     by (simp add: assms(2) exp_set_smaller_than2)
   show "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
-    using leq1 leq2 leq_transitive by blast
+    using leq1 leq2 set_card_transitive by blast
 qed
-
 
 lemma sets_squared:
   "A\<^bsup>\<Omega>\<^esup> \<cong> A \<times>\<^sub>c A "
@@ -2175,6 +2158,14 @@ proof -
    then show ?thesis
      using \<phi>_type is_isomorphic_def by blast
 qed
+
+
+section \<open>Pulled from Countable.thy\<close>
+
+
+(*We need a theory of Nats before we can have a general theory of Countable sets!*)
+
+
 
 
 

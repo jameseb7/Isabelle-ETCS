@@ -151,7 +151,6 @@ proof -
       then have y_eq_v: "y = v"
         unfolding v_def using i_iso
         by (typecheck_cfuncs, smt (verit, best) comp_associative2 id_right_unit2 inv_right)
-
       show "w = y"
         using w_eq_v y_eq_v by auto
     qed
@@ -428,13 +427,10 @@ proof -
 
   have p'_u_is_id: "p' \<circ>\<^sub>c u = id \<nat>\<^sub>c"
   proof (etcs_rule natural_number_object_func_unique[where f=successor])
-
     show "(p' \<circ>\<^sub>c u) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
       by (etcs_subst id_left_unit2, etcs_assocr, etcs_subst u_zero z'_def, simp)
-
     show "(p' \<circ>\<^sub>c u) \<circ>\<^sub>c successor = successor \<circ>\<^sub>c p' \<circ>\<^sub>c u"
       by (etcs_assocr, etcs_subst u_succ, etcs_assocl, etcs_subst s'_def, simp)
-
     show "id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
       by (etcs_subst id_right_unit2 id_left_unit2, simp)
   qed
@@ -573,7 +569,6 @@ lemma ITER_one:
  shows "ITER U \<circ>\<^sub>c \<langle>f, successor \<circ>\<^sub>c zero\<rangle> = f \<box> ( metafunc (id U))"
   using ITER_succ ITER_zero' assms zero_type by presburger
 
-(*We need to change the values used because 55 is not sufficient as it is throwing type errors when pasting a goal*)
 definition iter_comp :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("_\<^bsup>\<circ>_\<^esup>"[55,0]55) where
   "iter_comp g n  \<equiv> cnufatem (ITER (domain g) \<circ>\<^sub>c \<langle>metafunc g,n\<rangle>)"
 
