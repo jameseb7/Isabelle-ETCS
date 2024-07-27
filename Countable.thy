@@ -3781,6 +3781,61 @@ qed
 (*This is only a note: For any set X, the set \<P>X of its subsets is strictly larger than X*)
 
 
+lemma "Generalized_Cantors_Positive_Theorem":
+  assumes "\<not>(terminal_object Y)"
+  assumes "\<not>(initial_object Y)"
+  shows "X  \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+proof - 
+  have "\<Omega> \<le>\<^sub>c Y"
+    by (simp add: assms non_init_non_ter_sets)
+  then have fact: "\<Omega>\<^bsup>X\<^esup> \<le>\<^sub>c  Y\<^bsup>X\<^esup>"
+    by (simp add: exp_set_smaller_than2)
+  have "X \<le>\<^sub>c \<Omega>\<^bsup>X\<^esup>"
+    by (meson Cantors_Positive_Theorem CollectI injective_imp_monomorphism is_smaller_than_def)
+  then show ?thesis
+    using fact leq_transitive by blast
+qed
+
+
+lemma Generalized_Cantors_Negative_Theorem:
+  assumes "\<not>(initial_object X)"
+  assumes "\<not>(terminal_object Y)"
+  shows "\<nexists> s. s : X \<rightarrow> Y\<^bsup>X\<^esup> \<and> surjective(s)"
+proof(rule ccontr, auto) 
+  fix s 
+  assume s_type: "s : X \<rightarrow> Y\<^bsup>X\<^esup>"
+  assume s_surj: "surjective(s)"
+  obtain m where m_type: "m : Y\<^bsup>X\<^esup> \<rightarrow> X" and m_mono: "monomorphism(m)"
+    by (meson epis_give_monos s_surj s_type surjective_is_epimorphism)
+  have "nonempty X"
+    using is_empty_def assms(1) iso_empty_initial no_el_iff_iso_empty nonempty_def by blast
+
+  then have nonempty: "nonempty (\<Omega>\<^bsup>X\<^esup>)"
+    using nonempty_def nonempty_to_nonempty true_func_type by blast
+  show False
+  proof(cases "initial_object Y")
+    assume "initial_object Y"
+    then have "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
+      by (simp add: \<open>nonempty X\<close> empty_to_nonempty initial_iso_empty no_el_iff_iso_empty)      
+    then show False
+      by (meson is_empty_def assms(1) comp_type iso_empty_initial no_el_iff_iso_empty s_type) 
+  next
+    assume "\<not> initial_object Y"
+    then have "\<Omega> \<le>\<^sub>c Y"
+      by (simp add: assms(2) non_init_non_ter_sets)
+    then obtain n where n_type: "n : \<Omega>\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>" and n_mono: "monomorphism(n)"
+      by (meson exp_set_smaller_than2 is_smaller_than_def)
+    then have mn_type: "m \<circ>\<^sub>c n :  \<Omega>\<^bsup>X\<^esup> \<rightarrow> X"
+      by (meson comp_type m_type)
+    have mn_mono: "monomorphism(m \<circ>\<^sub>c n)"
+      using cfunc_type_def composition_of_monic_pair_is_monic m_mono m_type n_mono n_type by presburger
+    then have "\<exists>g. g: X  \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> epimorphism(g) \<and> g \<circ>\<^sub>c (m \<circ>\<^sub>c n) = id (\<Omega>\<^bsup>X\<^esup>)"
+      by (simp add: mn_type monos_give_epis nonempty)
+    then show False
+      by (metis Cantors_Negative_Theorem epi_is_surj powerset_def)
+  qed
+qed
+
 
 
 
