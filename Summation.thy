@@ -454,7 +454,7 @@ proof(unfold meta_add_def indexed_sum_def)
 
 
 
-(Use meta_add below)
+(* Use meta_add below *)
 lemma indexed_sum_split:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c"
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
@@ -469,7 +469,7 @@ proof(unfold indexed_sum_def)
         (eval_func  \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)
                \<circ>\<^sub>c (id(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<times>\<^sub>f (right_cart_proj \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)\<^esup>)  \<circ>\<^sub>c indexed_sum1) )) \<circ>\<^sub>c \<langle>\<langle>a,f\<rangle>,n\<rangle>"
     by (typecheck_cfuncs, simp add: comp_associative2 inv_transpose_func_def2)
-  also have "... =
+  also have "... ="
 
 (*
 definition indexed_sum :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" where
