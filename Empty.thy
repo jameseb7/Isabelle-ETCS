@@ -4,7 +4,6 @@ begin
 
 section  \<open>Axiom 8: Empty Set and Initial Objects\<close>
 
-
 axiomatization
   initial_func :: "cset \<Rightarrow> cfunc" ("\<alpha>\<^bsub>_\<^esub>" 100) and
   emptyset :: "cset" ("\<emptyset>")
@@ -13,11 +12,8 @@ where
   initial_func_unique: "h : \<emptyset> \<rightarrow> X \<Longrightarrow> h = initial_func X" and
   emptyset_is_empty: "\<not>(x \<in>\<^sub>c \<emptyset>)"
 
-
-
 definition initial_object :: "cset \<Rightarrow> bool" where
   "initial_object(X) \<longleftrightarrow> (\<forall> Y. \<exists>! f. f : X \<rightarrow> Y)"
-
 
 lemma emptyset_is_initial:
   "initial_object(\<emptyset>)"
@@ -28,10 +24,8 @@ lemma initial_iso_empty:
   shows "X \<cong> \<emptyset>"
   by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso initial_object_def injective_def injective_imp_monomorphism is_isomorphic_def singletonI surjective_def surjective_is_epimorphism)
 
-
-
 (* Exercise 2.4.6 *)
-lemma coproduct_with_zero_does_nothing:
+lemma coproduct_with_empty:
   shows "X \<Coprod> \<emptyset> \<cong> X"
 proof -
   have comp1: "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) = left_coproj X \<emptyset>"
@@ -71,31 +65,22 @@ proof -
     using cfunc_coprod_type id_type initial_func_type is_isomorphic_def by blast
 qed
 
-
-
 (* Proposition 2.4.7 *)
 lemma function_to_empty_is_iso:
   assumes "f: X \<rightarrow> \<emptyset>"
   shows "isomorphism(f)"
   by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso injective_def injective_imp_monomorphism singletonI surjective_def surjective_is_epimorphism)
 
-
-
-
-lemma zero_times_X:
+lemma empty_prod_X:
   "\<emptyset> \<times>\<^sub>c X \<cong> \<emptyset>"
   using cfunc_type_def function_to_empty_is_iso is_isomorphic_def left_cart_proj_type by blast
 
-lemma X_times_zero: 
+lemma X_prod_empty: 
   "X \<times>\<^sub>c \<emptyset> \<cong> \<emptyset>"
   using cfunc_type_def function_to_empty_is_iso is_isomorphic_def right_cart_proj_type by blast
 
-
-
-
-
 (* Proposition  2.4.8 *)
-lemma no_el_iff_iso_0:
+lemma no_el_iff_iso_empty:
   "is_empty X \<longleftrightarrow> X \<cong> \<emptyset>"
 proof auto
   show "X \<cong> \<emptyset> \<Longrightarrow> is_empty X"
@@ -123,31 +108,25 @@ lemma initial_maps_mono:
   assumes "initial_object(X)"
   assumes "f : X \<rightarrow> Y"
   shows "monomorphism(f)"
-  by (metis UNIV_I assms cfunc_type_def initial_iso_empty injective_def injective_imp_monomorphism no_el_iff_iso_0 is_empty_def)
-
-
+  by (metis UNIV_I assms cfunc_type_def initial_iso_empty injective_def injective_imp_monomorphism no_el_iff_iso_empty is_empty_def)
 
 lemma iso_empty_initial:
   assumes "X \<cong> \<emptyset>"
   shows "initial_object(X)"
   unfolding initial_object_def
-  by (meson assms comp_type is_isomorphic_def isomorphic_is_symmetric isomorphic_is_transitive no_el_iff_iso_0 is_empty_def one_separator terminal_func_type)
- 
+  by (meson assms comp_type is_isomorphic_def isomorphic_is_symmetric isomorphic_is_transitive no_el_iff_iso_empty is_empty_def one_separator terminal_func_type)
 
 lemma function_to_empty_set_is_iso:
   assumes "f: X \<rightarrow> Y"
   assumes "is_empty Y"
   shows "isomorphism(f)"
   by (metis assms cfunc_type_def comp_type epi_mon_is_iso injective_def injective_imp_monomorphism is_empty_def singletonI surjective_def surjective_is_epimorphism)
-  
-
 
 lemma prod_iso_to_empty_right:
   assumes "nonempty X"
   assumes "X \<times>\<^sub>c Y \<cong> \<emptyset>"
   shows "is_empty Y"
   by (metis emptyset_is_empty is_empty_def cfunc_prod_type epi_is_surj is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric nonempty_def surjective_def2 assms)
-
 
 lemma prod_iso_to_empty_left:
   assumes "nonempty Y"
@@ -159,7 +138,8 @@ lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>
   by (metis UNIV_I cfunc_type_def emptyset_is_empty initial_func_type injective_def injective_imp_monomorphism subobject_of_def2)
 
 text \<open>The lemma below corresponds to Proposition 2.2.1 in Halvorson\<close>
-lemma "card ({(X,m). (X,m) \<subseteq>\<^sub>c one}//{((X1,m1),(X2,m2)). X1 \<cong> X2}) = 2"
+lemma one_has_two_subsets:
+  "card ({(X,m). (X,m) \<subseteq>\<^sub>c one}//{((X1,m1),(X2,m2)). X1 \<cong> X2}) = 2"
 proof -
   have one_subobject: "(one, id one) \<subseteq>\<^sub>c one"
     using element_monomorphism id_type subobject_of_def2 by blast
@@ -205,7 +185,7 @@ proof -
           using true_false_distinct by auto
       qed
       then show "X \<cong> \<emptyset>"
-        using is_empty_def \<open>\<nexists>x. x \<in>\<^sub>c X\<close> no_el_iff_iso_0 by blast
+        using is_empty_def \<open>\<nexists>x. x \<in>\<^sub>c X\<close> no_el_iff_iso_empty by blast
     qed
 
     show "X \<cong> one \<or> X \<cong> \<emptyset>"
@@ -227,8 +207,6 @@ proof -
     by (simp add: classes_distinct)
 qed
 
-
-
 (*In fact these could go into Terminal.thy where we first define "is_empty" but it seems more natural here*)
 lemma prod_with_empty_is_empty1:
   assumes "is_empty (A)"
@@ -240,17 +218,15 @@ lemma prod_with_empty_is_empty2:
   shows "is_empty (A \<times>\<^sub>c B)"
   using assms cart_prod_decomp is_empty_def by blast
 
-
 lemma coprod_with_init_obj1: 
   assumes "initial_object Y"
   shows "X \<Coprod> Y \<cong> X"
-  by (meson assms coprod_pres_iso coproduct_with_zero_does_nothing initial_iso_empty isomorphic_is_reflexive isomorphic_is_transitive)
+  by (meson assms coprod_pres_iso coproduct_with_empty initial_iso_empty isomorphic_is_reflexive isomorphic_is_transitive)
 
 lemma coprod_with_init_obj2: 
   assumes "initial_object X"
   shows "X \<Coprod> Y \<cong> Y"
   using assms coprod_with_init_obj1 coproduct_commutes isomorphic_is_transitive by blast
-
 
 lemma prod_with_term_obj1:
   assumes "terminal_object(X)" 
@@ -261,7 +237,6 @@ lemma prod_with_term_obj2:
   assumes "terminal_object(Y)" 
   shows  "X \<times>\<^sub>c Y \<cong> X"
   by (meson assms isomorphic_is_transitive prod_with_term_obj1 product_commutes)
-
 
 end
 
