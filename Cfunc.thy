@@ -673,7 +673,6 @@ lemma id_isomorphism: "isomorphism (id X)"
   unfolding isomorphism_def
   by (rule_tac x="id X" in exI, auto simp add: id_codomain id_domain, metis id_domain id_right_unit)
 
-(*facts about isomorphisms*)
 lemma isomorphic_is_reflexive: "X \<cong> X"
   unfolding is_isomorphic_def
   by (rule_tac x="id X" in exI, auto simp add: id_domain id_codomain id_isomorphism id_type)
@@ -708,7 +707,8 @@ next
     unfolding trans_def using isomorphic_is_transitive by blast
 qed
 
-(*Exercise 2.1.7a*)
+
+text \<open>The lemma below corresponds to Exercise 2.1.7a in Halvorson\<close>
 lemma comp_monic_imp_monic:
   assumes "domain g = codomain f"
   shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
@@ -733,7 +733,7 @@ lemma comp_monic_imp_monic':
   shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
   by (metis assms cfunc_type_def comp_monic_imp_monic)
 
-(*Exercise 2.1.7b*)
+text \<open>The lemma below corresponds to Exercise 2.1.7b in Halvorson\<close>
 lemma comp_epi_imp_epi:
   assumes "domain g = codomain f"
   shows "epimorphism (g \<circ>\<^sub>c f) \<Longrightarrow> epimorphism g"
@@ -753,7 +753,7 @@ proof auto
     using gf_epi codomain_comp domain_s domain_t by (simp add: assms)
 qed
 
-(*Exercise 2.1.7c*)
+text \<open>The lemma below corresponds to Exercise 2.1.7c in Halvorson\<close>
 lemma composition_of_monic_pair_is_monic:
   assumes "codomain f = domain g"
   shows "monomorphism f \<Longrightarrow> monomorphism g \<Longrightarrow> monomorphism (g \<circ>\<^sub>c f)"
@@ -780,7 +780,7 @@ proof auto
     by (simp add: codomain_h codomain_k domain_comp f_mono assms)
 qed
 
-(*Exercise 2.1.7d*)
+text \<open>The lemma below corresponds to Exercise 2.1.7d in Halvorson\<close>
 lemma composition_of_epi_pair_is_epi:
 assumes "codomain f = domain g"
   shows "epimorphism f \<Longrightarrow> epimorphism g \<Longrightarrow> epimorphism (g \<circ>\<^sub>c f)"
@@ -808,8 +808,7 @@ proof auto
     by (simp add: codomain_comp domain_h domain_k g_epi assms)
 qed
 
-
-(*Exercise 2.1.7e*)
+text \<open>The lemma below corresponds to Exercise 2.1.7e in Halvorson\<close>
 lemma iso_imp_epi_and_monic:
   "isomorphism f \<Longrightarrow> epimorphism f \<and> monomorphism f"
   unfolding isomorphism_def epimorphism_def monomorphism_def
@@ -842,7 +841,6 @@ proof auto
     using calculation by auto
 next
   fix g h k
-
   assume domain_g: "domain g = codomain f"
   assume codomain_g: "codomain g = domain f"
   assume gf_id: "g \<circ>\<^sub>c f = id (domain f)"
@@ -865,25 +863,21 @@ next
     by (simp add: gf_id)
   also have "... = k"
     by (metis codomain_k id_left_unit)
-
   then show "k = h"
     using calculation by auto
 qed
 
-
 lemma isomorphism_sandwich: 
   assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C" and h_type: "h: C \<rightarrow> D"
-  assumes f_iso: "isomorphism(f)"
-  assumes h_iso: "isomorphism(h)"
+  assumes f_iso: "isomorphism f"
+  assumes h_iso: "isomorphism h"
   assumes hgf_iso: "isomorphism(h \<circ>\<^sub>c g \<circ>\<^sub>c f)"
-  shows "isomorphism(g)"
+  shows "isomorphism g"
 proof -
   have "isomorphism(h\<^bold>\<inverse> \<circ>\<^sub>c (h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<circ>\<^sub>c f\<^bold>\<inverse>)"
     using assms by (typecheck_cfuncs, simp add: f_iso h_iso hgf_iso inv_iso isomorphism_comp')
   then show "isomorphism(g)"
     using assms by (typecheck_cfuncs_prems, smt comp_associative2 id_left_unit2 id_right_unit2 inv_left inv_right)
 qed
-
-
 
 end

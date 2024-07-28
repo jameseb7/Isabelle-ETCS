@@ -22,24 +22,24 @@ lemma emptyset_is_initial:
 lemma initial_iso_empty:
   assumes "initial_object(X)"
   shows "X \<cong> \<emptyset>"
-  by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso initial_object_def injective_def injective_imp_monomorphism is_isomorphic_def singletonI surjective_def surjective_is_epimorphism)
+  by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso initial_object_def injective_def injective_imp_monomorphism is_isomorphic_def surjective_def surjective_is_epimorphism)
 
-(* Exercise 2.4.6 *)
+text \<open>The lemma below corresponds to Exercise 2.4.6 in Halvorson\<close>
 lemma coproduct_with_empty:
   shows "X \<Coprod> \<emptyset> \<cong> X"
 proof -
-  have comp1: "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) = left_coproj X \<emptyset>"
+  have comp1: "(left_coproj X \<emptyset> \<circ>\<^sub>c (id X \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c left_coproj X \<emptyset> = left_coproj X \<emptyset>"
   proof -
-    have "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) =
-            (left_coproj X \<emptyset>) \<circ>\<^sub>c ((id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>) \<circ>\<^sub>c (left_coproj X \<emptyset>))"
+    have "(left_coproj X \<emptyset> \<circ>\<^sub>c (id X \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c left_coproj X \<emptyset> =
+            left_coproj X \<emptyset> \<circ>\<^sub>c (id X \<amalg> \<alpha>\<^bsub>X\<^esub> \<circ>\<^sub>c left_coproj X \<emptyset>)"
       by (typecheck_cfuncs, simp add: comp_associative2)
-    also have "... = (left_coproj X \<emptyset>) \<circ>\<^sub>c id(X)"
+    also have "... = left_coproj X \<emptyset> \<circ>\<^sub>c id(X)"
       by (typecheck_cfuncs, metis left_coproj_cfunc_coprod)
     also have "... = left_coproj X \<emptyset>"
       by (typecheck_cfuncs, metis id_right_unit2)
     then show ?thesis using calculation by auto
   qed
-  have comp2: "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) = right_coproj X \<emptyset>"
+  have comp2: "(left_coproj X \<emptyset> \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c right_coproj X \<emptyset> = right_coproj X \<emptyset>"
   proof -
     have "((left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) = 
              (left_coproj X \<emptyset>) \<circ>\<^sub>c ((id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>) \<circ>\<^sub>c (right_coproj X \<emptyset>))"
@@ -50,9 +50,9 @@ proof -
       by (typecheck_cfuncs, metis initial_func_unique)
     then show ?thesis using calculation by auto
   qed
-  then have fact1: "((left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>)) \<circ>\<^sub>c (left_coproj X \<emptyset>) = (left_coproj X \<emptyset>)"
+  then have fact1: "(left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>) \<circ>\<^sub>c left_coproj X \<emptyset> = left_coproj X \<emptyset>"
     using left_coproj_cfunc_coprod by (typecheck_cfuncs, blast)
-  then have fact2: "((left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) = (right_coproj X \<emptyset>)"
+  then have fact2: "((left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>)) \<circ>\<^sub>c (right_coproj X \<emptyset>) = right_coproj X \<emptyset>"
     using right_coproj_cfunc_coprod by (typecheck_cfuncs, blast)
   then have concl: "(left_coproj X \<emptyset>) \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>) = ((left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>))"
     using cfunc_coprod_unique comp1 comp2 by (typecheck_cfuncs, blast)
@@ -65,11 +65,11 @@ proof -
     using cfunc_coprod_type id_type initial_func_type is_isomorphic_def by blast
 qed
 
-(* Proposition 2.4.7 *)
+text \<open>The lemma below corresponds to Proposition 2.4.7 in Halvorson\<close>
 lemma function_to_empty_is_iso:
   assumes "f: X \<rightarrow> \<emptyset>"
   shows "isomorphism(f)"
-  by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso injective_def injective_imp_monomorphism singletonI surjective_def surjective_is_epimorphism)
+  by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso injective_def injective_imp_monomorphism  surjective_def surjective_is_epimorphism)
 
 lemma empty_prod_X:
   "\<emptyset> \<times>\<^sub>c X \<cong> \<emptyset>"
@@ -79,7 +79,7 @@ lemma X_prod_empty:
   "X \<times>\<^sub>c \<emptyset> \<cong> \<emptyset>"
   using cfunc_type_def function_to_empty_is_iso is_isomorphic_def right_cart_proj_type by blast
 
-(* Proposition  2.4.8 *)
+text \<open>The lemma below corresponds to Proposition 2.4.8 in Halvorson\<close>
 lemma no_el_iff_iso_empty:
   "is_empty X \<longleftrightarrow> X \<cong> \<emptyset>"
 proof auto
@@ -88,7 +88,7 @@ proof auto
 next 
   assume "is_empty X"
   obtain f where f_type: "f: \<emptyset> \<rightarrow> X"
-    using initial_func_type by blast  (* f = \<alpha>_X *)
+    using initial_func_type by blast
  
   have  f_inj: "injective(f)"
     using cfunc_type_def emptyset_is_empty f_type injective_def by auto
@@ -108,19 +108,19 @@ lemma initial_maps_mono:
   assumes "initial_object(X)"
   assumes "f : X \<rightarrow> Y"
   shows "monomorphism(f)"
-  by (metis UNIV_I assms cfunc_type_def initial_iso_empty injective_def injective_imp_monomorphism no_el_iff_iso_empty is_empty_def)
+  by (metis assms cfunc_type_def initial_iso_empty injective_def injective_imp_monomorphism no_el_iff_iso_empty is_empty_def)
 
 lemma iso_empty_initial:
   assumes "X \<cong> \<emptyset>"
-  shows "initial_object(X)"
+  shows "initial_object X"
   unfolding initial_object_def
   by (meson assms comp_type is_isomorphic_def isomorphic_is_symmetric isomorphic_is_transitive no_el_iff_iso_empty is_empty_def one_separator terminal_func_type)
 
 lemma function_to_empty_set_is_iso:
   assumes "f: X \<rightarrow> Y"
   assumes "is_empty Y"
-  shows "isomorphism(f)"
-  by (metis assms cfunc_type_def comp_type epi_mon_is_iso injective_def injective_imp_monomorphism is_empty_def singletonI surjective_def surjective_is_epimorphism)
+  shows "isomorphism f"
+  by (metis assms cfunc_type_def comp_type epi_mon_is_iso injective_def injective_imp_monomorphism is_empty_def surjective_def surjective_is_epimorphism)
 
 lemma prod_iso_to_empty_right:
   assumes "nonempty X"
@@ -135,7 +135,7 @@ lemma prod_iso_to_empty_left:
   by (meson is_empty_def nonempty_def prod_iso_to_empty_right assms)
 
 lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>c X"
-  by (metis UNIV_I cfunc_type_def emptyset_is_empty initial_func_type injective_def injective_imp_monomorphism subobject_of_def2)
+  by (metis cfunc_type_def emptyset_is_empty initial_func_type injective_def injective_imp_monomorphism subobject_of_def2)
 
 text \<open>The lemma below corresponds to Proposition 2.2.1 in Halvorson\<close>
 lemma one_has_two_subsets:
@@ -239,5 +239,3 @@ lemma prod_with_term_obj2:
   by (meson assms isomorphic_is_transitive prod_with_term_obj1 product_commutes)
 
 end
-
-

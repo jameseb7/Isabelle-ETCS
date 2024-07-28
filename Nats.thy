@@ -46,7 +46,7 @@ lemma N_is_a_NNO:
     "is_NNO \<nat>\<^sub>c zero successor"
 by (simp add: is_NNO_def natural_number_object_property successor_type zero_type)
 
-(* Exercise 2.6.5 *)
+text \<open>The lemma below corresponds to Exercise 2.6.5 in Halvorson\<close>
 lemma NNOs_are_iso_N:
   assumes "is_NNO N z s"
   shows "N \<cong> \<nat>\<^sub>c"
@@ -86,7 +86,7 @@ proof-
     using cfunc_type_def half_isomorphism is_isomorphic_def isomorphism_def u_type v_type by fastforce
 qed
 
-(* Converse to Exercise 2.6.5 *)
+text \<open>The lemma below is the converse to Exercise 2.6.5 in Halvorson\<close>
 lemma Iso_to_N_is_NNO:
   assumes "N \<cong> \<nat>\<^sub>c"
   shows "\<exists> z s. is_NNO N z s"
@@ -188,7 +188,7 @@ proof (rule ccontr, auto)
     using true_false_distinct by blast
 qed
 
-(* Proposition 2.6.6 *)
+text \<open>The lemma below corresponds to Proposition 2.6.6 in Halvorson\<close>
 lemma oneUN_iso_N_isomorphism:
  "isomorphism(zero \<amalg> successor)" 
 proof - 
@@ -350,7 +350,7 @@ qed
     
 section \<open>Peano's Axioms and Induction\<close>
 
-(* Proposition 2.6.7 *)
+text \<open>The lemma below corresponds to Proposition 2.6.7 in Halvorson\<close>
 lemma Peano's_Axioms:
  "injective(successor) \<and> \<not>surjective(successor)"
 proof - 
@@ -699,11 +699,11 @@ lemma n_accessible_by_succ_iter:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(successor\<^bsup>\<circ>n\<^esup>) \<circ>\<^sub>c zero = n"
 proof - 
-  have "n = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,  ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> ,id \<nat>\<^sub>c  \<rangle>\<rangle> \<circ>\<^sub>c n"
+  have "n = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c n"
     using assms by (typecheck_cfuncs, simp add: comp_associative2 id_left_unit2 n_accessible_by_succ_iter_aux)
-  also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n ,  ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>  \<circ>\<^sub>c n ,id \<nat>\<^sub>c  \<circ>\<^sub>c n \<rangle>\<rangle> "
+  also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n , ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n, id \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>\<rangle> "
     using assms by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-  also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero,  ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor ,n \<rangle>\<rangle> "
+  also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero,  ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor, n\<rangle>\<rangle> "
     using assms by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2 terminal_func_comp_elem)
   also have "... = (successor\<^bsup>\<circ>n\<^esup>) \<circ>\<^sub>c zero"
     using assms by (typecheck_cfuncs, metis eval_lemma iter_comp_def3 metafunc_cnufatem)

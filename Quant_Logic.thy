@@ -101,7 +101,6 @@ lemma FORALL_true_implies_all_true:
 proof (rule ccontr)
   fix x
   assume x_type: "x \<in>\<^sub>c X"
-
   assume "p \<circ>\<^sub>c x \<noteq> \<t>"
   then have "p \<circ>\<^sub>c x = \<f>"
     using comp_type p_type true_false_only_truth_values x_type by blast
@@ -170,8 +169,6 @@ lemma FORALL_true_implies_all_true3:
   shows "\<And> x. x \<in>\<^sub>c X  \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, id one\<rangle> = \<t>"
   using FORALL_p_true FORALL_true_implies_all_true2 id_right_unit2 terminal_func_unique by (typecheck_cfuncs, auto)
 
-
-
 lemma FORALL_elim:
   assumes FORALL_p_true: "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t>" and p_type[type_rule]: "p : X \<times>\<^sub>c one \<rightarrow> \<Omega>"
   assumes x_type[type_rule]: "x \<in>\<^sub>c X"
@@ -218,8 +215,6 @@ lemma EXISTS_elim:
   assumes EXISTS_p_true: "EXISTS X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>" and p_type: "p : X \<rightarrow> \<Omega>"
   shows "(\<And> x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c x = \<t> \<Longrightarrow> Q) \<Longrightarrow> Q"
   using EXISTS_p_true EXISTS_true_implies_exists_true p_type by auto
-
-
 
 lemma exists_true_implies_EXISTS_true:
   assumes p_type: "p : X \<rightarrow> \<Omega>" and exists_p_true: "\<exists> x. x \<in>\<^sub>c X \<and> p \<circ>\<^sub>c x = \<t>"

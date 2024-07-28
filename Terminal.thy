@@ -27,7 +27,7 @@ lemma terminal_func_comp_elem:
 
 subsection \<open>Set membership and emptiness\<close>
 
-text \<open>The abbreviation below captures Definition 2.1.16 in Halvorson.\<close>
+text \<open>The abbreviation below captures Definition 2.1.16 in Halvorson\<close>
 abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
   "x \<in>\<^sub>c X \<equiv> (x : one \<rightarrow> X)"
 
@@ -37,7 +37,7 @@ definition nonempty :: "cset \<Rightarrow> bool" where
 definition is_empty :: "cset \<Rightarrow> bool" where
   "is_empty X \<equiv> \<not>(\<exists>x. x \<in>\<^sub>c X)"
 
-text \<open>The lemma below corresponds to Exercise 2.1.18 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.18 in Halvorson\<close>
 lemma element_monomorphism:
   "x \<in>\<^sub>c X \<Longrightarrow> monomorphism x"
   unfolding monomorphism_def
@@ -63,7 +63,7 @@ lemma terminal_el_monomorphism:
   unfolding monomorphism_def
   by (metis assms cfunc_type_def domain_comp terminal_object_def)
 
-text \<open>The lemma below corresponds to Exercise 2.1.15 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.15 in Halvorson\<close>
 lemma terminal_objects_isomorphic:
   assumes "terminal_object X" "terminal_object Y"
   shows "X \<cong> Y"
@@ -90,7 +90,7 @@ proof -
     using f_isomorphism f_type by auto
 qed
 
-text \<open>The two lemmas below show the converse to Exercise 2.1.15 in Halvorson.\<close>
+text \<open>The two lemmas below show the converse to Exercise 2.1.15 in Halvorson\<close>
 lemma iso_to1_is_term:
   assumes "X \<cong> one"
   shows "terminal_object X"
@@ -123,7 +123,7 @@ lemma iso_to_term_is_term:
   shows "terminal_object X"
   by (meson assms iso_to1_is_term isomorphic_is_transitive one_terminal_object terminal_objects_isomorphic)
 
-text \<open>The lemma below corresponds to Proposition 2.1.19 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.19 in Halvorson\<close>
 lemma single_elem_iso_one:
   "(\<exists>! x. x \<in>\<^sub>c X) \<longleftrightarrow> X \<cong> one"
 proof
@@ -185,25 +185,23 @@ qed
 
 subsection \<open>Injectivity\<close>
 
-text \<open>The definition below corresponds to Definition 2.1.24 in Halvorson.\<close>
+text \<open>The definition below corresponds to Definition 2.1.24 in Halvorson\<close>
 definition injective :: "cfunc \<Rightarrow> bool" where
  "injective f  \<longleftrightarrow> (\<forall> x y. (x \<in>\<^sub>c domain f \<and> y \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y) \<longrightarrow> x = y)"
-
 
 lemma injective_def2:
   assumes "f : X \<rightarrow> Y"
   shows "injective f  \<longleftrightarrow> (\<forall> x y. (x \<in>\<^sub>c X \<and> y \<in>\<^sub>c X \<and> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y) \<longrightarrow> x = y)"
   using assms cfunc_type_def injective_def by force
 
-text \<open>The lemma below corresponds to Exercise 2.1.26 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.26 in Halvorson\<close>
 lemma monomorphism_imp_injective:
   "monomorphism f \<Longrightarrow> injective f"
   by (simp add: cfunc_type_def injective_def monomorphism_def)
 
-text \<open>The lemma below corresponds to Proposition 2.1.27 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.27 in Halvorson\<close>
 lemma injective_imp_monomorphism:
-  assumes "f \<in> ETCS_func"
-  shows "injective f \<Longrightarrow> monomorphism f"
+  "injective f \<Longrightarrow> monomorphism f"
   unfolding monomorphism_def injective_def
 proof safe
   fix g h
@@ -213,11 +211,11 @@ proof safe
   assume fg_eq_fh: "f \<circ>\<^sub>c g = f \<circ>\<^sub>c h"
 
   obtain X Y where f_type: "f : X \<rightarrow> Y"
-    using assms cfunc_type_def by blast
+    using cfunc_type_def by auto    
   obtain A where g_type: "g : A \<rightarrow> X" and h_type: "h : A \<rightarrow> X"
     by (metis cd_g_eq_d_f cd_h_eq_d_f cfunc_type_def domain_comp f_type fg_eq_fh)
 
-  have "(\<forall>x. x \<in>\<^sub>c A \<longrightarrow> g \<circ>\<^sub>c x = h \<circ>\<^sub>c x)"
+  have "\<forall>x. x \<in>\<^sub>c A \<longrightarrow> g \<circ>\<^sub>c x = h \<circ>\<^sub>c x"
   proof auto
     fix x
     assume x_in_A: "x \<in>\<^sub>c A"
@@ -235,7 +233,7 @@ lemma cfunc_cross_prod_inj:
   assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
   assumes "injective f \<and> injective g"
   shows "injective (f \<times>\<^sub>f g)"
-  by (typecheck_cfuncs, metis assms cfunc_cross_prod_mono injective_imp_monomorphism mem_Collect_eq monomorphism_imp_injective)
+  by (typecheck_cfuncs, metis assms cfunc_cross_prod_mono injective_imp_monomorphism monomorphism_imp_injective)
 
 lemma cfunc_cross_prod_mono_converse:
   assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
@@ -264,11 +262,11 @@ proof (auto)
     have yb_type: "\<langle>y,b\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Z"
       by (simp add: b_def cfunc_prod_type y_type2)
     have "(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>x,b\<rangle> = \<langle>f \<circ>\<^sub>c x,g \<circ>\<^sub>c b\<rangle>"
-      using b_def cfunc_cross_prod_comp_cfunc_prod type_assms(1) type_assms(2) x_type2 by blast
+      using b_def cfunc_cross_prod_comp_cfunc_prod type_assms x_type2 by blast
     also have "... = \<langle>f \<circ>\<^sub>c y,g \<circ>\<^sub>c b\<rangle>"
       by (simp add: equals)
     also have "... = (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>y,b\<rangle>"
-      using b_def cfunc_cross_prod_comp_cfunc_prod type_assms(1) type_assms(2) y_type2 by auto
+      using b_def cfunc_cross_prod_comp_cfunc_prod type_assms y_type2 by auto
     then have "\<langle>x,b\<rangle> = \<langle>y,b\<rangle>"
       by (metis calculation cfunc_type_def fg_inject fg_type injective_def xb_type yb_type)
     then show "x = y"
@@ -350,7 +348,7 @@ qed
 
 subsection \<open>Surjectivity\<close>
 
-text \<open>The definition below corresponds to Definition 2.1.28 in Halvorson.\<close>
+text \<open>The definition below corresponds to Definition 2.1.28 in Halvorson\<close>
 definition surjective :: "cfunc \<Rightarrow> bool" where
  "surjective f  \<longleftrightarrow> (\<forall>y. y \<in>\<^sub>c codomain f \<longrightarrow> (\<exists>x. x \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = y))"
 
@@ -359,7 +357,7 @@ lemma surjective_def2:
   shows "surjective f  \<longleftrightarrow> (\<forall>y. y \<in>\<^sub>c Y \<longrightarrow> (\<exists>x. x \<in>\<^sub>c X \<and> f \<circ>\<^sub>c x = y))"
   using assms unfolding surjective_def cfunc_type_def by auto
 
-text \<open>The lemma below corresponds to Exercise 2.1.30 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.30 in Halvorson\<close>
 lemma surjective_is_epimorphism:
   "surjective f \<Longrightarrow> epimorphism f"
   unfolding surjective_def epimorphism_def
@@ -396,7 +394,7 @@ next
     by (metis empty cfunc_type_def codomain_comp nonempty_def one_separator)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.2.10 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.10 in Halvorson\<close>
 lemma cfunc_cross_prod_surj:
   assumes type_assms: "f : A \<rightarrow> C" "g : B \<rightarrow> D"
   assumes f_surj: "surjective f" and g_surj: "surjective g"
@@ -493,7 +491,7 @@ next
     unfolding diagonal_def using cfunc_prod_unique id_type left_eq x_type by blast
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.1.20 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.20 in Halvorson\<close>
 lemma X_is_cart_prod1:
   "is_cart_prod X (id X) (\<beta>\<^bsub>X\<^esub>) X one"
   unfolding is_cart_prod_def
@@ -550,14 +548,7 @@ lemma one_x_A_iso_A:
   "one \<times>\<^sub>c X \<cong> X"
   by (meson A_x_one_iso_A isomorphic_is_transitive product_commutes)
 
-
-
-
-
-
-
-
-text \<open>The following four lemmas provide some concrete examples of above isomorphisms\<close>
+text \<open>The following four lemmas provide some concrete examples of the above isomorphisms\<close>
 lemma left_cart_proj_one_left_inverse:
   "\<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X one = id (X \<times>\<^sub>c one)"
   by (typecheck_cfuncs, smt (z3) cfunc_prod_comp cfunc_prod_unique id_left_unit2 id_right_unit2 right_cart_proj_type terminal_func_comp terminal_func_unique)
@@ -580,8 +571,7 @@ lemma cfunc_cross_prod_right_terminal_decomp:
   using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_def cfunc_prod_comp cfunc_type_def
       comp_associative2 right_cart_proj_type terminal_func_comp terminal_func_unique)
 
-(* Proposition 2.1.21 *)
-(* this is equivalent to cart_prod_eq *)
+text \<open>The lemma below corresponds to Proposition 2.1.21 in Halvorson\<close>
 lemma cart_prod_elem_eq:
   assumes "a \<in>\<^sub>c X \<times>\<^sub>c Y" "b \<in>\<^sub>c X \<times>\<^sub>c Y"
   shows "a = b \<longleftrightarrow> 
@@ -589,14 +579,13 @@ lemma cart_prod_elem_eq:
       \<and> right_cart_proj X Y \<circ>\<^sub>c a = right_cart_proj X Y \<circ>\<^sub>c b)"
   by (metis (full_types) assms cfunc_prod_unique comp_type left_cart_proj_type right_cart_proj_type)
 
-(* Note 2.1.22 *)
-(* this is equivalent to cart_prod_eq2 *)
+text \<open>The lemma below corresponds to Note 2.1.22 in Halvorson\<close>
 lemma  element_pair_eq:
   assumes "x \<in>\<^sub>c X" "x' \<in>\<^sub>c X" "y \<in>\<^sub>c Y" "y' \<in>\<^sub>c Y"
   shows "\<langle>x, y\<rangle> = \<langle>x', y'\<rangle> \<longleftrightarrow> x = x' \<and> y = y'"
   by (metis assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
 
-text \<open>The lemma below corresponds to Proposition 2.1.23 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.23 in Halvorson\<close>
 lemma nonempty_right_imp_left_proj_epimorphism:
   "nonempty Y \<Longrightarrow> epimorphism (left_cart_proj X Y)"
 proof -
@@ -611,7 +600,6 @@ proof -
     fix g h
     assume domain_g: "domain g = codomain (left_cart_proj X Y)"
     assume domain_h: "domain h = codomain (left_cart_proj X Y)"
-
     assume "g \<circ>\<^sub>c left_cart_proj X Y = h \<circ>\<^sub>c left_cart_proj X Y"
     then have "g \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c \<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> = h \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c \<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>"
       using y_in_Y by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative domain_g domain_h)
@@ -620,7 +608,7 @@ proof -
   qed
 qed
 
-text \<open>The lemma below is the dual of Proposition 2.1.23 in Halvorson.\<close>
+text \<open>The lemma below is the dual of Proposition 2.1.23 in Halvorson\<close>
 lemma nonempty_left_imp_right_proj_epimorphism:
   "nonempty X \<Longrightarrow> epimorphism (right_cart_proj X Y)"
 proof - 
@@ -635,7 +623,6 @@ proof -
     fix g h
     assume domain_g: "domain g = codomain (right_cart_proj X Y)"
     assume domain_h: "domain h = codomain (right_cart_proj X Y)"
-
     assume "g \<circ>\<^sub>c right_cart_proj X Y = h \<circ>\<^sub>c right_cart_proj X Y"
     then have "g \<circ>\<^sub>c right_cart_proj X Y \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> = h \<circ>\<^sub>c right_cart_proj X Y \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle>"
       using y_in_Y by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative domain_g domain_h)
@@ -643,8 +630,6 @@ proof -
       by (metis cfunc_type_def domain_g domain_h id_eq id_right_unit right_cart_proj_type)
   qed
 qed
-
-
 
 lemma cart_prod_extract_left:
   assumes "f : one \<rightarrow> X" "g : one \<rightarrow> Y"

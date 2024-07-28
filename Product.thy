@@ -198,7 +198,7 @@ lemma cfunc_cross_prod_unique: "f : W \<rightarrow> Y \<Longrightarrow> g : X \<
   unfolding cfunc_cross_prod_def
   using cfunc_prod_unique cfunc_type_def comp_type left_cart_proj_type right_cart_proj_type by auto
 
-text \<open>The lemma below corresponds to Proposition 2.1.11 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.11 in Halvorson.\<close>
 lemma identity_distributes_across_composition:
   assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C"
   shows "id(X) \<times>\<^sub>f (g  \<circ>\<^sub>c f) = (id(X) \<times>\<^sub>f g) \<circ>\<^sub>c (id(X) \<times>\<^sub>f f)"
@@ -247,7 +247,6 @@ lemma cfunc_prod_comp:
   assumes f_type: "f : X \<rightarrow> Y"
   assumes a_type: "a : Y \<rightarrow> A" and b_type: "b : Y \<rightarrow> B"
   shows "\<langle>a, b\<rangle> \<circ>\<^sub>c f = \<langle>a \<circ>\<^sub>c f, b \<circ>\<^sub>c f\<rangle>"
-
 proof -
   have same_left_proj: "left_cart_proj A B \<circ>\<^sub>c \<langle>a, b\<rangle> \<circ>\<^sub>c f = a \<circ>\<^sub>c f"
     using assms by (typecheck_cfuncs, simp add: comp_associative2 left_cart_proj_cfunc_prod)
@@ -344,7 +343,6 @@ proof -
     using calculation by auto
 qed
 
-
 lemma swap_cross_prod:
   assumes "x : A \<rightarrow> X" "y : B \<rightarrow> Y"
   shows "swap X Y \<circ>\<^sub>c (x \<times>\<^sub>f y) = (y \<times>\<^sub>f x) \<circ>\<^sub>c swap A B"
@@ -361,7 +359,6 @@ proof -
     using calculation by auto
 qed
 
-
 lemma swap_idempotent:
   "swap Y X \<circ>\<^sub>c swap X Y = id (X \<times>\<^sub>c Y)"
   by (metis swap_def cfunc_prod_unique id_right_unit2 id_type left_cart_proj_type
@@ -370,7 +367,6 @@ lemma swap_idempotent:
 lemma swap_mono:
   "monomorphism(swap X Y)"
   by (metis cfunc_type_def iso_imp_epi_and_monic isomorphism_def swap_idempotent swap_type)
-
 
 subsubsection \<open>Permuting a Cartesian product to associate to the right\<close>
 
@@ -403,8 +399,6 @@ proof -
     using calculation by auto
 qed
 
-
-
 lemma associate_right_crossprod_ap:
   assumes "x : A \<rightarrow> X" "y : B \<rightarrow> Y" "z : C \<rightarrow> Z"
   shows "associate_right X Y Z \<circ>\<^sub>c ((x \<times>\<^sub>f y) \<times>\<^sub>f z) = (x \<times>\<^sub>f (y\<times>\<^sub>f z)) \<circ>\<^sub>c  associate_right A B C"
@@ -424,9 +418,6 @@ proof-
     unfolding associate_right_def by auto
   then show ?thesis using calculation by auto
 qed
-
-
-
 
 subsubsection \<open>Permuting a Cartesian product to associate to the left\<close>
 
@@ -464,7 +455,6 @@ proof -
     using calculation by auto
 qed
 
-
 lemma right_left: 
  "(associate_right A B C) \<circ>\<^sub>c (associate_left A B C) = id (A \<times>\<^sub>c (B \<times>\<^sub>c C))"
   by (typecheck_cfuncs, smt (verit, ccfv_threshold) associate_left_def associate_right_ap cfunc_prod_unique comp_type id_right_unit2 left_cart_proj_type right_cart_proj_type)
@@ -476,8 +466,6 @@ lemma left_right:
 lemma product_associates:
   "A \<times>\<^sub>c (B \<times>\<^sub>c C)  \<cong> (A \<times>\<^sub>c B) \<times>\<^sub>c C"
     by (metis associate_left_type associate_right_type cfunc_type_def is_isomorphic_def isomorphism_def left_right right_left) 
-
-
 
 lemma associate_left_crossprod_ap:
   assumes "x : A \<rightarrow> X" "y : B \<rightarrow> Y" "z : C \<rightarrow> Z"
@@ -498,9 +486,8 @@ proof-
     unfolding associate_left_def by auto
   then show ?thesis using calculation by auto
 qed
-
   
-    subsubsection \<open>Distributing over a Cartesian product from the right\<close>
+subsubsection \<open>Distributing over a Cartesian product from the right\<close>
 
 definition distribute_right_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_right_left X Y Z = 
@@ -516,8 +503,6 @@ lemma distribute_right_left_ap:
   shows "distribute_right_left X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle> = \<langle>x, z\<rangle>"
   unfolding distribute_right_left_def 
   by (typecheck_cfuncs, smt (verit, best) assms cfunc_prod_comp comp_associative2 left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
-
-
 
 definition distribute_right_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_right_right X Y Z = 
@@ -548,7 +533,6 @@ lemma distribute_right_ap:
   using assms unfolding distribute_right_def  
   by (typecheck_cfuncs, simp add: cfunc_prod_comp distribute_right_left_ap distribute_right_right_ap)
 
-
 lemma distribute_right_mono:
   "monomorphism (distribute_right X Y Z)"
 proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
@@ -577,7 +561,6 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by (simp add: g_expand h_expand)
 qed
 
-
 subsubsection \<open>Distributing over a Cartesian product from the left\<close>
 
 definition distribute_left_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
@@ -595,9 +578,6 @@ lemma distribute_left_left_ap:
   using assms distribute_left_left_def  
   by (typecheck_cfuncs, smt (z3) associate_left_ap associate_left_def cart_prod_decomp cart_prod_eq2 cfunc_prod_comp comp_associative2 distribute_left_left_def right_cart_proj_cfunc_prod right_cart_proj_type)
 
-
-
-
 definition distribute_left_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_left_right X Y Z = 
     \<langle>left_cart_proj X (Y \<times>\<^sub>c Z), right_cart_proj Y Z \<circ>\<^sub>c right_cart_proj X (Y \<times>\<^sub>c Z)\<rangle>"
@@ -613,9 +593,6 @@ lemma distribute_left_right_ap:
   using assms unfolding distribute_left_right_def  
   by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
 
-
-
-
 definition distribute_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_left X Y Z = \<langle>distribute_left_left X Y Z, distribute_left_right X Y Z\<rangle>"
 
@@ -629,8 +606,6 @@ lemma distribute_left_ap:
   shows "distribute_left X Y Z \<circ>\<^sub>c \<langle>x, \<langle>y, z\<rangle>\<rangle> = \<langle>\<langle>x, y\<rangle>, \<langle>x, z\<rangle>\<rangle>"
   using assms unfolding distribute_left_def 
   by (typecheck_cfuncs, simp add: cfunc_prod_comp distribute_left_left_ap distribute_left_right_ap)
-
-
 
 lemma distribute_left_mono:
   "monomorphism (distribute_left X Y Z)"
@@ -737,7 +712,6 @@ proof -
     using calculation by auto
 qed
 
-
 definition rights :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "rights A B C D = \<langle>
       right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A \<times>\<^sub>c B) (C \<times>\<^sub>c D),
@@ -760,6 +734,5 @@ proof -
   then show ?thesis
     using calculation by auto
 qed
-
 
 end

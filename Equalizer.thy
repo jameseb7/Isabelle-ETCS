@@ -46,7 +46,6 @@ proof -
     assume f_type2: "f : X' \<rightarrow> Y'"
     assume g_type2: "g : X' \<rightarrow> Y'"
     assume m_type: "m : E \<rightarrow> X'"
-
     assume fm_eq_gm: "f \<circ>\<^sub>c m = g \<circ>\<^sub>c m"
     assume equalizer_unique: "\<forall>h F. h : F \<rightarrow> X' \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E \<and> m \<circ>\<^sub>c k = h)"
 
@@ -62,7 +61,7 @@ proof -
   qed
 qed 
 
-text \<open>The lemma below corresponds to Exercise 2.1.31 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.31 in Halvorson\<close>
 lemma equalizers_isomorphic:
   assumes "equalizer E m f g" "equalizer E' m' f g"
   shows "\<exists> k. k : E \<rightarrow> E' \<and> isomorphism k \<and> m = m' \<circ>\<^sub>c k"
@@ -76,9 +75,9 @@ proof -
     using assms(1) unfolding equalizer_def by auto
 
   obtain k where k_type: "k : E' \<rightarrow> E" and mk_eq_m': "m \<circ>\<^sub>c k = m'"
-    by (metis assms(1) assms(2) cfunc_type_def equalizer_def)
+    by (metis assms cfunc_type_def equalizer_def)
   obtain k' where k'_type: "k' : E \<rightarrow> E'" and m'k_eq_m: "m' \<circ>\<^sub>c k' = m"
-    by (metis assms(1) assms(2) cfunc_type_def equalizer_def)
+    by (metis assms cfunc_type_def equalizer_def)
 
   have "f \<circ>\<^sub>c m \<circ>\<^sub>c k \<circ>\<^sub>c k' = g \<circ>\<^sub>c m \<circ>\<^sub>c k \<circ>\<^sub>c k'"
     using comp_associative2 m_type fm_eq_gm k'_type k_type m'k_eq_m mk_eq_m' by auto
@@ -111,7 +110,7 @@ proof -
 
   have equalizes: "f \<circ>\<^sub>c m \<circ>\<^sub>c \<phi> = g \<circ>\<^sub>c m \<circ>\<^sub>c \<phi>"
     using assms comp_associative2 equalizer_def by force
-  have "(\<forall>h F. h : F \<rightarrow> X \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E' \<and> (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = h))"
+  have "\<forall>h F. h : F \<rightarrow> X \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E' \<and> (m \<circ>\<^sub>c \<phi>) \<circ>\<^sub>c k = h)"
   proof(auto)
     fix h F
     assume h_type[type_rule]: "h : F \<rightarrow> X"
@@ -136,7 +135,7 @@ proof -
     by (smt (verit, best) assms(1,4,5,6) comp_type equalizer_def equalizes)
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.1.34 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.34 in Halvorson\<close>
 lemma equalizer_is_monomorphism:
   "equalizer E m f g \<Longrightarrow>  monomorphism(m)"
   unfolding equalizer_def monomorphism_def
@@ -155,18 +154,18 @@ proof auto
     using cfunc_type_def comp_associative f_type fm_gm g_type m_ga_mh m_type relation_h by auto
   then obtain z where "z: domain(h1) \<rightarrow> E \<and> m \<circ>\<^sub>c z = m \<circ>\<^sub>c h1 \<and> 
     (\<forall> j. j:domain(h1) \<rightarrow> E \<and>  m \<circ>\<^sub>c j = m \<circ>\<^sub>c h1 \<longrightarrow> j = z)"
-    using uniqueness by (erule_tac x="m \<circ>\<^sub>c h1" in allE, erule_tac x="domain(ga)" in allE,
+    using uniqueness by (erule_tac x="m \<circ>\<^sub>c h1" in allE, erule_tac x="domain(h1)" in allE,
                          smt cfunc_type_def codomain_comp domain_comp m_ga_mh m_type relation_ga)
   then show "h1 = h2"
     by (metis cfunc_type_def domain_comp m_ga_mh m_type relation_ga relation_h)
 qed
 
-text \<open>The definition below corresponds to Definition 2.1.35 in Halvorson.\<close>
+text \<open>The definition below corresponds to Definition 2.1.35 in Halvorson\<close>
 definition regular_monomorphism :: "cfunc \<Rightarrow> bool"
   where "regular_monomorphism f  \<longleftrightarrow>  
           (\<exists> g h. domain(g) = codomain(f) \<and> domain(h) = codomain(f) \<and> equalizer (domain f) f g h)"
 
-text \<open>The lemma below corresponds to Exercise 2.1.36 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.36 in Halvorson\<close>
 lemma epi_regmon_is_iso:
   assumes "epimorphism(f)" "regular_monomorphism(f)"
   shows "isomorphism(f)"
@@ -195,7 +194,7 @@ qed
 
 subsection \<open>Subobjects\<close>
 
-text \<open>The definition below corresponds to Definition 2.1.32 in Halvorson.\<close>
+text \<open>The definition below corresponds to Definition 2.1.32 in Halvorson\<close>
 definition factors_through :: "cfunc  \<Rightarrow> cfunc \<Rightarrow> bool" (infix "factorsthru" 90)
   where "g factorsthru f \<longleftrightarrow> (\<exists> h. (h: domain(g)\<rightarrow> domain(f)) \<and> f \<circ>\<^sub>c h = g)"
 
@@ -204,7 +203,7 @@ lemma factors_through_def2:
   shows "g factorsthru f \<longleftrightarrow> (\<exists> h. h: X \<rightarrow> Y \<and> f \<circ>\<^sub>c h = g)"
   unfolding factors_through_def using assms by (simp add: cfunc_type_def)
 
-text \<open>The lemma below corresponds to Exercise 2.1.33 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.33 in Halvorson\<close>
 lemma xfactorthru_equalizer_iff_fx_eq_gx:
   assumes "f: X\<rightarrow> Y" "g:X \<rightarrow> Y" "equalizer E m f g" "x\<in>\<^sub>c X"
   shows "x factorsthru m \<longleftrightarrow> f \<circ>\<^sub>c x = g  \<circ>\<^sub>c x"
@@ -219,7 +218,7 @@ next
     by (metis RHS assms(1,3,4) cfunc_type_def equalizer_def)
 qed
 
-text \<open>The definition below corresponds to Definition 2.1.37 in Halvorson.\<close>
+text \<open>The definition below corresponds to Definition 2.1.37 in Halvorson\<close>
 definition subobject_of :: "cset \<times> cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<subseteq>\<^sub>c" 50)
   where "B \<subseteq>\<^sub>c X \<longleftrightarrow> (snd B : fst B \<rightarrow> X \<and> monomorphism (snd B))"
 
@@ -241,7 +240,7 @@ lemma subobject_is_relative_subset: "(B,m) \<subseteq>\<^sub>c A \<longleftright
   unfolding relative_subset_def2 subobject_of_def2
   using cfunc_type_def id_isomorphism id_left_unit id_type iso_imp_epi_and_monic by auto
 
-text \<open>The definition below corresponds to Definition 2.1.39 in Halvorson.\<close>
+text \<open>The definition below corresponds to Definition 2.1.39 in Halvorson\<close>
 definition relative_member :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" ("_ \<in>\<^bsub>_\<^esub> _" [51,50,51]50) where
   "x \<in>\<^bsub>X\<^esub> B \<longleftrightarrow> (x \<in>\<^sub>c X \<and> monomorphism (snd B) \<and> snd B : fst B \<rightarrow> X \<and> x factorsthru (snd B))"
 
@@ -249,7 +248,7 @@ lemma relative_member_def2:
   "x \<in>\<^bsub>X\<^esub> (B, m) = (x \<in>\<^sub>c X \<and> monomorphism m \<and> m : B \<rightarrow> X \<and> x factorsthru m)"
   unfolding relative_member_def by auto
 
-text \<open>The lemma below corresponds to Proposition 2.1.40 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.40 in Halvorson\<close>
 lemma relative_subobject_member:
   assumes "(A,n) \<subseteq>\<^bsub>X\<^esub> (B,m)" "x \<in>\<^sub>c X"
   shows "x \<in>\<^bsub>X\<^esub> (A,n) \<Longrightarrow> x \<in>\<^bsub>X\<^esub> (B,m)"
@@ -258,12 +257,9 @@ proof auto
   fix k
   assume m_type: "m : B \<rightarrow> X"
   assume k_type: "k : A \<rightarrow> B"
-
   assume m_monomorphism: "monomorphism m"
   assume mk_monomorphism: "monomorphism (m \<circ>\<^sub>c k)"
-
   assume n_eq_mk: "n = m \<circ>\<^sub>c k"
-
   assume factorsthru_mk: "x factorsthru (m \<circ>\<^sub>c k)"
   
   obtain a where a_assms: "a \<in>\<^sub>c A \<and> (m \<circ>\<^sub>c k) \<circ>\<^sub>c a = x"
@@ -276,6 +272,7 @@ qed
 
 section \<open>Pullback\<close>
 
+text \<open>The definition below corresponds to a definition stated between Definition 2.1.42 and Definition 2.1.43 in Halvorson\<close>
 definition is_pullback :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
   "is_pullback A B C D ab bd ac cd \<longleftrightarrow> 
     (ab : A \<rightarrow> B \<and> bd : B \<rightarrow> D \<and> ac : A \<rightarrow> C \<and> cd : C \<rightarrow> D \<and> bd \<circ>\<^sub>c ab = cd \<circ>\<^sub>c ac \<and> 
@@ -338,6 +335,7 @@ qed
 
 section \<open>Inverse Image\<close>
 
+text\<open>The definition below corresponds to a definition given by a diagram between Definition 2.1.37 and Proposition 2.1.38 in Halvorson\<close>
 definition inverse_image :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>" [101,0,0]100) where
   "inverse_image f B m = (SOME A. \<exists> X Y k. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer A k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B))"
@@ -364,7 +362,7 @@ lemma inverse_image_is_equalizer2:
   shows "equalizer (inverse_image f B m) (inverse_image_mapping f B m) (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
 proof -
   obtain k where "equalizer (inverse_image f B m) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
-    using assms(1) assms(2) assms(3) inverse_image_is_equalizer by blast
+    using assms inverse_image_is_equalizer by blast
   then have "\<exists> X Y. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer (inverse_image f B m) (inverse_image_mapping f B m) (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
     unfolding inverse_image_mapping_def using assms by (rule_tac someI_ex, auto)
@@ -389,7 +387,7 @@ lemma inverse_image_mapping_monomorphism:
   shows "monomorphism (inverse_image_mapping f B m)"
   using assms equalizer_is_monomorphism inverse_image_is_equalizer2 by blast
 
-(* Proposition 2.1.38 *)
+text \<open>The lemma below is the dual of Proposition 2.1.38 in Halvorson.\<close>
 lemma inverse_image_monomorphism:
   assumes "m : B \<rightarrow> Y" "f : X \<rightarrow> Y" "monomorphism m"
   shows "monomorphism (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m)"
@@ -484,7 +482,6 @@ next
          (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h"
   proof (insert k_type h_type assms, typecheck_cfuncs, safe, rule_tac x=u in exI, safe)
     fix u
-
     assume u_type: "u : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
     assume u_eq: "inverse_image_mapping f B m \<circ>\<^sub>c u = \<langle>h,k\<rangle>"
 
@@ -498,10 +495,8 @@ next
   qed
 next
   fix Z j y
-
   assume j_type: "j : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
   assume y_type: "y : Z \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
-
   assume "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c y =
        (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j"
   then show "j = y"
@@ -509,7 +504,7 @@ next
     by (smt (verit, ccfv_threshold) inverse_image_monomorphism left_cart_proj_type monomorphism_def3)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.1.41 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.41 in Halvorson\<close>
 lemma in_inverse_image:
   assumes "f : X \<rightarrow> Y" "(B,m) \<subseteq>\<^sub>c Y" "x \<in>\<^sub>c X"
   shows "(x \<in>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m)) = (f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B,m))"
@@ -558,7 +553,7 @@ qed
 
 section \<open>Fibered Products\<close>
 
-text \<open>The definition below corresponds to Definition 2.1.42 in Halvorson.\<close>
+text \<open>The definition below corresponds to Definition 2.1.42 in Halvorson\<close>
 definition fibered_product :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" ("_ \<^bsub>_\<^esub>\<times>\<^sub>c\<^bsub>_\<^esub> _" [66,50,50,65]65) where
   "X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y = (SOME E. \<exists> Z m. f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z \<and>
     equalizer E m (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y))"
@@ -658,7 +653,7 @@ next
 
   have "\<langle>h,k\<rangle> factorsthru fibered_product_morphism X f g Y"
     using assms h_type k_h_commutes k_type pair_factorsthru_fibered_product_morphism by auto
-  then have "(\<exists>j. j : A \<rightarrow> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) \<and> fibered_product_morphism X f g Y \<circ>\<^sub>c j = \<langle>h,k\<rangle>)"
+  then have "\<exists>j. j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and> fibered_product_morphism X f g Y \<circ>\<^sub>c j = \<langle>h,k\<rangle>"
     by (meson assms cfunc_prod_type factors_through_def2 fibered_product_morphism_type h_type k_type)
   then show "\<exists>j. j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
            fibered_product_right_proj X f g Y \<circ>\<^sub>c j = k \<and> fibered_product_left_proj X f g Y \<circ>\<^sub>c j = h"
@@ -761,7 +756,6 @@ next
       show "j : domain \<langle>x,y\<rangle> \<rightarrow> domain (fibered_product_morphism X f g Y)"
         using assms j_type cfunc_type_def by (typecheck_cfuncs, auto)
 
-
       have left_eq: "left_cart_proj X Y \<circ>\<^sub>c fibered_product_morphism X f g Y \<circ>\<^sub>c j = x"
         using j_projs assms j_type comp_associative2
         unfolding fibered_product_left_proj_def by (typecheck_cfuncs, auto)
@@ -785,17 +779,14 @@ proof(auto)
   assume x_type[type_rule]: "x \<in>\<^sub>c X"
   assume y_type[type_rule]: "y \<in>\<^sub>c X"
   assume a3: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-
   then obtain h where
     h_type: "h \<in>\<^sub>c X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub>X" and h_eq: "fibered_product_morphism X f f X \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
     by (meson factors_through_def2 relative_member_def2)
-
 
   have left_eq: "fibered_product_left_proj X f f X \<circ>\<^sub>c h = x"
       unfolding fibered_product_left_proj_def
       by (typecheck_cfuncs, smt (z3) assms(1) comp_associative2 h_eq h_type left_cart_proj_cfunc_prod y_type)
     
-
   have right_eq: "fibered_product_right_proj X f f X \<circ>\<^sub>c h = y"
     unfolding fibered_product_right_proj_def
     by (typecheck_cfuncs, metis (full_types) a3 comp_associative2 h_eq h_type relative_member_def2 right_cart_proj_cfunc_prod x_type)
@@ -809,7 +800,7 @@ lemma kernel_pair_subset:
   shows "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
   using assms fibered_product_morphism_monomorphism fibered_product_morphism_type subobject_of_def2 by auto
 
-text \<open>The three lemmas below correspond to Exercise 2.1.44 in Halvorson.\<close>
+text \<open>The three lemmas below correspond to Exercise 2.1.44 in Halvorson\<close>
 lemma kern_pair_proj_iso_TFAE1:
   assumes "f: X \<rightarrow> Y" "monomorphism f"
   shows "(fibered_product_left_proj X f f X) = (fibered_product_right_proj X f f X)"
@@ -919,8 +910,8 @@ next
       have "xx \<circ>\<^sub>c a \<in>\<^sub>c codomain xx"
         using a_assms comp_type f4 by auto
       then show ?thesis
-        using f11 f9 f5 f2
-        using a_assms assms(1) cfunc_type_def fibered_product_morphism_monomorphism fibered_product_morphism_type monomorphism_def x_type
+        using f11 f9 f5 f2 a_assms assms(1) cfunc_type_def fibered_product_morphism_monomorphism 
+              fibered_product_morphism_type monomorphism_def x_type
         by auto
     qed
     also have "... = id\<^sub>c (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) \<circ>\<^sub>c x"

@@ -38,7 +38,7 @@ lemma add2_apply:
   by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2)
 
 definition add :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixl "+\<^sub>\<nat>" 65)
-  where "m +\<^sub>\<nat> n = add2\<circ>\<^sub>c\<langle>m, n\<rangle>"
+  where "m +\<^sub>\<nat> n = add2 \<circ>\<^sub>c \<langle>m, n\<rangle>"
 
 lemma add_type[type_rule]:
   assumes "m : X \<rightarrow> \<nat>\<^sub>c" "n : X \<rightarrow> \<nat>\<^sub>c"
@@ -46,7 +46,7 @@ lemma add_type[type_rule]:
   unfolding add_def using assms by typecheck_cfuncs
 
 lemma add_def2:
-  assumes "m\<in>\<^sub>c  \<nat>\<^sub>c" "n\<in>\<^sub>c  \<nat>\<^sub>c"
+  assumes "m \<in>\<^sub>c  \<nat>\<^sub>c" "n\<in>\<^sub>c  \<nat>\<^sub>c"
   shows "m +\<^sub>\<nat> n = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add1 \<circ>\<^sub>c n\<rangle>"
   unfolding add_def using assms by (typecheck_cfuncs, simp add: add2_apply)
 
@@ -1222,5 +1222,21 @@ proof(unfold meta_add_def)
     \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>"
     using assms by(typecheck_cfuncs, metis sharp_cancels_flat)
 qed
+
+lemma meta_add_as_add:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"  
+  assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  shows "cnufatem (meta_add \<nat>\<^sub>c \<circ>\<^sub>c \<langle>f, g\<rangle>) \<circ>\<^sub>c n = ((cnufatem  f) \<circ>\<^sub>c n) +\<^sub>\<nat> ((cnufatem  g) \<circ>\<^sub>c n)"
+proof(unfold meta_add_def add_def)
+  have "cnufatem
+     ((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c
+    id \<nat>\<^sub>c =
+    add2 \<circ>\<^sub>c \<langle>cnufatem f \<circ>\<^sub>c id \<nat>\<^sub>c,cnufatem g \<circ>\<^sub>c id \<nat>\<^sub>c\<rangle>"
+    oops
+
+
+
+
 
 end
