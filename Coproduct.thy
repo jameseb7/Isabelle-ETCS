@@ -20,6 +20,87 @@ where
   cfunc_coprod_unique: "f : X \<rightarrow> Z \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> h : X \<Coprod> Y \<rightarrow> Z \<Longrightarrow> 
     h \<circ>\<^sub>c left_coproj X Y = f \<Longrightarrow> h \<circ>\<^sub>c right_coproj X Y = g \<Longrightarrow> h = f\<amalg>g"
 
+
+definition is_coprod :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" where
+  "is_coprod W i\<^sub>0 i\<^sub>1 X Y \<longleftrightarrow> 
+    (i\<^sub>0 : X \<rightarrow> W \<and> i\<^sub>1 : Y \<rightarrow> W \<and>
+    (\<forall> f g Z. (f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z) \<longrightarrow> 
+      (\<exists> h. h :  W \<rightarrow> Z \<and> h \<circ>\<^sub>c i\<^sub>0 = f \<and> h \<circ>\<^sub>c i\<^sub>1 = g \<and>
+        (\<forall> h2. (h2 : W \<rightarrow> Z \<and> h2 \<circ>\<^sub>c i\<^sub>0 = f \<and> h2 \<circ>\<^sub>c i\<^sub>1 = g) \<longrightarrow> h2 = h))))"
+
+abbreviation is_coprod_triple :: "cset \<times> cfunc \<times> cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" where
+  "is_coprod_triple Wi X Y \<equiv> is_coprod (fst Wi) (fst (snd Wi)) (snd (snd Wi)) X Y"
+
+lemma canonical_coprod_is_coprod:
+ "is_coprod (X \<Coprod> Y) (left_coproj X Y) (right_coproj X Y) X Y"
+  unfolding is_coprod_def
+proof (typecheck_cfuncs, auto)
+  fix f g Z
+  assume f_type: "f : X \<rightarrow> Z"
+  assume g_type: "g : Y \<rightarrow> Z"
+  show "\<exists>h. h : X \<Coprod> Y \<rightarrow> Z \<and>
+           h \<circ>\<^sub>c left_coproj X Y = f \<and>
+           h \<circ>\<^sub>c right_coproj X Y = g \<and> (\<forall>h2. h2 : X \<Coprod> Y \<rightarrow> Z \<and> h2 \<circ>\<^sub>c left_coproj X Y = f \<and> h2 \<circ>\<^sub>c right_coproj X Y = g \<longrightarrow> h2 = h)"
+    using cfunc_coprod_type cfunc_coprod_unique f_type g_type left_coproj_cfunc_coprod right_coproj_cfunc_coprod 
+    by(rule_tac x="f\<amalg>g" in exI, auto)
+qed
+
+text \<open>The lemma below is dual to Proposition 2.1.8 in Halvorson\<close>
+lemma coprods_isomorphic:
+  assumes W_coprod:  "is_coprod_triple (W, i\<^sub>0, i\<^sub>1) X Y"
+  assumes W'_coprod: "is_coprod_triple (W', i'\<^sub>0, i'\<^sub>1) X Y"
+  shows "\<exists> g. g : W \<rightarrow> W' \<and> isomorphism g \<and> g \<circ>\<^sub>c i\<^sub>0  = i'\<^sub>0 \<and> g \<circ>\<^sub>c i\<^sub>1 = i'\<^sub>1"
+proof -
+  obtain f where f_def: "f : W' \<rightarrow> W \<and> f \<circ>\<^sub>c i'\<^sub>0  = i\<^sub>0 \<and> f \<circ>\<^sub>c i'\<^sub>1 = i\<^sub>1"
+    using W_coprod W'_coprod unfolding is_coprod_def
+    by (metis split_pairs)
+
+  obtain g where g_def: "g : W \<rightarrow> W' \<and> g \<circ>\<^sub>c i\<^sub>0  = i'\<^sub>0 \<and> g \<circ>\<^sub>c i\<^sub>1 = i'\<^sub>1"
+    using W_coprod W'_coprod unfolding is_coprod_def
+    by (metis split_pairs)
+
+  have fg0: "(f \<circ>\<^sub>c g) \<circ>\<^sub>c  i\<^sub>0   = i\<^sub>0"
+    by (metis W_coprod comp_associative2 f_def g_def is_coprod_def split_pairs)
+  have fg1: "(f \<circ>\<^sub>c g) \<circ>\<^sub>c  i\<^sub>1   = i\<^sub>1"
+    by (metis W_coprod comp_associative2 f_def g_def is_coprod_def split_pairs)
+    
+  obtain idW where "idW : W \<rightarrow> W \<and> (\<forall> h2. (h2 : W \<rightarrow> W \<and> h2 \<circ>\<^sub>c i\<^sub>0  = i\<^sub>0 \<and> h2 \<circ>\<^sub>c i\<^sub>1 = i\<^sub>1) \<longrightarrow> h2 = idW)"
+    by (smt (verit, best) W_coprod is_coprod_def prod.sel)
+  then have fg: "f \<circ>\<^sub>c g = id W"
+  proof auto
+    assume idW_unique: "\<forall>h2. h2 : W \<rightarrow> W \<and> h2 \<circ>\<^sub>c i\<^sub>0 = i\<^sub>0 \<and> h2 \<circ>\<^sub>c i\<^sub>1 = i\<^sub>1 \<longrightarrow> h2 = idW"
+    have 1: "f \<circ>\<^sub>c g = idW"
+      using comp_type f_def fg0 fg1 g_def idW_unique by blast
+    have 2: "id W = idW"
+      using W_coprod idW_unique id_left_unit2 id_type is_coprod_def by auto
+    from 1 2 show "f \<circ>\<^sub>c g = id W"
+      by auto
+  qed
+
+  have gf0: "(g \<circ>\<^sub>c f) \<circ>\<^sub>c i'\<^sub>0= i'\<^sub>0"
+    using W'_coprod comp_associative2 f_def g_def is_coprod_def by auto
+  have gf1: "(g \<circ>\<^sub>c f) \<circ>\<^sub>c i'\<^sub>1 = i'\<^sub>1"
+    using W'_coprod comp_associative2 f_def g_def is_coprod_def by auto
+
+  obtain idW' where "idW': W'\<rightarrow> W'\<and> (\<forall> h2. (h2 : W'\<rightarrow> W'\<and>  h2 \<circ>\<^sub>c i'\<^sub>0= i'\<^sub>0 \<and> h2 \<circ>\<^sub>c i'\<^sub>1= i'\<^sub>1) \<longrightarrow> h2 = idW')"
+    by (smt (verit, best) W'_coprod is_coprod_def prod.sel)
+  then have gf: "g \<circ>\<^sub>c f = id W'"
+  proof auto
+    assume idW'_unique: "\<forall>h2. h2 : W' \<rightarrow> W' \<and> h2 \<circ>\<^sub>c i'\<^sub>0 = i'\<^sub>0 \<and> h2 \<circ>\<^sub>c i'\<^sub>1 = i'\<^sub>1 \<longrightarrow> h2 = idW'"
+    have 1: "g \<circ>\<^sub>c f = idW'"
+      using comp_type f_def g_def gf0 gf1 idW'_unique by blast
+    have 2: "id W' = idW'"
+      using W'_coprod idW'_unique id_left_unit2 id_type is_coprod_def by auto      
+    from 1 2 show "g \<circ>\<^sub>c f = id W'"
+      by auto
+  qed
+
+  have g_iso: "isomorphism g"
+    using f_def fg g_def gf isomorphism_def3 by blast
+  from g_iso g_def show "\<exists> g. g : W \<rightarrow> W' \<and> isomorphism g \<and> g \<circ>\<^sub>c i\<^sub>0  = i'\<^sub>0 \<and> g \<circ>\<^sub>c i\<^sub>1 = i'\<^sub>1"
+    by blast
+qed
+
 subsection  \<open>Coproduct Function Properities\<close>
 
 lemma cfunc_coprod_comp:

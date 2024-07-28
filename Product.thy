@@ -31,12 +31,7 @@ abbreviation is_cart_prod_triple :: "cset \<times> cfunc \<times> cfunc \<Righta
 lemma canonical_cart_prod_is_cart_prod:
  "is_cart_prod (X \<times>\<^sub>c Y) (left_cart_proj X Y) (right_cart_proj X Y) X Y"
   unfolding is_cart_prod_def
-proof auto
-  show "left_cart_proj X Y: X \<times>\<^sub>c Y \<rightarrow> X"
-    by typecheck_cfuncs
-  show "right_cart_proj X Y: X \<times>\<^sub>c Y \<rightarrow> Y"
-    by typecheck_cfuncs
-next 
+proof (typecheck_cfuncs, auto)
   fix f g Z
   assume f_type: "f: Z \<rightarrow> X"
   assume g_type: "g: Z \<rightarrow> Y"
@@ -50,7 +45,7 @@ next
     by (rule_tac x="\<langle>f,g\<rangle>" in exI, simp add: cfunc_prod_type)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.1.8 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.8 in Halvorson\<close>
 lemma cart_prods_isomorphic:
   assumes W_cart_prod:  "is_cart_prod_triple (W, \<pi>\<^sub>0, \<pi>\<^sub>1) X Y"
   assumes W'_cart_prod: "is_cart_prod_triple (W', \<pi>'\<^sub>0, \<pi>'\<^sub>1) X Y"
@@ -73,9 +68,9 @@ proof -
   proof auto
     assume idW'_unique: "\<forall>h2. h2 : W' \<rightarrow> W' \<and> \<pi>'\<^sub>0 \<circ>\<^sub>c h2 = \<pi>'\<^sub>0 \<and> \<pi>'\<^sub>1 \<circ>\<^sub>c h2 = \<pi>'\<^sub>1 \<longrightarrow> h2 = idW'"
     have 1: "f \<circ>\<^sub>c g = idW'"
-      using idW'_unique cfunc_type_def codomain_comp domain_comp f_def fg0 fg1 g_def by (erule_tac x="f \<circ>\<^sub>c g" in allE, auto)
+      using comp_type f_def fg0 fg1 g_def idW'_unique by blast
     have 2: "id W' = idW'"
-      using idW'_unique W'_cart_prod id_right_unit2 id_type is_cart_prod_def by (erule_tac x="f \<circ>\<^sub>c g" in allE, auto)
+      using W'_cart_prod idW'_unique id_right_unit2 id_type is_cart_prod_def by auto
     from 1 2 show "f \<circ>\<^sub>c g = id W'"
       by auto
   qed
@@ -99,7 +94,7 @@ proof -
   qed
 
   have f_iso: "isomorphism f"
-    unfolding isomorphism_def using cfunc_type_def f_def g_def fg gf cfunc_type_def f_def g_def by (rule_tac x=g in exI, auto)
+    using f_def fg g_def gf isomorphism_def3 by blast
   from f_iso f_def show "\<exists>f. f : W \<rightarrow> W' \<and> isomorphism f \<and> \<pi>'\<^sub>0 \<circ>\<^sub>c f = \<pi>\<^sub>0 \<and> \<pi>'\<^sub>1 \<circ>\<^sub>c f = \<pi>\<^sub>1"
     by auto
 qed
