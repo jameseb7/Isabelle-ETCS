@@ -1120,6 +1120,10 @@ proof -
     by (metis canonical_cart_prod_is_cart_prod cart_prods_isomorphic is_isomorphic_def prod.sel(1,2))
 qed
 
+lemma coprod_exponential_distribution:
+  "(X \<Coprod> Y)\<^bsup>Z\<^esup> \<cong> (X\<^bsup>Z\<^esup>) \<Coprod> (X\<^bsup>Z\<^esup>)"
+  oops
+
 lemma empty_exp_nonempty:
   assumes "nonempty X"
   shows "\<emptyset>\<^bsup>X\<^esup> \<cong> \<emptyset>"

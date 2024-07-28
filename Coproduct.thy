@@ -2268,7 +2268,7 @@ proof -
 qed
 
 lemma oneUone_iso_\<Omega>:
-  "(one \<Coprod> one) \<cong> \<Omega>"
+  "one \<Coprod> one \<cong> \<Omega>"
   by (meson truth_value_set_iso_1u1 cfunc_coprod_type false_func_type is_isomorphic_def true_func_type)
 
 text \<open>The lemma below is dual to Proposition 2.2.2 in Halvorson\<close>
