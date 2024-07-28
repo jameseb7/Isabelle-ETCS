@@ -817,6 +817,9 @@ qed
 
 section \<open>Exponential Set Facts\<close>
 
+(*This section needs some more organizing!*)
+
+
 text \<open>The lemma below corresponds to Proposition 2.5.7 in Halvorson\<close>
 lemma exp_one:
   "X\<^bsup>one\<^esup> \<cong> X"
@@ -1121,8 +1124,7 @@ proof -
 qed
 
 lemma coprod_exponential_distribution:
-  "(X \<Coprod> Y)\<^bsup>Z\<^esup> \<cong> (X\<^bsup>Z\<^esup>) \<Coprod> (X\<^bsup>Z\<^esup>)"
-  oops
+  "(X \<Coprod> Y)\<^bsup>Z\<^esup> \<cong> (X\<^bsup>Z\<^esup>) \<times>\<^sub>c (X\<^bsup>Z\<^esup>)"
 
 lemma empty_exp_nonempty:
   assumes "nonempty X"
