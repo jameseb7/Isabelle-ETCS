@@ -1227,14 +1227,18 @@ lemma meta_add_as_add:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"  
   assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
-  shows "cnufatem (meta_add \<nat>\<^sub>c \<circ>\<^sub>c \<langle>f, g\<rangle>) \<circ>\<^sub>c n = ((cnufatem  f) \<circ>\<^sub>c n) +\<^sub>\<nat> ((cnufatem  g) \<circ>\<^sub>c n)"
+  shows "cnufatem (meta_add \<nat>\<^sub>c \<circ>\<^sub>c \<langle>f, g\<rangle>) \<circ>\<^sub>c n = add2 \<circ>\<^sub>c \<langle>((cnufatem  f) \<circ>\<^sub>c n), ((cnufatem  g) \<circ>\<^sub>c n)\<rangle>"
+  sorry
+
+
+(*
 proof(unfold meta_add_def add_def)
   have "cnufatem
      ((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c
     id \<nat>\<^sub>c =
     add2 \<circ>\<^sub>c \<langle>cnufatem f \<circ>\<^sub>c id \<nat>\<^sub>c,cnufatem g \<circ>\<^sub>c id \<nat>\<^sub>c\<rangle>"
     oops
-
+*)
 
 
 
