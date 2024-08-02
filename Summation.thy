@@ -556,4 +556,101 @@ proof -
     using assms by (typecheck_cfuncs, simp add: add_def calculation eq_pred_iff_eq)
 qed
 
+
+lemma index_sum_index_shift:
+  assumes "a \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>, f\<rangle>,n\<rangle> = indexed_sum \<circ>\<^sub>c \<langle>\<langle>m, metafunc(cnufatem(f) \<circ>\<^sub>c (add2 \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, a  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>))\<rangle>, n\<rangle>"
+proof -
+  have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>, f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>,
+                        indexed_sum \<circ>\<^sub>c \<langle>\<langle>m, metafunc(cnufatem(f) \<circ>\<^sub>c (add2 \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, a  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>))\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c n = \<t>"
+  proof(rule nat_induction)
+    show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+      using assms by typecheck_cfuncs
+    show "n \<in>\<^sub>c \<nat>\<^sub>c"
+      using assms(2) by auto
+  next
+    have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero =
+          eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c zero, indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c zero\<rangle>"
+      using assms by (etcs_assocr, typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2)
+    also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle>, zero\<rangle>, 
+                     indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle>,zero\<rangle>\<rangle>"
+      using assms by (typecheck_cfuncs, metis cart_prod_extract_right)
+    also have "... = \<t>"
+      using assms by (typecheck_cfuncs, smt (verit, best) cart_prod_extract_left cnufatem_metafunc comp_associative2 eq_pred_iff_eq indexed_sum_uppr_eq_lwr)
+    then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,
+                               indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero = \<t>"
+      using calculation by auto
+  next
+    fix n 
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume eq_pred_ind_hyp: "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,
+             indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c n =  \<t>"
+    have induction_hypothesis: "indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle>, n\<rangle> = 
+                                indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle>,n\<rangle>"
+    proof - 
+      have "\<t> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n,
+             indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n\<rangle>"
+        using assms eq_pred_ind_hyp by (-, typecheck_cfuncs, smt (verit, ccfv_SIG) cfunc_prod_comp comp_associative2)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle>, n\<rangle>,
+             indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle>,n\<rangle>\<rangle>"
+        using assms by (typecheck_cfuncs, metis cart_prod_extract_right)
+      then show ?thesis
+        using assms by (typecheck_cfuncs, metis calculation eq_pred_iff_eq_conv2)
+    qed
+    have induction_conclusion: "indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle>, successor \<circ>\<^sub>c n\<rangle> = 
+                                indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle>,successor \<circ>\<^sub>c n\<rangle>"
+    proof - 
+      have "indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle>, successor \<circ>\<^sub>c n\<rangle> = 
+                         (indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle>, n\<rangle>) +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c ((add2 \<circ>\<^sub>c \<langle>m,a\<rangle>) +\<^sub>\<nat> (successor \<circ>\<^sub>c n)))"
+        using assms indexed_sum_tail_term by (typecheck_cfuncs, presburger)
+      also have "... = (indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle>,n\<rangle>)
+                                           +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c ((add2 \<circ>\<^sub>c \<langle>m,a\<rangle>) +\<^sub>\<nat> (successor \<circ>\<^sub>c n)))"
+        using assms induction_hypothesis by argo
+      oops
+
+
+    show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,
+               indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+    proof - 
+      have "\<t> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle>, successor \<circ>\<^sub>c n\<rangle>,
+               indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle>,successor \<circ>\<^sub>c n\<rangle>\<rangle>"
+        using assms by (typecheck_cfuncs, metis eq_pred_iff_eq induction_conclusion)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n , id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>,
+               indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle>\<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n, id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>"
+        using assms by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>indexed_sum \<circ>\<^sub>c \<langle>\<langle>add2 \<circ>\<^sub>c \<langle>m,a\<rangle>,f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id\<^sub>c \<nat>\<^sub>c\<rangle>,
+               indexed_sum \<circ>\<^sub>c \<langle>\<langle>m,metafunc (cnufatem f \<circ>\<^sub>c add2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>)\<rangle>\<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+        using assms by (typecheck_cfuncs, smt (verit, ccfv_SIG) cfunc_prod_comp comp_associative2)
+      then show ?thesis
+        using assms by (typecheck_cfuncs, metis calculation comp_associative2)
+    qed
+  qed
+  then show ?thesis
+    using assms by (-, typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 eq_pred_iff_eq id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+qed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 end
