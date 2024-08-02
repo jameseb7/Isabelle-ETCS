@@ -1550,7 +1550,7 @@ lemma graph_morph_type[type_rule]:
   shows "graph_morph(f) : graph f \<rightarrow> X \<times>\<^sub>c Y"
   using graph_subobject subobject_of_def2 assms by auto
 
-text \<open>The lemma below corresponds to Exercise 2.3.7 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.3.13 in Halvorson\<close>
 lemma graphs_are_functional:
   assumes "f : X \<rightarrow> Y"
   shows "functional_on X Y (graph f, graph_morph f)"
@@ -1605,8 +1605,7 @@ proof(unfold functional_on_def, auto)
     by (smt (z3) comp_associative2 equalizer_def factors_through_def2 graph_equalizer4 left_cart_proj_cfunc_prod left_cart_proj_type relative_member_def2 right_cart_proj_cfunc_prod)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.3.14 in Halvorson\<close>
-lemma functional_relations_are_graphs_isomorphism_clause:
+lemma functional_on_isomorphism:
   assumes "functional_on X Y (R,m)"
   shows "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
 proof-
@@ -1656,42 +1655,8 @@ proof-
     by (metis epi_mon_is_iso inj injective_imp_monomorphism surj surjective_is_epimorphism)
 qed
 
-(*It seems that we have that IF the graph exists then it is unique, and we have by the above that it is an isomorphism.
-Is there a better way to state this?*)
-
-(*Keep?  Delete?*)
-
-lemma functional_relations_are_graphs_uniqueness_clause:
-  assumes "functional_on X Y (R,m)"
-  assumes "\<exists> f. (f : X \<rightarrow> Y \<and> (R,m) = (graph f, graph_morph f))"
-  shows "\<exists>! f. (f : X \<rightarrow> Y \<and> (R,m) = (graph f, graph_morph f))"
-proof(auto)
-  show "\<exists>f. f : X \<rightarrow> Y \<and> R = graph f \<and> m = graph_morph f"
-    using assms(2) by blast
-  show "\<And>f g. f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> m = graph_morph g \<Longrightarrow> R = graph g \<Longrightarrow> graph f = graph g \<Longrightarrow> graph_morph f = graph_morph g \<Longrightarrow> f = g"
-  proof-
-    fix f g
-    assume f_type[type_rule]: "f : X \<rightarrow> Y"
-    assume g_type[type_rule]: "g : X \<rightarrow> Y"
-    assume m_def: "m = graph_morph g"
-    assume R_def: "R = graph g"
-    assume equal_graphs: "graph f = graph g"
-    assume equal_morphs: "graph_morph f = graph_morph g"
-    have f1: "f \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = right_cart_proj X Y \<circ>\<^sub>c m"
-      by (typecheck_cfuncs, smt (verit) comp_associative2 equal_morphs equalizer_def graph_equalizer4 graph_subobject m_def subobject_of_def2)
-    have f2: "g \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = right_cart_proj X Y \<circ>\<^sub>c m"
-      by (typecheck_cfuncs, smt (verit) comp_associative2 equal_morphs equalizer_def graph_equalizer4 graph_subobject m_def subobject_of_def2)
-    have f3: "f \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = g \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
-      by (simp add: f1 f2)
-    have "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
-      using assms(1) functional_relations_are_graphs_isomorphism_clause by auto
-    then show "f = g"
-      using assms(1) cfunc_type_def codomain_comp epimorphism_def f3 f_type functional_on_def g_type iso_imp_epi_and_monic left_cart_proj_type subobject_of_def2 by force
-  qed
-qed
-
-(*NAME ME!*)
-lemma
+text \<open>The lemma below corresponds to Proposition 2.3.14 in Halvorson\<close>
+lemma functional_relations_are_graphs:
   assumes "functional_on X Y (R,m)"
   shows "\<exists>! f. f : X \<rightarrow> Y \<and> 
     (\<exists> i. i : R \<rightarrow> graph(f) \<and> isomorphism(i) \<and> m = graph_morph(f) \<circ>\<^sub>c i)"
@@ -1701,7 +1666,7 @@ proof auto
   have m_mono[type_rule]: "monomorphism(m)"
     using assms functional_on_def subobject_of_def2 by blast
   have isomorphism[type_rule]: "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
-    using assms functional_relations_are_graphs_isomorphism_clause by force
+    using assms functional_on_isomorphism by force
   
   obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_def: "h = (left_cart_proj X Y \<circ>\<^sub>c m)\<^bold>\<inverse>"
     by typecheck_cfuncs
@@ -1786,7 +1751,7 @@ next
   have m_type[type_rule]: "m : R \<rightarrow> X \<times>\<^sub>c Y"
     using assms unfolding functional_on_def subobject_of_def2 by auto
   have isomorphism[type_rule]: "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
-    using assms functional_relations_are_graphs_isomorphism_clause by force  
+    using assms functional_on_isomorphism by force  
   obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_def: "h = (left_cart_proj X Y \<circ>\<^sub>c m)\<^bold>\<inverse>"
     by typecheck_cfuncs  
   have "f1 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = f2 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
@@ -1806,55 +1771,6 @@ next
   then show "f1 = f2"
     by (typecheck_cfuncs, metis cfunc_type_def comp_associative h_def h_type id_right_unit2 inverse_def2 isomorphism)
 qed
-
-(*Should we delete this result?*)
-lemma functional_relations_are_graphs:
-  assumes "functional_on X Y (R,m)"
-  shows "\<exists>! f. (f : X \<rightarrow> Y \<and> (R,m) = (graph f, graph_morph f))"
-proof(auto)
-  have m_mono: "monomorphism(m)"
-    using assms functional_on_def subobject_of_def2 by blast
-  have pi0_m_type[type_rule]: "left_cart_proj X Y \<circ>\<^sub>c m : R \<rightarrow> X"
-    using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
-  have isomorphism: "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
-    using assms functional_relations_are_graphs_isomorphism_clause by force
-
-  show "\<And>f y. f : X \<rightarrow> Y \<Longrightarrow>
-           y : X \<rightarrow> Y \<Longrightarrow>
-           m = graph_morph y \<Longrightarrow> R = graph y \<Longrightarrow> graph f = graph y \<Longrightarrow> graph_morph f = graph_morph y \<Longrightarrow> f = y"
-    by (metis assms functional_relations_are_graphs_uniqueness_clause)
-  
-  obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_iso: "isomorphism(h)"
-    by (meson is_isomorphic_def isomorphic_is_symmetric isomorphism pi0_m_type)
-  obtain f where f_def: "f = (right_cart_proj X Y) \<circ>\<^sub>c m \<circ>\<^sub>c h"
-    by auto
-  then have f_type[type_rule]: "f : X \<rightarrow> Y"
-    by (metis assms comp_type f_def functional_on_def h_type right_cart_proj_type subobject_of_def2)
-
-  show "\<exists>f. f : X \<rightarrow> Y \<and> R = graph f \<and> m = graph_morph f"
-  proof (rule_tac x=f in exI, auto)
-    show "f : X \<rightarrow> Y"
-      by (simp add: f_type)
-    show "m = graph_morph f"
-
-  oops
-
-(*I think at this point the best we can say is that R \<cong> graph f*)
-(*In particular how do you make equality with a "SOME" ?*)
-
-
-(*
-  have "R = graph f \<and> m = graph_morph f"
-  proof(unfold graph_def, unfold graph_morph_def, auto)
-    show "R =
-    (SOME E.
-        \<exists>m. equalizer E m (f \<circ>\<^sub>c left_cart_proj (domain f) (codomain f))
-             (right_cart_proj (domain f) (codomain f)))"
-      oops
-*)
-
-
-
 
 end
 
