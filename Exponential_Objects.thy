@@ -819,7 +819,6 @@ section \<open>Exponential Set Facts\<close>
 
 (*This section needs some more organizing!*)
 
-
 text \<open>The lemma below corresponds to Proposition 2.5.7 in Halvorson\<close>
 lemma exp_one:
   "X\<^bsup>one\<^esup> \<cong> X"
@@ -1657,6 +1656,7 @@ lemma larger_than_infinite_is_infinite:
 
 section \<open>Pulled from Cardinality.thy\<close>
 
+(*I don't know where we should move this.... It requires "not initial" which comes from Empty.thy*)
 lemma non_init_non_ter_sets:
   assumes "\<not>(terminal_object X)"
   assumes "\<not>(initial_object X)"
@@ -1911,6 +1911,7 @@ proof (unfold is_smaller_than_def)
     qed
   qed
 qed
+
 
 lemma set_card_transitive:
   assumes "A \<le>\<^sub>c B"

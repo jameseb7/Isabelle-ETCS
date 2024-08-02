@@ -221,7 +221,6 @@ next
       using m_mono m_type monomorphism_def3 x1_type x2_type by blast
     then have RHS: "eq_pred X \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<t>"
       by (typecheck_cfuncs, insert eq_pred_iff_eq, blast)
-
     show "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = eq_pred X \<circ>\<^sub>c \<langle>x1,x2\<rangle>"
       using LHS RHS by auto
   next
@@ -238,7 +237,6 @@ next
       by auto
     then have RHS: "eq_pred X \<circ>\<^sub>c \<langle>x1,x2\<rangle> = \<f>"
       using eq_pred_iff_eq_conv by (typecheck_cfuncs, blast)
-
     show "(eq_pred Y \<circ>\<^sub>c m \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>x1,x2\<rangle> = eq_pred X \<circ>\<^sub>c \<langle>x1,x2\<rangle>"
       using LHS RHS by auto
   qed
@@ -304,7 +302,7 @@ proof(rule ccontr)
   qed
   obtain h where h_def: "h = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" and h_type[type_rule]:"h: Y \<rightarrow> \<Omega>"
     by typecheck_cfuncs
-  have hpx_eqs_f: "\<forall>x. (x \<in>\<^sub>c X \<longrightarrow> h \<circ>\<^sub>c p \<circ>\<^sub>c x = \<f>)"
+  have hpx_eqs_f: "\<forall>x. x \<in>\<^sub>c X \<longrightarrow> h \<circ>\<^sub>c p \<circ>\<^sub>c x = \<f>"
     by (smt assms(1) cfunc_type_def codomain_comp comp_associative false_func_type h_def id_right_unit2 id_type terminal_func_comp terminal_func_type terminal_func_unique)
   have gp_eqs_hp: "g \<circ>\<^sub>c p = h \<circ>\<^sub>c p"
   proof(rule one_separator[where X=X,where Y=\<Omega>])
@@ -363,7 +361,6 @@ proof -
     using surjective_is_epimorphism by blast
 qed
 
-(*This isn't quite true... there is no "part b" etc....! *)
 text \<open>The lemma below corresponds to Proposition 2.2.9b in Halvorson\<close>
 lemma pullback_of_epi_is_epi2:
 assumes "g: X \<rightarrow> Z" "epimorphism g" "is_pullback A Y X Z q1 f q0 g"
@@ -540,7 +537,7 @@ lemma not_surjective_has_some_empty_preimage:
   shows "\<exists> y. y\<in>\<^sub>c Y \<and>  is_empty(p\<^sup>-\<^sup>1{y})"
 proof -
   have nonempty: "nonempty(Y)"
-    using assms(1) assms(2) cfunc_type_def nonempty_def surjective_def by auto
+    using assms cfunc_type_def nonempty_def surjective_def by auto
   obtain y0 where y0_type[type_rule]: "y0 \<in>\<^sub>c Y" "\<forall> x. x \<in>\<^sub>c X \<longrightarrow> p\<circ>\<^sub>c x \<noteq> y0"
     using assms cfunc_type_def surjective_def by auto
 
@@ -551,7 +548,7 @@ proof -
       using a1 nonempty_def by blast
     have fiber_z_type: "fiber_morphism p y0 \<circ>\<^sub>c z \<in>\<^sub>c X"
       using assms(1) comp_type fiber_morphism_type y0_type z_type by auto
-    have contradiction: "p \<circ>\<^sub>c (fiber_morphism p y0 \<circ>\<^sub>c z) = y0"
+    have contradiction: "p \<circ>\<^sub>c fiber_morphism p y0 \<circ>\<^sub>c z = y0"
       by (typecheck_cfuncs, smt (z3) comp_associative2 fiber_morphism_eq id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type)
     have "p \<circ>\<^sub>c (fiber_morphism p y0 \<circ>\<^sub>c z) \<noteq> y0"
       by (simp add: fiber_z_type y0_type)
@@ -572,7 +569,7 @@ lemma fib_prod_left_id_iso:
   assumes "g : Y \<rightarrow> X"
   shows  "(X \<^bsub>id(X)\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) \<cong> Y"
 proof - 
-  have is_pullback: "is_pullback (X \<^bsub>id(X)\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) Y X X (fibered_product_right_proj X (id(X)) g Y) g (fibered_product_left_proj X (id(X)) g Y) (id(X)) "
+  have is_pullback: "is_pullback (X \<^bsub>id(X)\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) Y X X (fibered_product_right_proj X (id(X)) g Y) g (fibered_product_left_proj X (id(X)) g Y) (id(X))"
     using assms fibered_product_is_pullback by (typecheck_cfuncs, blast)
   then have mono: "monomorphism(fibered_product_right_proj X (id(X)) g Y)"
     using assms by (typecheck_cfuncs, meson id_isomorphism iso_imp_epi_and_monic pullback_of_mono_is_mono2)

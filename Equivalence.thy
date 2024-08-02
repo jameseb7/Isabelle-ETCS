@@ -101,14 +101,14 @@ proof (unfold equiv_rel_on_def, auto)
     assume xy_in: "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
     assume yz_in: "\<langle>y,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
 
-   have eqn1: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
-     using assms fibered_product_pair_member x_type xy_in y_type by blast
+    have eqn1: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
+      using assms fibered_product_pair_member x_type xy_in y_type by blast
 
-   have eqn2: "f \<circ>\<^sub>c y = f \<circ>\<^sub>c z"
-     using assms fibered_product_pair_member y_type yz_in z_type by blast
+    have eqn2: "f \<circ>\<^sub>c y = f \<circ>\<^sub>c z"
+      using assms fibered_product_pair_member y_type yz_in z_type by blast
 
-   show "\<langle>x,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-     using assms eqn1 eqn2 fibered_product_pair_member x_type z_type by auto
+    show "\<langle>x,z\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+      using assms eqn1 eqn2 fibered_product_pair_member x_type z_type by auto
   qed
 qed
 
@@ -152,9 +152,9 @@ lemma coequalizer_unique:
   shows "E \<cong> F"
 proof - 
   obtain k where k_def: "k: E \<rightarrow> F \<and> k \<circ>\<^sub>c m =  n"
-     by (typecheck_cfuncs, smt assms cfunc_type_def coequalizer_def)
+     by (typecheck_cfuncs, metis assms cfunc_type_def coequalizer_def)
   obtain k' where k'_def: "k': F \<rightarrow> E \<and> k' \<circ>\<^sub>c n =  m"
-     by (typecheck_cfuncs, smt assms cfunc_type_def coequalizer_def)
+     by (typecheck_cfuncs, metis assms cfunc_type_def coequalizer_def)
   obtain k'' where k''_def: "k'': F \<rightarrow> F \<and> k'' \<circ>\<^sub>c n =  n"
     by (typecheck_cfuncs, smt (verit) assms(2)  cfunc_type_def coequalizer_def)
 
@@ -321,11 +321,11 @@ lemma canonical_quot_map_is_epi:
 
 subsection  \<open>Regular Epimorphisms\<close>
 
-text \<open>The definition below corresponds to Definition 2.3.4 in Halvorson.\<close>
+text \<open>The definition below corresponds to Definition 2.3.4 in Halvorson\<close>
 definition regular_epimorphism :: "cfunc \<Rightarrow> bool" where
   "regular_epimorphism f = (\<exists> g h. coequalizer (codomain f) f g h)"
 
-text \<open>The lemma below corresponds to Exercise 2.3.5 in Halvorson.\<close>
+text \<open>The lemma below corresponds to Exercise 2.3.5 in Halvorson\<close>
 lemma reg_epi_and_mono_is_iso:
   assumes "f : X \<rightarrow> Y" "regular_epimorphism f" "monomorphism f"
   shows "isomorphism f"
@@ -971,9 +971,6 @@ next
   qed
 qed
 
-
-
-
 text \<open>The lemma below corresponds to Exercise 2.3.10 in Halvorson\<close>
 lemma in_inv_image_of_image:
   assumes "(A,m) \<subseteq>\<^sub>c X" 
@@ -1120,7 +1117,6 @@ proof (unfold reflexive_on_def, auto)
       by (simp add: cfunc_cross_prod_type id_type m_type)
     have dist_mid_type:"distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) : Z \<times>\<^sub>c Y \<rightarrow> (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
       using comp_type distribute_left_type mid_type by force
-
     have yz_type: "\<langle>z,y\<rangle> \<in>\<^sub>c Z \<times>\<^sub>c Y"
       by (typecheck_cfuncs, simp add: \<open>z \<in>\<^sub>c Z\<close> y_def)
     have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c \<langle>z,y\<rangle>  = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>z,y\<rangle>"
@@ -1719,7 +1715,6 @@ proof auto
 
   show "\<exists>f. f : X \<rightarrow> Y \<and> (\<exists>i. i : R \<rightarrow> graph f \<and> isomorphism i \<and> m = graph_morph f \<circ>\<^sub>c i)"
   proof (rule_tac x=f in exI, auto, typecheck_cfuncs)
-
     have graph_equalizer: "equalizer (graph f) (graph_morph f) (f \<circ>\<^sub>c left_cart_proj X Y) (right_cart_proj X Y)"
       by (simp add: f_type graph_equalizer4)
     then have "\<forall>h F. h : F \<rightarrow> X \<times>\<^sub>c Y \<and> (f \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c h = right_cart_proj X Y \<circ>\<^sub>c h \<longrightarrow>

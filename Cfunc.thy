@@ -24,7 +24,6 @@ where
 definition cfunc_type :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" ("_ : _ \<rightarrow> _" [50, 50, 50]50) where
   "(f : X \<rightarrow> Y) \<longleftrightarrow> (domain(f) = X \<and> codomain(f) = Y)"
 
-
 named_theorems type_rule
 
 (* lift the lemmas from the axiom to use the new types *)
@@ -706,7 +705,6 @@ next
   show "trans {(x, y). x \<cong> y}"
     unfolding trans_def using isomorphic_is_transitive by blast
 qed
-
 
 text \<open>The lemma below corresponds to Exercise 2.1.7a in Halvorson\<close>
 lemma comp_monic_imp_monic:

@@ -148,8 +148,7 @@ proof auto
   assume uniqueness: "\<forall>h F. h : F \<rightarrow> X \<and> f \<circ>\<^sub>c h = g \<circ>\<^sub>c h \<longrightarrow> (\<exists>!k. k : F \<rightarrow> E \<and> m \<circ>\<^sub>c k = h)"
   assume relation_ga: "codomain h1 = domain m"
   assume relation_h: "codomain h2 = domain m" 
-  assume m_ga_mh: "m \<circ>\<^sub>c h1 = m \<circ>\<^sub>c h2" 
-  
+  assume m_ga_mh: "m \<circ>\<^sub>c h1 = m \<circ>\<^sub>c h2"   
   have  "f \<circ>\<^sub>c m \<circ>\<^sub>c h1 =  g \<circ>\<^sub>c m \<circ>\<^sub>c h2"
     using cfunc_type_def comp_associative f_type fm_gm g_type m_ga_mh m_type relation_h by auto
   then obtain z where "z: domain(h1) \<rightarrow> E \<and> m \<circ>\<^sub>c z = m \<circ>\<^sub>c h1 \<and> 
@@ -396,7 +395,6 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
   fix g h A
   assume g_type: "g : A \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
   assume h_type: "h : A \<rightarrow> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>)"
-
   assume left_eq: "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c g
     = (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c h"
   then have "f \<circ>\<^sub>c (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c g
@@ -730,7 +728,6 @@ proof
     using left_eq right_eq by auto
 next
   assume f_g_eq: "f \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
-
   show "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y)"
     unfolding relative_member_def factors_through_def
   proof auto

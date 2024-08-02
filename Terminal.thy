@@ -50,7 +50,7 @@ lemma one_unique_element:
 subsection \<open>Terminal objects (sets with one element)\<close>
 
 definition terminal_object :: "cset \<Rightarrow> bool" where
-  "terminal_object(X) \<longleftrightarrow> (\<forall> Y. \<exists>! f. f : Y \<rightarrow> X)"
+  "terminal_object X \<longleftrightarrow> (\<forall> Y. \<exists>! f. f : Y \<rightarrow> X)"
 
 lemma one_terminal_object: "terminal_object(one)"
   unfolding terminal_object_def using terminal_func_type terminal_func_unique by blast
@@ -58,7 +58,7 @@ lemma one_terminal_object: "terminal_object(one)"
 text \<open>The lemma below is a generalisation of @{thm element_monomorphism}\<close>
 lemma terminal_el_monomorphism:
   assumes "x : T \<rightarrow> X"
-  assumes "terminal_object(T)"
+  assumes "terminal_object T"
   shows "monomorphism x"
   unfolding monomorphism_def
   by (metis assms cfunc_type_def domain_comp terminal_object_def)
@@ -220,7 +220,7 @@ proof safe
     fix x
     assume x_in_A: "x \<in>\<^sub>c A"
 
-    have "f \<circ>\<^sub>c (g \<circ>\<^sub>c x) = f \<circ>\<^sub>c (h \<circ>\<^sub>c x)"
+    have "f \<circ>\<^sub>c g \<circ>\<^sub>c x = f \<circ>\<^sub>c h \<circ>\<^sub>c x"
       using g_type h_type x_in_A f_type comp_associative2 fg_eq_fh by (typecheck_cfuncs, auto)
     then show "g \<circ>\<^sub>c x = h \<circ>\<^sub>c x"
       using cd_h_eq_d_f cfunc_type_def comp_type f_inj g_type h_type x_in_A by presburger
@@ -238,7 +238,7 @@ lemma cfunc_cross_prod_inj:
 lemma cfunc_cross_prod_mono_converse:
   assumes type_assms: "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
   assumes fg_inject: "injective (f \<times>\<^sub>f g)"
-  assumes nonempty: "nonempty(X)" "nonempty(Z)"
+  assumes nonempty: "nonempty X" "nonempty Z"
   shows "injective f \<and> injective g"
   unfolding injective_def
 proof (auto)
@@ -246,7 +246,7 @@ proof (auto)
   assume x_type: "x \<in>\<^sub>c domain f"
   assume y_type: "y \<in>\<^sub>c domain f"
   assume equals: "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
-  have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
+  have fg_type: "f \<times>\<^sub>f g : X \<times>\<^sub>c Z \<rightarrow> Y \<times>\<^sub>c W"
     using assms by typecheck_cfuncs
   have x_type2: "x \<in>\<^sub>c X"
     using cfunc_type_def type_assms(1) x_type by auto
@@ -277,7 +277,7 @@ next
   assume x_type: "x \<in>\<^sub>c domain g"
   assume y_type: "y \<in>\<^sub>c domain g"
   assume equals: "g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
-  have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
+  have fg_type: "f \<times>\<^sub>f g : X \<times>\<^sub>c Z \<rightarrow> Y \<times>\<^sub>c W"
     using assms by typecheck_cfuncs
   have x_type2: "x \<in>\<^sub>c Z"
     using cfunc_type_def type_assms(2) x_type by auto
@@ -309,7 +309,7 @@ That is, it will be the case that f\<times>g is injective, and we cannot infer f
 injective since f\<times>g will be injective no matter what.\<close>
 lemma the_nonempty_assumption_above_is_always_required:
   assumes "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
-  assumes "\<not>(nonempty(X)) \<or> \<not>(nonempty(Z))"
+  assumes "\<not>(nonempty X) \<or> \<not>(nonempty Z)"
   shows "injective (f \<times>\<^sub>f g)"
   unfolding injective_def 
 proof(cases "nonempty(X)", auto)
@@ -317,11 +317,11 @@ proof(cases "nonempty(X)", auto)
   assume nonempty:  "nonempty X"
   assume x_type: "x  \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
   assume "y \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
-  then have "\<not>(nonempty(Z))"
+  then have "\<not>(nonempty Z)"
     using nonempty assms(3) by blast
-  have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
+  have fg_type: "f \<times>\<^sub>f g : X \<times>\<^sub>c Z \<rightarrow> Y \<times>\<^sub>c W"
     by (typecheck_cfuncs, simp add: assms(1,2))
-  then have "x  \<in>\<^sub>c (X \<times>\<^sub>c Z)"
+  then have "x  \<in>\<^sub>c X \<times>\<^sub>c Z"
     using x_type cfunc_type_def by auto
   then have "\<exists>z. z\<in>\<^sub>c Z"
     using cart_prod_decomp by blast
@@ -333,10 +333,10 @@ next
   fix x y
   assume X_is_empty: "\<not> nonempty X"
   assume x_type: "x  \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
-  assume "y \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
-  have fg_type: "(f \<times>\<^sub>f g) : (X \<times>\<^sub>c Z) \<rightarrow> (Y \<times>\<^sub>c W)"
+  assume "y \<in>\<^sub>c domain(f \<times>\<^sub>f g)"
+  have fg_type: "f \<times>\<^sub>f g : X \<times>\<^sub>c Z  \<rightarrow> Y \<times>\<^sub>c W"
     by (typecheck_cfuncs, simp add: assms(1,2))
-  then have "x  \<in>\<^sub>c (X \<times>\<^sub>c Z)"
+  then have "x  \<in>\<^sub>c X \<times>\<^sub>c Z"
     using x_type cfunc_type_def by auto
   then have "\<exists>z. z\<in>\<^sub>c X"
     using cart_prod_decomp by blast
@@ -373,7 +373,6 @@ proof (cases "nonempty (codomain f)", auto)
     using nonempty cfunc_type_def f_surj nonempty_def by auto
   obtain A where g_type: "g : Y \<rightarrow> A" and h_type: "h : Y \<rightarrow> A"
     by (metis cfunc_type_def codomain_comp d_g_eq_cd_f d_h_eq_cd_f f_type gf_eq_hf)
-
   show "g = h"
   proof (rule ccontr)
     assume "g \<noteq> h"
@@ -403,9 +402,9 @@ lemma cfunc_cross_prod_surj:
 proof(auto)
   fix y
   assume y_type: "y \<in>\<^sub>c codomain (f \<times>\<^sub>f g)"
-  have fg_type: "f \<times>\<^sub>f g: (A \<times>\<^sub>c  B) \<rightarrow> (C \<times>\<^sub>c D)"
+  have fg_type: "f \<times>\<^sub>f g: A \<times>\<^sub>c  B \<rightarrow> C \<times>\<^sub>c D"
     using assms  by typecheck_cfuncs    
-  then have "y \<in>\<^sub>c (C \<times>\<^sub>c D)"
+  then have "y \<in>\<^sub>c C \<times>\<^sub>c D"
     using cfunc_type_def y_type by auto
   then have "\<exists> c d. c \<in>\<^sub>c C \<and> d \<in>\<^sub>c D \<and> y = \<langle>c,d\<rangle>"
     using cart_prod_decomp by blast
@@ -461,7 +460,7 @@ next
   then obtain a b where a_type[type_rule]: "a \<in>\<^sub>c A" and b_type[type_rule]: "b \<in>\<^sub>c B" and ab_def2: "ab = \<langle>a,b\<rangle>"
     using cart_prod_decomp by blast
   have  "b \<in>\<^sub>c domain g \<and> g \<circ>\<^sub>c b = d"
-    using a_type ab_def ab_def2 cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_type d_type cart_prod_eq2 type_assms by (typecheck_cfuncs, force)
+    using a_type ab_def ab_def2 cfunc_cross_prod_comp_cfunc_prod cfunc_type_def comp_type d_type cart_prod_eq2 type_assms by(typecheck_cfuncs, force)
   then show "\<exists>x. x \<in>\<^sub>c domain g \<and> g \<circ>\<^sub>c x = d"
     by blast
 qed
@@ -470,7 +469,7 @@ subsection \<open>Interactions of cartesian products with terminal objects\<clos
 
 lemma diag_on_elements:
   assumes "x \<in>\<^sub>c X"
-  shows "diagonal(X) \<circ>\<^sub>c x = \<langle>x,x\<rangle>"
+  shows "diagonal X \<circ>\<^sub>c x = \<langle>x,x\<rangle>"
   using assms cfunc_prod_comp cfunc_type_def diagonal_def id_left_unit id_type by auto
 
 lemma one_cross_one_unique_element:

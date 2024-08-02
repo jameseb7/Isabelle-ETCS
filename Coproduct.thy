@@ -20,7 +20,6 @@ where
   cfunc_coprod_unique: "f : X \<rightarrow> Z \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> h : X \<Coprod> Y \<rightarrow> Z \<Longrightarrow> 
     h \<circ>\<^sub>c left_coproj X Y = f \<Longrightarrow> h \<circ>\<^sub>c right_coproj X Y = g \<Longrightarrow> h = f\<amalg>g"
 
-
 definition is_coprod :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" where
   "is_coprod W i\<^sub>0 i\<^sub>1 X Y \<longleftrightarrow> 
     (i\<^sub>0 : X \<rightarrow> W \<and> i\<^sub>1 : Y \<rightarrow> W \<and>
@@ -517,11 +516,11 @@ lemma cfunc_bowtie_prod_unique: "f : X \<rightarrow> Y \<Longrightarrow> g : V \
 text \<open>The lemma below is dual to Proposition 2.1.11 in Halvorson\<close>
 lemma identity_distributes_across_composition_dual:
   assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C"
-  shows "(g  \<circ>\<^sub>c f) \<bowtie>\<^sub>f id X  = (g \<bowtie>\<^sub>f id X) \<circ>\<^sub>c (f \<bowtie>\<^sub>f id X)"
+  shows "(g  \<circ>\<^sub>c f) \<bowtie>\<^sub>f id X = (g \<bowtie>\<^sub>f id X) \<circ>\<^sub>c (f \<bowtie>\<^sub>f id X)"
 proof - 
   from cfunc_bowtie_prod_unique
   have uniqueness: "\<forall>h. h : A \<Coprod>  X \<rightarrow> C \<Coprod> X \<and>
-    h \<circ>\<^sub>c left_coproj A X  =   left_coproj C X \<circ>\<^sub>c (g \<circ>\<^sub>c f) \<and>
+    h \<circ>\<^sub>c left_coproj A X  = left_coproj C X \<circ>\<^sub>c (g \<circ>\<^sub>c f) \<and>
     h \<circ>\<^sub>c right_coproj A X = right_coproj C X \<circ>\<^sub>c  id(X) \<longrightarrow>
     h =  (g \<circ>\<^sub>c f) \<bowtie>\<^sub>f  id\<^sub>c X"
     using assms by (typecheck_cfuncs, simp add: cfunc_bowtie_prod_unique)
@@ -542,7 +541,7 @@ lemma coproduct_of_beta:
 lemma cfunc_bowtieprod_comp_cfunc_coprod:
   assumes a_type: "a : Y \<rightarrow> Z" and b_type: "b : W \<rightarrow> Z"
   assumes f_type: "f : X \<rightarrow> Y" and g_type: "g : V \<rightarrow> W"
-  shows "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)   = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
+  shows "(a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
 proof - 
   from cfunc_bowtie_prod_unique have uniqueness:
     "\<forall>h. h : X \<Coprod> V \<rightarrow> Z \<and> h \<circ>\<^sub>c left_coproj X V   = a \<circ>\<^sub>c f \<and> h \<circ>\<^sub>c right_coproj X V  = b \<circ>\<^sub>c g \<longrightarrow> 
@@ -551,7 +550,7 @@ proof -
 
   have left_eq: "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)"
   proof - 
-    have "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V = (a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V"
+    have "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V = (a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c left_coproj X V"
       using assms by (typecheck_cfuncs, simp add: comp_associative2)
     also have "... = (a \<amalg> b)  \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f"
       using f_type g_type left_coproj_cfunc_bowtie_prod by auto
@@ -563,23 +562,23 @@ proof -
       by (simp add: calculation)
   qed
 
-  have right_eq: "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
+  have right_eq: "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
   proof - 
-    have "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V"
+    have "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V = (a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V"
       using assms by (typecheck_cfuncs, simp add: comp_associative2)
-    also have "... = (a \<amalg> b)  \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
+    also have "... = (a \<amalg> b) \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
       using f_type g_type right_coproj_cfunc_bowtie_prod by auto
-    also have "... = ((a \<amalg> b)  \<circ>\<^sub>c right_coproj Y W) \<circ>\<^sub>c g"
+    also have "... = ((a \<amalg> b) \<circ>\<^sub>c right_coproj Y W) \<circ>\<^sub>c g"
       using a_type assms(2) cfunc_type_def comp_associative g_type by (typecheck_cfuncs, auto)
     also have "... = (b \<circ>\<^sub>c g)"
       using a_type b_type right_coproj_cfunc_coprod by auto
-    then show "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g)  \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
+    then show "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
       by (simp add: calculation)
   qed
 
-  show "(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)   = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
+  show "(a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
     using uniqueness left_eq right_eq assms
-    by (typecheck_cfuncs, erule_tac x="(a \<amalg> b) \<circ>\<^sub>c  (f \<bowtie>\<^sub>f g)" in allE, auto)
+    by (typecheck_cfuncs, erule_tac x="(a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g)" in allE, auto)
 qed
 
 lemma id_bowtie_prod: "id(X) \<bowtie>\<^sub>f id(Y) = id(X \<Coprod> Y)"
@@ -622,34 +621,34 @@ proof (typecheck_cfuncs, unfold epimorphism_def3, auto)
 
   have "(x1 = y1) \<and> (x2 = y2)"
   proof(auto)
-    have "x1 \<circ>\<^sub>c f = ((x1 \<amalg> x2) \<circ>\<^sub>c (left_coproj Y W)) \<circ>\<^sub>c f"
+    have "x1 \<circ>\<^sub>c f = ((x1 \<amalg> x2) \<circ>\<^sub>c left_coproj Y W) \<circ>\<^sub>c f"
       using x1_x2_type left_coproj_cfunc_coprod by auto 
-    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (left_coproj Y W) \<circ>\<^sub>c f"
+    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f"
       using assms comp_associative2 x_expand x_type by (typecheck_cfuncs, auto)
-    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X V)"
+    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V"
       using left_coproj_cfunc_bowtie_prod type_assms by force
-    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (left_coproj X V)"
+    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V"
       using assms cfunc_type_def comp_associative eqs x_expand x_type y_expand y_type by (typecheck_cfuncs, auto)
-    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (left_coproj Y W) \<circ>\<^sub>c f"
+    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f"
       using assms by (typecheck_cfuncs, simp add: left_coproj_cfunc_bowtie_prod)
-    also have "... = ((y1 \<amalg> y2) \<circ>\<^sub>c (left_coproj Y W)) \<circ>\<^sub>c f"
+    also have "... = ((y1 \<amalg> y2) \<circ>\<^sub>c left_coproj Y W) \<circ>\<^sub>c f"
       using assms comp_associative2 y_expand y_type by (typecheck_cfuncs, blast)
     also have "... = y1 \<circ>\<^sub>c f"
       using y1_y2_type left_coproj_cfunc_coprod by auto 
     then show "x1 = y1"
       using calculation epimorphism_def3 f_epi type_assms(1) x1_x2_type(1) y1_y2_type(1) by fastforce
   next
-    have "x2 \<circ>\<^sub>c g = ((x1 \<amalg> x2) \<circ>\<^sub>c (right_coproj Y W)) \<circ>\<^sub>c g"
+    have "x2 \<circ>\<^sub>c g = ((x1 \<amalg> x2) \<circ>\<^sub>c right_coproj Y W) \<circ>\<^sub>c g"
       using x1_x2_type right_coproj_cfunc_coprod by auto 
-    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (right_coproj Y W) \<circ>\<^sub>c g"
+    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
       using assms comp_associative2 x_expand x_type by (typecheck_cfuncs, auto)
-    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X V)"
+    also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V"
       using right_coproj_cfunc_bowtie_prod type_assms by force
-    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c (right_coproj X V)"
+    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V"
       using assms cfunc_type_def comp_associative eqs x_expand x_type y_expand y_type by (typecheck_cfuncs, auto)
-    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (right_coproj Y W) \<circ>\<^sub>c g"
+    also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
       using assms by (typecheck_cfuncs, simp add: right_coproj_cfunc_bowtie_prod)
-    also have "... = ((y1 \<amalg> y2) \<circ>\<^sub>c (right_coproj Y W)) \<circ>\<^sub>c g"
+    also have "... = ((y1 \<amalg> y2) \<circ>\<^sub>c right_coproj Y W) \<circ>\<^sub>c g"
       using assms comp_associative2 y_expand y_type by (typecheck_cfuncs, blast)
     also have "... = y2 \<circ>\<^sub>c g"
       using right_coproj_cfunc_coprod y1_y2_type(1) y1_y2_type(2) by auto
@@ -679,12 +678,12 @@ proof(auto)
   have y_type2: "z2 \<in>\<^sub>c X \<Coprod> V"
     using cfunc_type_def f_bowtie_g_type y_type by auto
 
-  have z1_decomp: "(\<exists> x1. (x1 \<in>\<^sub>c X \<and> z1 = (left_coproj X V) \<circ>\<^sub>c x1))
-      \<or>  (\<exists> y1. (y1 \<in>\<^sub>c V \<and> z1 = (right_coproj X V) \<circ>\<^sub>c y1))"
+  have z1_decomp: "(\<exists> x1. (x1 \<in>\<^sub>c X \<and> z1 = left_coproj X V \<circ>\<^sub>c x1))
+      \<or>  (\<exists> y1. (y1 \<in>\<^sub>c V \<and> z1 = right_coproj X V \<circ>\<^sub>c y1))"
     by (simp add: coprojs_jointly_surj x_type2)
 
-  have z2_decomp: "(\<exists> x2. (x2 \<in>\<^sub>c X \<and> z2 = (left_coproj X V) \<circ>\<^sub>c x2))
-      \<or>  (\<exists> y2. (y2 \<in>\<^sub>c V \<and> z2 = (right_coproj X V) \<circ>\<^sub>c y2))"
+  have z2_decomp: "(\<exists> x2. (x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2))
+      \<or>  (\<exists> y2. (y2 \<in>\<^sub>c V \<and> z2 = right_coproj X V \<circ>\<^sub>c y2))"
     by (simp add: coprojs_jointly_surj y_type2)
 
   show "z1 = z2"
@@ -731,7 +730,7 @@ proof(auto)
       qed
     next 
       assume caseB: "\<nexists>x2. x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2"
-      then obtain y2 where y2_def: "(y2 \<in>\<^sub>c V \<and> z2 = (right_coproj X V) \<circ>\<^sub>c y2)"
+      then obtain y2 where y2_def: "(y2 \<in>\<^sub>c V \<and> z2 = right_coproj X V \<circ>\<^sub>c y2)"
         using z2_decomp by blast
       have "left_coproj Y W \<circ>\<^sub>c f  \<circ>\<^sub>c x1  = (left_coproj Y W \<circ>\<^sub>c f) \<circ>\<^sub>c x1"
             using cfunc_type_def comp_associative left_proj_type type_assms(1) x1_def by auto            
@@ -794,7 +793,7 @@ proof(auto)
       qed
     next
       assume caseB: "\<nexists>x2. x2 \<in>\<^sub>c X \<and> z2 = left_coproj X V \<circ>\<^sub>c x2"
-      then obtain y2 where y2_def: "(y2 \<in>\<^sub>c V \<and> z2 = (right_coproj X V) \<circ>\<^sub>c y2)"
+      then obtain y2 where y2_def: "(y2 \<in>\<^sub>c V \<and> z2 = right_coproj X V \<circ>\<^sub>c y2)"
         using z2_decomp by blast
         have "y1 = y2"
         proof - 
@@ -1239,7 +1238,7 @@ proof -
       proof - 
         have "\<langle>a, left_coproj B C \<circ>\<^sub>c b\<rangle> = \<langle>id A \<circ>\<^sub>c a, left_coproj B C \<circ>\<^sub>c b\<rangle>"
           using ab_def id_left_unit2 by force
-        also have "... = (id A \<times>\<^sub>f left_coproj B C)  \<circ>\<^sub>c \<langle>a,  b\<rangle>"
+        also have "... = (id A \<times>\<^sub>f left_coproj B C) \<circ>\<^sub>c \<langle>a, b\<rangle>"
           by (smt ab_def cfunc_cross_prod_comp_cfunc_prod id_type left_proj_type)
         also have "... = (\<phi> \<circ>\<^sub>c left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c \<langle>a, b\<rangle>"
           unfolding \<phi>_def using left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
@@ -1249,7 +1248,7 @@ proof -
           by (simp add: local.equal)
         also have "... = (\<phi> \<circ>\<^sub>c right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c \<langle>a', c'\<rangle>"
           using a'c'_def comp_associative2 y'_def by (typecheck_cfuncs, blast)
-          also have "... = (id A \<times>\<^sub>f right_coproj B C)  \<circ>\<^sub>c \<langle> a',  c'\<rangle>"
+          also have "... = (id A \<times>\<^sub>f right_coproj B C) \<circ>\<^sub>c \<langle>a', c'\<rangle>"
           unfolding \<phi>_def using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
         also have "... = \<langle>id A \<circ>\<^sub>c a', right_coproj B C \<circ>\<^sub>c c'\<rangle>"
           using a'c'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
@@ -1282,7 +1281,7 @@ proof -
       proof - 
         have "\<langle>a, right_coproj B C \<circ>\<^sub>c c\<rangle> = \<langle>id(A) \<circ>\<^sub>c a, right_coproj B C \<circ>\<^sub>c c\<rangle>"
           using ac_def id_left_unit2 by force
-        also have "... = (id A \<times>\<^sub>f right_coproj B C)  \<circ>\<^sub>c \<langle>a,  c\<rangle>"
+        also have "... = (id A \<times>\<^sub>f right_coproj B C)  \<circ>\<^sub>c \<langle>a, c\<rangle>"
           by (smt ac_def cfunc_cross_prod_comp_cfunc_prod id_type right_proj_type)
         also have "... = (\<phi> \<circ>\<^sub>c right_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c \<langle>a, c\<rangle>"
           unfolding \<phi>_def using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
@@ -1292,7 +1291,7 @@ proof -
           by (simp add: local.equal)
         also have "... = (\<phi> \<circ>\<^sub>c left_coproj (A \<times>\<^sub>c B) (A \<times>\<^sub>c C)) \<circ>\<^sub>c \<langle>a', b'\<rangle>"
           using a'b'_def comp_associative2 \<phi>_type y'_def by (typecheck_cfuncs, blast)
-          also have "... = (id A \<times>\<^sub>f left_coproj B C)  \<circ>\<^sub>c \<langle>a',  b'\<rangle>"
+          also have "... = (id A \<times>\<^sub>f left_coproj B C) \<circ>\<^sub>c \<langle>a', b'\<rangle>"
           unfolding \<phi>_def using left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
         also have "... = \<langle>id A \<circ>\<^sub>c a', left_coproj B C \<circ>\<^sub>c b'\<rangle>"
           using a'b'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
@@ -1364,13 +1363,13 @@ proof -
       by (meson cart_prod_decomp)
     then obtain bc where bc_def: "bc \<in>\<^sub>c (B \<Coprod> C) \<and> y = \<langle>a,bc\<rangle>"
       by blast
-    have bc_form: "(\<exists> b. b \<in>\<^sub>c B \<and> bc = left_coproj B C  \<circ>\<^sub>c b) \<or> (\<exists> c. c \<in>\<^sub>c C \<and> bc = right_coproj B C  \<circ>\<^sub>c c)"
+    have bc_form: "(\<exists> b. b \<in>\<^sub>c B \<and> bc = left_coproj B C \<circ>\<^sub>c b) \<or> (\<exists> c. c \<in>\<^sub>c C \<and> bc = right_coproj B C \<circ>\<^sub>c c)"
       by (simp add: bc_def coprojs_jointly_surj)
     have domain_is: "(A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) = domain ((id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C))"
       by (typecheck_cfuncs, simp add: cfunc_type_def)
     show "\<exists>x. x \<in>\<^sub>c domain ((id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C)) \<and>
              (id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C) \<circ>\<^sub>c x = y"
-    proof(cases "\<exists> b. b \<in>\<^sub>c B \<and> bc = left_coproj B C  \<circ>\<^sub>c b")
+    proof(cases "\<exists> b. b \<in>\<^sub>c B \<and> bc = left_coproj B C \<circ>\<^sub>c b")
       assume case1: "\<exists>b. b \<in>\<^sub>c B \<and> bc = left_coproj B C \<circ>\<^sub>c b"
       then obtain b where b_def: "b \<in>\<^sub>c B \<and> bc = left_coproj B C \<circ>\<^sub>c b"
         by blast
@@ -1424,7 +1423,7 @@ lemma dist_prod_coprod_iso:
   "isomorphism(dist_prod_coprod A B C)"
   by (simp add: dist_prod_coprod_epi dist_prod_coprod_mono epi_mon_is_iso)
 
-(* Proposition 2.5.10 *)
+text \<open>The lemma below corresponds to Proposition 2.5.10 in Halvorson\<close>
 lemma prod_distribute_coprod:
   "A \<times>\<^sub>c (X \<Coprod> Y) \<cong> (A \<times>\<^sub>c X) \<Coprod> (A \<times>\<^sub>c Y)"
   using dist_prod_coprod_iso dist_prod_coprod_type is_isomorphic_def isomorphic_is_symmetric by blast

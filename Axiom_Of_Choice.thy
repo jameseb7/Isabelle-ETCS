@@ -55,7 +55,6 @@ proof -
   proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     fix x y A
     assume x_type[type_rule]: "x : A \<rightarrow> X" and y_type[type_rule]: "y : A \<rightarrow> X"
-
     assume "g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
     then have "(m \<circ>\<^sub>c g) \<circ>\<^sub>c x = (m \<circ>\<^sub>c g) \<circ>\<^sub>c y"
       by (typecheck_cfuncs, smt comp_associative2)
