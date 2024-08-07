@@ -44,7 +44,7 @@ proof (typecheck_cfuncs, auto)
     by(rule_tac x="f\<amalg>g" in exI, auto)
 qed
 
-text \<open>The lemma below is dual to Proposition 2.1.8 in Halvorson\<close>
+text \<open>The lemma below is dual to Proposition 2.1.8 in Halvorson.\<close>
 lemma coprods_isomorphic:
   assumes W_coprod:  "is_coprod_triple (W, i\<^sub>0, i\<^sub>1) X Y"
   assumes W'_coprod: "is_coprod_triple (W', i'\<^sub>0, i'\<^sub>1) X Y"
@@ -124,7 +124,7 @@ lemma id_coprod:
   "id(A \<Coprod> B) = (left_coproj A B) \<amalg> (right_coproj A B)"
     by (typecheck_cfuncs, simp add: cfunc_coprod_unique id_left_unit2)
 
-text \<open>The lemma below corresponds to Proposition 2.4.1 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.4.1 in Halvorson.\<close>
 lemma coproducts_disjoint:
   " x\<in>\<^sub>c X \<Longrightarrow>  y \<in>\<^sub>c Y \<Longrightarrow>  (left_coproj X Y) \<circ>\<^sub>c x \<noteq> (right_coproj X Y) \<circ>\<^sub>c y"
 proof (rule ccontr, auto)
@@ -152,7 +152,7 @@ proof (rule ccontr, auto)
     using calculation true_false_distinct by auto
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.4.2 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.4.2 in Halvorson.\<close>
 lemma left_coproj_are_monomorphisms:
   "monomorphism(left_coproj X Y)"
 proof (cases "\<exists>x. x \<in>\<^sub>c X")
@@ -338,7 +338,7 @@ proof (rule_tac x="a \<circ>\<^sub>c left_coproj X Y" in exI, rule_tac x="a \<ci
     by (meson assms comp_type right_proj_type)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.4.4 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.4.4 in Halvorson.\<close>
 lemma truth_value_set_iso_1u1:
   "isomorphism(\<t>\<amalg>\<f>)"
   by (typecheck_cfuncs, smt (verit, best) CollectI epi_mon_is_iso injective_def2
@@ -513,7 +513,7 @@ lemma cfunc_bowtie_prod_unique: "f : X \<rightarrow> Y \<Longrightarrow> g : V \
   unfolding cfunc_bowtie_prod_def
   using cfunc_coprod_unique cfunc_type_def codomain_comp domain_comp left_proj_type right_proj_type by auto
 
-text \<open>The lemma below is dual to Proposition 2.1.11 in Halvorson\<close>
+text \<open>The lemma below is dual to Proposition 2.1.11 in Halvorson.\<close>
 lemma identity_distributes_across_composition_dual:
   assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C"
   shows "(g  \<circ>\<^sub>c f) \<bowtie>\<^sub>f id X = (g \<bowtie>\<^sub>f id X) \<circ>\<^sub>c (f \<bowtie>\<^sub>f id X)"
@@ -1423,7 +1423,7 @@ lemma dist_prod_coprod_iso:
   "isomorphism(dist_prod_coprod A B C)"
   by (simp add: dist_prod_coprod_epi dist_prod_coprod_mono epi_mon_is_iso)
 
-text \<open>The lemma below corresponds to Proposition 2.5.10 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.10 in Halvorson.\<close>
 lemma prod_distribute_coprod:
   "A \<times>\<^sub>c (X \<Coprod> Y) \<cong> (A \<times>\<^sub>c X) \<Coprod> (A \<times>\<^sub>c Y)"
   using dist_prod_coprod_iso dist_prod_coprod_type is_isomorphic_def isomorphic_is_symmetric by blast
@@ -2351,7 +2351,7 @@ lemma oneUone_iso_\<Omega>:
   "one \<Coprod> one \<cong> \<Omega>"
   by (meson truth_value_set_iso_1u1 cfunc_coprod_type false_func_type is_isomorphic_def true_func_type)
 
-text \<open>The lemma below is dual to Proposition 2.2.2 in Halvorson\<close>
+text \<open>The lemma below is dual to Proposition 2.2.2 in Halvorson.\<close>
 lemma "card {x. x \<in>\<^sub>c \<Omega> \<Coprod> \<Omega>} = 4"
 proof -
   (*Distinctness*)

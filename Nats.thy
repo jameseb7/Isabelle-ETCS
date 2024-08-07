@@ -46,7 +46,7 @@ lemma N_is_a_NNO:
     "is_NNO \<nat>\<^sub>c zero successor"
 by (simp add: is_NNO_def natural_number_object_property successor_type zero_type)
 
-text \<open>The lemma below corresponds to Exercise 2.6.5 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.6.5 in Halvorson.\<close>
 lemma NNOs_are_iso_N:
   assumes "is_NNO N z s"
   shows "N \<cong> \<nat>\<^sub>c"
@@ -86,7 +86,7 @@ proof-
     using cfunc_type_def half_isomorphism is_isomorphic_def isomorphism_def u_type v_type by fastforce
 qed
 
-text \<open>The lemma below is the converse to Exercise 2.6.5 in Halvorson\<close>
+text \<open>The lemma below is the converse to Exercise 2.6.5 in Halvorson.\<close>
 lemma Iso_to_N_is_NNO:
   assumes "N \<cong> \<nat>\<^sub>c"
   shows "\<exists> z s. is_NNO N z s"
@@ -161,7 +161,7 @@ qed
 
 section \<open>Cardinality and Finiteness\<close>
 
-text \<open>The definitions below correspond to Definition 2.6.1 in Halvorson\<close>
+text \<open>The definitions below correspond to Definition 2.6.1 in Halvorson.\<close>
 definition is_finite :: "cset \<Rightarrow> bool"  where
    "is_finite(X) \<longleftrightarrow> (\<forall>m. (m : X \<rightarrow> X \<and> monomorphism(m)) \<longrightarrow>  isomorphism(m))"
 
@@ -172,7 +172,7 @@ lemma either_finite_or_infinite:
   "is_finite(X) \<or> is_infinite(X)"
   using epi_mon_is_iso is_finite_def is_infinite_def surjective_is_epimorphism by blast
 
-text \<open>The definition below corresponds to Definition 2.6.2 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.6.2 in Halvorson.\<close>
 definition is_smaller_than :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<le>\<^sub>c" 50) where
    "X \<le>\<^sub>c Y \<longleftrightarrow> (\<exists> m. m : X \<rightarrow> Y \<and> monomorphism(m))"
 
@@ -343,7 +343,7 @@ lemma sets_size_3_plus:
   "(\<not>(initial_object X) \<and> \<not>(terminal_object X) \<and> \<not>(X \<cong> \<Omega>)) = (\<exists> x1. (\<exists> x2.  \<exists> x3. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and>  (x3 \<in>\<^sub>c X) \<and> (x1\<noteq>x2) \<and>  (x2\<noteq>x3) \<and> (x1\<noteq>x3) )             ))"
   by (metis not_init_not_term size_2_sets)
 
-text \<open>The next two lemmas below correspond to Proposition 2.6.3 in Halvorson\<close>
+text \<open>The next two lemmas below correspond to Proposition 2.6.3 in Halvorson.\<close>
 lemma smaller_than_coproduct1:
   "X \<le>\<^sub>c X \<Coprod> Y"
   using is_smaller_than_def left_coproj_are_monomorphisms left_proj_type by blast
@@ -352,7 +352,7 @@ lemma  smaller_than_coproduct2:
   "X \<le>\<^sub>c Y \<Coprod> X"
   using is_smaller_than_def right_coproj_are_monomorphisms right_proj_type by blast
 
-text \<open>The next two lemmas below correspond to Proposition 2.6.4 in Halvorson\<close>
+text \<open>The next two lemmas below correspond to Proposition 2.6.4 in Halvorson.\<close>
 lemma smaller_than_product1:
   assumes "nonempty Y"
   shows "X \<le>\<^sub>c X \<times>\<^sub>c Y"
@@ -1345,7 +1345,7 @@ proof (rule ccontr, auto)
     using true_false_distinct by blast
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.6.6 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.6.6 in Halvorson.\<close>
 lemma oneUN_iso_N_isomorphism:
  "isomorphism(zero \<amalg> successor)" 
 proof - 
@@ -1507,7 +1507,7 @@ qed
     
 section \<open>Peano's Axioms and Induction\<close>
 
-text \<open>The lemma below corresponds to Proposition 2.6.7 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.6.7 in Halvorson.\<close>
 lemma Peano's_Axioms:
  "injective(successor) \<and> \<not>surjective(successor)"
 proof - 

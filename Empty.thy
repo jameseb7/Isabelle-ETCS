@@ -24,7 +24,7 @@ lemma initial_iso_empty:
   shows "X \<cong> \<emptyset>"
   by (metis assms cfunc_type_def comp_type emptyset_is_empty epi_mon_is_iso initial_object_def injective_def injective_imp_monomorphism is_isomorphic_def surjective_def surjective_is_epimorphism)
 
-text \<open>The lemma below corresponds to Exercise 2.4.6 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.4.6 in Halvorson.\<close>
 lemma coproduct_with_empty:
   shows "X \<Coprod> \<emptyset> \<cong> X"
 proof -
@@ -65,7 +65,7 @@ proof -
     using cfunc_coprod_type id_type initial_func_type is_isomorphic_def by blast
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.4.7 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.4.7 in Halvorson.\<close>
 lemma function_to_empty_is_iso:
   assumes "f: X \<rightarrow> \<emptyset>"
   shows "isomorphism(f)"
@@ -79,7 +79,7 @@ lemma X_prod_empty:
   "X \<times>\<^sub>c \<emptyset> \<cong> \<emptyset>"
   using cfunc_type_def function_to_empty_is_iso is_isomorphic_def right_cart_proj_type by blast
 
-text \<open>The lemma below corresponds to Proposition 2.4.8 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.4.8 in Halvorson.\<close>
 lemma no_el_iff_iso_empty:
   "is_empty X \<longleftrightarrow> X \<cong> \<emptyset>"
 proof auto
@@ -137,7 +137,7 @@ lemma prod_iso_to_empty_left:
 lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>c X"
   by (metis cfunc_type_def emptyset_is_empty initial_func_type injective_def injective_imp_monomorphism subobject_of_def2)
 
-text \<open>The lemma below corresponds to Proposition 2.2.1 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.1 in Halvorson.\<close>
 lemma one_has_two_subsets:
   "card ({(X,m). (X,m) \<subseteq>\<^sub>c one}//{((X1,m1),(X2,m2)). X1 \<cong> X2}) = 2"
 proof -

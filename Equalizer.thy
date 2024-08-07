@@ -61,7 +61,7 @@ proof -
   qed
 qed 
 
-text \<open>The lemma below corresponds to Exercise 2.1.31 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.31 in Halvorson.\<close>
 lemma equalizers_isomorphic:
   assumes "equalizer E m f g" "equalizer E' m' f g"
   shows "\<exists> k. k : E \<rightarrow> E' \<and> isomorphism k \<and> m = m' \<circ>\<^sub>c k"
@@ -135,7 +135,7 @@ proof -
     by (smt (verit, best) assms(1,4,5,6) comp_type equalizer_def equalizes)
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.1.34 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.34 in Halvorson.\<close>
 lemma equalizer_is_monomorphism:
   "equalizer E m f g \<Longrightarrow>  monomorphism(m)"
   unfolding equalizer_def monomorphism_def
@@ -159,12 +159,12 @@ proof auto
     by (metis cfunc_type_def domain_comp m_ga_mh m_type relation_ga relation_h)
 qed
 
-text \<open>The definition below corresponds to Definition 2.1.35 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.1.35 in Halvorson.\<close>
 definition regular_monomorphism :: "cfunc \<Rightarrow> bool"
   where "regular_monomorphism f  \<longleftrightarrow>  
           (\<exists> g h. domain(g) = codomain(f) \<and> domain(h) = codomain(f) \<and> equalizer (domain f) f g h)"
 
-text \<open>The lemma below corresponds to Exercise 2.1.36 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.36 in Halvorson.\<close>
 lemma epi_regmon_is_iso:
   assumes "epimorphism(f)" "regular_monomorphism(f)"
   shows "isomorphism(f)"
@@ -193,7 +193,7 @@ qed
 
 subsection \<open>Subobjects\<close>
 
-text \<open>The definition below corresponds to Definition 2.1.32 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.1.32 in Halvorson.\<close>
 definition factors_through :: "cfunc  \<Rightarrow> cfunc \<Rightarrow> bool" (infix "factorsthru" 90)
   where "g factorsthru f \<longleftrightarrow> (\<exists> h. (h: domain(g)\<rightarrow> domain(f)) \<and> f \<circ>\<^sub>c h = g)"
 
@@ -202,7 +202,7 @@ lemma factors_through_def2:
   shows "g factorsthru f \<longleftrightarrow> (\<exists> h. h: X \<rightarrow> Y \<and> f \<circ>\<^sub>c h = g)"
   unfolding factors_through_def using assms by (simp add: cfunc_type_def)
 
-text \<open>The lemma below corresponds to Exercise 2.1.33 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.33 in Halvorson.\<close>
 lemma xfactorthru_equalizer_iff_fx_eq_gx:
   assumes "f: X\<rightarrow> Y" "g:X \<rightarrow> Y" "equalizer E m f g" "x\<in>\<^sub>c X"
   shows "x factorsthru m \<longleftrightarrow> f \<circ>\<^sub>c x = g  \<circ>\<^sub>c x"
@@ -217,7 +217,7 @@ next
     by (metis RHS assms(1,3,4) cfunc_type_def equalizer_def)
 qed
 
-text \<open>The definition below corresponds to Definition 2.1.37 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.1.37 in Halvorson.\<close>
 definition subobject_of :: "cset \<times> cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<subseteq>\<^sub>c" 50)
   where "B \<subseteq>\<^sub>c X \<longleftrightarrow> (snd B : fst B \<rightarrow> X \<and> monomorphism (snd B))"
 
@@ -239,7 +239,7 @@ lemma subobject_is_relative_subset: "(B,m) \<subseteq>\<^sub>c A \<longleftright
   unfolding relative_subset_def2 subobject_of_def2
   using cfunc_type_def id_isomorphism id_left_unit id_type iso_imp_epi_and_monic by auto
 
-text \<open>The definition below corresponds to Definition 2.1.39 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.1.39 in Halvorson.\<close>
 definition relative_member :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> bool" ("_ \<in>\<^bsub>_\<^esub> _" [51,50,51]50) where
   "x \<in>\<^bsub>X\<^esub> B \<longleftrightarrow> (x \<in>\<^sub>c X \<and> monomorphism (snd B) \<and> snd B : fst B \<rightarrow> X \<and> x factorsthru (snd B))"
 
@@ -247,7 +247,7 @@ lemma relative_member_def2:
   "x \<in>\<^bsub>X\<^esub> (B, m) = (x \<in>\<^sub>c X \<and> monomorphism m \<and> m : B \<rightarrow> X \<and> x factorsthru m)"
   unfolding relative_member_def by auto
 
-text \<open>The lemma below corresponds to Proposition 2.1.40 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.40 in Halvorson.\<close>
 lemma relative_subobject_member:
   assumes "(A,n) \<subseteq>\<^bsub>X\<^esub> (B,m)" "x \<in>\<^sub>c X"
   shows "x \<in>\<^bsub>X\<^esub> (A,n) \<Longrightarrow> x \<in>\<^bsub>X\<^esub> (B,m)"
@@ -271,7 +271,7 @@ qed
 
 section \<open>Pullback\<close>
 
-text \<open>The definition below corresponds to a definition stated between Definition 2.1.42 and Definition 2.1.43 in Halvorson\<close>
+text \<open>The definition below corresponds to a definition stated between Definition 2.1.42 and Definition 2.1.43 in Halvorson.\<close>
 definition is_pullback :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
   "is_pullback A B C D ab bd ac cd \<longleftrightarrow> 
     (ab : A \<rightarrow> B \<and> bd : B \<rightarrow> D \<and> ac : A \<rightarrow> C \<and> cd : C \<rightarrow> D \<and> bd \<circ>\<^sub>c ab = cd \<circ>\<^sub>c ac \<and> 
@@ -334,7 +334,7 @@ qed
 
 section \<open>Inverse Image\<close>
 
-text\<open>The definition below corresponds to a definition given by a diagram between Definition 2.1.37 and Proposition 2.1.38 in Halvorson\<close>
+text\<open>The definition below corresponds to a definition given by a diagram between Definition 2.1.37 and Proposition 2.1.38 in Halvorson.\<close>
 definition inverse_image :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1[_]\<^bsub>_\<^esub>" [101,0,0]100) where
   "inverse_image f B m = (SOME A. \<exists> X Y k. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer A k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B))"
@@ -502,7 +502,7 @@ next
     by (smt (verit, ccfv_threshold) inverse_image_monomorphism left_cart_proj_type monomorphism_def3)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.1.41 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.41 in Halvorson.\<close>
 lemma in_inverse_image:
   assumes "f : X \<rightarrow> Y" "(B,m) \<subseteq>\<^sub>c Y" "x \<in>\<^sub>c X"
   shows "(x \<in>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1[B]\<^bsub>m\<^esub>, left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m)) = (f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B,m))"
@@ -551,7 +551,7 @@ qed
 
 section \<open>Fibered Products\<close>
 
-text \<open>The definition below corresponds to Definition 2.1.42 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.1.42 in Halvorson.\<close>
 definition fibered_product :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cset \<Rightarrow> cset" ("_ \<^bsub>_\<^esub>\<times>\<^sub>c\<^bsub>_\<^esub> _" [66,50,50,65]65) where
   "X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y = (SOME E. \<exists> Z m. f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z \<and>
     equalizer E m (f \<circ>\<^sub>c left_cart_proj X Y) (g \<circ>\<^sub>c right_cart_proj X Y))"
@@ -797,7 +797,7 @@ lemma kernel_pair_subset:
   shows "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
   using assms fibered_product_morphism_monomorphism fibered_product_morphism_type subobject_of_def2 by auto
 
-text \<open>The three lemmas below correspond to Exercise 2.1.44 in Halvorson\<close>
+text \<open>The three lemmas below correspond to Exercise 2.1.44 in Halvorson.\<close>
 lemma kern_pair_proj_iso_TFAE1:
   assumes "f: X \<rightarrow> Y" "monomorphism f"
   shows "(fibered_product_left_proj X f f X) = (fibered_product_right_proj X f f X)"

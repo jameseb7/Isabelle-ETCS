@@ -45,7 +45,7 @@ proof (typecheck_cfuncs, auto)
     by (rule_tac x="\<langle>f,g\<rangle>" in exI, simp add: cfunc_prod_type)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.1.8 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.8 in Halvorson.\<close>
 lemma cart_prods_isomorphic:
   assumes W_cart_prod:  "is_cart_prod_triple (W, \<pi>\<^sub>0, \<pi>\<^sub>1) X Y"
   assumes W'_cart_prod: "is_cart_prod_triple (W', \<pi>'\<^sub>0, \<pi>'\<^sub>1) X Y"
@@ -143,7 +143,7 @@ qed
 
 subsection \<open>Diagonal function\<close>
 
-text \<open>The definition below corresponds to Definition 2.1.9 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.1.9 in Halvorson.\<close>
 definition diagonal :: "cset \<Rightarrow> cfunc" where
   "diagonal X = \<langle>id X,id X\<rangle>"
 
@@ -162,7 +162,7 @@ qed
 
 subsection \<open>Products of functions\<close>
 
-text \<open>The definition below corresponds to Definition 2.1.10 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.1.10 in Halvorson.\<close>
 definition cfunc_cross_prod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<times>\<^sub>f" 55) where
   "f \<times>\<^sub>f g = \<langle>f \<circ>\<^sub>c left_cart_proj (domain f) (domain g), g \<circ>\<^sub>c right_cart_proj (domain f) (domain g)\<rangle>"
 
@@ -192,7 +192,7 @@ lemma cfunc_cross_prod_unique: "f : W \<rightarrow> Y \<Longrightarrow> g : X \<
   unfolding cfunc_cross_prod_def
   using cfunc_prod_unique cfunc_type_def comp_type left_cart_proj_type right_cart_proj_type by auto
 
-text \<open>The lemma below corresponds to Proposition 2.1.11 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.1.11 in Halvorson.\<close>
 lemma identity_distributes_across_composition:
   assumes f_type: "f : A \<rightarrow> B" and g_type: "g : B \<rightarrow> C"
   shows "id X \<times>\<^sub>f (g  \<circ>\<^sub>c f) = (id X \<times>\<^sub>f g) \<circ>\<^sub>c (id X \<times>\<^sub>f f)"
@@ -250,11 +250,11 @@ proof -
     by (typecheck_cfuncs, metis a_type b_type cfunc_prod_unique f_type same_left_proj same_right_proj)
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.1.12 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.12 in Halvorson.\<close>
 lemma id_cross_prod: "id(X) \<times>\<^sub>f id(Y) = id(X \<times>\<^sub>c Y)"
   by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_unique id_left_unit2 id_right_unit2 left_cart_proj_type right_cart_proj_type)
 
-text \<open>The lemma below corresponds to Exercise 2.1.14 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.14 in Halvorson.\<close>
 lemma cfunc_cross_prod_comp_diagonal:
   assumes "f: X \<rightarrow> Y" 
   shows "(f \<times>\<^sub>f f) \<circ>\<^sub>c diagonal(X) = diagonal(Y) \<circ>\<^sub>c f"

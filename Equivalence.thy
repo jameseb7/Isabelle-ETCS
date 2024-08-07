@@ -59,7 +59,7 @@ lemma transitive_def2:
   using assms unfolding transitive_on_def relative_member_def factors_through_def2
   by (metis cfunc_prod_type factors_through_def2 fst_conv snd_conv subobject_of_def2)
 
-text \<open>The lemma below corresponds to Exercise 2.3.3 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.3.3 in Halvorson.\<close>
 lemma kernel_pair_equiv_rel:
   assumes "f : X \<rightarrow> Y"
   shows "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
@@ -169,7 +169,7 @@ proof -
     using cfunc_type_def is_isomorphic_def isomorphism_def k'_def k'k_idE k_def kk'_idF by fastforce
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.3.2 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.3.2 in Halvorson.\<close>
 lemma coequalizer_is_epimorphism:
   "coequalizer E m f g \<Longrightarrow>  epimorphism(m)"
   unfolding coequalizer_def epimorphism_def
@@ -321,11 +321,11 @@ lemma canonical_quot_map_is_epi:
 
 subsection  \<open>Regular Epimorphisms\<close>
 
-text \<open>The definition below corresponds to Definition 2.3.4 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.3.4 in Halvorson.\<close>
 definition regular_epimorphism :: "cfunc \<Rightarrow> bool" where
   "regular_epimorphism f = (\<exists> g h. coequalizer (codomain f) f g h)"
 
-text \<open>The lemma below corresponds to Exercise 2.3.5 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.3.5 in Halvorson.\<close>
 lemma reg_epi_and_mono_is_iso:
   assumes "f : X \<rightarrow> Y" "regular_epimorphism f" "monomorphism f"
   shows "isomorphism f"
@@ -350,7 +350,7 @@ proof -
     using  assms(1) cfunc_type_def isomorphism_def j_def by fastforce  
 qed
 
-text \<open>The two lemmas below correspond to Proposition 2.3.6 in Halvorson\<close>
+text \<open>The two lemmas below correspond to Proposition 2.3.6 in Halvorson.\<close>
 lemma epimorphism_coequalizer_kernel_pair:
   assumes "f : X \<rightarrow> Y" "epimorphism f"
   shows "coequalizer Y f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
@@ -594,7 +594,7 @@ lemma epi_monic_factorization2:
 
 section  \<open>Image of a Function\<close>
 
-text \<open>The definition below corresponds to Definition 2.3.7 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.3.7 in Halvorson.\<close>
 definition image_of :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cset" ("_[_]\<^bsub>_\<^esub>" [101,0,0]100) where
   "image_of f A n = (SOME fA. \<exists>g m.
    g : A \<rightarrow> fA \<and>
@@ -723,7 +723,7 @@ proof -
 qed
 
 (*Now we show that f(A) is the smallest subobject of Y through which f factors (in the sense of epi-monic factorization)*)
-text \<open>The lemma below corresponds to Proposition 2.3.8 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.3.8 in Halvorson.\<close>
 lemma image_smallest_subobject:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y" and a_type[type_rule]: "a : A \<rightarrow> X"
   shows "(B, n) \<subseteq>\<^sub>c Y \<Longrightarrow> f factorsthru n \<Longrightarrow> (f[A]\<^bsub>a\<^esub>, [f[A]\<^bsub>a\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B, n)"
@@ -864,7 +864,7 @@ proof (typecheck_cfuncs, auto)
     by (rule_tac x="k \<circ>\<^sub>c k'" in exI, typecheck_cfuncs, simp add: b_k_eq_map comp_associative2 k'_maps_eq)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.3.9 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.3.9 in Halvorson.\<close>
 lemma subset_inv_image_iff_image_subset:
   assumes "(A,a) \<subseteq>\<^sub>c X" "(B,m) \<subseteq>\<^sub>c Y" 
   assumes[type_rule]: "f : X \<rightarrow> Y"
@@ -971,7 +971,7 @@ next
   qed
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.3.10 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.3.10 in Halvorson.\<close>
 lemma in_inv_image_of_image:
   assumes "(A,m) \<subseteq>\<^sub>c X" 
   assumes[type_rule]: "f : X \<rightarrow> Y"
@@ -1515,7 +1515,7 @@ definition functional_on :: "cset \<Rightarrow> cset \<Rightarrow> cset \<times>
     (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (\<exists>! y.  y \<in>\<^sub>c Y \<and>  
       \<langle>x,y\<rangle> \<in>\<^bsub>X\<times>\<^sub>cY\<^esub> R)))" 
 
-text \<open>The definition below corresponds to Definition 2.3.12 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.3.12 in Halvorson.\<close>
 definition graph :: "cfunc \<Rightarrow> cset" where
  "graph f = (SOME E. \<exists> m. equalizer E m (f \<circ>\<^sub>c left_cart_proj (domain f) (codomain f)) (right_cart_proj (domain f) (codomain f)))"
 
@@ -1550,7 +1550,7 @@ lemma graph_morph_type[type_rule]:
   shows "graph_morph(f) : graph f \<rightarrow> X \<times>\<^sub>c Y"
   using graph_subobject subobject_of_def2 assms by auto
 
-text \<open>The lemma below corresponds to Exercise 2.3.13 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.3.13 in Halvorson.\<close>
 lemma graphs_are_functional:
   assumes "f : X \<rightarrow> Y"
   shows "functional_on X Y (graph f, graph_morph f)"
@@ -1655,7 +1655,7 @@ proof-
     by (metis epi_mon_is_iso inj injective_imp_monomorphism surj surjective_is_epimorphism)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.3.14 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.3.14 in Halvorson.\<close>
 lemma functional_relations_are_graphs:
   assumes "functional_on X Y (R,m)"
   shows "\<exists>! f. f : X \<rightarrow> Y \<and> 

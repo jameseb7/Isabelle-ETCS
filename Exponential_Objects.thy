@@ -44,7 +44,7 @@ proof(auto)
     using calculation needed_type by (typecheck_cfuncs, auto)
 qed
 
-text \<open>The lemma below corresponds to a note above Definition 2.5.1 in Halvorson\<close>
+text \<open>The lemma below corresponds to a note above Definition 2.5.1 in Halvorson.\<close>
 lemma exponential_object_identity:
   "(eval_func X A)\<^sup>\<sharp> = id\<^sub>c(X\<^bsup>A\<^esup>)"
   by (metis cfunc_type_def eval_func_type id_cross_prod id_right_unit id_type transpose_func_unique)
@@ -57,7 +57,7 @@ lemma eval_func_X_empty_injective:
 
 subsection \<open>Lifting Functions\<close>
 
-text \<open>The definition below corresponds to Definition 2.5.1 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.5.1 in Halvorson.\<close>
 definition exp_func :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc" ("(_)\<^bsup>_\<^esup>\<^sub>f" [100,100]100) where
   "exp_func g A = (g \<circ>\<^sub>c eval_func (domain g) A)\<^sup>\<sharp>"
 
@@ -75,13 +75,13 @@ lemma exp_of_id_is_id_of_exp:
   "id(X\<^bsup>A\<^esup>) = (id(X))\<^bsup>A\<^esup>\<^sub>f"
   by (metis (no_types) eval_func_type exp_func_def exponential_object_identity id_domain id_left_unit2)
 
-text \<open>The lemma below corresponds to a note below Definition 2.5.1 in Halvorson\<close>
+text \<open>The lemma below corresponds to a note below Definition 2.5.1 in Halvorson.\<close>
 lemma exponential_square_diagram:
   assumes "g : Y \<rightarrow> Z"
   shows "(eval_func Z A) \<circ>\<^sub>c (id\<^sub>c(A)\<times>\<^sub>f g\<^bsup>A\<^esup>\<^sub>f)  = g \<circ>\<^sub>c (eval_func Y A)"
   using assms by (typecheck_cfuncs, simp add: exp_func_def2 transpose_func_def)
 
-text \<open>The lemma below corresponds to Proposition 2.5.2 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.2 in Halvorson.\<close>
 lemma transpose_of_comp:
   assumes f_type: "f: A \<times>\<^sub>c X \<rightarrow> Y" and g_type: "g: Y \<rightarrow> Z"
   shows "f: A \<times>\<^sub>c X \<rightarrow> Y \<and> g: Y \<rightarrow> Z  \<Longrightarrow>  (g \<circ>\<^sub>c f)\<^sup>\<sharp> = g\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c f\<^sup>\<sharp>"
@@ -108,7 +108,7 @@ lemma exponential_object_identity2:
   "id(X)\<^bsup>A\<^esup>\<^sub>f = id\<^sub>c(X\<^bsup>A\<^esup>)"
   by (metis eval_func_type exp_func_def exponential_object_identity id_domain id_left_unit2)
 
-text \<open>The lemma below corresponds to comments below Proposition 2.5.2 and above Definition 2.5.3 in Halvorson\<close>
+text \<open>The lemma below corresponds to comments below Proposition 2.5.2 and above Definition 2.5.3 in Halvorson.\<close>
 lemma eval_of_id_cross_id_sharp1:
   "(eval_func (A \<times>\<^sub>c X) A) \<circ>\<^sub>c (id(A) \<times>\<^sub>f (id(A \<times>\<^sub>c X))\<^sup>\<sharp>)  = id(A \<times>\<^sub>c X)"
   using id_type transpose_func_def by blast
@@ -125,7 +125,7 @@ lemma transpose_factors:
 
 subsection "Inverse Transpose Function (flat)"
 
-text \<open>The definition below corresponds to Definition 2.5.3 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.5.3 in Halvorson.\<close>
 definition inv_transpose_func :: "cfunc \<Rightarrow> cfunc" ("_\<^sup>\<flat>" [100]100) where
   "f\<^sup>\<flat> = (THE g. \<exists> Z X A. domain f = Z \<and> codomain f = X\<^bsup>A\<^esup> \<and> g = (eval_func X A) \<circ>\<^sub>c (id A \<times>\<^sub>f f))"
 
@@ -153,19 +153,19 @@ lemma flat_type[type_rule]:
   shows "f\<^sup>\<flat> : A \<times>\<^sub>c Z \<rightarrow> X"
   by (etcs_subst inv_transpose_func_def3, typecheck_cfuncs)
 
-text \<open>The lemma below corresponds to Proposition 2.5.4 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.4 in Halvorson.\<close>
 lemma inv_transpose_of_composition:
   assumes "f: X \<rightarrow> Y" "g: Y \<rightarrow> Z\<^bsup>A\<^esup>"
   shows "(g \<circ>\<^sub>c f)\<^sup>\<flat> = g\<^sup>\<flat> \<circ>\<^sub>c (id(A) \<times>\<^sub>f f)"
   using assms comp_associative2 identity_distributes_across_composition
   by (typecheck_cfuncs, unfold inv_transpose_func_def3, typecheck_cfuncs)
 
-text \<open>The lemma below corresponds to Proposition 2.5.5 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.5 in Halvorson.\<close>
 lemma flat_cancels_sharp:
   "f : A \<times>\<^sub>c Z \<rightarrow> X  \<Longrightarrow> (f\<^sup>\<sharp>)\<^sup>\<flat> = f"
   using inv_transpose_func_def3 transpose_func_def transpose_func_type by fastforce
 
-text \<open>The lemma below corresponds to Proposition 2.5.6 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.6 in Halvorson.\<close>
 lemma sharp_cancels_flat:
  "f: Z \<rightarrow> X\<^bsup>A\<^esup>  \<Longrightarrow> (f\<^sup>\<flat>)\<^sup>\<sharp> = f"
 proof - 
@@ -819,7 +819,7 @@ section \<open>Exponential Set Facts\<close>
 
 (*This section needs some more organizing!*)
 
-text \<open>The lemma below corresponds to Proposition 2.5.7 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.7 in Halvorson.\<close>
 lemma exp_one:
   "X\<^bsup>one\<^esup> \<cong> X"
 proof -
@@ -861,7 +861,7 @@ proof -
     using e_type is_isomorphic_def isomorphic_is_symmetric isomorphic_is_transitive one_x_A_iso_A by blast
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.5.8 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.8 in Halvorson.\<close>
 lemma exp_empty:
   "X\<^bsup>\<emptyset>\<^esup> \<cong> one"
 proof - 
@@ -904,7 +904,7 @@ proof -
     using ex1 single_elem_iso_one by auto
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.5.9 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.9 in Halvorson.\<close>
 lemma power_rule:
   "(X \<times>\<^sub>c Y)\<^bsup>A\<^esup> \<cong> X\<^bsup>A\<^esup> \<times>\<^sub>c Y\<^bsup>A\<^esup>"
 proof - 
@@ -1407,11 +1407,11 @@ lemma empty_to_nonempty_converse:
   shows "is_empty Y \<and> nonempty X"
   by (metis is_empty_def exp_is_empty assms no_el_iff_iso_empty nonempty_def nonempty_to_nonempty single_elem_iso_one)
 
-text \<open>The definition below corresponds to Definition 2.5.11 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.5.11 in Halvorson.\<close>
 definition powerset :: "cset \<Rightarrow> cset" ("\<P>_" [101]100) where
   "\<P> X = \<Omega>\<^bsup>X\<^esup>"
 
-text \<open>The lemma below corresponds to Exercise 2.6.15 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.6.15 in Halvorson.\<close>
 lemma inject_into_powerset: 
   "\<exists> f. (f : X \<rightarrow> \<P> X) \<and> (injective f)"
 proof -

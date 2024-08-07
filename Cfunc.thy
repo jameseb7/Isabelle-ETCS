@@ -231,7 +231,7 @@ next
     unfolding trans_def using isomorphic_is_transitive by blast
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.1.7a in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.7a in Halvorson.\<close>
 lemma comp_monic_imp_monic:
   assumes "domain g = codomain f"
   shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
@@ -256,7 +256,7 @@ lemma comp_monic_imp_monic':
   shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
   by (metis assms cfunc_type_def comp_monic_imp_monic)
 
-text \<open>The lemma below corresponds to Exercise 2.1.7b in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.7b in Halvorson.\<close>
 lemma comp_epi_imp_epi:
   assumes "domain g = codomain f"
   shows "epimorphism (g \<circ>\<^sub>c f) \<Longrightarrow> epimorphism g"
@@ -276,7 +276,7 @@ proof auto
     using gf_epi codomain_comp domain_s domain_t by (simp add: assms)
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.1.7c in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.7c in Halvorson.\<close>
 lemma composition_of_monic_pair_is_monic:
   assumes "codomain f = domain g"
   shows "monomorphism f \<Longrightarrow> monomorphism g \<Longrightarrow> monomorphism (g \<circ>\<^sub>c f)"
@@ -303,7 +303,7 @@ proof auto
     by (simp add: codomain_h codomain_k domain_comp f_mono assms)
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.1.7d in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.7d in Halvorson.\<close>
 lemma composition_of_epi_pair_is_epi:
 assumes "codomain f = domain g"
   shows "epimorphism f \<Longrightarrow> epimorphism g \<Longrightarrow> epimorphism (g \<circ>\<^sub>c f)"
@@ -331,7 +331,7 @@ proof auto
     by (simp add: codomain_comp domain_h domain_k g_epi assms)
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.1.7e in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.1.7e in Halvorson.\<close>
 lemma iso_imp_epi_and_monic:
   "isomorphism f \<Longrightarrow> epimorphism f \<and> monomorphism f"
   unfolding isomorphism_def epimorphism_def monomorphism_def

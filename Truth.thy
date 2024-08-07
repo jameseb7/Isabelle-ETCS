@@ -126,7 +126,7 @@ lemma not_rel_mem_char_func_false:
   shows "characteristic_func m \<circ>\<^sub>c x = \<f>"
   by (meson assms characteristic_func_true_relative_member characteristic_func_type comp_type true_false_only_truth_values)
 
-text \<open>The lemma below corresponds to Proposition 2.2.2 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.2 in Halvorson.\<close>
 lemma "card {x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>} = 4"
 proof -
   have "{x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>} = {\<langle>\<t>,\<t>\<rangle>, \<langle>\<t>,\<f>\<rangle>, \<langle>\<f>,\<t>\<rangle>, \<langle>\<f>,\<f>\<rangle>}"
@@ -254,24 +254,24 @@ lemma eq_pred_false_extract_right:
 
 section \<open>Properties of Monomorphisms and Epimorphisms\<close>
 
-text \<open>The lemma below corresponds to Exercise 2.2.3 in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.2.3 in Halvorson.\<close>
 lemma regmono_is_mono: "regular_monomorphism(m) \<Longrightarrow> monomorphism(m)"
   using equalizer_is_monomorphism regular_monomorphism_def by blast
 
-text \<open>The lemma below corresponds to Proposition 2.2.4 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.4 in Halvorson.\<close>
 lemma mono_is_regmono:
   shows "monomorphism(m) \<Longrightarrow> regular_monomorphism(m)"
   unfolding monomorphism_def regular_monomorphism_def
   using cfunc_type_def characteristic_func_type monomorphism_def domain_comp terminal_func_type true_func_type monomorphism_equalizes_char_func
   by (rule_tac x="characteristic_func m" in exI, rule_tac x="\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub>" in exI, auto)
 
-text \<open>The lemma below corresponds to Proposition 2.2.5 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.5 in Halvorson.\<close>
 lemma epi_mon_is_iso:
   assumes "epimorphism(f)" "monomorphism(f)"
   shows "isomorphism(f)"
   using assms epi_regmon_is_iso mono_is_regmono by auto
 
-text \<open>The lemma below corresponds to Proposition 2.2.8 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.8 in Halvorson.\<close>
 lemma epi_is_surj:
   assumes "p: X \<rightarrow> Y" "epimorphism(p)"
   shows "surjective(p)"
@@ -334,7 +334,7 @@ qed
     using gp_eqs_hp assms cfunc_type_def epimorphism_def g_type h_type by auto
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.2.9 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.9 in Halvorson.\<close>
 lemma pullback_of_epi_is_epi1:
 assumes "f: Y \<rightarrow> Z" "epimorphism f" "is_pullback A Y X Z q1 f q0 g"
 shows "epimorphism q0" 
@@ -361,7 +361,7 @@ proof -
     using surjective_is_epimorphism by blast
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.2.9b in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.9b in Halvorson.\<close>
 lemma pullback_of_epi_is_epi2:
 assumes "g: X \<rightarrow> Z" "epimorphism g" "is_pullback A Y X Z q1 f q0 g"
 shows "epimorphism q1" 
@@ -388,7 +388,7 @@ proof -
     using surjective_is_epimorphism by blast
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.2.9c in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.9c in Halvorson.\<close>
 lemma pullback_of_mono_is_mono1:
 assumes "g: X \<rightarrow> Z" "monomorphism f" "is_pullback A Y X Z q1 f q0 g"
 shows "monomorphism q0" 
@@ -438,7 +438,7 @@ proof(unfold monomorphism_def2, auto)
     using eqn2 equals uniqueness by (typecheck_cfuncs, auto)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.2.9d in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.9d in Halvorson.\<close>
 lemma pullback_of_mono_is_mono2:
 assumes "g: X \<rightarrow> Z" "monomorphism g" "is_pullback A Y X Z q1 f q0 g"
 shows "monomorphism q1" 
@@ -489,7 +489,7 @@ qed
 
 section \<open>Fiber Over an Element and its Connection to the Fibered Product\<close>
 
-text \<open>The definition below corresponds to Definition 2.2.6 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.2.6 in Halvorson.\<close>
 definition fiber :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1{_}" [100,100]100) where
   "f\<^sup>-\<^sup>1{y} = (f\<^sup>-\<^sup>1[one]\<^bsub>y\<^esub>)"
 
@@ -531,7 +531,7 @@ proof -
     using calculation by auto
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.2.7 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.2.7 in Halvorson.\<close>
 lemma not_surjective_has_some_empty_preimage:
   assumes p_type[type_rule]: "p: X \<rightarrow> Y" and p_not_surj: "\<not> surjective p"
   shows "\<exists> y. y\<in>\<^sub>c Y \<and>  is_empty(p\<^sup>-\<^sup>1{y})"
@@ -598,7 +598,7 @@ proof -
     using assms fibered_product_left_proj_type id_type is_isomorphic_def by blast
 qed
 
-text \<open>The lemma below corresponds to the discussion at the top of page 42 in Halvorson\<close>
+text \<open>The lemma below corresponds to the discussion at the top of page 42 in Halvorson.\<close>
 lemma kernel_pair_connection:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y" and g_type[type_rule]: "g : X \<rightarrow> E"
   assumes g_epi: "epimorphism g"
