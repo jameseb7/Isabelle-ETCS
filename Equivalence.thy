@@ -113,7 +113,7 @@ proof (unfold equiv_rel_on_def, auto)
 qed
 
 axiomatization 
-  quotient_set :: "cset \<Rightarrow> cset \<times> cfunc \<Rightarrow> cset" and
+  quotient_set :: "cset \<Rightarrow> (cset \<times> cfunc) \<Rightarrow> cset" and
   equiv_class :: "cset \<times> cfunc \<Rightarrow> cfunc" and
   quotient_func :: "cfunc \<Rightarrow> cset \<times> cfunc \<Rightarrow> cfunc"
 where
@@ -127,7 +127,8 @@ where
      quotient_func f R \<circ>\<^sub>c equiv_class R = f" and  
   quotient_func_unique: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> (const_on_rel X R f) \<Longrightarrow>
     h : quotient_set X R \<rightarrow> Y \<Longrightarrow> h \<circ>\<^sub>c equiv_class R = f \<Longrightarrow> h = quotient_func f R"
-(*Note that quotient_func f R is just f_bar *)
+text \<open>Note that @{const quotient_set} corresponds to $X/R$ and @{const quotient_func}
+  corresponds to $\bar{f}$ in Halvorson.\<close>
 
 section  \<open>Coequalizers and Epimorphisms\<close>
 
@@ -602,9 +603,6 @@ definition image_of :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarro
    coequalizer fA g (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
    monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : fA \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m))"
 
-(*An above is (A,n) below 
-so that fst An is just the set A 
-while snd An is just n, and fA corresponds to f(A) or \<exists>\<^sub>f(f) in the text.*)
 lemma image_of_def2:
   assumes "f : X \<rightarrow> Y" "n : A \<rightarrow> X"
   shows "\<exists>g m.
@@ -722,7 +720,6 @@ proof -
     by (simp add: isomorphic_is_symmetric)
 qed
 
-(*Now we show that f(A) is the smallest subobject of Y through which f factors (in the sense of epi-monic factorization)*)
 text \<open>The lemma below corresponds to Proposition 2.3.8 in Halvorson.\<close>
 lemma image_smallest_subobject:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y" and a_type[type_rule]: "a : A \<rightarrow> X"

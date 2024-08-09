@@ -7,7 +7,7 @@ section \<open>Axiom 11: Axiom of Choice\<close>
 definition section_of :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" (infix "sectionof" 90)
   where "s sectionof f \<longleftrightarrow> s : codomain f \<rightarrow> domain f \<and> f \<circ>\<^sub>c s = id (codomain f)"
 
-text \<open>The definition below corresponds to Definition 2.7.1 in Halvorson\<close>
+text \<open>The definition below corresponds to Definition 2.7.1 in Halvorson.\<close>
 definition split_epimorphism :: "cfunc \<Rightarrow> bool"
   where "split_epimorphism f \<longleftrightarrow> (\<exists> s.  s : codomain f \<rightarrow> domain f \<and> f \<circ>\<^sub>c s = id (codomain f))"
 
@@ -40,7 +40,7 @@ corollary epis_are_split:
   shows "split_epimorphism f"
   using epis_give_monos cfunc_type_def  f_epi split_epimorphism_def by blast
 
-text \<open>The lemma below corresponds to Proposition 2.6.8 in Halvorson\<close>
+text \<open>The lemma below corresponds to Proposition 2.6.8 in Halvorson.\<close>
 lemma monos_give_epis:
   assumes f_type: "f : X \<rightarrow> Y"
   assumes f_mono: "monomorphism f"
@@ -117,7 +117,7 @@ proof -
   qed
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.7.2(i) in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.7.2(i) in Halvorson.\<close>
 lemma split_epis_are_regular: 
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"
   assumes "split_epimorphism f"
@@ -133,7 +133,7 @@ proof -
     using assms coequalizer_is_epimorphism epimorphisms_are_regular by blast
 qed
 
-text \<open>The lemma below corresponds to Exercise 2.7.2(ii) in Halvorson\<close>
+text \<open>The lemma below corresponds to Exercise 2.7.2(ii) in Halvorson.\<close>
 lemma sections_are_regular_monos: 
   assumes s_type:  "s : Y \<rightarrow> X"
   assumes "s sectionof f"

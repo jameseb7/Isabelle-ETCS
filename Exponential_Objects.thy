@@ -817,8 +817,6 @@ qed
 
 section \<open>Exponential Set Facts\<close>
 
-(*This section needs some more organizing!*)
-
 text \<open>The lemma below corresponds to Proposition 2.5.7 in Halvorson.\<close>
 lemma exp_one:
   "X\<^bsup>one\<^esup> \<cong> X"

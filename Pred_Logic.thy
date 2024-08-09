@@ -1327,7 +1327,7 @@ lemma IMPLIES_false_is_true_false:
   shows "p = \<t> \<and> q = \<f>"
   by (metis IMPLIES_false_false_is_true IMPLIES_false_true_is_true IMPLIES_true_true_is_true assms true_false_only_truth_values)
 
-(*ETCS analog to (A iff  B) == (A \<Longrightarrow> B) \<and> (B \<Longrightarrow> A) *)
+text \<open>ETCS analog to "(A \<Longleftrightarrow> B) == (A \<Longrightarrow> B) \<and> (B \<Longrightarrow> A)"\<close>
 lemma iff_is_and_implies_implies_swap:
 "IFF = AND \<circ>\<^sub>c  \<langle>IMPLIES, IMPLIES \<circ>\<^sub>c  swap \<Omega> \<Omega>\<rangle>"
 proof(rule one_separator[ where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y = "\<Omega>"])

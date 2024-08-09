@@ -244,46 +244,4 @@ proof -
   by (simp add: EXISTS_def)
 qed
 
-
-
-
-(*
-lemma forall_equals:
-
-
-
-  assumes p_type[type_rule]: "p : X \<rightarrow> \<Omega>" 
-  assumes q_type[type_rule]: "q : X \<rightarrow> \<Omega>" 
-  assumes nonempty: "nonempty(X)"
-  assumes equals: "FORALL (X \<^bsub>p\<^esub>\<times>\<^sub>c\<^bsub>q\<^esub> X) \<circ>\<^sub>c ((fibered_product_morphism X p q X) \<circ>\<^sub>c left_cart_proj (X \<^bsub>p\<^esub>\<times>\<^sub>c\<^bsub>q\<^esub> X) one)\<^sup>\<sharp> = \<t>"
-  shows "p = q"
-proof - 
-  have "(fibered_product_morphism X p q X) : (X \<^bsub>p\<^esub>\<times>\<^sub>c\<^bsub>q\<^esub> X) \<rightarrow> \<Omega>" 
-    apply typecheck_cfuncs
-    oops
-    (*Put the correct type above*)
-
-  have "\<And> x. x \<in>\<^sub>c (X \<^bsub>p\<^esub>\<times>\<^sub>c\<^bsub>q\<^esub> X) \<Longrightarrow> (fibered_product_morphism X p q X)  \<circ>\<^sub>c x = \<t>"
-    apply typecheck_cfuncs
-(*
-lemma forall_equals:
-  assumes p_type[type_rule]: "p : X \<rightarrow> \<Omega>" 
-  assumes q_type[type_rule]: "q : X \<rightarrow> \<Omega>" 
-  assumes nonempty: "nonempty(X)"
-  assumes equals: "FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = FORALL X \<circ>\<^sub>c (q \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp>"
-  shows "p = q"
-proof(cases "FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>")
-  assume "FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>"
-  show "p = q"
-    by (typecheck_cfuncs, metis FORALL_true_implies_all_true \<open>FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<t>\<close> equals one_separator)
-next
-  assume "FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> \<noteq> \<t>"
-  then have "FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> = \<f>"
-    using \<open>FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X one)\<^sup>\<sharp> \<noteq> \<t>\<close> true_false_only_truth_values by (typecheck_cfuncs, blast)
-  then have "\<And> x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c x = \<f> \<Longrightarrow> q \<circ>\<^sub>c x = \<f>"
-    apply typecheck_cfuncs
-
-*)
-*)
-
 end

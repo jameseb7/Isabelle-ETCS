@@ -1,4 +1,4 @@
-theory Empty
+theory Initial
   imports Coproduct
 begin
 

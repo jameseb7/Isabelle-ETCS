@@ -4,8 +4,14 @@ begin
 
 section \<open>Basic types and operators for the category of sets\<close>
 
+
 typedecl cset
 typedecl cfunc
+
+text \<open>We declare @{type cset} and @{type cfunc} as types to represent the sets and functions within
+  ETCS, as distinct from HOL sets and functions.
+  The "c" prefix here is intended to stand for "category", and emphasises that these are
+  category-theoretic objects.\<close>
 
 axiomatization
   domain :: "cfunc \<Rightarrow> cset" and
@@ -21,13 +27,12 @@ where
   id_right_unit: "f \<circ>\<^sub>c id (domain f) = f" and
   id_left_unit: "id (codomain f) \<circ>\<^sub>c f = f"
 
+
+text \<open>We define a neater way of stating types and lift the type axioms into lemmas using it.\<close>
 definition cfunc_type :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" ("_ : _ \<rightarrow> _" [50, 50, 50]50) where
   "(f : X \<rightarrow> Y) \<longleftrightarrow> (domain(f) = X \<and> codomain(f) = Y)"
 
-named_theorems type_rule
-
-(* lift the lemmas from the axiom to use the new types *)
-lemma comp_type[type_rule]:
+lemma comp_type:
   "f : X \<rightarrow> Y \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> g \<circ>\<^sub>c f : X \<rightarrow> Z"
   by (simp add: cfunc_type_def codomain_comp domain_comp)
 
@@ -35,7 +40,7 @@ lemma comp_associative2:
   "f : X \<rightarrow> Y \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> h : Z \<rightarrow> W \<Longrightarrow> h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = (h \<circ>\<^sub>c g) \<circ>\<^sub>c f"
   by (simp add: cfunc_type_def comp_associative)
 
-lemma id_type[type_rule]: "id X : X \<rightarrow> X"
+lemma id_type: "id X : X \<rightarrow> X"
   unfolding cfunc_type_def using id_domain id_codomain by auto
 
 lemma id_right_unit2: "f : X \<rightarrow> Y \<Longrightarrow> f \<circ>\<^sub>c id X = f"
@@ -46,23 +51,31 @@ lemma id_left_unit2: "f : X \<rightarrow> Y \<Longrightarrow> id Y \<circ>\<^sub
 
 subsection \<open>Tactics for applying typing rules\<close>
 
+text \<open>ETCS lemmas often have assumptions on its ETCS type, which can often be cumbersome to prove.
+  To simplify proofs involving ETCS types, we provide proof methods that apply type rules in a
+  structured way to prove facts about ETCS function types.
+  The type rules state the types of the basic constants and operators of ETCS and are declared as
+  a named set of theorems called $type_rule$.\<close>
+
+named_theorems type_rule
+
+declare id_type[type_rule]
+declare comp_type[type_rule]
+
 ML_file \<open>typecheck.ml\<close>
 
 subsubsection \<open>typecheck_cfuncs: Tactic to construct type facts\<close>
 
-(* setup typecheck_cfuncs_method as a proof method in the theory *)
 method_setup typecheck_cfuncs =
   \<open>Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
      >> typecheck_cfuncs_method\<close>
   "Check types of cfuncs in current goal and add as assumptions of the current goal"
 
-(* setup typecheck_cfuncs_method as a proof method in the theory *)
 method_setup typecheck_cfuncs_all =
   \<open>Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
      >> typecheck_cfuncs_all_method\<close>
   "Check types of cfuncs in all subgoals and add as assumptions of the current goal"
 
-(* setup typecheck_cfuncs_prems_method as a proof method in the theory *)
 method_setup typecheck_cfuncs_prems =
   \<open>Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
      >> typecheck_cfuncs_prems_method\<close>

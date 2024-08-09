@@ -1890,7 +1890,6 @@ qed
 lemma coproduct_associates:
   "A \<Coprod> (B \<Coprod> C)  \<cong> (A \<Coprod> B) \<Coprod> C"
 proof -
-(*Diagram 1*)
   obtain q where q_def: "q = (left_coproj (A \<Coprod> B) C ) \<circ>\<^sub>c (right_coproj A B)" and q_type[type_rule]: "q: B \<rightarrow> (A \<Coprod> B) \<Coprod> C"
     by typecheck_cfuncs  
   obtain f where f_def: "f = q \<amalg> (right_coproj (A \<Coprod> B) C)" and f_type[type_rule]: "(f: (B \<Coprod> C) \<rightarrow> ((A \<Coprod> B) \<Coprod> C))"
@@ -1900,7 +1899,6 @@ proof -
   then have f_unique: "(\<exists>!f. (f: (B \<Coprod> C) \<rightarrow> ((A \<Coprod> B) \<Coprod> C)) \<and> (f \<circ>\<^sub>c left_coproj B C = q) \<and> (f \<circ>\<^sub>c right_coproj B C = right_coproj (A \<Coprod> B) C))"
     by (typecheck_cfuncs, metis cfunc_coprod_unique f_prop f_type)
 
-(*Diagram 2*)
   obtain m where m_def: "m = (left_coproj (A \<Coprod> B) C ) \<circ>\<^sub>c (left_coproj A B)" and m_type[type_rule]: "m : A \<rightarrow> (A \<Coprod> B) \<Coprod> C"
     by typecheck_cfuncs
   obtain g where g_def: "g = m \<amalg> f" and g_type[type_rule]: "g: A \<Coprod> (B \<Coprod> C)  \<rightarrow> (A \<Coprod> B) \<Coprod> C"
@@ -1910,7 +1908,6 @@ proof -
   have g_unique: "\<exists>! g. ((g: A \<Coprod> (B \<Coprod> C)  \<rightarrow> (A \<Coprod> B) \<Coprod> C) \<and> (g \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = m) \<and> (g \<circ>\<^sub>c (right_coproj A (B \<Coprod> C)) = f))"
     by (typecheck_cfuncs, metis cfunc_coprod_unique g_prop g_type)
 
-(*Diagram 3*)
   obtain p where p_def: "p = (right_coproj A (B \<Coprod> C)) \<circ>\<^sub>c  (left_coproj B C)" and p_type[type_rule]: "p: B \<rightarrow> A \<Coprod> (B \<Coprod> C)"
     by typecheck_cfuncs
   obtain h where h_def: "h = (left_coproj A (B \<Coprod> C)) \<amalg> p" and h_type[type_rule]: "h: (A \<Coprod> B) \<rightarrow> A \<Coprod> (B \<Coprod> C)"
@@ -1922,13 +1919,11 @@ proof -
   have h_unique: "\<exists>! h. ((h: (A \<Coprod> B) \<rightarrow> A \<Coprod> (B \<Coprod> C)) \<and> (h \<circ>\<^sub>c (left_coproj A B)  = (left_coproj A (B \<Coprod> C))) \<and> (h \<circ>\<^sub>c (right_coproj A B) =p))"
     by (typecheck_cfuncs, metis cfunc_coprod_unique h_prop1 h_prop2 h_type)
 
-(*Diagram 4*)
   obtain j where j_def: "j = (right_coproj A (B \<Coprod> C)) \<circ>\<^sub>c  (right_coproj B C)" and j_type[type_rule]: "j : C \<rightarrow> A \<Coprod> (B \<Coprod> C)"
     by typecheck_cfuncs
   obtain k where k_def: "k = h \<amalg> j" and k_type[type_rule]: "k: (A \<Coprod> B) \<Coprod> C \<rightarrow> A \<Coprod> (B \<Coprod> C)"
     by typecheck_cfuncs
 
-(*Master diagram*)
   have fact1: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = (left_coproj A (B \<Coprod> C))"
     by (typecheck_cfuncs, smt (z3) comp_associative2 g_prop h_prop1 h_type j_type k_def left_coproj_cfunc_coprod left_proj_type m_def)
   have fact2: "(g \<circ>\<^sub>c k) \<circ>\<^sub>c (left_coproj (A \<Coprod> B) C) = (left_coproj (A \<Coprod> B) C)"
@@ -1945,7 +1940,7 @@ proof -
     by (metis cfunc_type_def fact5 fact6 g_type is_isomorphic_def isomorphism_def k_type)
 qed
 
-text \<open>The lemma below corresponds to Proposition 2.5.10\<close>
+text \<open>The lemma below corresponds to Proposition 2.5.10.\<close>
 lemma product_distribute_over_coproduct_left:
   "A \<times>\<^sub>c (X \<Coprod> Y) \<cong> (A \<times>\<^sub>c X) \<Coprod> (A \<times>\<^sub>c Y)"
   using dist_prod_coprod_type dist_prod_coprod_iso is_isomorphic_def isomorphic_is_symmetric by blast
