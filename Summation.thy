@@ -1,5 +1,5 @@
 theory Summation
-  imports Add Pred_Logic
+  imports Add Mult Pred_Logic
 begin
 
 definition indexed_sum1 :: cfunc where
@@ -627,5 +627,18 @@ proof -
   then show ?thesis
     using assms by (-, typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 eq_pred_iff_eq id_left_unit2 id_right_unit2 terminal_func_comp_elem)
 qed
+
+
+lemma mult_index_sum:
+  assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
+  oops
+
+
+
+
+
+
 
 end

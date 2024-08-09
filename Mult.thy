@@ -1277,4 +1277,39 @@ lemma FOIL_2:
   shows "(a +\<^sub>\<nat> b) \<cdot>\<^sub>\<nat> (c +\<^sub>\<nat> d)  = (a \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat> (a \<cdot>\<^sub>\<nat> d) +\<^sub>\<nat> (c \<cdot>\<^sub>\<nat> b) +\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> d)"
   using assms by (typecheck_cfuncs, simp add: FOIL mult_commutative)
 
+
+
+subsection \<open>Multiplication of Metafuncs\<close>
+
+definition meta_mult :: "cset \<Rightarrow> cfunc" 
+  where "meta_mult X  = (mult2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f  eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp>"
+
+lemma meta_add_type[type_rule]:
+  "meta_mult X : (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<rightarrow> \<nat>\<^sub>c\<^bsup>X\<^esup>"
+  unfolding meta_mult_def by typecheck_cfuncs
+
+
+lemma mmult_commutes:
+  assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
+  assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
+  shows "meta_mult X \<circ>\<^sub>c \<langle>f, g\<rangle> = meta_mult X \<circ>\<^sub>c \<langle>g, f\<rangle>"
+  sorry
+  (*
+proof(unfold meta_mult_def)
+*)
+
+lemma mmult_associates:
+  assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
+  assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
+  assumes "h \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>" 
+  shows "meta_mult X \<circ>\<^sub>c \<langle>f, meta_mult X \<circ>\<^sub>c \<langle>g, h\<rangle>\<rangle> = meta_mult X \<circ>\<^sub>c \<langle>meta_mult X \<circ>\<^sub>c \<langle>f, g\<rangle>, h\<rangle>"
+  sorry
+
+
+lemma meta_mult_as_mult:
+  assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  shows "cnufatem (meta_mult \<nat>\<^sub>c \<circ>\<^sub>c \<langle>f, g\<rangle>)  = mult2 \<circ>\<^sub>c \<langle>cnufatem  f, cnufatem  g\<rangle>"
+  sorry
+
 end
