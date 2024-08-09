@@ -1,8 +1,8 @@
 theory Countable
-  imports Nats Axiom_Of_Choice Nat_Parity
+  imports Nats Axiom_Of_Choice Nat_Parity Cardinality
 begin
 
-(* Definition 2.6.9 *)
+text \<open>The definition below corresponds to Definition 2.6.9 in Halvorson.\<close>
 definition epi_countable :: "cset \<Rightarrow> bool" where
   "epi_countable X \<longleftrightarrow> (\<exists> f. f : \<nat>\<^sub>c \<rightarrow> X \<and> epimorphism f)"
 
@@ -10,7 +10,8 @@ lemma emptyset_is_not_epi_countable:
   "\<not> (epi_countable \<emptyset>)"
   using comp_type emptyset_is_empty epi_countable_def zero_type by blast
 
-(*Better  Definition 2.6.9 *)
+text \<open>The fact that the empty set is not countable according to the definition from Halvorson
+  (@{thm epi_countable_def}) motivated the following definition.\<close>
 definition countable :: "cset \<Rightarrow> bool" where
   "countable X \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> \<nat>\<^sub>c \<and> monomorphism f)"
 
@@ -27,7 +28,6 @@ lemma natural_numbers_are_countably_infinite:
   "(countable \<nat>\<^sub>c) \<and> (is_infinite \<nat>\<^sub>c)"
   by (meson CollectI Peano's_Axioms countable_def injective_imp_monomorphism is_infinite_def successor_type)
 
-
 lemma iso_to_N_is_countably_infinite:
   assumes "X \<cong> \<nat>\<^sub>c"
   shows "(countable X) \<and> (is_infinite X)"
@@ -41,13 +41,13 @@ lemma smaller_than_countable_is_countable:
 lemma iso_pres_countable:
   assumes "X \<cong> Y" "countable Y"
   shows "countable X"
-  using assms(1) assms(2) is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic smaller_than_countable_is_countable by blast
+  using assms is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic smaller_than_countable_is_countable by blast
 
 lemma NuN_is_countable:
   "countable(\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c)"
   using countable_def epis_give_monos halve_with_parity_iso halve_with_parity_type iso_imp_epi_and_monic by smt
 
-(*Exercise 2.6.11*)
+text \<open>The lemma below corresponds to Exercise 2.6.11 in Halvorson.\<close>
 lemma coproduct_of_countables_is_countable:
   assumes "countable X" "countable Y"
   shows "countable(X \<Coprod> Y)"

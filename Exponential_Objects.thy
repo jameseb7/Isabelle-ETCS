@@ -1411,43 +1411,6 @@ text \<open>The definition below corresponds to Definition 2.5.11 in Halvorson.\
 definition powerset :: "cset \<Rightarrow> cset" ("\<P>_" [101]100) where
   "\<P> X = \<Omega>\<^bsup>X\<^esup>"
 
-text \<open>The lemma below corresponds to Exercise 2.6.15 in Halvorson.\<close>
-lemma inject_into_powerset: 
-  "\<exists> f. (f : X \<rightarrow> \<P> X) \<and> (injective f)"
-proof -
-  have "injective((eq_pred X)\<^sup>\<sharp>)"
-    unfolding injective_def
-  proof (auto)
-    fix x y 
-    assume "x \<in>\<^sub>c domain ((eq_pred X)\<^sup>\<sharp>)"
-    then have x_type[type_rule]: "x \<in>\<^sub>c X"
-      using cfunc_type_def eq_pred_type transpose_func_type by force
-    assume "y \<in>\<^sub>c domain ((eq_pred X)\<^sup>\<sharp>)"
-    then have y_type[type_rule]: "y \<in>\<^sub>c X"
-      using cfunc_type_def eq_pred_type transpose_func_type by force
-    assume eqs: "(eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c x = (eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c y"
-  
-    have "eq_pred X \<circ>\<^sub>c \<langle>x,x\<rangle> = ((eval_func \<Omega> X) \<circ>\<^sub>c (id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>)) \<circ>\<^sub>c \<langle>x,x\<rangle>"
-      by (typecheck_cfuncs, metis flat_cancels_sharp inv_transpose_func_def3)
-    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c ((id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x,x\<rangle>)"
-      by (typecheck_cfuncs, simp add: comp_associative2)
-    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c x, (eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c x\<rangle>"
-      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-    also have "... = (eval_func \<Omega> X) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c x,(eq_pred X)\<^sup>\<sharp> \<circ>\<^sub>c y\<rangle>"
-      using eqs by auto
-    also have "... =  (eval_func \<Omega> X) \<circ>\<^sub>c ((id(X) \<times>\<^sub>f (eq_pred X)\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x,y\<rangle>)"
-      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-    also have "... = eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle>"
-      by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
-    then have computation: "eq_pred X \<circ>\<^sub>c \<langle>x,x\<rangle> = eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle>"
-      by (simp add: calculation)
-    then show "x=y"
-      by (typecheck_cfuncs, metis computation eq_pred_iff_eq_conv)
-  qed
-  then show "(\<exists> f.((f : X \<rightarrow> \<P> X) \<and> injective(f)))"
-    by (metis eq_pred_type powerset_def transpose_func_type)
-qed
-
 lemma sets_squared:
   "A\<^bsup>\<Omega>\<^esup> \<cong> A \<times>\<^sub>c A"
 proof - 

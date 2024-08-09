@@ -1,8 +1,8 @@
 theory Fixed_Points
-  imports Nats Axiom_Of_Choice Pred_Logic
+  imports Axiom_Of_Choice Pred_Logic Cardinality
 begin
 
-(* Definition 2.6.12 *)
+text \<open>The definitions below correspond to Definition 2.6.12 in Halvorson.\<close>
 definition fixed_point :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
   "fixed_point a g \<longleftrightarrow> (\<exists> A. g : A \<rightarrow> A \<and> a \<in>\<^sub>c A \<and> g \<circ>\<^sub>c a = a)"
 definition has_fixed_point :: "cfunc \<Rightarrow> bool" where
@@ -15,7 +15,7 @@ lemma fixed_point_def2:
   shows "fixed_point a g = (g \<circ>\<^sub>c a = a)"
   unfolding fixed_point_def using assms by blast
 
-(*Theorem 2.6.13*)
+text \<open>The lemma below corresponds to Theorem 2.6.13 in Halvorson.\<close>
 lemma Lawveres_fixed_point_theorem:
   assumes p_type[type_rule]: "p : X \<rightarrow> A\<^bsup>X\<^esup>"
   assumes p_surj: "surjective p"
@@ -69,8 +69,8 @@ proof(unfold fixed_point_property_def has_fixed_point_def ,auto)
     using fixed_point_def by auto
 qed
 
-(*Theorem 2.6.14*)
-lemma Cantors_Negative_Theorem:
+text \<open>The theorem below corresponds to Theorem 2.6.14 in Halvorson.\<close>
+theorem Cantors_Negative_Theorem:
   "\<nexists> s. s : X \<rightarrow> \<P> X \<and> surjective(s)"
 proof(rule ccontr, auto)
   fix s 
@@ -89,15 +89,15 @@ proof(rule ccontr, auto)
     using Omega_doesnt_have_ffp Omega_has_ffp by auto
 qed
 
-(*Exercise 2.6.15*)
-lemma Cantors_Positive_Theorem:
+text \<open>The theorem below corresponds to Exercise 2.6.15 in Halvorson.\<close>
+theorem Cantors_Positive_Theorem:
   "\<exists>m. m : X \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> injective m"
 proof - 
-  have eq_pred_sharp_type[type_rule]: "(eq_pred X)\<^sup>\<sharp> : X \<rightarrow>  \<Omega>\<^bsup>X\<^esup>"
-    by (typecheck_cfuncs)
-  have "injective((eq_pred X)\<^sup>\<sharp>)"
+  have eq_pred_sharp_type[type_rule]: "eq_pred X\<^sup>\<sharp> : X \<rightarrow>  \<Omega>\<^bsup>X\<^esup>"
+    by typecheck_cfuncs
+  have "injective(eq_pred X\<^sup>\<sharp>)"
     unfolding injective_def
-  proof(auto)
+  proof (auto)
     fix x y 
     assume "x \<in>\<^sub>c domain (eq_pred X\<^sup>\<sharp>)" then have x_type[type_rule]: "x \<in>\<^sub>c X"
       using cfunc_type_def eq_pred_sharp_type by auto
@@ -130,8 +130,13 @@ proof -
     using eq_pred_sharp_type injective_imp_monomorphism by blast
 qed
 
+text \<open>The corollary below corresponds to Corollary 2.6.16 in Halvorson.\<close>
+corollary 
+  "X \<le>\<^sub>c \<P> X \<and> \<not> (X \<cong> \<P> X)"
+  using Cantors_Negative_Theorem Cantors_Positive_Theorem
+  unfolding is_smaller_than_def is_isomorphic_def powerset_def
+  by (metis epi_is_surj injective_imp_monomorphism iso_imp_epi_and_monic)
 
-(*Corollary to Exercise 2.6.15*)
 corollary Generalized_Cantors_Positive_Theorem:
   assumes "\<not>(terminal_object Y)"
   assumes "\<not>(initial_object Y)"
@@ -147,7 +152,7 @@ proof -
     using fact set_card_transitive by blast
 qed
 
-lemma Generalized_Cantors_Negative_Theorem:
+corollary Generalized_Cantors_Negative_Theorem:
   assumes "\<not>(initial_object X)"
   assumes "\<not>(terminal_object Y)"
   shows "\<nexists> s. s : X \<rightarrow> Y\<^bsup>X\<^esup> \<and> surjective(s)"

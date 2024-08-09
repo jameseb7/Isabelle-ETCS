@@ -2,6 +2,8 @@ theory Nat_Parity
   imports Nats Quant_Logic
 begin
 
+section \<open>Nth Even Number\<close>
+
 definition nth_even :: "cfunc" where
   "nth_even = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<and> 
     u \<circ>\<^sub>c zero = zero \<and>
@@ -26,6 +28,8 @@ lemma nth_even_successor:
 lemma nth_even_successor2:
   "nth_even \<circ>\<^sub>c successor = successor \<circ>\<^sub>c successor \<circ>\<^sub>c nth_even"
   using comp_associative2 nth_even_def2 by (typecheck_cfuncs, auto)
+
+section \<open>Nth Odd Number\<close>
 
 definition nth_odd :: "cfunc" where
   "nth_odd = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<and> 
@@ -111,7 +115,9 @@ proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f=
     by (metis cfunc_type_def codomain_comp comp_associative nth_odd_def2 successor_type)
   then show "(nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c successor = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even \<circ>\<^sub>c successor"
     using nth_even_successor2 nth_odd_is_succ_nth_even by auto
-qed      
+qed
+
+section \<open>Checking if a Number is Even\<close>
 
 definition is_even :: "cfunc" where
   "is_even = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> u \<circ>\<^sub>c zero = \<t> \<and> NOT \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
@@ -131,6 +137,8 @@ lemma is_even_zero:
 lemma is_even_successor:
   "is_even \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_even"
   by (simp add: is_even_def2)
+
+section \<open>Checking if a Number is Odd\<close>
 
 definition is_odd :: "cfunc" where
   "is_odd = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> u \<circ>\<^sub>c zero = \<f> \<and> NOT \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
@@ -360,6 +368,8 @@ proof -
   then show ?thesis
     using calculation by auto
 qed
+
+section \<open>Natural Number Halving\<close>
 
 definition halve_with_parity :: "cfunc" where
   "halve_with_parity = (THE u. u: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> 

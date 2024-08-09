@@ -120,6 +120,29 @@ proof(rule ccontr)
     using true_false_distinct by auto
 qed
 
+lemma AND_commutative:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle>p,q\<rangle> = AND \<circ>\<^sub>c \<langle>q,p\<rangle>"
+  by (metis AND_false_left_is_false AND_false_right_is_false assms true_false_only_truth_values)
+
+lemma AND_idempotent:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle>p,p\<rangle> = p"
+  using AND_false_right_is_false AND_true_true_is_true assms true_false_only_truth_values by blast
+
+lemma AND_associative:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  assumes "r \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle>AND \<circ>\<^sub>c \<langle>p,q\<rangle>, r\<rangle> = AND \<circ>\<^sub>c \<langle>p, AND \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle>"
+  by (metis AND_commutative AND_false_left_is_false AND_true_true_is_true assms true_false_only_truth_values)
+
+lemma AND_complementary:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "AND \<circ>\<^sub>c \<langle>p, NOT \<circ>\<^sub>c p\<rangle> =  \<f>"
+  by (metis AND_false_left_is_false AND_false_right_is_false NOT_false_is_true NOT_true_is_false assms true_false_only_truth_values true_func_type)
+
 subsection \<open>NOR\<close>
 
 definition NOR :: "cfunc" where
@@ -182,8 +205,7 @@ proof (rule ccontr)
     using true_false_distinct by auto
 qed
 
-(*Rename*)
-lemma unnamed_special_1:
+lemma NOR_true_implies_both_false:
   assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
   assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
   assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
@@ -218,13 +240,12 @@ proof -
     using eqs by linarith
 qed
 
-(*Rename*)
-lemma unnamed_special_2:
+lemma NOR_true_implies_neither_true:
   assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
   assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
   assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
   shows "\<not> ((P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
-  by (smt (verit, ccfv_SIG) NOR_true NOT_false_is_true NOT_true_is_false NOT_type X_nonempty Y_nonempty assms(3,4) comp_associative2 comp_type nonempty_def terminal_func_type true_false_distinct true_false_only_truth_values unnamed_special_1)
+  by (smt (verit, ccfv_SIG) NOR_true NOT_false_is_true NOT_true_is_false NOT_type X_nonempty Y_nonempty assms(3,4) comp_associative2 comp_type nonempty_def terminal_func_type true_false_distinct true_false_only_truth_values NOR_true_implies_both_false)
 
 subsection \<open>OR\<close>
 
@@ -477,28 +498,28 @@ proof(rule one_separator[where X = "\<Omega> \<times>\<^sub>c \<Omega>", where Y
   qed
 qed
 
+lemma OR_commutative:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>p,q\<rangle> = OR \<circ>\<^sub>c \<langle>q,p\<rangle>"
+  by (metis OR_true_left_is_true OR_true_right_is_true assms true_false_only_truth_values)
 
+lemma OR_idempotent:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>p,p\<rangle> = p"
+  using OR_false_false_is_false OR_true_left_is_true assms true_false_only_truth_values by blast
 
-(*
+lemma OR_associative:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  assumes "q \<in>\<^sub>c \<Omega>"
+  assumes "r \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>OR \<circ>\<^sub>c \<langle>p,q\<rangle>, r\<rangle> = OR \<circ>\<^sub>c \<langle>p, OR \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle>"
+  by (metis OR_commutative OR_false_false_is_false OR_true_right_is_true assms true_false_only_truth_values)
 
-lemma unnamed_special_3:
-  assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
-  assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
-  assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-  shows "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)" 
-proof-
-  have "(NOT  \<circ>\<^sub>c NOR) \<circ>\<^sub>c (P \<times>\<^sub>f Q) = (NOT \<circ>\<^sub>c \<f>) \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-    by (typecheck_cfuncs, smt (z3) NOR_true comp_associative2)
-  then have "OR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-    by (simp add: NOT_NOR_is_OR NOT_false_is_true)
-  then have "OR \<circ>\<^sub>c \<langle>P \<circ>\<^sub>c left_cart_proj X Y, Q \<circ>\<^sub>c right_cart_proj X Y\<rangle> =  \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-    using assms(3) assms(4) cfunc_cross_prod_def2 by auto
-  then have "(P \<circ>\<^sub>c left_cart_proj X Y) = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) \<or> 
-             (Q \<circ>\<^sub>c right_cart_proj X Y) = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>) "
-    apply typecheck_cfuncs
-    oops
-
-*)
+lemma OR_complementary:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "OR \<circ>\<^sub>c \<langle>p, NOT \<circ>\<^sub>c p\<rangle> =  \<t>"
+  by (metis NOT_false_is_true NOT_true_is_false OR_true_left_is_true OR_true_right_is_true assms false_func_type true_false_only_truth_values)
 
 subsection \<open>XOR\<close>
 
@@ -882,6 +903,11 @@ proof(rule one_separator[where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y =
       by (typecheck_cfuncs, metis AND_false_left_is_false AND_false_right_is_false AND_true_true_is_true NAND_left_false_is_true NAND_right_false_is_true NAND_true_implies_one_is_false NOT_false_is_true NOT_true_is_false comp_associative2 true_false_only_truth_values x_def x_type)
   qed
 qed
+
+lemma NAND_not_idempotent:
+  assumes "p \<in>\<^sub>c \<Omega>"
+  shows "NAND \<circ>\<^sub>c \<langle>p,p\<rangle> = NOT \<circ>\<^sub>c p"
+  using NAND_right_false_is_true NAND_true_true_is_false NOT_false_is_true NOT_true_is_false assms true_false_only_truth_values by fastforce
 
 subsection \<open>IFF\<close>
 
@@ -1611,43 +1637,7 @@ lemma implies_implies_IMPLIES:
   shows  "(P = \<t> \<Longrightarrow> Q = \<t>) \<Longrightarrow> IMPLIES \<circ>\<^sub>c \<langle>P, Q\<rangle> = \<t>"
   by (typecheck_cfuncs, metis IMPLIES_false_is_true_false true_false_only_truth_values)
 
-subsection \<open>OTHER BOOLEAN IDENTITIES\<close>
-
-lemma AND_commutative:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  assumes "q \<in>\<^sub>c \<Omega>"
-  shows "AND \<circ>\<^sub>c \<langle>p,q\<rangle> = AND \<circ>\<^sub>c \<langle>q,p\<rangle>"
-  by (metis AND_false_left_is_false AND_false_right_is_false assms true_false_only_truth_values)
-
-lemma AND_idempotent:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  shows "AND \<circ>\<^sub>c \<langle>p,p\<rangle> = p"
-  using AND_false_right_is_false AND_true_true_is_true assms true_false_only_truth_values by blast
-
-lemma OR_commutative:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  assumes "q \<in>\<^sub>c \<Omega>"
-  shows "OR \<circ>\<^sub>c \<langle>p,q\<rangle> = OR \<circ>\<^sub>c \<langle>q,p\<rangle>"
-  by (metis OR_true_left_is_true OR_true_right_is_true assms true_false_only_truth_values)
-
-lemma OR_idempotent:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  shows "OR \<circ>\<^sub>c \<langle>p,p\<rangle> = p"
-  using OR_false_false_is_false OR_true_left_is_true assms true_false_only_truth_values by blast
-
-lemma AND_associative:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  assumes "q \<in>\<^sub>c \<Omega>"
-  assumes "r \<in>\<^sub>c \<Omega>"
-  shows "AND \<circ>\<^sub>c \<langle>AND \<circ>\<^sub>c \<langle>p,q\<rangle>, r\<rangle> = AND \<circ>\<^sub>c \<langle>p, AND \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle>"
-  by (metis AND_commutative AND_false_left_is_false AND_true_true_is_true assms true_false_only_truth_values)
-
-lemma OR_associative:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  assumes "q \<in>\<^sub>c \<Omega>"
-  assumes "r \<in>\<^sub>c \<Omega>"
-  shows "OR \<circ>\<^sub>c \<langle>OR \<circ>\<^sub>c \<langle>p,q\<rangle>, r\<rangle> = OR \<circ>\<^sub>c \<langle>p, OR \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle>"
-  by (metis OR_commutative OR_false_false_is_false OR_true_right_is_true assms true_false_only_truth_values)
+subsection \<open>Other Boolean Identities\<close>
 
 lemma AND_OR_distributive:
   assumes "p \<in>\<^sub>c \<Omega>"
@@ -1662,16 +1652,6 @@ lemma OR_AND_distributive:
   assumes "r \<in>\<^sub>c \<Omega>"
   shows "OR \<circ>\<^sub>c \<langle>p, AND \<circ>\<^sub>c \<langle>q,r\<rangle>\<rangle> = AND \<circ>\<^sub>c \<langle>OR \<circ>\<^sub>c \<langle>p,q\<rangle>, OR \<circ>\<^sub>c \<langle>p,r\<rangle>\<rangle>"
   by (smt (z3) AND_commutative AND_false_right_is_false AND_true_true_is_true OR_commutative OR_false_false_is_false OR_true_right_is_true assms true_false_only_truth_values)
-
-lemma OR_complementary:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  shows "OR \<circ>\<^sub>c \<langle>p, NOT \<circ>\<^sub>c p\<rangle> =  \<t>"
-  by (metis NOT_false_is_true NOT_true_is_false OR_true_left_is_true OR_true_right_is_true assms false_func_type true_false_only_truth_values)
-
-lemma AND_complementary:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  shows "AND \<circ>\<^sub>c \<langle>p, NOT \<circ>\<^sub>c p\<rangle> =  \<f>"
-  by (metis AND_false_left_is_false AND_false_right_is_false NOT_false_is_true NOT_true_is_false assms true_false_only_truth_values true_func_type)
 
 lemma OR_AND_absorption:
   assumes "p \<in>\<^sub>c \<Omega>"
@@ -1697,9 +1677,6 @@ lemma deMorgan_Law2:
   shows "NOT \<circ>\<^sub>c AND \<circ>\<^sub>c \<langle>p,q\<rangle> = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c p, NOT \<circ>\<^sub>c q\<rangle>"
   by (metis AND_complementary AND_idempotent NOT_false_is_true NOT_true_is_false OR_complementary OR_false_false_is_false OR_idempotent assms true_false_only_truth_values true_func_type)
  
-lemma NAND_not_idempotent:
-  assumes "p \<in>\<^sub>c \<Omega>"
-  shows "NAND \<circ>\<^sub>c \<langle>p,p\<rangle> = NOT \<circ>\<^sub>c p"
-  using NAND_right_false_is_true NAND_true_true_is_false NOT_false_is_true NOT_true_is_false assms true_false_only_truth_values by fastforce
+
 
 end
