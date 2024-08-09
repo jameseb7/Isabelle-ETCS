@@ -207,17 +207,6 @@ proof -
     by (simp add: classes_distinct)
 qed
 
-(*In fact these could go into Terminal.thy where we first define "is_empty" but it seems more natural here*)
-lemma prod_with_empty_is_empty1:
-  assumes "is_empty (A)"
-  shows "is_empty(A \<times>\<^sub>c B)"
-  by (meson assms comp_type left_cart_proj_type is_empty_def)
-
-lemma prod_with_empty_is_empty2:
-  assumes "is_empty (B)"
-  shows "is_empty (A \<times>\<^sub>c B)"
-  using assms cart_prod_decomp is_empty_def by blast
-
 lemma coprod_with_init_obj1: 
   assumes "initial_object Y"
   shows "X \<Coprod> Y \<cong> X"

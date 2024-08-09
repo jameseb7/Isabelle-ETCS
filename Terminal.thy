@@ -47,6 +47,16 @@ lemma one_unique_element:
   "\<exists>! x. x \<in>\<^sub>c one"
   using terminal_func_type terminal_func_unique by blast
 
+lemma prod_with_empty_is_empty1:
+  assumes "is_empty (A)"
+  shows "is_empty(A \<times>\<^sub>c B)"
+  by (meson assms comp_type left_cart_proj_type is_empty_def)
+
+lemma prod_with_empty_is_empty2:
+  assumes "is_empty (B)"
+  shows "is_empty (A \<times>\<^sub>c B)"
+  using assms cart_prod_decomp is_empty_def by blast
+
 subsection \<open>Terminal objects (sets with one element)\<close>
 
 definition terminal_object :: "cset \<Rightarrow> bool" where

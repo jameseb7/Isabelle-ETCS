@@ -1,5 +1,5 @@
 theory Exponential_Objects
-  imports Empty 
+  imports Initial
 begin
 
 section \<open>Exponential Objects, Transposes and Evaluation\<close>
