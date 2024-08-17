@@ -4,6 +4,7 @@ begin
 
 section \<open>Terminal objects, constant functions and elements\<close>
 
+text \<open>The axiomatization below corresponds to Axiom 3 (Terminal Object) in Halvorson.\<close>
 axiomatization
   terminal_func :: "cset \<Rightarrow> cfunc" ("\<beta>\<^bsub>_\<^esub>" 100) and
   one :: "cset"

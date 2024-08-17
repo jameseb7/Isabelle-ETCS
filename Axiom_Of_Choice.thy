@@ -2,12 +2,12 @@ theory Axiom_Of_Choice
   imports Coproduct
 begin
 
-section \<open>Axiom 11: Axiom of Choice\<close>
+section \<open>Axiom of Choice\<close>
 
+text \<open>The two definitions below correspond to Definition 2.7.1 in Halvorson.\<close>
 definition section_of :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" (infix "sectionof" 90)
   where "s sectionof f \<longleftrightarrow> s : codomain f \<rightarrow> domain f \<and> f \<circ>\<^sub>c s = id (codomain f)"
 
-text \<open>The definition below corresponds to Definition 2.7.1 in Halvorson.\<close>
 definition split_epimorphism :: "cfunc \<Rightarrow> bool"
   where "split_epimorphism f \<longleftrightarrow> (\<exists> s.  s : codomain f \<rightarrow> domain f \<and> f \<circ>\<^sub>c s = id (codomain f))"
 
@@ -23,6 +23,7 @@ lemma sections_define_splits:
   shows "f : X \<rightarrow> Y \<and> split_epimorphism(f)"
   using assms cfunc_type_def section_of_def split_epimorphism_def by auto
 
+text \<open>The axiomatization below corresponds to Axiom 11 (Axiom of Choice) in Halvorson.\<close>
 axiomatization
   where
   axiom_of_choice: "epimorphism f \<longrightarrow> (\<exists> g . g sectionof f)"

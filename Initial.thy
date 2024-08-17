@@ -2,8 +2,9 @@ theory Initial
   imports Coproduct
 begin
 
-section  \<open>Axiom 8: Empty Set and Initial Objects\<close>
+section  \<open>Empty Set and Initial Objects\<close>
 
+text \<open>The axiomatization below corresponds to Axiom 8 (Empty Set) in Halvorson.\<close>
 axiomatization
   initial_func :: "cset \<Rightarrow> cfunc" ("\<alpha>\<^bsub>_\<^esub>" 100) and
   emptyset :: "cset" ("\<emptyset>")

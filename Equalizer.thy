@@ -30,6 +30,7 @@ lemma similar_equalizers:
   shows "\<exists>! k. k : F \<rightarrow> E \<and> m \<circ>\<^sub>c k = h"
   using assms equalizer_def2 by auto
 
+text \<open>The definition above and the axiomatization below correspond to Axiom 4 (Equalizers) in Halvorson.\<close>
 axiomatization where
   equalizer_exists: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> \<exists> E m. equalizer E m f g"
 

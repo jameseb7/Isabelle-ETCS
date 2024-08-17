@@ -2,8 +2,9 @@ theory Nats
   imports Exponential_Objects
 begin
 
-section \<open>Axiom 10: Natural Number Object\<close>
+section \<open>Natural Number Object\<close>
 
+text \<open>The axiomatization below corresponds to Axiom 10 (Natural Number Object) in Halvorson.\<close>
 axiomatization
   natural_numbers :: "cset" ("\<nat>\<^sub>c") and
   zero :: "cfunc" and

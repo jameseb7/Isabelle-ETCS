@@ -112,8 +112,9 @@ proof (unfold equiv_rel_on_def, auto)
   qed
 qed
 
+text \<open>The axiomatization below corresponds to Axiom 6 (Equivalence Classes) in Halvorson.\<close>
 axiomatization 
-  quotient_set :: "cset \<Rightarrow> (cset \<times> cfunc) \<Rightarrow> cset" and
+  quotient_set :: "cset \<Rightarrow> (cset \<times> cfunc) \<Rightarrow> cset" (infix "\<sslash>" 50) and
   equiv_class :: "cset \<times> cfunc \<Rightarrow> cfunc" and
   quotient_func :: "cfunc \<Rightarrow> cset \<times> cfunc \<Rightarrow> cfunc"
 where
@@ -127,8 +128,12 @@ where
      quotient_func f R \<circ>\<^sub>c equiv_class R = f" and  
   quotient_func_unique: "equiv_rel_on X R \<Longrightarrow> f : X \<rightarrow> Y \<Longrightarrow> (const_on_rel X R f) \<Longrightarrow>
     h : quotient_set X R \<rightarrow> Y \<Longrightarrow> h \<circ>\<^sub>c equiv_class R = f \<Longrightarrow> h = quotient_func f R"
-text \<open>Note that @{const quotient_set} corresponds to $X/R$ and @{const quotient_func}
-  corresponds to $\bar{f}$ in Halvorson.\<close>
+text \<open>Note that @{const quotient_set} corresponds to $X/R$, @{const equiv_class} corresponds to the
+  canonical quotient mapping $q$, and @{const quotient_func} corresponds to $\bar{f}$ in Halvorson's
+  formulation of this axiom.\<close>
+
+abbreviation equiv_class' :: "cfunc \<Rightarrow> cset \<times> cfunc \<Rightarrow> cfunc" ("[_]\<^bsub>_\<^esub>") where
+  "[x]\<^bsub>R\<^esub> \<equiv> equiv_class R \<circ>\<^sub>c x"
 
 section  \<open>Coequalizers and Epimorphisms\<close>
 

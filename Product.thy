@@ -4,6 +4,7 @@ begin
 
 section \<open>Cartesian products of sets\<close>
 
+text \<open>The axiomatization below corresponds to Axiom 2 (Cartesian Products) in Halvorson.\<close>
 axiomatization
   cart_prod :: "cset \<Rightarrow> cset \<Rightarrow> cset" (infixr "\<times>\<^sub>c" 65) and
   left_cart_proj :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" and

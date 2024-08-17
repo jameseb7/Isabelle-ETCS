@@ -13,6 +13,7 @@ text \<open>We declare @{type cset} and @{type cfunc} as types to represent the 
   The "c" prefix here is intended to stand for "category", and emphasises that these are
   category-theoretic objects.\<close>
 
+text \<open>The axiomatization below corresponds to Axiom 1 (Sets Is a Category) in Halvorson.\<close>
 axiomatization
   domain :: "cfunc \<Rightarrow> cset" and
   codomain :: "cfunc \<Rightarrow> cset" and

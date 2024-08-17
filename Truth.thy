@@ -4,6 +4,7 @@ begin
 
 section \<open>Truth Values and Characteristic Functions\<close>
 
+text \<open>The axiomatization below corresponds to Axiom 5 (Truth-Value Object) in Halvorson.\<close>
 axiomatization
   true_func :: "cfunc" ("\<t>") and
   false_func  :: "cfunc" ("\<f>") and

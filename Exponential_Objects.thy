@@ -4,6 +4,7 @@ begin
 
 section \<open>Exponential Objects, Transposes and Evaluation\<close>
 
+text \<open>The axiomatization below corresponds to Axiom 9 (Exponential Objects) in Halvorson.\<close>
 axiomatization
   exp_set :: "cset \<Rightarrow> cset \<Rightarrow> cset" ("_\<^bsup>_\<^esup>" [100,100]100) and
   eval_func  :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" and

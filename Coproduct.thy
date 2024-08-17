@@ -4,8 +4,10 @@ begin
 
 section  \<open>Axiom 7: Coproducts\<close>
 
+(* We define our own (ETCS) case_bool later, so we need to hide the HOL one. *)
 hide_const case_bool
 
+text \<open>The axiomatization below corresponds to Axiom 7 (Coproducts) in Halvorson.\<close>
 axiomatization
   coprod :: "cset \<Rightarrow> cset \<Rightarrow> cset" (infixr "\<Coprod>" 65) and
   left_coproj :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" and
