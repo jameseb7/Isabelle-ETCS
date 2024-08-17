@@ -492,7 +492,7 @@ section \<open>Fiber Over an Element and its Connection to the Fibered Product\<
 
 text \<open>The definition below corresponds to Definition 2.2.6 in Halvorson.\<close>
 definition fiber :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1{_}" [100,100]100) where
-  "f\<^sup>-\<^sup>1{y} = (f\<^sup>-\<^sup>1[one]\<^bsub>y\<^esub>)"
+  "f\<^sup>-\<^sup>1{y} = (f\<^sup>-\<^sup>1\<lparr>one\<rparr>\<^bsub>y\<^esub>)"
 
 definition fiber_morphism :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" where
   "fiber_morphism f y = left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
@@ -524,7 +524,7 @@ proof -
     unfolding fiber_morphism_def by auto
   also have "... = y \<circ>\<^sub>c right_cart_proj X one \<circ>\<^sub>c inverse_image_mapping f one y"
     using assms cfunc_type_def element_monomorphism inverse_image_mapping_eq by auto
-  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1[one]\<^bsub>y\<^esub>\<^esub>"
+  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1\<lparr>one\<rparr>\<^bsub>y\<^esub>\<^esub>"
     using assms by (typecheck_cfuncs, metis element_monomorphism terminal_func_unique)
   also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
     unfolding fiber_def by auto

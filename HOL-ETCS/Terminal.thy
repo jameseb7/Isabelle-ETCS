@@ -316,8 +316,8 @@ next
 qed
 
 text \<open>The next lemma shows that unless both domains are nonempty we gain no new information. 
-That is, it will be the case that f\<times>g is injective, and we cannot infer from this that f or g are
-injective since f\<times>g will be injective no matter what.\<close>
+That is, it will be the case that $f \times g$ is injective, and we cannot infer from this that $f$ or $g$ are
+injective since $f \times g$ will be injective no matter what.\<close>
 lemma the_nonempty_assumption_above_is_always_required:
   assumes "f : X \<rightarrow> Y" "g : Z \<rightarrow> W"
   assumes "\<not>(nonempty X) \<or> \<not>(nonempty Z)"

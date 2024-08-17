@@ -1,0 +1,435 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Countable}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Countable\isanewline
+\ \ \isakeyword{imports}\ Nats\ Axiom{\isacharunderscore}{\kern0pt}Of{\isacharunderscore}{\kern0pt}Choice\ Nat{\isacharunderscore}{\kern0pt}Parity\ Cardinality\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\begin{isamarkuptext}%
+The definition below corresponds to Definition 2.6.9 in Halvorson.%
+\end{isamarkuptext}\isamarkuptrue%
+\isacommand{definition}\isamarkupfalse%
+\ epi{\isacharunderscore}{\kern0pt}countable\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}cset\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}epi{\isacharunderscore}{\kern0pt}countable\ X\ {\isasymlongleftrightarrow}\ {\isacharparenleft}{\kern0pt}{\isasymexists}\ f{\isachardot}{\kern0pt}\ f\ {\isacharcolon}{\kern0pt}\ {\isasymnat}\isactrlsub c\ {\isasymrightarrow}\ X\ {\isasymand}\ epimorphism\ f{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ emptyset{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}epi{\isacharunderscore}{\kern0pt}countable{\isacharcolon}{\kern0pt}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymnot}\ {\isacharparenleft}{\kern0pt}epi{\isacharunderscore}{\kern0pt}countable\ {\isasymemptyset}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ comp{\isacharunderscore}{\kern0pt}type\ emptyset{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}empty\ epi{\isacharunderscore}{\kern0pt}countable{\isacharunderscore}{\kern0pt}def\ zero{\isacharunderscore}{\kern0pt}type\ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\begin{isamarkuptext}%
+The fact that the empty set is not countable according to the definition from Halvorson
+  (\isa{epi{\isacharunderscore}{\kern0pt}countable\ {\isacharquery}{\kern0pt}X\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}{\isasymexists}f{\isachardot}{\kern0pt}\ f\ {\isacharcolon}{\kern0pt}\ {\isasymnat}\isactrlsub c\ {\isasymrightarrow}\ {\isacharquery}{\kern0pt}X\ {\isasymand}\ epimorphism\ f{\isacharparenright}{\kern0pt}}) motivated the following definition.%
+\end{isamarkuptext}\isamarkuptrue%
+\isacommand{definition}\isamarkupfalse%
+\ countable\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}cset\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}countable\ X\ {\isasymlongleftrightarrow}\ {\isacharparenleft}{\kern0pt}{\isasymexists}\ f{\isachardot}{\kern0pt}\ f\ {\isacharcolon}{\kern0pt}\ X\ {\isasymrightarrow}\ {\isasymnat}\isactrlsub c\ {\isasymand}\ monomorphism\ f{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ epi{\isacharunderscore}{\kern0pt}countable{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}countable{\isacharcolon}{\kern0pt}\ \isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}epi{\isacharunderscore}{\kern0pt}countable\ X{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}countable\ X{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\ countable{\isacharunderscore}{\kern0pt}def\ epi{\isacharunderscore}{\kern0pt}countable{\isacharunderscore}{\kern0pt}def\ epis{\isacharunderscore}{\kern0pt}give{\isacharunderscore}{\kern0pt}monos\ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ emptyset{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}countable{\isacharcolon}{\kern0pt}\isanewline
+\ \ {\isachardoublequoteopen}countable\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ countable{\isacharunderscore}{\kern0pt}def\ empty{\isacharunderscore}{\kern0pt}subset\ subobject{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}def{\isadigit{2}}\ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ natural{\isacharunderscore}{\kern0pt}numbers{\isacharunderscore}{\kern0pt}are{\isacharunderscore}{\kern0pt}countably{\isacharunderscore}{\kern0pt}infinite{\isacharcolon}{\kern0pt}\isanewline
+\ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}countable\ {\isasymnat}\isactrlsub c{\isacharparenright}{\kern0pt}\ {\isasymand}\ {\isacharparenleft}{\kern0pt}is{\isacharunderscore}{\kern0pt}infinite\ {\isasymnat}\isactrlsub c{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}meson\ CollectI\ Peano{\isacharprime}{\kern0pt}s{\isacharunderscore}{\kern0pt}Axioms\ countable{\isacharunderscore}{\kern0pt}def\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ is{\isacharunderscore}{\kern0pt}infinite{\isacharunderscore}{\kern0pt}def\ successor{\isacharunderscore}{\kern0pt}type{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ iso{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}N{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}countably{\isacharunderscore}{\kern0pt}infinite{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}X\ {\isasymcong}\ {\isasymnat}\isactrlsub c{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}countable\ X{\isacharparenright}{\kern0pt}\ {\isasymand}\ {\isacharparenleft}{\kern0pt}is{\isacharunderscore}{\kern0pt}infinite\ X{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}meson\ assms\ countable{\isacharunderscore}{\kern0pt}def\ is{\isacharunderscore}{\kern0pt}isomorphic{\isacharunderscore}{\kern0pt}def\ is{\isacharunderscore}{\kern0pt}smaller{\isacharunderscore}{\kern0pt}than{\isacharunderscore}{\kern0pt}def\ iso{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}epi{\isacharunderscore}{\kern0pt}and{\isacharunderscore}{\kern0pt}monic\ isomorphic{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}symmetric\ larger{\isacharunderscore}{\kern0pt}than{\isacharunderscore}{\kern0pt}infinite{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}infinite\ natural{\isacharunderscore}{\kern0pt}numbers{\isacharunderscore}{\kern0pt}are{\isacharunderscore}{\kern0pt}countably{\isacharunderscore}{\kern0pt}infinite{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ smaller{\isacharunderscore}{\kern0pt}than{\isacharunderscore}{\kern0pt}countable{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}countable{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}X\ {\isasymle}\isactrlsub c\ Y{\isachardoublequoteclose}\ {\isachardoublequoteopen}countable\ Y{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}countable\ X{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}smt\ assms\ cfunc{\isacharunderscore}{\kern0pt}type{\isacharunderscore}{\kern0pt}def\ comp{\isacharunderscore}{\kern0pt}type\ composition{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}monic{\isacharunderscore}{\kern0pt}pair{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}monic\ countable{\isacharunderscore}{\kern0pt}def\ is{\isacharunderscore}{\kern0pt}smaller{\isacharunderscore}{\kern0pt}than{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ iso{\isacharunderscore}{\kern0pt}pres{\isacharunderscore}{\kern0pt}countable{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}X\ {\isasymcong}\ Y{\isachardoublequoteclose}\ {\isachardoublequoteopen}countable\ Y{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}countable\ X{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\ is{\isacharunderscore}{\kern0pt}isomorphic{\isacharunderscore}{\kern0pt}def\ is{\isacharunderscore}{\kern0pt}smaller{\isacharunderscore}{\kern0pt}than{\isacharunderscore}{\kern0pt}def\ iso{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}epi{\isacharunderscore}{\kern0pt}and{\isacharunderscore}{\kern0pt}monic\ smaller{\isacharunderscore}{\kern0pt}than{\isacharunderscore}{\kern0pt}countable{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}countable\ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ NuN{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}countable{\isacharcolon}{\kern0pt}\isanewline
+\ \ {\isachardoublequoteopen}countable{\isacharparenleft}{\kern0pt}{\isasymnat}\isactrlsub c\ {\isasymCoprod}\ {\isasymnat}\isactrlsub c{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ countable{\isacharunderscore}{\kern0pt}def\ epis{\isacharunderscore}{\kern0pt}give{\isacharunderscore}{\kern0pt}monos\ halve{\isacharunderscore}{\kern0pt}with{\isacharunderscore}{\kern0pt}parity{\isacharunderscore}{\kern0pt}iso\ halve{\isacharunderscore}{\kern0pt}with{\isacharunderscore}{\kern0pt}parity{\isacharunderscore}{\kern0pt}type\ iso{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}epi{\isacharunderscore}{\kern0pt}and{\isacharunderscore}{\kern0pt}monic\ \isacommand{by}\isamarkupfalse%
+\ smt%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\begin{isamarkuptext}%
+The lemma below corresponds to Exercise 2.6.11 in Halvorson.%
+\end{isamarkuptext}\isamarkuptrue%
+\isacommand{lemma}\isamarkupfalse%
+\ coproduct{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}countables{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}countable{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}countable\ X{\isachardoublequoteclose}\ {\isachardoublequoteopen}countable\ Y{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}countable{\isacharparenleft}{\kern0pt}X\ {\isasymCoprod}\ Y{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ countable{\isacharunderscore}{\kern0pt}def\isanewline
+\isacommand{proof}\isamarkupfalse%
+{\isacharminus}{\kern0pt}\isanewline
+\ \ \isacommand{obtain}\isamarkupfalse%
+\ x\ \isakeyword{where}\ x{\isacharunderscore}{\kern0pt}def{\isacharcolon}{\kern0pt}\ \ {\isachardoublequoteopen}x\ {\isacharcolon}{\kern0pt}\ X\ \ {\isasymrightarrow}\ {\isasymnat}\isactrlsub c\ {\isasymand}\ monomorphism\ x{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ countable{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
+\ blast\isanewline
+\ \ \isacommand{obtain}\isamarkupfalse%
+\ y\ \isakeyword{where}\ y{\isacharunderscore}{\kern0pt}def{\isacharcolon}{\kern0pt}\ \ {\isachardoublequoteopen}y\ {\isacharcolon}{\kern0pt}\ Y\ \ {\isasymrightarrow}\ {\isasymnat}\isactrlsub c\ {\isasymand}\ monomorphism\ y{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ countable{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
+\ blast\isanewline
+\ \ \isacommand{obtain}\isamarkupfalse%
+\ n\ \isakeyword{where}\ n{\isacharunderscore}{\kern0pt}def{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}\ n\ {\isacharcolon}{\kern0pt}\ {\isasymnat}\isactrlsub c\ {\isasymCoprod}\ {\isasymnat}\isactrlsub c\ {\isasymrightarrow}\ {\isasymnat}\isactrlsub c\ {\isasymand}\ monomorphism\ n{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ NuN{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}countable\ countable{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
+\ blast\isanewline
+\ \ \isacommand{have}\isamarkupfalse%
+\ xy{\isacharunderscore}{\kern0pt}type{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymbowtie}\isactrlsub f\ y\ {\isacharcolon}{\kern0pt}\ X\ {\isasymCoprod}\ Y\ {\isasymrightarrow}\ {\isasymnat}\isactrlsub c\ {\isasymCoprod}\ {\isasymnat}\isactrlsub c{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ x{\isacharunderscore}{\kern0pt}def\ y{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ nxy{\isacharunderscore}{\kern0pt}type{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}n\ {\isasymcirc}\isactrlsub c\ {\isacharparenleft}{\kern0pt}x\ {\isasymbowtie}\isactrlsub f\ y{\isacharparenright}{\kern0pt}\ {\isacharcolon}{\kern0pt}\ X\ {\isasymCoprod}\ Y\ {\isasymrightarrow}\ {\isasymnat}\isactrlsub c{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ comp{\isacharunderscore}{\kern0pt}type\ n{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
+\ blast\isanewline
+\ \ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}injective{\isacharparenleft}{\kern0pt}x\ {\isasymbowtie}\isactrlsub f\ y{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ cfunc{\isacharunderscore}{\kern0pt}bowtieprod{\isacharunderscore}{\kern0pt}inj\ monomorphism{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}injective\ x{\isacharunderscore}{\kern0pt}def\ y{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
+\ blast\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}monomorphism{\isacharparenleft}{\kern0pt}x\ {\isasymbowtie}\isactrlsub f\ y{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ \isacommand{by}\isamarkupfalse%
+\ auto\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}monomorphism{\isacharparenleft}{\kern0pt}n\ {\isasymcirc}\isactrlsub c\ {\isacharparenleft}{\kern0pt}x\ {\isasymbowtie}\isactrlsub f\ y{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ cfunc{\isacharunderscore}{\kern0pt}type{\isacharunderscore}{\kern0pt}def\ composition{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}monic{\isacharunderscore}{\kern0pt}pair{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}monic\ n{\isacharunderscore}{\kern0pt}def\ xy{\isacharunderscore}{\kern0pt}type\ \isacommand{by}\isamarkupfalse%
+\ auto\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymexists}f{\isachardot}{\kern0pt}\ f\ {\isacharcolon}{\kern0pt}\ X\ {\isasymCoprod}\ Y\ {\isasymrightarrow}\ {\isasymnat}\isactrlsub c\ {\isasymand}\ monomorphism\ f{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ nxy{\isacharunderscore}{\kern0pt}type\ \isacommand{by}\isamarkupfalse%
+\ blast\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/ETCS/HOL-ETCS/Countable.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%22=5%:%
+%:%24=6%:%
+%:%25=6%:%
+%:%26=7%:%
+%:%27=8%:%
+%:%28=9%:%
+%:%29=9%:%
+%:%30=10%:%
+%:%33=11%:%
+%:%37=11%:%
+%:%38=11%:%
+%:%39=11%:%
+%:%48=13%:%
+%:%49=14%:%
+%:%51=15%:%
+%:%52=15%:%
+%:%53=16%:%
+%:%54=17%:%
+%:%55=18%:%
+%:%56=18%:%
+%:%57=19%:%
+%:%58=20%:%
+%:%61=21%:%
+%:%65=21%:%
+%:%66=21%:%
+%:%67=21%:%
+%:%72=21%:%
+%:%75=22%:%
+%:%76=23%:%
+%:%77=23%:%
+%:%78=24%:%
+%:%81=25%:%
+%:%85=25%:%
+%:%86=25%:%
+%:%87=25%:%
+%:%92=25%:%
+%:%95=26%:%
+%:%96=27%:%
+%:%97=27%:%
+%:%98=28%:%
+%:%101=29%:%
+%:%105=29%:%
+%:%106=29%:%
+%:%111=29%:%
+%:%114=30%:%
+%:%115=31%:%
+%:%116=31%:%
+%:%117=32%:%
+%:%118=33%:%
+%:%121=34%:%
+%:%125=34%:%
+%:%126=34%:%
+%:%131=34%:%
+%:%134=35%:%
+%:%135=36%:%
+%:%136=36%:%
+%:%137=37%:%
+%:%138=38%:%
+%:%141=39%:%
+%:%145=39%:%
+%:%146=39%:%
+%:%151=39%:%
+%:%154=40%:%
+%:%155=41%:%
+%:%156=41%:%
+%:%157=42%:%
+%:%158=43%:%
+%:%161=44%:%
+%:%165=44%:%
+%:%166=44%:%
+%:%167=44%:%
+%:%172=44%:%
+%:%175=45%:%
+%:%176=46%:%
+%:%177=46%:%
+%:%178=47%:%
+%:%181=48%:%
+%:%185=48%:%
+%:%186=48%:%
+%:%187=48%:%
+%:%196=50%:%
+%:%198=51%:%
+%:%199=51%:%
+%:%200=52%:%
+%:%201=53%:%
+%:%204=54%:%
+%:%208=54%:%
+%:%209=54%:%
+%:%210=55%:%
+%:%211=55%:%
+%:%212=56%:%
+%:%213=56%:%
+%:%214=57%:%
+%:%215=57%:%
+%:%216=57%:%
+%:%217=58%:%
+%:%218=58%:%
+%:%219=59%:%
+%:%220=59%:%
+%:%221=59%:%
+%:%222=60%:%
+%:%223=60%:%
+%:%224=61%:%
+%:%225=61%:%
+%:%226=61%:%
+%:%227=62%:%
+%:%228=62%:%
+%:%229=63%:%
+%:%230=63%:%
+%:%231=63%:%
+%:%232=64%:%
+%:%233=64%:%
+%:%234=64%:%
+%:%235=65%:%
+%:%236=65%:%
+%:%237=65%:%
+%:%238=66%:%
+%:%239=66%:%
+%:%240=67%:%
+%:%241=67%:%
+%:%242=67%:%
+%:%243=68%:%
+%:%244=68%:%
+%:%245=68%:%
+%:%246=69%:%
+%:%247=69%:%
+%:%248=69%:%
+%:%249=70%:%
+%:%250=70%:%
+%:%251=70%:%
+%:%252=71%:%
+%:%253=71%:%
+%:%254=71%:%
+%:%255=72%:%
+%:%256=72%:%
+%:%257=72%:%
+%:%258=73%:%
+%:%259=73%:%
+%:%260=73%:%
+%:%261=74%:%
+%:%267=74%:%
+%:%272=75%:%
+%:%277=76%:%

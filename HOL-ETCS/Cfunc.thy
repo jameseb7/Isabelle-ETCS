@@ -56,7 +56,7 @@ text \<open>ETCS lemmas often have assumptions on its ETCS type, which can often
   To simplify proofs involving ETCS types, we provide proof methods that apply type rules in a
   structured way to prove facts about ETCS function types.
   The type rules state the types of the basic constants and operators of ETCS and are declared as
-  a named set of theorems called $type_rule$.\<close>
+  a named set of theorems called $type\_rule$.\<close>
 
 named_theorems type_rule
 
@@ -65,7 +65,7 @@ declare comp_type[type_rule]
 
 ML_file \<open>typecheck.ml\<close>
 
-subsubsection \<open>typecheck_cfuncs: Tactic to construct type facts\<close>
+subsubsection \<open>typecheck\_cfuncs: Tactic to construct type facts\<close>
 
 method_setup typecheck_cfuncs =
   \<open>Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
@@ -82,7 +82,7 @@ method_setup typecheck_cfuncs_prems =
      >> typecheck_cfuncs_prems_method\<close>
   "Check types of cfuncs in assumptions of the current goal and add as assumptions of the current goal"
 
-subsubsection \<open>etcs_rule: Tactic to apply rules with ETCS typechecking\<close>
+subsubsection \<open>etcs\_rule: Tactic to apply rules with ETCS typechecking\<close>
 
 method_setup etcs_rule = 
   \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
@@ -90,7 +90,7 @@ method_setup etcs_rule =
      >> ETCS_resolve_method\<close>
   "apply rule with ETCS type checking"
 
-subsubsection \<open>etcs_subst: Tactic to apply substitutions with ETCS typechecking\<close>
+subsubsection \<open>etcs\_subst: Tactic to apply substitutions with ETCS typechecking\<close>
 
 method_setup etcs_subst = 
   \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
@@ -110,7 +110,7 @@ method_setup etcs_subst_asm =
 method etcs_assocl_asm declares type_rule = (etcs_subst_asm comp_associative2)+
 method etcs_assocr_asm declares type_rule = (etcs_subst_asm sym[OF comp_associative2])+
 
-subsubsection \<open>etcs_erule: Tactic to apply elimination rules with ETCS typechecking\<close>
+subsubsection \<open>etcs\_erule: Tactic to apply elimination rules with ETCS typechecking\<close>
 
 method_setup etcs_erule = 
   \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
