@@ -1,9 +1,8 @@
+section \<open>Basic Types and Operators for the Category of Sets\<close>
+
 theory Cfunc
   imports Main "HOL-Eisbach.Eisbach"
 begin
-
-section \<open>Basic types and operators for the category of sets\<close>
-
 
 typedecl cset
 typedecl cfunc
@@ -50,7 +49,7 @@ lemma id_right_unit2: "f : X \<rightarrow> Y \<Longrightarrow> f \<circ>\<^sub>c
 lemma id_left_unit2: "f : X \<rightarrow> Y \<Longrightarrow> id Y \<circ>\<^sub>c f = f"
   unfolding cfunc_type_def using id_left_unit by auto
 
-subsection \<open>Tactics for applying typing rules\<close>
+subsection \<open>Tactics for Applying Typing Rules\<close>
 
 text \<open>ETCS lemmas often have assumptions on its ETCS type, which can often be cumbersome to prove.
   To simplify proofs involving ETCS types, we provide proof methods that apply type rules in a
@@ -65,7 +64,7 @@ declare comp_type[type_rule]
 
 ML_file \<open>typecheck.ml\<close>
 
-subsubsection \<open>typecheck\_cfuncs: Tactic to construct type facts\<close>
+subsubsection \<open>typecheck\_cfuncs: Tactic to Construct Type Facts\<close>
 
 method_setup typecheck_cfuncs =
   \<open>Scan.option ((Scan.lift (Args.$$$ "type_rule" -- Args.colon)) |-- Attrib.thms)
@@ -82,7 +81,7 @@ method_setup typecheck_cfuncs_prems =
      >> typecheck_cfuncs_prems_method\<close>
   "Check types of cfuncs in assumptions of the current goal and add as assumptions of the current goal"
 
-subsubsection \<open>etcs\_rule: Tactic to apply rules with ETCS typechecking\<close>
+subsubsection \<open>etcs\_rule: Tactic to Apply Rules with ETCS Typechecking\<close>
 
 method_setup etcs_rule = 
   \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
@@ -90,7 +89,7 @@ method_setup etcs_rule =
      >> ETCS_resolve_method\<close>
   "apply rule with ETCS type checking"
 
-subsubsection \<open>etcs\_subst: Tactic to apply substitutions with ETCS typechecking\<close>
+subsubsection \<open>etcs\_subst: Tactic to Apply Substitutions with ETCS Typechecking\<close>
 
 method_setup etcs_subst = 
   \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
@@ -110,7 +109,7 @@ method_setup etcs_subst_asm =
 method etcs_assocl_asm declares type_rule = (etcs_subst_asm comp_associative2)+
 method etcs_assocr_asm declares type_rule = (etcs_subst_asm sym[OF comp_associative2])+
 
-subsubsection \<open>etcs\_erule: Tactic to apply elimination rules with ETCS typechecking\<close>
+subsubsection \<open>etcs\_erule: Tactic to Apply Elimination Rules with ETCS Typechecking\<close>
 
 method_setup etcs_erule = 
   \<open>Scan.repeats (Scan.unless (Scan.lift (Args.$$$ "type_rule" -- Args.colon)) Attrib.multi_thm)
@@ -119,6 +118,8 @@ method_setup etcs_erule =
   "apply erule with ETCS type checking"
 
 subsection \<open>Monomorphisms, Epimorphisms and Isomorphisms\<close>
+
+subsubsection \<open>Monomorphisms\<close>
 
 definition monomorphism :: "cfunc \<Rightarrow> bool" where
   "monomorphism(f) \<longleftrightarrow> (\<forall> g h. 
@@ -133,6 +134,60 @@ lemma monomorphism_def3:
   shows "monomorphism f \<longleftrightarrow> (\<forall> g h A. g : A \<rightarrow> X \<and> h : A \<rightarrow> X \<longrightarrow> (f \<circ>\<^sub>c g = f \<circ>\<^sub>c h \<longrightarrow> g = h))"
   unfolding monomorphism_def2 using assms cfunc_type_def by auto 
 
+text \<open>The lemma below corresponds to Exercise 2.1.7a in Halvorson.\<close>
+lemma comp_monic_imp_monic:
+  assumes "domain g = codomain f"
+  shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
+  unfolding monomorphism_def
+proof auto
+  fix s t
+  assume gf_monic: "\<forall>s. \<forall>t. 
+    codomain s = domain (g \<circ>\<^sub>c f) \<and> codomain t = domain (g \<circ>\<^sub>c f) \<longrightarrow>
+          (g \<circ>\<^sub>c f) \<circ>\<^sub>c s = (g \<circ>\<^sub>c f) \<circ>\<^sub>c t \<longrightarrow> s = t"
+  assume codomain_s: "codomain s = domain f"
+  assume codomain_t: "codomain t = domain f"
+  assume "f \<circ>\<^sub>c s = f \<circ>\<^sub>c t"
+
+  then have "(g \<circ>\<^sub>c f) \<circ>\<^sub>c s = (g \<circ>\<^sub>c f) \<circ>\<^sub>c t"
+    by (metis assms codomain_s codomain_t comp_associative)
+  then show "s = t"
+    using gf_monic codomain_s codomain_t domain_comp by (simp add: assms)
+qed
+
+lemma comp_monic_imp_monic':
+  assumes "f : X \<rightarrow> Y" "g : Y \<rightarrow> Z"
+  shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
+  by (metis assms cfunc_type_def comp_monic_imp_monic)
+
+text \<open>The lemma below corresponds to Exercise 2.1.7c in Halvorson.\<close>
+lemma composition_of_monic_pair_is_monic:
+  assumes "codomain f = domain g"
+  shows "monomorphism f \<Longrightarrow> monomorphism g \<Longrightarrow> monomorphism (g \<circ>\<^sub>c f)"
+  unfolding monomorphism_def
+proof auto
+  fix h k
+  assume f_mono: "\<forall>s t. 
+    codomain s = domain f \<and> codomain t = domain f \<longrightarrow> f \<circ>\<^sub>c s = f \<circ>\<^sub>c t \<longrightarrow> s = t"
+  assume g_mono: "\<forall>s. \<forall>t. 
+    codomain s = domain g \<and> codomain t = domain g \<longrightarrow> g \<circ>\<^sub>c s = g \<circ>\<^sub>c t \<longrightarrow> s = t"
+  assume codomain_k: "codomain k = domain (g \<circ>\<^sub>c f)"
+  assume codomain_h: "codomain h = domain (g \<circ>\<^sub>c f)"
+  assume gfh_eq_gfk: "(g \<circ>\<^sub>c f) \<circ>\<^sub>c k = (g \<circ>\<^sub>c f) \<circ>\<^sub>c h"
+ 
+  have "g \<circ>\<^sub>c (f \<circ>\<^sub>c h) = (g  \<circ>\<^sub>c f)  \<circ>\<^sub>c h"
+    by (simp add: assms codomain_h comp_associative domain_comp)
+  also have "... = (g \<circ>\<^sub>c f) \<circ>\<^sub>c k"
+    by (simp add: gfh_eq_gfk)
+  also have "... = g \<circ>\<^sub>c (f \<circ>\<^sub>c k)"
+    by (simp add: assms codomain_k comp_associative domain_comp)
+  then have "f \<circ>\<^sub>c h = f \<circ>\<^sub>c k"
+    using assms calculation cfunc_type_def codomain_h codomain_k comp_type domain_comp g_mono by auto
+  then show "k = h"
+    by (simp add: codomain_h codomain_k domain_comp f_mono assms)
+qed
+
+subsubsection \<open>Epimorphisms\<close>
+
 definition epimorphism :: "cfunc \<Rightarrow> bool" where
   "epimorphism f \<longleftrightarrow> (\<forall> g h. 
     (domain(g) = codomain(f) \<and> domain(h) = codomain(f)) \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
@@ -145,6 +200,56 @@ lemma epimorphism_def3:
   assumes "f : X \<rightarrow> Y"
   shows "epimorphism f \<longleftrightarrow> (\<forall> g h A. g : Y \<rightarrow> A \<and> h : Y \<rightarrow> A \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
   unfolding epimorphism_def2 using assms cfunc_type_def by auto
+
+text \<open>The lemma below corresponds to Exercise 2.1.7b in Halvorson.\<close>
+lemma comp_epi_imp_epi:
+  assumes "domain g = codomain f"
+  shows "epimorphism (g \<circ>\<^sub>c f) \<Longrightarrow> epimorphism g"
+  unfolding epimorphism_def
+proof auto
+  fix s t
+  assume gf_epi: "\<forall>s. \<forall>t.
+    domain s = codomain (g \<circ>\<^sub>c f) \<and> domain t = codomain (g \<circ>\<^sub>c f) \<longrightarrow>
+          s \<circ>\<^sub>c g \<circ>\<^sub>c f = t \<circ>\<^sub>c g \<circ>\<^sub>c f \<longrightarrow> s = t"
+  assume domain_s: "domain s = codomain g"
+  assume domain_t: "domain t = codomain g"
+  assume sf_eq_tf: "s \<circ>\<^sub>c g = t \<circ>\<^sub>c g"
+
+  from sf_eq_tf have "s \<circ>\<^sub>c (g \<circ>\<^sub>c f) = t \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
+    by (simp add: assms comp_associative domain_s domain_t)
+  then show "s = t"
+    using gf_epi codomain_comp domain_s domain_t by (simp add: assms)
+qed
+
+text \<open>The lemma below corresponds to Exercise 2.1.7d in Halvorson.\<close>
+lemma composition_of_epi_pair_is_epi:
+assumes "codomain f = domain g"
+  shows "epimorphism f \<Longrightarrow> epimorphism g \<Longrightarrow> epimorphism (g \<circ>\<^sub>c f)"
+  unfolding epimorphism_def
+proof auto
+  fix h k
+  assume f_epi :"\<forall> s h.
+    (domain(s) = codomain(f) \<and> domain(h) = codomain(f)) \<longrightarrow> (s \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> s = h)"
+  assume g_epi :"\<forall> s h.
+    (domain(s) = codomain(g) \<and> domain(h) = codomain(g)) \<longrightarrow> (s \<circ>\<^sub>c g = h \<circ>\<^sub>c g \<longrightarrow> s = h)"
+  assume domain_k: "domain k = codomain (g \<circ>\<^sub>c f)"
+  assume domain_h: "domain h = codomain (g \<circ>\<^sub>c f)"
+  assume hgf_eq_kgf: "h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = k \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
+  
+  have "(h \<circ>\<^sub>c g) \<circ>\<^sub>c f = h \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
+    by (simp add: assms codomain_comp comp_associative domain_h)
+  also have "... = k \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
+    by (simp add: hgf_eq_kgf)
+  also have "... =(k \<circ>\<^sub>c g) \<circ>\<^sub>c f "
+    by (simp add: assms codomain_comp comp_associative domain_k)
+ 
+  then have "h \<circ>\<^sub>c g = k \<circ>\<^sub>c g"
+    by (simp add: assms calculation codomain_comp domain_comp domain_h domain_k f_epi)
+  then show "h = k"
+    by (simp add: codomain_comp domain_h domain_k g_epi assms)
+qed
+
+subsubsection \<open>Isomorphisms\<close>
 
 definition isomorphism :: "cfunc \<Rightarrow> bool" where
   "isomorphism(f) \<longleftrightarrow> (\<exists> g. domain(g) = codomain(f) \<and> codomain(g) = domain(f) \<and> 
@@ -243,106 +348,6 @@ next
 next
   show "trans {(x, y). x \<cong> y}"
     unfolding trans_def using isomorphic_is_transitive by blast
-qed
-
-text \<open>The lemma below corresponds to Exercise 2.1.7a in Halvorson.\<close>
-lemma comp_monic_imp_monic:
-  assumes "domain g = codomain f"
-  shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
-  unfolding monomorphism_def
-proof auto
-  fix s t
-  assume gf_monic: "\<forall>s. \<forall>t. 
-    codomain s = domain (g \<circ>\<^sub>c f) \<and> codomain t = domain (g \<circ>\<^sub>c f) \<longrightarrow>
-          (g \<circ>\<^sub>c f) \<circ>\<^sub>c s = (g \<circ>\<^sub>c f) \<circ>\<^sub>c t \<longrightarrow> s = t"
-  assume codomain_s: "codomain s = domain f"
-  assume codomain_t: "codomain t = domain f"
-  assume "f \<circ>\<^sub>c s = f \<circ>\<^sub>c t"
-
-  then have "(g \<circ>\<^sub>c f) \<circ>\<^sub>c s = (g \<circ>\<^sub>c f) \<circ>\<^sub>c t"
-    by (metis assms codomain_s codomain_t comp_associative)
-  then show "s = t"
-    using gf_monic codomain_s codomain_t domain_comp by (simp add: assms)
-qed      
-
-lemma comp_monic_imp_monic':
-  assumes "f : X \<rightarrow> Y" "g : Y \<rightarrow> Z"
-  shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
-  by (metis assms cfunc_type_def comp_monic_imp_monic)
-
-text \<open>The lemma below corresponds to Exercise 2.1.7b in Halvorson.\<close>
-lemma comp_epi_imp_epi:
-  assumes "domain g = codomain f"
-  shows "epimorphism (g \<circ>\<^sub>c f) \<Longrightarrow> epimorphism g"
-  unfolding epimorphism_def
-proof auto
-  fix s t
-  assume gf_epi: "\<forall>s. \<forall>t.
-    domain s = codomain (g \<circ>\<^sub>c f) \<and> domain t = codomain (g \<circ>\<^sub>c f) \<longrightarrow>
-          s \<circ>\<^sub>c g \<circ>\<^sub>c f = t \<circ>\<^sub>c g \<circ>\<^sub>c f \<longrightarrow> s = t"
-  assume domain_s: "domain s = codomain g"
-  assume domain_t: "domain t = codomain g"
-  assume sf_eq_tf: "s \<circ>\<^sub>c g = t \<circ>\<^sub>c g"
-
-  from sf_eq_tf have "s \<circ>\<^sub>c (g \<circ>\<^sub>c f) = t \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
-    by (simp add: assms comp_associative domain_s domain_t)
-  then show "s = t"
-    using gf_epi codomain_comp domain_s domain_t by (simp add: assms)
-qed
-
-text \<open>The lemma below corresponds to Exercise 2.1.7c in Halvorson.\<close>
-lemma composition_of_monic_pair_is_monic:
-  assumes "codomain f = domain g"
-  shows "monomorphism f \<Longrightarrow> monomorphism g \<Longrightarrow> monomorphism (g \<circ>\<^sub>c f)"
-  unfolding monomorphism_def
-proof auto
-  fix h k
-  assume f_mono: "\<forall>s t. 
-    codomain s = domain f \<and> codomain t = domain f \<longrightarrow> f \<circ>\<^sub>c s = f \<circ>\<^sub>c t \<longrightarrow> s = t"
-  assume g_mono: "\<forall>s. \<forall>t. 
-    codomain s = domain g \<and> codomain t = domain g \<longrightarrow> g \<circ>\<^sub>c s = g \<circ>\<^sub>c t \<longrightarrow> s = t"
-  assume codomain_k: "codomain k = domain (g \<circ>\<^sub>c f)"
-  assume codomain_h: "codomain h = domain (g \<circ>\<^sub>c f)"
-  assume gfh_eq_gfk: "(g \<circ>\<^sub>c f) \<circ>\<^sub>c k = (g \<circ>\<^sub>c f) \<circ>\<^sub>c h"
- 
-  have "g \<circ>\<^sub>c (f \<circ>\<^sub>c h) = (g  \<circ>\<^sub>c f)  \<circ>\<^sub>c h"
-    by (simp add: assms codomain_h comp_associative domain_comp)
-  also have "... = (g \<circ>\<^sub>c f) \<circ>\<^sub>c k"
-    by (simp add: gfh_eq_gfk)
-  also have "... = g \<circ>\<^sub>c (f \<circ>\<^sub>c k)"
-    by (simp add: assms codomain_k comp_associative domain_comp)
-  then have "f \<circ>\<^sub>c h = f \<circ>\<^sub>c k"
-    using assms calculation cfunc_type_def codomain_h codomain_k comp_type domain_comp g_mono by auto
-  then show "k = h"
-    by (simp add: codomain_h codomain_k domain_comp f_mono assms)
-qed
-
-text \<open>The lemma below corresponds to Exercise 2.1.7d in Halvorson.\<close>
-lemma composition_of_epi_pair_is_epi:
-assumes "codomain f = domain g"
-  shows "epimorphism f \<Longrightarrow> epimorphism g \<Longrightarrow> epimorphism (g \<circ>\<^sub>c f)"
-  unfolding epimorphism_def
-proof auto
-  fix h k
-  assume f_epi :"\<forall> s h.
-    (domain(s) = codomain(f) \<and> domain(h) = codomain(f)) \<longrightarrow> (s \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> s = h)"
-  assume g_epi :"\<forall> s h.
-    (domain(s) = codomain(g) \<and> domain(h) = codomain(g)) \<longrightarrow> (s \<circ>\<^sub>c g = h \<circ>\<^sub>c g \<longrightarrow> s = h)"
-  assume domain_k: "domain k = codomain (g \<circ>\<^sub>c f)"
-  assume domain_h: "domain h = codomain (g \<circ>\<^sub>c f)"
-  assume hgf_eq_kgf: "h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = k \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
-  
-  have "(h \<circ>\<^sub>c g) \<circ>\<^sub>c f = h \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
-    by (simp add: assms codomain_comp comp_associative domain_h)
-  also have "... = k \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
-    by (simp add: hgf_eq_kgf)
-  also have "... =(k \<circ>\<^sub>c g) \<circ>\<^sub>c f "
-    by (simp add: assms codomain_comp comp_associative domain_k)
- 
-  then have "h \<circ>\<^sub>c g = k \<circ>\<^sub>c g"
-    by (simp add: assms calculation codomain_comp domain_comp domain_h domain_k f_epi)
-  then show "h = k"
-    by (simp add: codomain_comp domain_h domain_k g_epi assms)
 qed
 
 text \<open>The lemma below corresponds to Exercise 2.1.7e in Halvorson.\<close>

@@ -1,8 +1,8 @@
+section \<open>Natural Number Object\<close>
+
 theory Nats
   imports Exponential_Objects
 begin
-
-section \<open>Natural Number Object\<close>
 
 text \<open>The axiomatization below corresponds to Axiom 10 (Natural Number Object) in Halvorson.\<close>
 axiomatization
@@ -160,7 +160,7 @@ proof -
     by auto
 qed
 
-section \<open>Zero and Successor\<close>
+subsection \<open>Zero and Successor\<close>
 
 lemma zero_is_not_successor:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -285,7 +285,7 @@ proof -
     using   calculation n_def by auto
 qed
 
-section \<open>Predecessor\<close>
+subsection \<open>Predecessor\<close>
 
 definition predecessor :: "cfunc" where
   "predecessor = (THE f. f : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c 
@@ -349,7 +349,7 @@ proof -
     using calculation by auto
 qed
     
-section \<open>Peano's Axioms and Induction\<close>
+subsection \<open>Peano's Axioms and Induction\<close>
 
 text \<open>The lemma below corresponds to Proposition 2.6.7 in Halvorson.\<close>
 lemma Peano's_Axioms:
@@ -442,7 +442,7 @@ proof -
     by (typecheck_cfuncs, smt (z3) comp_associative2 id_left_unit2 id_right_unit2 p'_type p'_u_is_id terminal_func_comp_elem terminal_func_type u_type)
 qed
     
-section \<open>Function Iteration\<close>
+subsection \<open>Function Iteration\<close>
 
 definition ITER_curried :: "cset \<Rightarrow> cfunc" where 
   "ITER_curried U = (THE u . u : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  u \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp> \<and>
@@ -712,7 +712,7 @@ proof -
     using calculation by auto
 qed
 
-section \<open>Relation of Nat to Other Sets\<close>
+subsection \<open>Relation of Nat to Other Sets\<close>
 
 lemma oneUN_iso_N:
   "one \<Coprod> \<nat>\<^sub>c \<cong> \<nat>\<^sub>c"

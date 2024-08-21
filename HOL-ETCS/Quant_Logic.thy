@@ -1,8 +1,10 @@
+section \<open>Quantifiers\<close>
+
 theory Quant_Logic
   imports Pred_Logic Exponential_Objects
 begin
 
-section \<open>Universal Quantification\<close>
+subsection \<open>Universal Quantification\<close>
 
 definition FORALL :: "cset \<Rightarrow> cfunc" where
   "FORALL X = (THE \<chi>. is_pullback one one (\<Omega>\<^bsup>X\<^esup>) \<Omega> (\<beta>\<^bsub>one\<^esub>) \<t> ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c one\<^esub>)\<^sup>\<sharp>) \<chi>)"
@@ -182,7 +184,7 @@ lemma FORALL_elim':
   shows "((\<And>x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c \<langle>x, id one\<rangle> = \<t>) \<Longrightarrow> P) \<Longrightarrow> P"
   using FORALL_p_true FORALL_true_implies_all_true3 p_type by auto
 
-section \<open>Existential Quantification\<close>
+subsection \<open>Existential Quantification\<close>
 
 definition EXISTS :: "cset \<Rightarrow> cfunc" where
   "EXISTS X = NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c NOT\<^bsup>X\<^esup>\<^sub>f"

@@ -1,8 +1,8 @@
+section \<open>Predicate Logic Functions\<close>
+
 theory Pred_Logic
   imports Coproduct
 begin
-
-section \<open>Predicate logic functions\<close>
 
 subsection \<open>NOT\<close>
 

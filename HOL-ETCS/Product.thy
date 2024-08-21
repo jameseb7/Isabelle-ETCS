@@ -1,8 +1,8 @@
+section \<open>Cartesian Products of Sets\<close>
+
 theory Product
   imports Cfunc
 begin
-
-section \<open>Cartesian products of sets\<close>
 
 text \<open>The axiomatization below corresponds to Axiom 2 (Cartesian Products) in Halvorson.\<close>
 axiomatization
@@ -142,7 +142,7 @@ proof (rule_tac x="left_cart_proj X Y \<circ>\<^sub>c a" in exI, rule_tac x="rig
     using assms by typecheck_cfuncs
 qed
 
-subsection \<open>Diagonal function\<close>
+subsection \<open>Diagonal Functions\<close>
 
 text \<open>The definition below corresponds to Definition 2.1.9 in Halvorson.\<close>
 definition diagonal :: "cset \<Rightarrow> cfunc" where
@@ -161,7 +161,7 @@ proof -
     by (metis cfunc_type_def comp_monic_imp_monic diagonal_type id_isomorphism iso_imp_epi_and_monic left_cart_proj_type)
 qed
 
-subsection \<open>Products of functions\<close>
+subsection \<open>Products of Functions\<close>
 
 text \<open>The definition below corresponds to Definition 2.1.10 in Halvorson.\<close>
 definition cfunc_cross_prod :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixr "\<times>\<^sub>f" 55) where
@@ -314,9 +314,9 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by (simp add: x_expand y_expand)
 qed
 
-subsection \<open>Useful Cartesian product permuting functions\<close>
+subsection \<open>Useful Cartesian Product Permuting Functions\<close>
 
-subsubsection \<open>Swapping a Cartesian product\<close>
+subsubsection \<open>Swapping a Cartesian Product\<close>
 
 definition swap :: "cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "swap X Y = \<langle>right_cart_proj X Y, left_cart_proj X Y\<rangle>"
@@ -363,7 +363,7 @@ lemma swap_mono:
   "monomorphism(swap X Y)"
   by (metis cfunc_type_def iso_imp_epi_and_monic isomorphism_def swap_idempotent swap_type)
 
-subsubsection \<open>Permuting a Cartesian product to associate to the right\<close>
+subsubsection \<open>Permuting a Cartesian Product to Associate to the Right\<close>
 
 definition associate_right :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "associate_right X Y Z =
@@ -414,7 +414,7 @@ proof-
   then show ?thesis using calculation by auto
 qed
 
-subsubsection \<open>Permuting a Cartesian product to associate to the left\<close>
+subsubsection \<open>Permuting a Cartesian Product to Associate to the Left\<close>
 
 definition associate_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "associate_left X Y Z =
@@ -482,7 +482,7 @@ proof-
   then show ?thesis using calculation by auto
 qed
   
-subsubsection \<open>Distributing over a Cartesian product from the right\<close>
+subsubsection \<open>Distributing over a Cartesian Product from the Right\<close>
 
 definition distribute_right_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_right_left X Y Z = 
@@ -556,7 +556,7 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by (simp add: g_expand h_expand)
 qed
 
-subsubsection \<open>Distributing over a Cartesian product from the left\<close>
+subsubsection \<open>Distributing over a Cartesian Product from the Left\<close>
 
 definition distribute_left_left :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "distribute_left_left X Y Z = 
@@ -630,7 +630,7 @@ proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
     by (simp add: g_expand h_expand)
 qed
 
-subsubsection \<open>Selecting pairs from a pair of pairs\<close>
+subsubsection \<open>Selecting Pairs from a Pair of Pairs\<close>
 
 definition outers :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
   "outers A B C D = \<langle>

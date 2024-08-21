@@ -1,8 +1,8 @@
+section \<open>Axiom of Choice\<close>
+
 theory Axiom_Of_Choice
   imports Coproduct
 begin
-
-section \<open>Axiom of Choice\<close>
 
 text \<open>The two definitions below correspond to Definition 2.7.1 in Halvorson.\<close>
 definition section_of :: "cfunc \<Rightarrow> cfunc \<Rightarrow> bool" (infix "sectionof" 90)

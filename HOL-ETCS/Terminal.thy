@@ -1,8 +1,8 @@
+section \<open>Terminal Objects and Elements\<close>
+
 theory Terminal
   imports Cfunc Product
 begin
-
-section \<open>Terminal objects, constant functions and elements\<close>
 
 text \<open>The axiomatization below corresponds to Axiom 3 (Terminal Object) in Halvorson.\<close>
 axiomatization
@@ -26,7 +26,7 @@ lemma terminal_func_comp_elem:
   "x : one \<rightarrow> X \<Longrightarrow> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = id one"
   by (metis id_type terminal_func_comp terminal_func_unique)
 
-subsection \<open>Set membership and emptiness\<close>
+subsection \<open>Set Membership and Emptiness\<close>
 
 text \<open>The abbreviation below captures Definition 2.1.16 in Halvorson.\<close>
 abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
@@ -58,7 +58,7 @@ lemma prod_with_empty_is_empty2:
   shows "is_empty (A \<times>\<^sub>c B)"
   using assms cart_prod_decomp is_empty_def by blast
 
-subsection \<open>Terminal objects (sets with one element)\<close>
+subsection \<open>Terminal Objects (sets with one element)\<close>
 
 definition terminal_object :: "cset \<Rightarrow> bool" where
   "terminal_object X \<longleftrightarrow> (\<forall> Y. \<exists>! f. f : Y \<rightarrow> X)"
@@ -476,7 +476,7 @@ next
     by blast
 qed
 
-subsection \<open>Interactions of cartesian products with terminal objects\<close>
+subsection \<open>Interactions of Cartesian Products with Terminal Objects\<close>
 
 lemma diag_on_elements:
   assumes "x \<in>\<^sub>c X"
@@ -663,6 +663,69 @@ proof -
     using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
   then show ?thesis
     using calculation by auto
+qed
+
+subsubsection \<open>Cartesian Products as Pullbacks\<close>
+
+text \<open>The definition below corresponds to a definition stated between Definition 2.1.42 and Definition 2.1.43 in Halvorson.\<close>
+definition is_pullback :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool" where
+  "is_pullback A B C D ab bd ac cd \<longleftrightarrow> 
+    (ab : A \<rightarrow> B \<and> bd : B \<rightarrow> D \<and> ac : A \<rightarrow> C \<and> cd : C \<rightarrow> D \<and> bd \<circ>\<^sub>c ab = cd \<circ>\<^sub>c ac \<and> 
+    (\<forall> Z k h. (k : Z \<rightarrow> B \<and> h : Z \<rightarrow> C \<and> bd \<circ>\<^sub>c k = cd \<circ>\<^sub>c h)  \<longrightarrow>
+      (\<exists>! j. j : Z \<rightarrow> A \<and> ab \<circ>\<^sub>c j = k \<and> ac \<circ>\<^sub>c j = h)))"
+
+lemma pullback_iff_product:
+  assumes "terminal_object(T)"
+  assumes f_type[type_rule]: "f : Y \<rightarrow> T" 
+  assumes g_type[type_rule]: "g : X \<rightarrow> T"
+  shows "(is_pullback P Y X T (pY) f (pX) g) = (is_cart_prod P pX pY X Y)"
+proof(auto)
+  assume pullback: "is_pullback P Y X T pY f pX g"
+  have f_type[type_rule]: "f : Y \<rightarrow> T"
+    using is_pullback_def pullback by force
+  have g_type[type_rule]: "g : X \<rightarrow> T"
+    using is_pullback_def pullback by force
+  show "is_cart_prod P pX pY X Y"
+  proof(unfold is_cart_prod_def, auto)
+    show pX_type[type_rule]: "pX : P \<rightarrow> X"
+      using pullback is_pullback_def by force
+    show pY_type[type_rule]: "pY : P \<rightarrow> Y"
+      using pullback is_pullback_def by force
+    show "\<And>x y Z.
+       x : Z \<rightarrow> X \<Longrightarrow>
+       y : Z \<rightarrow> Y \<Longrightarrow>
+       \<exists>h. h : Z \<rightarrow> P \<and>
+           pX \<circ>\<^sub>c h = x \<and> pY \<circ>\<^sub>c h = y \<and> (\<forall>h2. h2 : Z \<rightarrow> P \<and> pX \<circ>\<^sub>c h2 = x \<and> pY \<circ>\<^sub>c h2 = y \<longrightarrow> h2 = h)"
+    proof - 
+      fix x y Z
+      assume x_type[type_rule]: "x : Z \<rightarrow> X"
+      assume y_type[type_rule]: "y : Z \<rightarrow> Y"
+      have  "\<And>Z k h. k : Z \<rightarrow> Y \<Longrightarrow> h : Z \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c k = g \<circ>\<^sub>c h \<Longrightarrow> \<exists>j. j : Z \<rightarrow> P \<and> pY \<circ>\<^sub>c j = k \<and> pX \<circ>\<^sub>c j = h"
+        using is_pullback_def pullback by blast
+      then have "\<exists>h. h : Z \<rightarrow> P \<and>
+           pX \<circ>\<^sub>c h = x \<and> pY \<circ>\<^sub>c h = y"
+        by (smt (verit, ccfv_threshold) assms cfunc_type_def codomain_comp domain_comp f_type g_type terminal_object_def x_type y_type)
+      then show "\<exists>h. h : Z \<rightarrow> P \<and>
+           pX \<circ>\<^sub>c h = x \<and> pY \<circ>\<^sub>c h = y \<and> (\<forall>h2. h2 : Z \<rightarrow> P \<and> pX \<circ>\<^sub>c h2 = x \<and> pY \<circ>\<^sub>c h2 = y \<longrightarrow> h2 = h)"
+        by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 is_pullback_def pullback)
+    qed
+  qed
+next
+  assume prod: "is_cart_prod P pX pY X Y"
+  then show "is_pullback P Y X T pY f pX g"
+  proof(unfold is_cart_prod_def is_pullback_def, typecheck_cfuncs, auto)
+    assume pX_type[type_rule]: "pX : P \<rightarrow> X"
+    assume pY_type[type_rule]: "pY : P \<rightarrow> Y"
+    show "f \<circ>\<^sub>c pY = g \<circ>\<^sub>c pX"
+      using assms(1) terminal_object_def by (typecheck_cfuncs, auto)  
+    show "\<And>Z k h. k : Z \<rightarrow> Y \<Longrightarrow> h : Z \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c k = g \<circ>\<^sub>c h \<Longrightarrow> \<exists>j. j : Z \<rightarrow> P \<and> pY \<circ>\<^sub>c j = k \<and> pX \<circ>\<^sub>c j = h"
+      using is_cart_prod_def prod by blast
+    show "\<And>Z j y.
+       pY \<circ>\<^sub>c j : Z \<rightarrow> Y \<Longrightarrow>
+       pX \<circ>\<^sub>c j : Z \<rightarrow> X \<Longrightarrow>
+       f \<circ>\<^sub>c pY \<circ>\<^sub>c j = g \<circ>\<^sub>c pX \<circ>\<^sub>c j \<Longrightarrow> j : Z \<rightarrow> P \<Longrightarrow> y : Z \<rightarrow> P \<Longrightarrow> pY \<circ>\<^sub>c y = pY \<circ>\<^sub>c j \<Longrightarrow> pX \<circ>\<^sub>c y = pX \<circ>\<^sub>c j \<Longrightarrow> j = y"
+      using is_cart_prod_def prod by blast
+  qed
 qed
 
 end

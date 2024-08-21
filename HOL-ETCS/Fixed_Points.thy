@@ -1,3 +1,5 @@
+section \<open>Fixed Points and Cantor's Theorems\<close>
+
 theory Fixed_Points
   imports Axiom_Of_Choice Pred_Logic Cardinality
 begin

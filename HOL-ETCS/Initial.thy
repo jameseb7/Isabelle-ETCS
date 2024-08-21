@@ -1,8 +1,8 @@
+section  \<open>Empty Set and Initial Objects\<close>
+
 theory Initial
   imports Coproduct
 begin
-
-section  \<open>Empty Set and Initial Objects\<close>
 
 text \<open>The axiomatization below corresponds to Axiom 8 (Empty Set) in Halvorson.\<close>
 axiomatization

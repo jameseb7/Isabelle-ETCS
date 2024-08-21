@@ -1,3 +1,5 @@
+section \<open>Countable Sets\<close>
+
 theory Countable
   imports Nats Axiom_Of_Choice Nat_Parity Cardinality
 begin
