@@ -164,7 +164,7 @@ lemma composition_of_monic_pair_is_monic:
   assumes "codomain f = domain g"
   shows "monomorphism f \<Longrightarrow> monomorphism g \<Longrightarrow> monomorphism (g \<circ>\<^sub>c f)"
   unfolding monomorphism_def
-proof auto
+proof safe
   fix h k
   assume f_mono: "\<forall>s t. 
     codomain s = domain f \<and> codomain t = domain f \<longrightarrow> f \<circ>\<^sub>c s = f \<circ>\<^sub>c t \<longrightarrow> s = t"
@@ -206,7 +206,7 @@ lemma comp_epi_imp_epi:
   assumes "domain g = codomain f"
   shows "epimorphism (g \<circ>\<^sub>c f) \<Longrightarrow> epimorphism g"
   unfolding epimorphism_def
-proof auto
+proof safe
   fix s t
   assume gf_epi: "\<forall>s. \<forall>t.
     domain s = codomain (g \<circ>\<^sub>c f) \<and> domain t = codomain (g \<circ>\<^sub>c f) \<longrightarrow>

@@ -252,7 +252,7 @@ lemma cfunc_cross_prod_mono_converse:
   assumes nonempty: "nonempty X" "nonempty Z"
   shows "injective f \<and> injective g"
   unfolding injective_def
-proof (auto)
+proof (safe)
   fix x y 
   assume x_type: "x \<in>\<^sub>c domain f"
   assume y_type: "y \<in>\<^sub>c domain f"
@@ -323,7 +323,7 @@ lemma the_nonempty_assumption_above_is_always_required:
   assumes "\<not>(nonempty X) \<or> \<not>(nonempty Z)"
   shows "injective (f \<times>\<^sub>f g)"
   unfolding injective_def 
-proof(cases "nonempty(X)", auto)
+proof(cases "nonempty(X)", safe)
   fix x y
   assume nonempty:  "nonempty X"
   assume x_type: "x  \<in>\<^sub>c domain (f \<times>\<^sub>f g)"
@@ -372,7 +372,7 @@ text \<open>The lemma below corresponds to Exercise 2.1.30 in Halvorson.\<close>
 lemma surjective_is_epimorphism:
   "surjective f \<Longrightarrow> epimorphism f"
   unfolding surjective_def epimorphism_def
-proof (cases "nonempty (codomain f)", auto)
+proof (cases "nonempty (codomain f)", safe)
   fix g h
   assume f_surj: "\<forall>y. y \<in>\<^sub>c codomain f \<longrightarrow> (\<exists>x. x \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = y)"
   assume d_g_eq_cd_f: "domain g = codomain f"
@@ -410,7 +410,7 @@ lemma cfunc_cross_prod_surj:
   assumes f_surj: "surjective f" and g_surj: "surjective g"
   shows "surjective (f \<times>\<^sub>f g)"
   unfolding surjective_def
-proof(auto)
+proof(safe)
   fix y
   assume y_type: "y \<in>\<^sub>c codomain (f \<times>\<^sub>f g)"
   have fg_type: "f \<times>\<^sub>f g: A \<times>\<^sub>c  B \<rightarrow> C \<times>\<^sub>c D"
@@ -441,7 +441,7 @@ lemma cfunc_cross_prod_surj_converse:
   assumes "surjective (f \<times>\<^sub>f g)"
   shows "surjective f \<and> surjective g"
   unfolding surjective_def
-proof(auto)
+proof(safe)
   fix c 
   assume c_type[type_rule]: "c \<in>\<^sub>c codomain f"
   then have c_type2:  "c \<in>\<^sub>c C"
@@ -505,7 +505,7 @@ text \<open>The lemma below corresponds to Proposition 2.1.20 in Halvorson.\<clo
 lemma X_is_cart_prod1:
   "is_cart_prod X (id X) (\<beta>\<^bsub>X\<^esub>) X one"
   unfolding is_cart_prod_def
-proof auto
+proof safe
   show "id\<^sub>c X : X \<rightarrow> X"
     by typecheck_cfuncs
 next
@@ -529,7 +529,7 @@ qed
 lemma X_is_cart_prod2:
   "is_cart_prod X (\<beta>\<^bsub>X\<^esub>) (id X) one X"
   unfolding is_cart_prod_def
-proof auto
+proof safe
   show "id\<^sub>c X : X \<rightarrow> X"
     by typecheck_cfuncs
 next
@@ -606,7 +606,7 @@ proof -
     using comp_type id_type left_cart_proj_cfunc_prod terminal_func_type by blast
   then show "epimorphism (left_cart_proj X Y)"
     unfolding epimorphism_def
-  proof auto
+  proof safe
     fix g h
     assume domain_g: "domain g = codomain (left_cart_proj X Y)"
     assume domain_h: "domain h = codomain (left_cart_proj X Y)"
@@ -679,7 +679,7 @@ lemma pullback_iff_product:
   assumes f_type[type_rule]: "f : Y \<rightarrow> T" 
   assumes g_type[type_rule]: "g : X \<rightarrow> T"
   shows "(is_pullback P Y X T (pY) f (pX) g) = (is_cart_prod P pX pY X Y)"
-proof(auto)
+proof(safe)
   assume pullback: "is_pullback P Y X T pY f pX g"
   have f_type[type_rule]: "f : Y \<rightarrow> T"
     using is_pullback_def pullback by force
@@ -713,7 +713,7 @@ proof(auto)
 next
   assume prod: "is_cart_prod P pX pY X Y"
   then show "is_pullback P Y X T pY f pX g"
-  proof(unfold is_cart_prod_def is_pullback_def, typecheck_cfuncs, auto)
+  proof(unfold is_cart_prod_def is_pullback_def, typecheck_cfuncs, safe)
     assume pX_type[type_rule]: "pX : P \<rightarrow> X"
     assume pY_type[type_rule]: "pY : P \<rightarrow> Y"
     show "f \<circ>\<^sub>c pY = g \<circ>\<^sub>c pX"

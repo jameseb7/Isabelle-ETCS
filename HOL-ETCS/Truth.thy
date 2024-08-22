@@ -58,7 +58,7 @@ lemma monomorphism_equalizes_char_func:
   assumes m_type[type_rule]: "m : B \<rightarrow> X" and m_mono[type_rule]: "monomorphism m"
   shows "equalizer B m (characteristic_func m) (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>)"
   unfolding equalizer_def
-proof (typecheck_cfuncs, rule_tac x="X" in exI, rule_tac x="\<Omega>" in exI, auto)
+proof (typecheck_cfuncs, rule_tac x="X" in exI, rule_tac x="\<Omega>" in exI, safe)
   have comm: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub> = characteristic_func m \<circ>\<^sub>c m"
     using characteristic_func_eq m_mono m_type by auto
   then have "\<beta>\<^bsub>B\<^esub> = \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c m"
@@ -77,7 +77,7 @@ lemma characteristic_func_true_relative_member:
   assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
   shows "x \<in>\<^bsub>X\<^esub> (B,m)"
-proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
+proof (insert assms, unfold relative_member_def2 factors_through_def, safe)
   have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
     by (simp add: assms characteristic_func_is_pullback)
   then have "\<exists>j. j : one \<rightarrow> B \<and> \<beta>\<^bsub>B\<^esub> \<circ>\<^sub>c j = id one \<and> m \<circ>\<^sub>c j = x"
@@ -90,7 +90,7 @@ lemma characteristic_func_false_not_relative_member:
   assumes "m : B \<rightarrow> X" "monomorphism m" "x \<in>\<^sub>c X"
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<f>"
   shows "\<not> (x \<in>\<^bsub>X\<^esub> (B,m))"
-proof (insert assms, unfold relative_member_def2 factors_through_def, auto)
+proof (insert assms, unfold relative_member_def2 factors_through_def, safe)
   fix h
   assume x_def: "x = m \<circ>\<^sub>c h"
   assume "h : domain (m \<circ>\<^sub>c h) \<rightarrow> domain m"
@@ -156,7 +156,7 @@ lemma eq_pred_square: "eq_pred X \<circ>\<^sub>c diagonal X = \<t> \<circ>\<^sub
 lemma eq_pred_iff_eq:
   assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
   shows "(x = y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> = \<t>)"
-proof auto
+proof safe
   assume x_eq_y: "x = y"
 
   have "(eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,id\<^sub>c X\<rangle>) \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c y"
@@ -182,7 +182,7 @@ qed
 lemma eq_pred_iff_eq_conv:
   assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
   shows "(x \<noteq> y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> = \<f>)"
-proof(auto)
+proof(safe)
   assume "x \<noteq> y"
   then show "eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<f>"
     using assms eq_pred_iff_eq true_false_only_truth_values by (typecheck_cfuncs, blast)
@@ -393,7 +393,7 @@ text \<open>The lemma below corresponds to Proposition 2.2.9c in Halvorson.\<clo
 lemma pullback_of_mono_is_mono1:
 assumes "g: X \<rightarrow> Z" "monomorphism f" "is_pullback A Y X Z q1 f q0 g"
 shows "monomorphism q0" 
-proof(unfold monomorphism_def2, auto)
+proof(unfold monomorphism_def2, safe)
   fix u v Q a x
   assume u_type: "u : Q \<rightarrow> a"  
   assume v_type: "v : Q \<rightarrow> a"
@@ -443,7 +443,7 @@ text \<open>The lemma below corresponds to Proposition 2.2.9d in Halvorson.\<clo
 lemma pullback_of_mono_is_mono2:
 assumes "g: X \<rightarrow> Z" "monomorphism g" "is_pullback A Y X Z q1 f q0 g"
 shows "monomorphism q1" 
-proof(unfold monomorphism_def2, auto)
+proof(unfold monomorphism_def2, safe)
   fix u v Q a y
   assume u_type: "u : Q \<rightarrow> a"  
   assume v_type: "v : Q \<rightarrow> a"
@@ -701,7 +701,7 @@ proof -
       by (typecheck_cfuncs_prems, smt cfunc_prod_comp cfunc_prod_unique)
 
     show "\<exists>!l. l : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c l = k \<and> b \<circ>\<^sub>c l = j"
-    proof auto
+    proof safe
       show "\<exists>l. l : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c l = k \<and> b \<circ>\<^sub>c l = j"
       proof (rule_tac x=z in exI, auto simp add: k_eq z_type)
         have "fibered_product_morphism E h h E \<circ>\<^sub>c j = (g \<times>\<^sub>f g) \<circ>\<^sub>c k"
@@ -731,7 +731,7 @@ proof -
         fibered_product_left_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
         fibered_product_right_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
         epimorphism b"
-  proof (rule_tac x=b in exI, auto)
+  proof (rule_tac x=b in exI, safe)
     show "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E"
       by typecheck_cfuncs
     show "fibered_product_left_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_left_proj X f f X"
@@ -1049,7 +1049,7 @@ text \<open>The lemma below corresponds to Exercise 2.3.13 in Halvorson.\<close>
 lemma graphs_are_functional:
   assumes "f : X \<rightarrow> Y"
   shows "functional_on X Y (graph f, graph_morph f)"
-proof(unfold functional_on_def, auto)
+proof(unfold functional_on_def, safe)
   show graph_subobj: "(graph f, graph_morph f)  \<subseteq>\<^sub>c (X\<times>\<^sub>c Y)"
     by (simp add: assms graph_subobject)
   show "\<And>x. x \<in>\<^sub>c X \<Longrightarrow> \<exists>y. y \<in>\<^sub>c Y \<and> \<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (graph f, graph_morph f)"
@@ -1120,7 +1120,7 @@ proof-
       by (typecheck_cfuncs, smt (verit, best) cfunc_type_def comp_associative factors_through_def2 left_cart_proj_cfunc_prod relative_member_def2)
   qed
   have inj: "injective(left_cart_proj X Y \<circ>\<^sub>c m)"
-  proof(unfold injective_def, auto)
+  proof(unfold injective_def, safe)
     fix r1 r2 
     assume "r1 \<in>\<^sub>c domain (left_cart_proj X Y \<circ>\<^sub>c m)" then have r1_type[type_rule]: "r1 \<in>\<^sub>c R"
       by (metis cfunc_type_def pi0_m_type)
@@ -1155,7 +1155,7 @@ lemma functional_relations_are_graphs:
   assumes "functional_on X Y (R,m)"
   shows "\<exists>! f. f : X \<rightarrow> Y \<and> 
     (\<exists> i. i : R \<rightarrow> graph(f) \<and> isomorphism(i) \<and> m = graph_morph(f) \<circ>\<^sub>c i)"
-proof auto
+proof safe
   have m_type[type_rule]: "m : R \<rightarrow> X \<times>\<^sub>c Y"
     using assms unfolding functional_on_def subobject_of_def2 by auto
   have m_mono[type_rule]: "monomorphism(m)"
@@ -1174,7 +1174,7 @@ proof auto
     unfolding f_def h_def by (typecheck_cfuncs, smt comp_associative2 id_right_unit2 inv_left isomorphism)
 
   show "\<exists>f. f : X \<rightarrow> Y \<and> (\<exists>i. i : R \<rightarrow> graph f \<and> isomorphism i \<and> m = graph_morph f \<circ>\<^sub>c i)"
-  proof (rule_tac x=f in exI, auto, typecheck_cfuncs)
+  proof (rule_tac x=f in exI, safe, typecheck_cfuncs)
     have graph_equalizer: "equalizer (graph f) (graph_morph f) (f \<circ>\<^sub>c left_cart_proj X Y) (right_cart_proj X Y)"
       by (simp add: f_type graph_equalizer4)
     then have "\<forall>h F. h : F \<rightarrow> X \<times>\<^sub>c Y \<and> (f \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c h = right_cart_proj X Y \<circ>\<^sub>c h \<longrightarrow>
@@ -1199,7 +1199,7 @@ proof auto
         using x_y_in_R unfolding relative_member_def2 by (-, etcs_subst_asm factors_through_def2, auto)
 
       have "graph_morph(f) \<circ>\<^sub>c i \<circ>\<^sub>c x' = graph_morph(f) \<circ>\<^sub>c y'"
-      proof (typecheck_cfuncs, rule cart_prod_eqI, auto)
+      proof (typecheck_cfuncs, rule cart_prod_eqI, safe)
         show left: "left_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c i \<circ>\<^sub>c x' = left_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
         proof -
           have "left_cart_proj X Y \<circ>\<^sub>c graph_morph(f) \<circ>\<^sub>c i \<circ>\<^sub>c x' = left_cart_proj X Y \<circ>\<^sub>c m \<circ>\<^sub>c x'"

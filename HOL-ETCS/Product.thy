@@ -32,7 +32,7 @@ abbreviation is_cart_prod_triple :: "cset \<times> cfunc \<times> cfunc \<Righta
 lemma canonical_cart_prod_is_cart_prod:
  "is_cart_prod (X \<times>\<^sub>c Y) (left_cart_proj X Y) (right_cart_proj X Y) X Y"
   unfolding is_cart_prod_def
-proof (typecheck_cfuncs, auto)
+proof (typecheck_cfuncs, safe)
   fix f g Z
   assume f_type: "f: Z \<rightarrow> X"
   assume g_type: "g: Z \<rightarrow> Y"
@@ -289,7 +289,7 @@ lemma cfunc_cross_prod_mono:
   assumes f_mono: "monomorphism f" and g_mono: "monomorphism g"
   shows "monomorphism (f \<times>\<^sub>f g)"
   using type_assms
-proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+proof (typecheck_cfuncs, unfold monomorphism_def3, safe)
   fix x y A
   assume x_type: "x : A \<rightarrow> X \<times>\<^sub>c Z"
   assume y_type: "y : A \<rightarrow> X \<times>\<^sub>c Z"
@@ -530,7 +530,7 @@ lemma distribute_right_ap:
 
 lemma distribute_right_mono:
   "monomorphism (distribute_right X Y Z)"
-proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+proof (typecheck_cfuncs, unfold monomorphism_def3, safe)
   fix g h A
   assume "g : A \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
   then obtain g1 g2 g3 where g_expand: "g = \<langle>\<langle>g1, g2\<rangle>, g3\<rangle>"
@@ -604,7 +604,7 @@ lemma distribute_left_ap:
 
 lemma distribute_left_mono:
   "monomorphism (distribute_left X Y Z)"
-proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+proof (typecheck_cfuncs, unfold monomorphism_def3, safe)
   fix g h A
   assume g_type: "g : A \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
   then obtain g1 g2 g3 where g_expand: "g = \<langle>g1, \<langle>g2, g3\<rangle>\<rangle>"
