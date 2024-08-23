@@ -95,11 +95,11 @@ proof -
   obtain i where i_type[type_rule]: "i: \<nat>\<^sub>c \<rightarrow> N" and i_iso: "isomorphism(i)"
     using assms isomorphic_is_symmetric is_isomorphic_def by blast 
   obtain z where z_type[type_rule]: "z \<in>\<^sub>c N" and z_def: "z = i \<circ>\<^sub>c zero"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   obtain s where s_type[type_rule]: "s: N \<rightarrow> N" and s_def: "s = (i \<circ>\<^sub>c successor) \<circ>\<^sub>c i\<^bold>\<inverse>"
-    using i_iso by typecheck_cfuncs
+    using i_iso by (typecheck_cfuncs, simp)
   have "is_NNO N z s"
-  proof(unfold is_NNO_def, typecheck_cfuncs, clarify)
+  proof(unfold is_NNO_def, typecheck_cfuncs)
     fix X q f 
     assume q_type[type_rule]: "q: one \<rightarrow> X"
     assume f_type[type_rule]: "f:   X \<rightarrow> X"
@@ -107,7 +107,7 @@ proof -
     obtain u where u_type[type_rule]: "u: \<nat>\<^sub>c \<rightarrow> X" and u_def:  "u \<circ>\<^sub>c zero =  q \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
       using natural_number_object_property2 by (typecheck_cfuncs, blast)
     obtain v where v_type[type_rule]: "v: N \<rightarrow> X" and v_def: "v = u \<circ>\<^sub>c i\<^bold>\<inverse>"
-      using i_iso by typecheck_cfuncs
+      using i_iso by (typecheck_cfuncs, simp)
     then have bottom_triangle: "v \<circ>\<^sub>c z = q"
       unfolding v_def u_def z_def using i_iso
       by (typecheck_cfuncs, metis cfunc_type_def comp_associative id_right_unit2 inv_left u_def)
@@ -194,9 +194,9 @@ lemma oneUN_iso_N_isomorphism:
  "isomorphism(zero \<amalg> successor)" 
 proof - 
   obtain i0 where i0_type[type_rule]:  "i0: one \<rightarrow> (one \<Coprod> \<nat>\<^sub>c)" and i0_def: "i0 = left_coproj one \<nat>\<^sub>c"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   obtain i1 where i1_type[type_rule]:  "i1: \<nat>\<^sub>c \<rightarrow> (one \<Coprod> \<nat>\<^sub>c)" and i1_def: "i1 = right_coproj one \<nat>\<^sub>c"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   obtain g where g_type[type_rule]: "g: \<nat>\<^sub>c \<rightarrow> (one \<Coprod> \<nat>\<^sub>c)" and
    g_triangle: " g \<circ>\<^sub>c zero = i0" and
    g_square: "g \<circ>\<^sub>c successor = ((i1 \<circ>\<^sub>c zero) \<amalg> (i1 \<circ>\<^sub>c successor)) \<circ>\<^sub>c g"

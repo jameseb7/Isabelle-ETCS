@@ -647,7 +647,7 @@ proof(rule ccontr)
   then have "XOR \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle>  = \<t>"
     by (metis NOR_is_pullback XOR_type comp_type is_pullback_def  true_false_only_truth_values)
   then obtain j where j_def: "j \<in>\<^sub>c one\<Coprod>one \<and> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) \<circ>\<^sub>c j  = \<langle>\<f>,\<f>\<rangle>"
-    by (typecheck_cfuncs, smt (verit, ccfv_threshold) XOR_is_pullback id_right_unit2 id_type is_pullback_def)
+    by (typecheck_cfuncs, auto, smt (verit, ccfv_threshold) XOR_is_pullback id_right_unit2 id_type is_pullback_def)
   show False
   proof(cases "j = left_coproj one one")
     assume "j = left_coproj one one"
@@ -681,7 +681,7 @@ proof(rule ccontr)
   then have "XOR \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle>  = \<t>"
     by (metis XOR_type comp_type diag_on_elements diagonal_type true_false_only_truth_values true_func_type)
   then obtain j where j_def: "j \<in>\<^sub>c one\<Coprod>one \<and> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) \<circ>\<^sub>c j  = \<langle>\<t>,\<t>\<rangle>"
-    by (typecheck_cfuncs, smt (verit, ccfv_threshold) XOR_is_pullback id_right_unit2 id_type is_pullback_def)
+    by (typecheck_cfuncs, auto, smt (verit, ccfv_threshold) XOR_is_pullback id_right_unit2 id_type is_pullback_def)
   show False
   proof(cases "j = left_coproj one one")
     assume "j = left_coproj one one"
