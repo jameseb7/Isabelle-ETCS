@@ -32,7 +32,7 @@ abbreviation is_cart_prod_triple :: "cset \<times> cfunc \<times> cfunc \<Righta
 lemma canonical_cart_prod_is_cart_prod:
  "is_cart_prod (X \<times>\<^sub>c Y) (left_cart_proj X Y) (right_cart_proj X Y) X Y"
   unfolding is_cart_prod_def
-proof (typecheck_cfuncs, safe)
+proof (typecheck_cfuncs)
   fix f g Z
   assume f_type: "f: Z \<rightarrow> X"
   assume g_type: "g: Z \<rightarrow> Y"

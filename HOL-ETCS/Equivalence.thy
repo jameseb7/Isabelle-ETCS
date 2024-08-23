@@ -498,7 +498,7 @@ next
   then have g_bar_type[type_rule]: "g_bar : F \<rightarrow> E"
     using F_def assms(1) g_bar_def g_type kernel_pair_equiv_rel quotient_func_type by blast
   obtain k where k_def: "k = g_bar \<circ>\<^sub>c f_bar_inv" and k_type[type_rule]: "k : Y \<rightarrow> E"
-    by typecheck_cfuncs   
+    by (typecheck_cfuncs, simp) 
   then show "\<exists>k. k : Y \<rightarrow> E \<and> k \<circ>\<^sub>c f = g"
     by (smt (z3) \<open>const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) g\<close> assms(1) comp_associative2 f_bar_inv_eq1 f_bar_inv_type f_bar_type f_eqs g_bar_def g_bar_type g_type id_left_unit2 kernel_pair_equiv_rel q_def q_type quotient_func_eq)
 next
@@ -1361,9 +1361,9 @@ next
     using cart_prod_eq2 by (typecheck_cfuncs, auto, presburger)
 
   have mhy2_eq_mgy1: "mhy2 = mgy1"
-    using t_def2 t_def cart_prod_eq2 by (auto, typecheck_cfuncs)
+    using t_def2 t_def cart_prod_eq2 by (typecheck_cfuncs_prems, auto)
   have gy_eq_gz: "hz = gz"
-    using t_def2 t_def cart_prod_eq2 by (auto, typecheck_cfuncs)
+    using t_def2 t_def cart_prod_eq2 by (typecheck_cfuncs_prems, auto)
 
   have mhy_in_Y: "\<langle>mhy1, mhy2\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (Y, m)"
     using m_def h_part_types mhy_decomp
@@ -1463,9 +1463,9 @@ next
   then have t_def2: "t = \<langle>gz, mgy2\<rangle>" and u_def: "u = \<langle>gz, mgy1\<rangle>"
     using cart_prod_eq2 by (typecheck_cfuncs, auto, presburger)
   have mhy2_eq_mgy2: "mhy2 = mgy2"
-    using t_def2 t_def cart_prod_eq2 by (auto, typecheck_cfuncs)
+    using t_def2 t_def cart_prod_eq2 by (typecheck_cfuncs_prems, auto)
   have gy_eq_gz: "hz = gz"
-    using t_def2 t_def cart_prod_eq2 by (auto, typecheck_cfuncs)
+    using t_def2 t_def cart_prod_eq2 by (typecheck_cfuncs_prems, auto)
   have mhy_in_Y: "\<langle>mhy1, mhy2\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (Y, m)"
     using m_def h_part_types mhy_decomp
     by (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)

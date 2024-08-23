@@ -302,7 +302,7 @@ proof(rule ccontr)
       by (smt assms(1) bwoc cfunc_type_def eq_pred_false_extract_right comp_associative comp_type eq_pred_type g_def g_right_arg_type x_type y_def)
   qed
   obtain h where h_def: "h = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" and h_type[type_rule]:"h: Y \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   have hpx_eqs_f: "\<forall>x. x \<in>\<^sub>c X \<longrightarrow> h \<circ>\<^sub>c p \<circ>\<^sub>c x = \<f>"
     by (smt assms(1) cfunc_type_def codomain_comp comp_associative false_func_type h_def id_right_unit2 id_type terminal_func_comp terminal_func_type terminal_func_unique)
   have gp_eqs_hp: "g \<circ>\<^sub>c p = h \<circ>\<^sub>c p"
@@ -647,10 +647,12 @@ proof -
   then obtain b where b_type[type_rule]: "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E"
           and b_eq: "fibered_product_morphism E h h E \<circ>\<^sub>c b = (g \<times>\<^sub>f g) \<circ>\<^sub>c fibered_product_morphism X f f X"
     by (meson cfunc_cross_prod_type comp_type f_type fibered_product_morphism_type g_type gxg_fpmorph_eq)
-      
+
+  print_methods
+
   have "is_pullback (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) (X \<times>\<^sub>c X) (E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E) (E \<times>\<^sub>c E)
       (fibered_product_morphism X f f X) (g \<times>\<^sub>f g) b (fibered_product_morphism E h h E)"
-  proof (insert b_eq, unfold is_pullback_def, typecheck_cfuncs, clarify)
+  proof (unfold is_pullback_def, typecheck_cfuncs, safe, metis b_eq)
     fix Z k j
     assume k_type[type_rule]: "k : Z \<rightarrow> X \<times>\<^sub>c X" and h_type[type_rule]: "j : Z \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E"
     assume k_h_eq: "(g \<times>\<^sub>f g) \<circ>\<^sub>c k = fibered_product_morphism E h h E \<circ>\<^sub>c j"
@@ -700,28 +702,22 @@ proof -
       unfolding fibered_product_right_proj_def fibered_product_left_proj_def
       by (typecheck_cfuncs_prems, smt cfunc_prod_comp cfunc_prod_unique)
 
-    show "\<exists>!l. l : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c l = k \<and> b \<circ>\<^sub>c l = j"
-    proof safe
-      show "\<exists>l. l : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c l = k \<and> b \<circ>\<^sub>c l = j"
-      proof (rule_tac x=z in exI, auto simp add: k_eq z_type)
-        have "fibered_product_morphism E h h E \<circ>\<^sub>c j = (g \<times>\<^sub>f g) \<circ>\<^sub>c k"
-          by (simp add: k_h_eq)
-        also have "... = (g \<times>\<^sub>f g) \<circ>\<^sub>c fibered_product_morphism X f f X \<circ>\<^sub>c z"
-          by (simp add: k_eq)
-        also have "... = fibered_product_morphism E h h E \<circ>\<^sub>c b \<circ>\<^sub>c z"
-          by (typecheck_cfuncs, simp add: b_eq comp_associative2)
-        then show "b \<circ>\<^sub>c z = j"
-          using assms(6) calculation cfunc_type_def fibered_product_morphism_monomorphism fibered_product_morphism_type h_type monomorphism_def
-          by (typecheck_cfuncs, auto)
-      qed
-    next
-      fix j y
-      assume j_type[type_rule]: "j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" and y_type[type_rule]: "y : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"
-      assume "fibered_product_morphism X f f X \<circ>\<^sub>c y = fibered_product_morphism X f f X \<circ>\<^sub>c j"
-      then show "j = y"
-        using fibered_product_morphism_monomorphism fibered_product_morphism_type monomorphism_def cfunc_type_def f_type
-        by (typecheck_cfuncs, auto)
+    show "\<exists>l. l : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c l = k \<and> b \<circ>\<^sub>c l = j"
+    proof (rule_tac x=z in exI, typecheck_cfuncs, insert k_eq, safe)
+      have "fibered_product_morphism E h h E \<circ>\<^sub>c j = (g \<times>\<^sub>f g) \<circ>\<^sub>c k"
+        by (simp add: k_h_eq)
+      also have "... = (g \<times>\<^sub>f g) \<circ>\<^sub>c fibered_product_morphism X f f X \<circ>\<^sub>c z"
+        by (simp add: k_eq)
+      also have "... = fibered_product_morphism E h h E \<circ>\<^sub>c b \<circ>\<^sub>c z"
+        by (typecheck_cfuncs, simp add: b_eq comp_associative2)
+      then show "b \<circ>\<^sub>c z = j"
+        using calculation fibered_product_morphism_monomorphism monomorphism_def2 by (typecheck_cfuncs_prems, metis)
     qed
+
+    show "\<And> j y. j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<Longrightarrow> y : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<Longrightarrow>
+        fibered_product_morphism X f f X \<circ>\<^sub>c y = fibered_product_morphism X f f X \<circ>\<^sub>c j \<Longrightarrow>
+        j = y"
+      using fibered_product_morphism_monomorphism monomorphism_def2 by (typecheck_cfuncs_prems, metis)
   qed
   then have b_epi: "epimorphism b"
     using g_epi g_type cfunc_cross_prod_type cfunc_cross_prod_surj  pullback_of_epi_is_epi1 h_type
@@ -905,7 +901,7 @@ proof -
   obtain \<chi>m where \<chi>m_type[type_rule]: "\<chi>m : C \<rightarrow> \<Omega>" and \<chi>m_def: "\<chi>m = characteristic_func m"
     using characteristic_func_type m_mono m_type by blast
   obtain \<chi>mi where \<chi>mi_type[type_rule]: "\<chi>mi : C \<rightarrow> \<Omega>" and \<chi>mi_def: "\<chi>mi = characteristic_func (m \<circ>\<^sub>c i)"
-    by (typecheck_cfuncs)
+    by (typecheck_cfuncs, simp)
   have "\<And> c. c \<in>\<^sub>c C \<Longrightarrow> (\<chi>m \<circ>\<^sub>c c = \<t>) = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
   proof -
     fix c
@@ -940,7 +936,7 @@ proof -
   obtain \<chi>m where \<chi>m_type[type_rule]: "\<chi>m : A \<rightarrow> \<Omega>" and \<chi>m_def: "\<chi>m = characteristic_func m"
     using characteristic_func_type m_mono m_type by blast
   obtain \<chi>im where \<chi>im_type[type_rule]: "\<chi>im : B \<rightarrow> \<Omega>" and \<chi>im_def: "\<chi>im = characteristic_func (i \<circ>\<^sub>c m)"
-    by (typecheck_cfuncs)
+    by (typecheck_cfuncs, simp)
   have \<chi>im_pullback: "is_pullback C one B \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> (i \<circ>\<^sub>c m) \<chi>im"
     using \<chi>im_def characteristic_func_is_pullback comp_type i_type im_mono m_type by blast
   have "is_pullback C one A \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> m (\<chi>im \<circ>\<^sub>c i)"
@@ -1164,7 +1160,7 @@ proof safe
     using assms functional_on_isomorphism by force
   
   obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_def: "h = (left_cart_proj X Y \<circ>\<^sub>c m)\<^bold>\<inverse>"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   obtain f where f_def: "f = (right_cart_proj X Y) \<circ>\<^sub>c m \<circ>\<^sub>c h"
     by auto
   then have f_type[type_rule]: "f : X \<rightarrow> Y"
@@ -1240,7 +1236,7 @@ next
   assume i2_type[type_rule]: "i2 : R \<rightarrow> graph f2"
   assume i1_iso: "isomorphism i1"
   assume i2_iso: "isomorphism i2"
-  assume eq1: "m = graph_morph f2 \<circ>\<^sub>c i2"
+  assume eq1: "m = graph_morph f1 \<circ>\<^sub>c i1"
   assume eq2: "graph_morph f1 \<circ>\<^sub>c i1 = graph_morph f2 \<circ>\<^sub>c i2" 
 
   have m_type[type_rule]: "m : R \<rightarrow> X \<times>\<^sub>c Y"
@@ -1248,7 +1244,7 @@ next
   have isomorphism[type_rule]: "isomorphism(left_cart_proj X Y \<circ>\<^sub>c m)"
     using assms functional_on_isomorphism by force  
   obtain h where h_type[type_rule]: "h: X \<rightarrow> R" and h_def: "h = (left_cart_proj X Y \<circ>\<^sub>c m)\<^bold>\<inverse>"
-    by typecheck_cfuncs  
+    by (typecheck_cfuncs, simp)
   have "f1 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = f2 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
   proof - 
     have "f1 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m = (f1 \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c graph_morph f1 \<circ>\<^sub>c i1"
@@ -1260,7 +1256,7 @@ next
     also have "... = (f2 \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c graph_morph f2 \<circ>\<^sub>c i2"
       by (typecheck_cfuncs, smt comp_associative2 equalizer_eq graph_equalizer4)
     also have "... = f2 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
-      by (typecheck_cfuncs, metis comp_associative2 eq1)
+      by (typecheck_cfuncs, metis comp_associative2 eq1 eq2)
     then show ?thesis using calculation by auto
   qed
   then show "f1 = f2"

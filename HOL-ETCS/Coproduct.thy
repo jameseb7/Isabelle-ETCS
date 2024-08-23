@@ -197,7 +197,7 @@ proof (rule ccontr, auto)
   assume not_in_right_image: "\<forall>y. y \<in>\<^sub>c Y \<longrightarrow> z \<noteq> right_coproj X Y \<circ>\<^sub>c y"
   
   obtain h where h_def: "h = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>" and h_type[type_rule]: "h : X \<Coprod> Y \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
 
   have fact1: "(eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c left_coproj X Y = h \<circ>\<^sub>c left_coproj X Y"
   proof(rule one_separator[where X=X, where Y = \<Omega>])
@@ -1162,7 +1162,7 @@ lemma factor_prod_coprod_left_mono:
 proof -
   obtain \<phi> where \<phi>_def: "\<phi> = (id A  \<times>\<^sub>f left_coproj B C) \<amalg> (id A \<times>\<^sub>f right_coproj B C)" and
                  \<phi>_type[type_rule]: "\<phi> : (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
 
   have injective: "injective(\<phi>)"
     unfolding injective_def
@@ -1353,7 +1353,7 @@ lemma factor_prod_coprod_left_epi:
 proof -
   obtain \<phi> where \<phi>_def: "\<phi> = (id A \<times>\<^sub>f left_coproj B C) \<amalg> (id A \<times>\<^sub>f right_coproj B C)" and
                  \<phi>_type[type_rule]: "\<phi> : (A \<times>\<^sub>c B) \<Coprod> (A \<times>\<^sub>c C) \<rightarrow> A \<times>\<^sub>c (B \<Coprod> C)"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   have surjective: "surjective((id A \<times>\<^sub>f left_coproj B C) \<amalg> (id A \<times>\<^sub>f right_coproj B C))"
     unfolding surjective_def
   proof(auto)
@@ -1894,27 +1894,27 @@ lemma coproduct_associates:
   "A \<Coprod> (B \<Coprod> C)  \<cong> (A \<Coprod> B) \<Coprod> C"
 proof -
   obtain q where q_def: "q = (left_coproj (A \<Coprod> B) C ) \<circ>\<^sub>c (right_coproj A B)" and q_type[type_rule]: "q: B \<rightarrow> (A \<Coprod> B) \<Coprod> C"
-    by typecheck_cfuncs  
+    by (typecheck_cfuncs, simp)  
   obtain f where f_def: "f = q \<amalg> (right_coproj (A \<Coprod> B) C)" and f_type[type_rule]: "(f: (B \<Coprod> C) \<rightarrow> ((A \<Coprod> B) \<Coprod> C))"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   have f_prop: "(f \<circ>\<^sub>c left_coproj B C = q) \<and> (f \<circ>\<^sub>c right_coproj B C = right_coproj (A \<Coprod> B) C)"
     by (typecheck_cfuncs, simp add: f_def left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
   then have f_unique: "(\<exists>!f. (f: (B \<Coprod> C) \<rightarrow> ((A \<Coprod> B) \<Coprod> C)) \<and> (f \<circ>\<^sub>c left_coproj B C = q) \<and> (f \<circ>\<^sub>c right_coproj B C = right_coproj (A \<Coprod> B) C))"
     by (typecheck_cfuncs, metis cfunc_coprod_unique f_prop f_type)
 
   obtain m where m_def: "m = (left_coproj (A \<Coprod> B) C ) \<circ>\<^sub>c (left_coproj A B)" and m_type[type_rule]: "m : A \<rightarrow> (A \<Coprod> B) \<Coprod> C"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   obtain g where g_def: "g = m \<amalg> f" and g_type[type_rule]: "g: A \<Coprod> (B \<Coprod> C)  \<rightarrow> (A \<Coprod> B) \<Coprod> C"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   have g_prop: "(g \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = m) \<and> (g \<circ>\<^sub>c (right_coproj A (B \<Coprod> C)) = f)"
     by (typecheck_cfuncs, simp add: g_def left_coproj_cfunc_coprod right_coproj_cfunc_coprod) 
   have g_unique: "\<exists>! g. ((g: A \<Coprod> (B \<Coprod> C)  \<rightarrow> (A \<Coprod> B) \<Coprod> C) \<and> (g \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = m) \<and> (g \<circ>\<^sub>c (right_coproj A (B \<Coprod> C)) = f))"
     by (typecheck_cfuncs, metis cfunc_coprod_unique g_prop g_type)
 
   obtain p where p_def: "p = (right_coproj A (B \<Coprod> C)) \<circ>\<^sub>c  (left_coproj B C)" and p_type[type_rule]: "p: B \<rightarrow> A \<Coprod> (B \<Coprod> C)"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   obtain h where h_def: "h = (left_coproj A (B \<Coprod> C)) \<amalg> p" and h_type[type_rule]: "h: (A \<Coprod> B) \<rightarrow> A \<Coprod> (B \<Coprod> C)"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   have h_prop1: "h \<circ>\<^sub>c (left_coproj A B)  = (left_coproj A (B \<Coprod> C))"
     by (typecheck_cfuncs, simp add: h_def left_coproj_cfunc_coprod p_type)
   have h_prop2: "h \<circ>\<^sub>c (right_coproj A B) = p"
@@ -1923,9 +1923,9 @@ proof -
     by (typecheck_cfuncs, metis cfunc_coprod_unique h_prop1 h_prop2 h_type)
 
   obtain j where j_def: "j = (right_coproj A (B \<Coprod> C)) \<circ>\<^sub>c  (right_coproj B C)" and j_type[type_rule]: "j : C \<rightarrow> A \<Coprod> (B \<Coprod> C)"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   obtain k where k_def: "k = h \<amalg> j" and k_type[type_rule]: "k: (A \<Coprod> B) \<Coprod> C \<rightarrow> A \<Coprod> (B \<Coprod> C)"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
 
   have fact1: "(k \<circ>\<^sub>c g) \<circ>\<^sub>c (left_coproj A (B \<Coprod> C)) = (left_coproj A (B \<Coprod> C))"
     by (typecheck_cfuncs, smt (z3) comp_associative2 g_prop h_prop1 h_type j_type k_def left_coproj_cfunc_coprod left_proj_type m_def)
@@ -2180,7 +2180,7 @@ lemma coproduct_with_self_iso:
   "X \<Coprod> X \<cong> X \<times>\<^sub>c \<Omega>"
 proof - 
   obtain \<rho> where \<rho>_def: "\<rho> = \<langle>id X, \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> \<langle>id X, \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>" and \<rho>_type[type_rule]: "\<rho> : X \<Coprod> X \<rightarrow> X \<times>\<^sub>c \<Omega>"
-    by typecheck_cfuncs
+    by (typecheck_cfuncs, simp)
   have \<rho>_inj: "injective \<rho>"
     unfolding injective_def
   proof(auto)
