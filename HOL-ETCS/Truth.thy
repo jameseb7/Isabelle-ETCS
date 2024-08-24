@@ -543,7 +543,7 @@ proof -
     using assms cfunc_type_def surjective_def by auto
 
   have "\<not>nonempty(p\<^sup>-\<^sup>1{y0})"
-  proof (rule ccontr,auto)
+  proof (rule ccontr, clarify)
     assume a1: "nonempty(p\<^sup>-\<^sup>1{y0})"
     obtain z where z_type[type_rule]: "z \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}"
       using a1 nonempty_def by blast
@@ -938,7 +938,7 @@ proof -
   have \<chi>im_pullback: "is_pullback C one B \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> (i \<circ>\<^sub>c m) \<chi>im"
     using \<chi>im_def characteristic_func_is_pullback comp_type i_type im_mono m_type by blast
   have "is_pullback C one A \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> m (\<chi>im \<circ>\<^sub>c i)"
-  proof (unfold is_pullback_def, typecheck_cfuncs, auto)
+  proof (unfold is_pullback_def, typecheck_cfuncs, safe)
     show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub> = (\<chi>im \<circ>\<^sub>c i) \<circ>\<^sub>c m"
       by (typecheck_cfuncs, etcs_assocr, metis \<chi>im_def characteristic_func_eq comp_type im_mono)
   next

@@ -66,7 +66,7 @@ proof -
   obtain idW' where "idW' : W' \<rightarrow> W' \<and> (\<forall> h2. (h2 : W' \<rightarrow> W' \<and> \<pi>'\<^sub>0 \<circ>\<^sub>c h2 = \<pi>'\<^sub>0 \<and> \<pi>'\<^sub>1 \<circ>\<^sub>c h2 = \<pi>'\<^sub>1) \<longrightarrow> h2 = idW')"
     using W'_cart_prod unfolding is_cart_prod_def by (metis fst_conv snd_conv)
   then have fg: "f \<circ>\<^sub>c g = id W'"
-  proof auto
+  proof clarify
     assume idW'_unique: "\<forall>h2. h2 : W' \<rightarrow> W' \<and> \<pi>'\<^sub>0 \<circ>\<^sub>c h2 = \<pi>'\<^sub>0 \<and> \<pi>'\<^sub>1 \<circ>\<^sub>c h2 = \<pi>'\<^sub>1 \<longrightarrow> h2 = idW'"
     have 1: "f \<circ>\<^sub>c g = idW'"
       using comp_type f_def fg0 fg1 g_def idW'_unique by blast
@@ -84,7 +84,7 @@ proof -
   obtain idW where "idW : W \<rightarrow> W \<and> (\<forall> h2. (h2 : W \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h2 = \<pi>\<^sub>0 \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h2 = \<pi>\<^sub>1) \<longrightarrow> h2 = idW)"
     using W_cart_prod unfolding is_cart_prod_def by (metis fst_conv snd_conv)
   then have gf: "g \<circ>\<^sub>c f = id W"
-  proof auto
+  proof clarify
     assume idW_unique: "\<forall>h2. h2 : W \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h2 = \<pi>\<^sub>0 \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h2 = \<pi>\<^sub>1 \<longrightarrow> h2 = idW"
     have 1: "g \<circ>\<^sub>c f = idW"
       using idW_unique cfunc_type_def codomain_comp domain_comp f_def gf0 gf1 g_def by (erule_tac x="g \<circ>\<^sub>c f" in allE, auto)

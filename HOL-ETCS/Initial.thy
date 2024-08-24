@@ -171,7 +171,7 @@ proof -
     proof -
       assume \<chi>_false: "\<chi> = \<f>"
       have "\<nexists> x. x \<in>\<^sub>c X"
-      proof auto
+      proof clarify
         fix x
         assume x_in_X: "x \<in>\<^sub>c X"
         have "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> = \<f> \<circ>\<^sub>c m"

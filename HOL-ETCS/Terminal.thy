@@ -227,7 +227,7 @@ proof clarify
     by (metis cd_g_eq_d_f cd_h_eq_d_f cfunc_type_def domain_comp f_type fg_eq_fh)
 
   have "\<forall>x. x \<in>\<^sub>c A \<longrightarrow> g \<circ>\<^sub>c x = h \<circ>\<^sub>c x"
-  proof auto
+  proof clarify
     fix x
     assume x_in_A: "x \<in>\<^sub>c A"
 

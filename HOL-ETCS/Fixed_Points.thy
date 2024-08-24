@@ -81,11 +81,14 @@ proof(rule ccontr, clarify)
   then have Omega_has_ffp: "fixed_point_property \<Omega>"
     using Lawveres_fixed_point_theorem powerset_def s_type by auto
   have Omega_doesnt_have_ffp: "\<not>(fixed_point_property \<Omega>)"
-  proof(unfold fixed_point_property_def has_fixed_point_def fixed_point_def, auto)   
+  proof(unfold fixed_point_property_def has_fixed_point_def fixed_point_def, standard)   
+    assume BWOC: "\<forall>g. g : \<Omega> \<rightarrow> \<Omega> \<longrightarrow> (\<exists>a A. g : A \<rightarrow> A \<and> a \<in>\<^sub>c A \<and> g \<circ>\<^sub>c a = a)"
     have  "NOT : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. \<forall>A. a \<in>\<^sub>c A \<longrightarrow> NOT : A \<rightarrow> A \<longrightarrow> NOT \<circ>\<^sub>c a \<noteq> a \<or> \<not> a \<in>\<^sub>c \<Omega>)"
       by (typecheck_cfuncs, metis AND_complementary AND_idempotent OR_complementary OR_idempotent true_false_distinct)
-    then show "\<exists>g. g : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. \<forall>A. a \<in>\<^sub>c A \<longrightarrow> g : A \<rightarrow> A \<longrightarrow> g \<circ>\<^sub>c a \<noteq> a)"
+    then have "\<exists>g. g : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. \<forall>A. a \<in>\<^sub>c A \<longrightarrow> g : A \<rightarrow> A \<longrightarrow> g \<circ>\<^sub>c a \<noteq> a)"
       by (metis cfunc_type_def)
+    then show False
+      using BWOC by presburger
   qed
   show False
     using Omega_doesnt_have_ffp Omega_has_ffp by auto

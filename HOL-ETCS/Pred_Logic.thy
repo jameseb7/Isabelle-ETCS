@@ -1550,7 +1550,7 @@ proof -
         \<or> z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one"
       by (typecheck_cfuncs, smt comp_associative2 coprojs_jointly_surj one_unique_element)
     then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
-    proof auto
+    proof safe
       assume "z \<circ>\<^sub>c \<langle>x,y\<rangle> = left_coproj one (one \<Coprod> one)"
       then have "(P \<times>\<^sub>f Q) \<circ>\<^sub>c \<langle>x,y\<rangle> = (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c left_coproj one (one \<Coprod> one)"
         by (typecheck_cfuncs, typecheck_cfuncs_prems, smt comp_associative2 z_eq)
