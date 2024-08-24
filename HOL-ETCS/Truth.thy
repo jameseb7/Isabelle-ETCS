@@ -256,26 +256,26 @@ lemma eq_pred_false_extract_right:
 subsection \<open>Properties of Monomorphisms and Epimorphisms\<close>
 
 text \<open>The lemma below corresponds to Exercise 2.2.3 in Halvorson.\<close>
-lemma regmono_is_mono: "regular_monomorphism(m) \<Longrightarrow> monomorphism(m)"
+lemma regmono_is_mono: "regular_monomorphism m \<Longrightarrow> monomorphism m"
   using equalizer_is_monomorphism regular_monomorphism_def by blast
 
 text \<open>The lemma below corresponds to Proposition 2.2.4 in Halvorson.\<close>
 lemma mono_is_regmono:
-  shows "monomorphism(m) \<Longrightarrow> regular_monomorphism(m)"
+  shows "monomorphism m \<Longrightarrow> regular_monomorphism m"
   unfolding monomorphism_def regular_monomorphism_def
   using cfunc_type_def characteristic_func_type monomorphism_def domain_comp terminal_func_type true_func_type monomorphism_equalizes_char_func
   by (rule_tac x="characteristic_func m" in exI, rule_tac x="\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub>" in exI, auto)
 
 text \<open>The lemma below corresponds to Proposition 2.2.5 in Halvorson.\<close>
 lemma epi_mon_is_iso:
-  assumes "epimorphism(f)" "monomorphism(f)"
-  shows "isomorphism(f)"
+  assumes "epimorphism f" "monomorphism f"
+  shows "isomorphism f"
   using assms epi_regmon_is_iso mono_is_regmono by auto
 
 text \<open>The lemma below corresponds to Proposition 2.2.8 in Halvorson.\<close>
 lemma epi_is_surj:
-  assumes "p: X \<rightarrow> Y" "epimorphism(p)"
-  shows "surjective(p)"
+  assumes "p: X \<rightarrow> Y" "epimorphism p"
+  shows "surjective p"
   unfolding surjective_def
 proof(rule ccontr)
   assume a1: "\<not> (\<forall>y. y \<in>\<^sub>c codomain p \<longrightarrow> (\<exists>x. x \<in>\<^sub>c domain p \<and> p \<circ>\<^sub>c x = y))"
@@ -283,23 +283,23 @@ proof(rule ccontr)
     using a1 assms(1) cfunc_type_def by auto
   then obtain y0 where y_def: "y0 \<in>\<^sub>c Y \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> p \<circ>\<^sub>c x \<noteq> y0)"
     by auto
-  have mono: "monomorphism(y0)"
+  have mono: "monomorphism y0"
     using element_monomorphism y_def by blast
   obtain g where g_def: "g = eq_pred Y \<circ>\<^sub>c \<langle>y0 \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle>"
     by simp
-  have g_right_arg_type: "\<langle>y0 \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> : Y \<rightarrow> (Y\<times>\<^sub>cY)"
+  have g_right_arg_type: "\<langle>y0 \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> : Y \<rightarrow> Y \<times>\<^sub>c Y"
     by (meson cfunc_prod_type comp_type id_type terminal_func_type y_def)
   then have g_type[type_rule]: "g: Y \<rightarrow> \<Omega>"
     using comp_type eq_pred_type g_def by blast
 
-  have gpx_Eqs_f: "\<forall>x. (x \<in>\<^sub>c X \<longrightarrow> g \<circ>\<^sub>c p \<circ>\<^sub>c x = \<f>)"
-  proof(rule ccontr, auto)
-    fix x
-    assume x_type: "x \<in>\<^sub>c X" 
-    assume bwoc: "g \<circ>\<^sub>c p \<circ>\<^sub>c x \<noteq> \<f>"
-   (* have contradiction: "\<exists>s. s \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}" *)
-    show False  
-      by (smt assms(1) bwoc cfunc_type_def eq_pred_false_extract_right comp_associative comp_type eq_pred_type g_def g_right_arg_type x_type y_def)
+  have gpx_Eqs_f: "\<forall>x. x \<in>\<^sub>c X \<longrightarrow> g \<circ>\<^sub>c p \<circ>\<^sub>c x = \<f>"
+  proof(rule ccontr)
+    assume "\<not> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> g \<circ>\<^sub>c p \<circ>\<^sub>c x = \<f>)"
+    then obtain x where x_type: "x \<in>\<^sub>c X" and bwoc: "g \<circ>\<^sub>c p \<circ>\<^sub>c x \<noteq> \<f>"
+      by blast
+    (* have contradiction: "\<exists>s. s \<in>\<^sub>c p\<^sup>-\<^sup>1{y0}" *)
+    show False
+      by (smt (verit) assms(1) bwoc cfunc_type_def comp_associative comp_type eq_pred_false_extract_right eq_pred_type g_def g_right_arg_type x_type y_def)
   qed
   obtain h where h_def: "h = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" and h_type[type_rule]:"h: Y \<rightarrow> \<Omega>"
     by (typecheck_cfuncs, simp)
@@ -369,7 +369,7 @@ shows "epimorphism q1"
 proof - 
   have surj_g: "surjective g"
     using assms(1) assms(2) epi_is_surj by auto
-  have "surjective (q1)"
+  have "surjective q1"
     unfolding surjective_def
   proof(clarify)
     fix y
@@ -1056,14 +1056,14 @@ proof(unfold functional_on_def, safe)
       using assms comp_type x_type y_def by blast
 
     have "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (graph f, graph_morph f)"
-    proof(unfold relative_member_def, auto)
+    proof(unfold relative_member_def, safe)
       show "\<langle>x,y\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Y"
         by typecheck_cfuncs 
-      show "monomorphism (graph_morph f)"
-        using graph_subobj subobject_of_def2 by blast
-      show "graph_morph f : graph f \<rightarrow> X \<times>\<^sub>c Y"
-        using graph_subobj subobject_of_def2 by blast
-      show "\<langle>x,y\<rangle> factorsthru graph_morph f"
+      show "monomorphism (snd (graph f, graph_morph f))"
+        using graph_subobj subobject_of_def by auto
+      show " snd (graph f, graph_morph f) : fst (graph f, graph_morph f) \<rightarrow> X \<times>\<^sub>c Y"
+        by (simp add: assms graph_morph_type)
+      have "\<langle>x,y\<rangle> factorsthru graph_morph f"
       proof(subst xfactorthru_equalizer_iff_fx_eq_gx[where E = "graph f", where m = "graph_morph f",  
                                                      where f = "(f \<circ>\<^sub>c left_cart_proj X Y)", where g = "right_cart_proj X Y", where X = "X \<times>\<^sub>c Y", where Y = Y,
                                                      where x ="\<langle>x,y\<rangle>"])
@@ -1079,6 +1079,8 @@ proof(unfold functional_on_def, safe)
           using assms  
           by (typecheck_cfuncs, smt (z3) comp_associative2 left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod y_def)
       qed
+      then show "\<langle>x,y\<rangle> factorsthru snd (graph f, graph_morph f)"
+        by simp
     qed
     then show "\<exists>y. y \<in>\<^sub>c Y \<and> \<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (graph f, graph_morph f)"
       using y_type by blast
@@ -1103,7 +1105,7 @@ proof-
   have pi0_m_type[type_rule]: "left_cart_proj X Y \<circ>\<^sub>c m : R \<rightarrow> X"
     using assms functional_on_def subobject_of_def2 by (typecheck_cfuncs, blast)
   have surj: "surjective(left_cart_proj X Y \<circ>\<^sub>c m)"
-  proof(unfold surjective_def, auto)
+  proof(unfold surjective_def, clarify)
     fix x 
     assume "x \<in>\<^sub>c codomain (left_cart_proj X Y \<circ>\<^sub>c m)"
     then have [type_rule]: "x \<in>\<^sub>c X"
