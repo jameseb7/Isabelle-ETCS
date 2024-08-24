@@ -115,17 +115,19 @@ proof -
       unfolding v_def u_def s_def using i_iso
       by (typecheck_cfuncs, smt (verit, ccfv_SIG) comp_associative2 id_right_unit2 inv_left u_def)
     show "\<exists>!u. u : N \<rightarrow> X \<and> q = u \<circ>\<^sub>c z \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c s"
-    proof auto
+    proof safe
       show "\<exists>u. u : N \<rightarrow> X \<and> q = u \<circ>\<^sub>c z \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c s"
         by (rule_tac x=v in exI, auto simp add: bottom_triangle bottom_square v_type)
     next
       fix w y
       assume w_type[type_rule]: "w : N \<rightarrow> X"
       assume y_type[type_rule]: "y : N \<rightarrow> X"
-      assume w_y_z: "w \<circ>\<^sub>c z = y \<circ>\<^sub>c z"
-      assume q_def: "q = y \<circ>\<^sub>c z"
       assume f_w: "f \<circ>\<^sub>c w = w \<circ>\<^sub>c s"
       assume f_y: "f \<circ>\<^sub>c y = y \<circ>\<^sub>c s"
+      assume w_y_z: "w \<circ>\<^sub>c z = y \<circ>\<^sub>c z"
+      assume q_def: "q = w \<circ>\<^sub>c z"
+      
+
 
       have "w \<circ>\<^sub>c i = u"
       proof (etcs_rule natural_number_object_func_unique[where f=f])
@@ -165,7 +167,7 @@ subsection \<open>Zero and Successor\<close>
 lemma zero_is_not_successor:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "zero \<noteq> successor \<circ>\<^sub>c n"
-proof (rule ccontr, auto)
+proof (rule ccontr, clarify)
   assume for_contradiction: "zero = successor \<circ>\<^sub>c n"
   have "\<exists>!u. u: \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> u \<circ>\<^sub>c zero = \<t> \<and> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<Omega>\<^esub>) \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
     by (typecheck_cfuncs, rule natural_number_object_property2)
@@ -245,11 +247,7 @@ lemma nonzero_is_succ_aux:
   assumes "x \<in>\<^sub>c (one \<Coprod> \<nat>\<^sub>c)"
   shows "(x = (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one) \<or>
          (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c) \<and> (x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n))"
-proof auto
-  assume "\<forall> n. n \<in>\<^sub>c  \<nat>\<^sub>c  \<longrightarrow>  x \<noteq> right_coproj one \<nat>\<^sub>c \<circ>\<^sub>c n"
-  then show "x = left_coproj one \<nat>\<^sub>c \<circ>\<^sub>c id one"
-    using assms coprojs_jointly_surj one_unique_element by (typecheck_cfuncs, blast)
-qed
+  by(clarify, metis assms coprojs_jointly_surj id_type one_unique_element)
 
 lemma nonzero_is_succ:
   assumes "k \<in>\<^sub>c \<nat>\<^sub>c"
@@ -264,7 +262,7 @@ proof -
                 (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c \<and> x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n))"
     by (simp add: nonzero_is_succ_aux x_def)
   have not_case_1: "x \<noteq> (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one"
-  proof(rule ccontr,auto)
+  proof(rule ccontr,clarify)
     assume bwoc: "x = left_coproj one \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c one"
     have contradiction: "k = zero"
       by (metis bwoc id_right_unit2 left_coproj_cfunc_coprod left_proj_type successor_type x_def zero_type)
@@ -294,7 +292,7 @@ definition predecessor :: "cfunc" where
 lemma predecessor_def2:
   "predecessor : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c \<and> predecessor \<circ>\<^sub>c (zero \<amalg> successor) = id (one \<Coprod> \<nat>\<^sub>c)
     \<and> (zero \<amalg> successor) \<circ>\<^sub>c predecessor = id \<nat>\<^sub>c"
-proof (unfold predecessor_def, rule theI', auto)
+proof (unfold predecessor_def, rule theI', safe)
   show "\<exists>x. x : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c \<and>
         x \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (one \<Coprod> \<nat>\<^sub>c) \<and> zero \<amalg> successor \<circ>\<^sub>c x = id\<^sub>c \<nat>\<^sub>c"
     using oneUN_iso_N_isomorphism by (typecheck_cfuncs, unfold isomorphism_def cfunc_type_def, auto)
@@ -353,7 +351,7 @@ subsection \<open>Peano's Axioms and Induction\<close>
 
 text \<open>The lemma below corresponds to Proposition 2.6.7 in Halvorson.\<close>
 lemma Peano's_Axioms:
- "injective(successor) \<and> \<not>surjective(successor)"
+ "injective successor  \<and> \<not> surjective successor"
 proof - 
   have i1_mono: "monomorphism(right_coproj one \<nat>\<^sub>c)"
     by (simp add: right_coproj_are_monomorphisms)
@@ -365,9 +363,9 @@ proof -
     by (metis cfunc_coprod_type cfunc_type_def composition_of_monic_pair_is_monic i1_mono iso_imp_epi_and_monic oneUN_iso_N_isomorphism right_proj_type successor_type zero_type)
   obtain u where u_type: "u:  \<nat>\<^sub>c  \<rightarrow> \<Omega>" and u_def: "u \<circ>\<^sub>c zero = \<t>  \<and> (\<f>\<circ>\<^sub>c\<beta>\<^bsub>\<Omega>\<^esub>) \<circ>\<^sub>c u = u \<circ>\<^sub>c  successor"
     by (typecheck_cfuncs, metis natural_number_object_property)    
-  have s_not_surj: "\<not>(surjective(successor))"
-    proof (rule ccontr, auto)
-      assume BWOC : "surjective(successor)"
+  have s_not_surj: "\<not> surjective successor"
+    proof (rule ccontr, clarify)
+      assume BWOC : "surjective successor"
       obtain n where n_type: "n : one \<rightarrow> \<nat>\<^sub>c" and snEqz: "successor \<circ>\<^sub>c n = zero"
         using BWOC cfunc_type_def successor_type surjective_def zero_type by auto
       then show False
@@ -391,7 +389,7 @@ proof -
   obtain p' P where
     p'_type[type_rule]: "p' : P \<rightarrow> \<nat>\<^sub>c" and
     p'_equalizer: "p \<circ>\<^sub>c p' = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c p'" and
-    p'_uni_prop: "\<forall> h F. ((h : F \<rightarrow> \<nat>\<^sub>c) \<and> (p \<circ>\<^sub>c h = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c h)) \<longrightarrow> (\<exists>! k. (k : F \<rightarrow> P) \<and> p' \<circ>\<^sub>c k = h)"
+    p'_uni_prop: "\<forall> h F. (h : F \<rightarrow> \<nat>\<^sub>c \<and> p \<circ>\<^sub>c h = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c h) \<longrightarrow> (\<exists>! k. k : F \<rightarrow> P \<and> p' \<circ>\<^sub>c k = h)"
     using equalizer_exists2 by (typecheck_cfuncs, blast)
 
   from base_case have "p \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"

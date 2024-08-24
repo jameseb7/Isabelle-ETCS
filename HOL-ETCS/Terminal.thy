@@ -144,7 +144,7 @@ proof
   then obtain f where f_type: "f : one \<rightarrow> X" and f_iso: "isomorphism f"
     using is_isomorphic_def by blast
   show "\<exists>!x. x \<in>\<^sub>c X"
-  proof(auto)
+  proof(safe)
     show "\<exists>x. x \<in>\<^sub>c X"
       by (meson f_type)
   next  
@@ -214,7 +214,7 @@ text \<open>The lemma below corresponds to Proposition 2.1.27 in Halvorson.\<clo
 lemma injective_imp_monomorphism:
   "injective f \<Longrightarrow> monomorphism f"
   unfolding monomorphism_def injective_def
-proof safe
+proof clarify
   fix g h
   assume f_inj: "\<forall>x y. x \<in>\<^sub>c domain f \<and> y \<in>\<^sub>c domain f \<and> f \<circ>\<^sub>c x = f \<circ>\<^sub>c y \<longrightarrow> x = y"
   assume cd_g_eq_d_f: "codomain g = domain f"
@@ -252,7 +252,7 @@ lemma cfunc_cross_prod_mono_converse:
   assumes nonempty: "nonempty X" "nonempty Z"
   shows "injective f \<and> injective g"
   unfolding injective_def
-proof (safe)
+proof safe
   fix x y 
   assume x_type: "x \<in>\<^sub>c domain f"
   assume y_type: "y \<in>\<^sub>c domain f"
@@ -410,7 +410,7 @@ lemma cfunc_cross_prod_surj:
   assumes f_surj: "surjective f" and g_surj: "surjective g"
   shows "surjective (f \<times>\<^sub>f g)"
   unfolding surjective_def
-proof(safe)
+proof(clarify)
   fix y
   assume y_type: "y \<in>\<^sub>c codomain (f \<times>\<^sub>f g)"
   have fg_type: "f \<times>\<^sub>f g: A \<times>\<^sub>c  B \<rightarrow> C \<times>\<^sub>c D"
@@ -516,7 +516,7 @@ next
   assume f_type: "f : Y \<rightarrow> X" and g_type: "g : Y \<rightarrow> one"
   then show "\<exists>h. h : Y \<rightarrow> X \<and>
            id\<^sub>c X \<circ>\<^sub>c h = f \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h = g \<and> (\<forall>h2. h2 : Y \<rightarrow> X \<and> id\<^sub>c X \<circ>\<^sub>c h2 = f \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h2 = g \<longrightarrow> h2 = h)"
-  proof (rule_tac x=f in exI, auto)
+  proof (rule_tac x=f in exI, safe)
     show "id X \<circ>\<^sub>c f = f"
       using cfunc_type_def f_type id_left_unit by auto
     show "\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c f = g"
@@ -540,7 +540,7 @@ next
   assume f_type: "f : Z \<rightarrow> one" and g_type: "g : Z \<rightarrow> X"
   then show "\<exists>h. h : Z \<rightarrow> X \<and>
            \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h = f \<and> id\<^sub>c X \<circ>\<^sub>c h = g \<and> (\<forall>h2. h2 : Z \<rightarrow> X \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h2 = f \<and> id\<^sub>c X \<circ>\<^sub>c h2 = g \<longrightarrow> h2 = h)"
-  proof (rule_tac x=g in exI, auto)
+  proof (rule_tac x=g in exI, safe)
     show "id\<^sub>c X \<circ>\<^sub>c g = g"
       using cfunc_type_def g_type id_left_unit by auto
     show "\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c g = f"
@@ -606,7 +606,7 @@ proof -
     using comp_type id_type left_cart_proj_cfunc_prod terminal_func_type by blast
   then show "epimorphism (left_cart_proj X Y)"
     unfolding epimorphism_def
-  proof safe
+  proof clarify
     fix g h
     assume domain_g: "domain g = codomain (left_cart_proj X Y)"
     assume domain_h: "domain h = codomain (left_cart_proj X Y)"
@@ -629,7 +629,7 @@ proof -
      using comp_type id_type right_cart_proj_cfunc_prod terminal_func_type by blast
   then show "epimorphism (right_cart_proj X Y)"
     unfolding epimorphism_def
-  proof auto
+  proof clarify
     fix g h
     assume domain_g: "domain g = codomain (right_cart_proj X Y)"
     assume domain_h: "domain h = codomain (right_cart_proj X Y)"
@@ -686,7 +686,7 @@ proof(safe)
   have g_type[type_rule]: "g : X \<rightarrow> T"
     using is_pullback_def pullback by force
   show "is_cart_prod P pX pY X Y"
-  proof(unfold is_cart_prod_def, auto)
+  proof(unfold is_cart_prod_def, safe)
     show pX_type[type_rule]: "pX : P \<rightarrow> X"
       using pullback is_pullback_def by force
     show pY_type[type_rule]: "pY : P \<rightarrow> Y"

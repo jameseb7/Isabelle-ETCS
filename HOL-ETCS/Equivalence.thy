@@ -63,9 +63,9 @@ text \<open>The lemma below corresponds to Exercise 2.3.3 in Halvorson.\<close>
 lemma kernel_pair_equiv_rel:
   assumes "f : X \<rightarrow> Y"
   shows "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-proof (unfold equiv_rel_on_def, auto)
+proof (unfold equiv_rel_on_def, safe)
   show "reflexive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-  proof (unfold reflexive_on_def, auto)
+  proof (unfold reflexive_on_def, safe)
     show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
       using assms kernel_pair_subset by auto
   next
@@ -77,7 +77,7 @@ proof (unfold equiv_rel_on_def, auto)
   qed
 
   show "symmetric_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-  proof (unfold symmetric_on_def, auto)
+  proof (unfold symmetric_on_def, safe)
     show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
       using assms kernel_pair_subset by auto
   next 
@@ -92,7 +92,7 @@ proof (unfold equiv_rel_on_def, auto)
   qed
 
   show "transitive_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-  proof (unfold transitive_on_def, auto)
+  proof (unfold transitive_on_def, safe)
     show "(X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<subseteq>\<^sub>c X \<times>\<^sub>c X"
       using assms kernel_pair_subset by auto
   next 
@@ -177,7 +177,7 @@ text \<open>The lemma below corresponds to Exercise 2.3.2 in Halvorson.\<close>
 lemma coequalizer_is_epimorphism:
   "coequalizer E m f g \<Longrightarrow>  epimorphism(m)"
   unfolding coequalizer_def epimorphism_def
-proof auto
+proof clarify
   fix k h X Y
   assume f_type: "f : Y \<rightarrow> X"
   assume g_type: "g : Y \<rightarrow> X"
@@ -202,23 +202,23 @@ qed
 
 lemma canonical_quotient_map_is_coequalizer:
   assumes "equiv_rel_on X (R,m)"
-  shows "coequalizer (quotient_set X (R,m)) (equiv_class (R,m))
+  shows "coequalizer (X \<sslash> (R,m)) (equiv_class (R,m))
                      (left_cart_proj X X \<circ>\<^sub>c m) (right_cart_proj X X \<circ>\<^sub>c m)"
   unfolding coequalizer_def 
-proof(rule_tac x=X in exI, rule_tac x= "R" in exI,auto)
-  have m_type: "m: R \<rightarrow>X \<times>\<^sub>c X"
+proof(rule_tac x=X in exI, rule_tac x= R in exI, safe)
+  have m_type: "m: R \<rightarrow> X \<times>\<^sub>c X"
     using assms equiv_rel_on_def subobject_of_def2 transitive_on_def by blast
   show "left_cart_proj X X \<circ>\<^sub>c m : R \<rightarrow> X"
     using m_type by typecheck_cfuncs
   show "right_cart_proj X X \<circ>\<^sub>c m : R \<rightarrow> X"
     using m_type by typecheck_cfuncs
-  show "equiv_class (R, m) : X \<rightarrow> quotient_set X (R,m)"
+  show "equiv_class (R, m) : X \<rightarrow> X \<sslash> (R, m)"
     by (simp add: assms equiv_class_type)
-  show "equiv_class (R, m) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c m = equiv_class (R, m) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c m"
-  proof(rule one_separator[where X="R", where Y = "quotient_set X (R,m)"])
-    show "equiv_class (R, m) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c m : R \<rightarrow> quotient_set X (R, m)"
+  show "[left_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub> = [right_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub>"
+  proof(rule one_separator[where X="R", where Y = "X \<sslash> (R,m)"])
+    show "[left_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub> : R \<rightarrow> X \<sslash> (R, m)"
       using m_type assms by typecheck_cfuncs
-    show "equiv_class (R, m) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c m : R \<rightarrow> quotient_set X (R, m)"
+    show "[right_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub> : R \<rightarrow> X \<sslash> (R, m)"
       using m_type assms by typecheck_cfuncs
   next
     fix x 
@@ -235,7 +235,7 @@ proof(rule_tac x=X in exI, rule_tac x= "R" in exI,auto)
       using a_type b_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
     then have "equiv_class (R, m) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c m \<circ>\<^sub>c x = equiv_class (R, m) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c m \<circ>\<^sub>c x"
       by (simp add: m_x_eq)
-    then show "(equiv_class (R, m) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c m) \<circ>\<^sub>c x = (equiv_class (R, m) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c m) \<circ>\<^sub>c x"
+    then show "[left_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub> \<circ>\<^sub>c x = [right_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub> \<circ>\<^sub>c x"
       using x_type m_type assms by (typecheck_cfuncs, metis cfunc_type_def comp_associative m_x_eq)
   qed   
 next
@@ -246,7 +246,7 @@ next
   have m_type: "m : R \<rightarrow> X \<times>\<^sub>c X"
     using assms equiv_rel_on_def reflexive_on_def subobject_of_def2 by blast
   have "const_on_rel X (R, m) h"
-  proof (unfold const_on_rel_def, auto)
+  proof (unfold const_on_rel_def, clarify)
     fix x y
     assume x_type: "x \<in>\<^sub>c X" and y_type: "y \<in>\<^sub>c X"
     assume "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (R, m)"
@@ -260,13 +260,13 @@ next
     then show "h \<circ>\<^sub>c x = h \<circ>\<^sub>c y"
       using left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod x_type y_type by auto
   qed
-  then show "\<exists>k. k : quotient_set X (R, m) \<rightarrow> F \<and> k \<circ>\<^sub>c equiv_class (R, m) = h"
+  then show "\<exists>k. k : X \<sslash> (R, m) \<rightarrow> F \<and> k \<circ>\<^sub>c equiv_class (R, m) = h"
     using assms h_type quotient_func_type quotient_func_eq
-    by (rule_tac x="quotient_func h (R, m)" in exI, auto)
+    by (rule_tac x="quotient_func h (R, m)" in exI, safe)
 next
   fix F k y
-  assume k_type: "k : quotient_set X (R, m) \<rightarrow> F"
-  assume y_type: "y : quotient_set X (R, m) \<rightarrow> F"
+  assume k_type: "k : X \<sslash> (R, m) \<rightarrow> F"
+  assume y_type: "y : X \<sslash> (R, m) \<rightarrow> F"
   assume k_equiv_class_type: "k \<circ>\<^sub>c equiv_class (R, m) : X \<rightarrow> F"
   assume k_equiv_class_eq: "(k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c m =
        (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c m"
@@ -277,7 +277,7 @@ next
 
   have y_eq: "y = quotient_func (y \<circ>\<^sub>c equiv_class (R, m)) (R, m)"
     using assms y_type k_equiv_class_type y_k_eq
-  proof (rule_tac quotient_func_unique[where X=X, where Y=F], simp_all, unfold const_on_rel_def, auto)
+  proof (rule_tac quotient_func_unique[where X=X, where Y=F], simp_all, unfold const_on_rel_def, clarify)
     fix a b
     assume a_type: "a \<in>\<^sub>c X" and b_type: "b \<in>\<^sub>c X"
     assume ab_in_R: "\<langle>a,b\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (R, m)"
@@ -297,7 +297,7 @@ next
 
   have k_eq: "k = quotient_func (y \<circ>\<^sub>c equiv_class (R, m)) (R, m)"
     using assms k_type k_equiv_class_type y_k_eq
-  proof (rule_tac quotient_func_unique[where X=X, where Y=F], simp_all, unfold const_on_rel_def, auto)
+  proof (rule_tac quotient_func_unique[where X=X, where Y=F], simp_all, unfold const_on_rel_def, clarify)
     fix a b
     assume a_type: "a \<in>\<^sub>c X" and b_type: "b \<in>\<^sub>c X"
     assume ab_in_R: "\<langle>a,b\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (R, m)"
@@ -358,7 +358,7 @@ text \<open>The two lemmas below correspond to Proposition 2.3.6 in Halvorson.\<
 lemma epimorphism_coequalizer_kernel_pair:
   assumes "f : X \<rightarrow> Y" "epimorphism f"
   shows "coequalizer Y f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
-proof (unfold coequalizer_def, rule_tac x=X in exI, rule_tac x="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" in exI, auto)
+proof (unfold coequalizer_def, rule_tac x=X in exI, rule_tac x="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" in exI, safe)
   show "fibered_product_left_proj X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X"
     using assms by typecheck_cfuncs
   show "fibered_product_right_proj X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X"
@@ -372,17 +372,13 @@ next
   assume g_type: "g : X \<rightarrow> E"
   assume g_eq: "g \<circ>\<^sub>c fibered_product_left_proj X f f X = g \<circ>\<^sub>c fibered_product_right_proj X f f X"
 
-  obtain F where F_def: "F = quotient_set X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-    by auto
-  obtain q where q_def: "q = equiv_class (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-    by auto
-  have q_type[type_rule]: "q : X \<rightarrow> F"
-    using F_def assms(1) equiv_class_type kernel_pair_equiv_rel q_def by blast
-    
-  obtain f_bar where f_bar_def: "f_bar = quotient_func f (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
-    by auto
-  have f_bar_type[type_rule]: "f_bar : F \<rightarrow> Y" 
-      using F_def assms(1) const_on_rel_def f_bar_def fibered_product_pair_member kernel_pair_equiv_rel quotient_func_type by auto
+  define  F where F_def: "F = quotient_set X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
+  obtain  q where q_def: "q = equiv_class (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)" and
+  q_type[type_rule]: "q : X \<rightarrow> F"
+    using F_def assms(1) equiv_class_type kernel_pair_equiv_rel by auto
+  obtain  f_bar where f_bar_def: "f_bar = quotient_func f (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)" and
+  f_bar_type[type_rule]: "f_bar : F \<rightarrow> Y" 
+    using F_def assms(1) const_on_rel_def fibered_product_pair_member kernel_pair_equiv_rel quotient_func_type by auto
   have fibr_proj_left_type[type_rule]: "fibered_product_left_proj F (f_bar) (f_bar) F : F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F \<rightarrow> F"
     by typecheck_cfuncs
   have fibr_proj_right_type[type_rule]: "fibered_product_right_proj F (f_bar) (f_bar) F : F \<^bsub>(f_bar)\<^esub>\<times>\<^sub>c\<^bsub>(f_bar)\<^esub> F \<rightarrow> F"
@@ -401,7 +397,6 @@ next
     proof - 
       have fact1: "equiv_rel_on X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X)"
         by (meson assms(1) kernel_pair_equiv_rel)
-
       have fact2: "const_on_rel X (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) f"
         using assms(1) const_on_rel_def fibered_product_pair_member by presburger
       show ?thesis
@@ -533,7 +528,7 @@ proof -
     \<and> coequalizer E g (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)
     \<and> monomorphism m \<and> f = m \<circ>\<^sub>c g
     \<and> (\<forall>x. x : E \<rightarrow> Y \<longrightarrow> f = x \<circ>\<^sub>c g \<longrightarrow> x = m)"
-  proof (rule_tac x="q" in exI, rule_tac x="m" in exI, rule_tac x="E" in exI, auto)
+  proof (rule_tac x="q" in exI, rule_tac x="m" in exI, rule_tac x="E" in exI, safe)
     show q_type[type_rule]: "q : X \<rightarrow> E"
       unfolding q_def E_def using kernel_pair_equiv_rel by (typecheck_cfuncs, blast)
     
@@ -819,7 +814,7 @@ lemma image_rel_subset_conv:
   shows "(f\<lparr>A\<rparr>\<^bsub>m \<circ>\<^sub>c n\<^esub>, [f\<lparr>A\<rparr>\<^bsub>m \<circ>\<^sub>c n\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B,b)"
   using rel_sub1 image_subobj_map_mono
   unfolding relative_subset_def2
-proof (typecheck_cfuncs, auto)
+proof (typecheck_cfuncs, safe)
   fix k
   assume k_type[type_rule]: "k : (f \<circ>\<^sub>c m)\<lparr>A\<rparr>\<^bsub>n\<^esub> \<rightarrow> B"
   assume b_type[type_rule]: "b : B \<rightarrow> Y"
@@ -869,7 +864,7 @@ lemma subset_inv_image_iff_image_subset:
   assumes "(A,a) \<subseteq>\<^sub>c X" "(B,m) \<subseteq>\<^sub>c Y" 
   assumes[type_rule]: "f : X \<rightarrow> Y"
   shows "((A, a) \<subseteq>\<^bsub>X\<^esub> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>,[f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>]map)) = ((f\<lparr>A\<rparr>\<^bsub>a\<^esub>, [f\<lparr>A\<rparr>\<^bsub>a\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B,m))"
-proof auto
+proof safe
   have b_mono: "monomorphism(m)"
     using assms(2) subobject_of_def2 by blast
   have b_type[type_rule]: "m : B  \<rightarrow> Y"
@@ -963,7 +958,7 @@ next
   then show "(A, a)\<subseteq>\<^bsub>X\<^esub>(f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>, [f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>]map)"
     unfolding relative_subset_def2 
     using assms a_mono m_mono inverse_image_subobject_mapping_mono
-  proof (typecheck_cfuncs, auto)
+  proof (typecheck_cfuncs, safe)
     assume "monomorphism k"
     then show "\<exists>k. k : A \<rightarrow> f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub> \<and> [f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>]map \<circ>\<^sub>c k = a"
       using assms(3) inverse_image_subobject_mapping_def2 k_left_eq k_type 
@@ -995,7 +990,7 @@ lemma left_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
   shows "(Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z)) \<subseteq>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z)"
   unfolding subobject_of_def2 using assms
-proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+proof (typecheck_cfuncs, unfold monomorphism_def3, clarify)
   fix g h A
   assume g_type: "g : A \<rightarrow> Y \<times>\<^sub>c Z"
   assume h_type: "h : A \<rightarrow> Y \<times>\<^sub>c Z"
@@ -1018,7 +1013,7 @@ lemma right_pair_subset:
   assumes "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
   shows "(Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<subseteq>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c (Z \<times>\<^sub>c X)"
   unfolding subobject_of_def2 using assms
-proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+proof (typecheck_cfuncs, unfold monomorphism_def3, clarify)
   fix g h A
   assume g_type: "g : A \<rightarrow> Z \<times>\<^sub>c Y"
   assume h_type: "h : A \<rightarrow> Z \<times>\<^sub>c Y"
@@ -1040,7 +1035,7 @@ qed
 lemma left_pair_reflexive:
   assumes "reflexive_on X (Y, m)"
   shows "reflexive_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))"
-proof (unfold reflexive_on_def, auto)
+proof (unfold reflexive_on_def, safe)
   have "m : Y \<rightarrow> X \<times>\<^sub>c X \<and> monomorphism m"
     using assms unfolding reflexive_on_def subobject_of_def2 by auto
   then show "(Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<subseteq>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
@@ -1054,7 +1049,7 @@ next
     using cart_prod_decomp by blast
   then show "\<langle>xz,xz\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
     using m_type
-  proof (auto, typecheck_cfuncs, unfold relative_member_def2, auto)
+  proof (clarify, typecheck_cfuncs, unfold relative_member_def2, safe)
     have "monomorphism m"
       using assms unfolding reflexive_on_def subobject_of_def2 by auto
     then show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
@@ -1089,7 +1084,7 @@ qed
 lemma right_pair_reflexive:
   assumes "reflexive_on X (Y, m)"
   shows "reflexive_on (Z \<times>\<^sub>c X) (Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
-proof (unfold reflexive_on_def, auto)
+proof (unfold reflexive_on_def, safe)
   have "m : Y \<rightarrow> X \<times>\<^sub>c X \<and> monomorphism m"
     using assms unfolding reflexive_on_def subobject_of_def2 by auto
   then show "(Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<subseteq>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
@@ -1103,7 +1098,7 @@ proof (unfold reflexive_on_def, auto)
     using cart_prod_decomp by blast
   then show "\<langle>zx,zx\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
     using m_type
-  proof (auto, typecheck_cfuncs, unfold relative_member_def2, auto)
+  proof (clarify, typecheck_cfuncs, unfold relative_member_def2, safe)
     have "monomorphism m"
       using assms unfolding reflexive_on_def subobject_of_def2 by auto
     then show "monomorphism (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
@@ -1137,7 +1132,7 @@ qed
 lemma left_pair_symmetric:
   assumes "symmetric_on X (Y, m)"
   shows "symmetric_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))"
-proof (unfold symmetric_on_def, auto)
+proof (unfold symmetric_on_def, safe)
   have "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
     using assms subobject_of_def2 symmetric_on_def by auto
   then show "(Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<subseteq>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
@@ -1157,7 +1152,7 @@ next
 
   show "\<langle>t,s\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z)\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))" 
     using s_def t_def m_def
-  proof (simp, typecheck_cfuncs, auto, unfold relative_member_def2, auto)
+  proof (simp, typecheck_cfuncs, clarify, unfold relative_member_def2, safe)
     show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
       using relative_member_def2 st_relation by blast
 
@@ -1217,7 +1212,7 @@ qed
 lemma right_pair_symmetric:
   assumes "symmetric_on X (Y, m)"
   shows "symmetric_on (Z \<times>\<^sub>c X) (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
-proof (unfold symmetric_on_def, auto)
+proof (unfold symmetric_on_def, safe)
   have "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
     using assms subobject_of_def2 symmetric_on_def by auto
   then show "(Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<subseteq>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
@@ -1238,7 +1233,7 @@ next
 
   show "\<langle>t,s\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c (Z \<times>\<^sub>c X)\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))" 
     using s_def t_def m_def
-  proof (simp, typecheck_cfuncs, auto, unfold relative_member_def2, auto)
+  proof (simp, typecheck_cfuncs, clarify, unfold relative_member_def2, safe)
     show "monomorphism (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
       using relative_member_def2 st_relation by blast
 
@@ -1298,7 +1293,7 @@ qed
 lemma left_pair_transitive:
   assumes "transitive_on X (Y, m)"
   shows "transitive_on (X \<times>\<^sub>c Z) (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))"
-proof (unfold transitive_on_def, auto)
+proof (unfold transitive_on_def, safe)
   have "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
     using assms subobject_of_def2 transitive_on_def by auto
   then show "(Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<subseteq>\<^sub>c (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
@@ -1379,13 +1374,13 @@ next
     by (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
 
   show " \<langle>s,u\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))" 
-  proof (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
+  proof (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, safe)
     show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
       using relative_member_def2 st_relation by blast
 
     show "\<exists>h. h \<in>\<^sub>c Y \<times>\<^sub>c Z \<and> (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c h = \<langle>s,u\<rangle>"
       unfolding s_def u_def gy_eq_gz
-    proof (rule_tac x="\<langle>y,gz\<rangle>" in exI, auto, typecheck_cfuncs)
+    proof (rule_tac x="\<langle>y,gz\<rangle>" in exI, safe, typecheck_cfuncs)
       have "(distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,gz\<rangle> = distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,gz\<rangle>"
         by (typecheck_cfuncs, auto simp add: comp_associative2)
       also have "... = distribute_right X X Z \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c y, gz\<rangle>"
@@ -1401,7 +1396,7 @@ qed
 lemma right_pair_transitive:
   assumes "transitive_on X (Y, m)"
   shows "transitive_on (Z \<times>\<^sub>c X) (Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
-proof (unfold transitive_on_def, auto)
+proof (unfold transitive_on_def, safe)
   have "m : Y \<rightarrow> X \<times>\<^sub>c X" "monomorphism m"
     using assms subobject_of_def2 transitive_on_def by auto
   then show "(Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<subseteq>\<^sub>c (Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X"
@@ -1478,12 +1473,12 @@ next
   then obtain y where y_type[type_rule]: "y \<in>\<^sub>c Y" and y_def: "m \<circ>\<^sub>c y = \<langle>mhy1, mgy1\<rangle>"
     by (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
   show " \<langle>s,u\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c Z \<times>\<^sub>c X\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m)" 
-  proof (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, auto)
+  proof (typecheck_cfuncs, unfold relative_member_def2 factors_through_def2, safe)
     show "monomorphism (distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m)"
       using relative_member_def2 st_relation by blast
     show "\<exists>h. h \<in>\<^sub>c Z \<times>\<^sub>c Y \<and> (distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c h = \<langle>s,u\<rangle>"
       unfolding s_def u_def gy_eq_gz
-    proof (rule_tac x="\<langle>gz,y\<rangle>" in exI, auto, typecheck_cfuncs)
+    proof (rule_tac x="\<langle>gz,y\<rangle>" in exI, safe, typecheck_cfuncs)
       have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c \<langle>gz,y\<rangle> = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>gz,y\<rangle>"
         by (typecheck_cfuncs, auto simp add: comp_associative2)
       also have "... = distribute_left Z X X  \<circ>\<^sub>c \<langle>gz, m \<circ>\<^sub>c y\<rangle>"

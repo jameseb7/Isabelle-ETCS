@@ -43,7 +43,7 @@ corollary epis_are_split:
 
 text \<open>The lemma below corresponds to Proposition 2.6.8 in Halvorson.\<close>
 lemma monos_give_epis:
-  assumes f_type: "f : X \<rightarrow> Y"
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
   assumes f_mono: "monomorphism f"
   assumes X_nonempty: "nonempty X"
   shows "\<exists>g. g: Y \<rightarrow> X \<and> epimorphism g \<and> g \<circ>\<^sub>c f = id X"
@@ -53,7 +53,7 @@ proof -
     using epi_monic_factorization2 f_type by blast
 
   have g_mono: "monomorphism g"
-  proof (typecheck_cfuncs, unfold monomorphism_def3, auto)
+  proof (typecheck_cfuncs, unfold monomorphism_def3, clarify)
     fix x y A
     assume x_type[type_rule]: "x : A \<rightarrow> X" and y_type[type_rule]: "y : A \<rightarrow> X"
     assume "g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
@@ -75,10 +75,7 @@ proof -
     using X_nonempty nonempty_def by blast
 
   show "\<exists>g. g: Y \<rightarrow> X \<and> epimorphism g \<and> g \<circ>\<^sub>c f = id\<^sub>c X"
-  proof (rule_tac x="(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>)) \<circ>\<^sub>c try_cast m" in exI, auto)
-    show "g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m : Y \<rightarrow> X"
-      by typecheck_cfuncs
-
+  proof (rule_tac x="(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>)) \<circ>\<^sub>c try_cast m" in exI, safe, typecheck_cfuncs)
     have func_f_elem_eq: "\<And> y. y \<in>\<^sub>c X \<Longrightarrow> (g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c f \<circ>\<^sub>c y = y"
     proof -
       fix y
@@ -96,25 +93,12 @@ proof -
       then show "(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c f \<circ>\<^sub>c y = y"
         using calculation by auto
     qed
-
     show "epimorphism (g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m)"
-    proof (rule surjective_is_epimorphism, typecheck_cfuncs, unfold surjective_def2, auto)
-      fix y
-      assume y_type[type_rule]: "y \<in>\<^sub>c X"
-
-      show "\<exists>xa. xa \<in>\<^sub>c Y \<and> (g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c xa = y"
-      proof (rule_tac x="f \<circ>\<^sub>c y" in exI, auto)
-
-        show "f \<circ>\<^sub>c y \<in>\<^sub>c Y"
-          using f_type by typecheck_cfuncs
-
-        show "(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c f \<circ>\<^sub>c y = y"
-          by (simp add: func_f_elem_eq y_type)
-      qed
-    qed
-
+      by (rule surjective_is_epimorphism, typecheck_cfuncs, unfold surjective_def2, clarify,
+             rule_tac x="f \<circ>\<^sub>c y" in exI, safe, typecheck_cfuncs, simp add: func_f_elem_eq,
+             simp add: cfunc_type_def codomain_comp domain_comp, smt func_f_elem_eq)
     show "(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c f = id\<^sub>c X"
-      by (insert comp_associative2 func_f_elem_eq id_left_unit2 f_type, typecheck_cfuncs, rule one_separator, auto)
+      by (insert comp_associative2 func_f_elem_eq id_left_unit2, typecheck_cfuncs, rule one_separator, auto)
   qed
 qed
 

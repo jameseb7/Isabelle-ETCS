@@ -6,18 +6,18 @@ begin
 
 text \<open>The definitions below correspond to Definition 2.6.1 in Halvorson.\<close>
 definition is_finite :: "cset \<Rightarrow> bool"  where
-   "is_finite(X) \<longleftrightarrow> (\<forall>m. (m : X \<rightarrow> X \<and> monomorphism(m)) \<longrightarrow>  isomorphism(m))"
+   "is_finite X \<longleftrightarrow> (\<forall>m. (m : X \<rightarrow> X \<and> monomorphism m) \<longrightarrow> isomorphism m)"
 
 definition is_infinite :: "cset \<Rightarrow> bool"  where
-   "is_infinite(X) \<longleftrightarrow> (\<exists> m. (m : X \<rightarrow> X \<and> monomorphism(m) \<and> \<not>surjective(m)))"
+   "is_infinite X \<longleftrightarrow> (\<exists> m. m : X \<rightarrow> X \<and> monomorphism m \<and> \<not>surjective m)"
 
 lemma either_finite_or_infinite:
-  "is_finite(X) \<or> is_infinite(X)"
+  "is_finite X \<or> is_infinite X"
   using epi_mon_is_iso is_finite_def is_infinite_def surjective_is_epimorphism by blast
 
 text \<open>The definition below corresponds to Definition 2.6.2 in Halvorson.\<close>
 definition is_smaller_than :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<le>\<^sub>c" 50) where
-   "X \<le>\<^sub>c Y \<longleftrightarrow> (\<exists> m. m : X \<rightarrow> Y \<and> monomorphism(m))"
+   "X \<le>\<^sub>c Y \<longleftrightarrow> (\<exists> m. m : X \<rightarrow> Y \<and> monomorphism m)"
 
 text \<open>The purpose of the following lemma is simply to unify the two notations used in the book.\<close>
 lemma subobject_iff_smaller_than:
@@ -32,7 +32,7 @@ lemma set_card_transitive:
 
 lemma all_emptysets_are_finite:
   assumes "is_empty X"
-  shows "is_finite(X)"
+  shows "is_finite X"
   by (metis assms epi_mon_is_iso epimorphism_def3 is_finite_def is_empty_def one_separator)
 
 lemma emptyset_is_smallest_set:
@@ -42,19 +42,19 @@ lemma emptyset_is_smallest_set:
 lemma truth_set_is_finite:
   "is_finite \<Omega>"
   unfolding is_finite_def
-proof(auto)
+proof(clarify)
   fix m 
   assume m_type[type_rule]: "m : \<Omega> \<rightarrow> \<Omega>"
-  assume m_mono: "monomorphism(m)"
-  have "surjective(m)"
+  assume m_mono: "monomorphism m"
+  have "surjective m"
     unfolding surjective_def
-  proof(auto)
+  proof(clarify)
     fix y
     assume "y \<in>\<^sub>c codomain m" 
     then have "y \<in>\<^sub>c \<Omega>"
       using cfunc_type_def m_type by force
-    show "\<exists>x. x \<in>\<^sub>c domain m \<and> m \<circ>\<^sub>c x = y"
-      by (smt (verit, del_insts) \<open>y \<in>\<^sub>c \<Omega>\<close> cfunc_type_def codomain_comp domain_comp injective_def m_mono m_type monomorphism_imp_injective true_false_only_truth_values)
+    then show "\<exists>x. x \<in>\<^sub>c domain m \<and> m \<circ>\<^sub>c x = y"
+      by (smt (verit, del_insts) cfunc_type_def codomain_comp domain_comp injective_def m_mono m_type monomorphism_imp_injective true_false_only_truth_values)
   qed
   then show "isomorphism m"
     by (simp add: epi_mon_is_iso m_mono surjective_is_epimorphism)
@@ -64,7 +64,7 @@ lemma smaller_than_finite_is_finite:
   assumes "X \<le>\<^sub>c Y" "is_finite Y" 
   shows "is_finite X"
   unfolding is_finite_def
-proof(auto)
+proof(clarify)
   fix x
   assume x_type: "x : X \<rightarrow> X"
   assume x_mono: "monomorphism x"
@@ -86,11 +86,11 @@ proof(auto)
     using m_def try_cast_mono by blast
   have mono3: "monomorphism((x \<bowtie>\<^sub>f id(Y \<setminus> (X,m))) \<circ>\<^sub>c try_cast m)"
     using cfunc_type_def composition_of_monic_pair_is_monic m_def mono1 mono2 x_type by (typecheck_cfuncs, auto)
-  then have \<phi>_mono: "monomorphism(\<phi>)" 
+  then have \<phi>_mono: "monomorphism \<phi>" 
     unfolding \<phi>_def
     using cfunc_type_def composition_of_monic_pair_is_monic 
           into_super_mono m_def mono3 x_type by (typecheck_cfuncs,auto)
-  then have "isomorphism(\<phi>)" 
+  then have "isomorphism \<phi>" 
     using \<phi>_def \<phi>_type assms(2) is_finite_def by blast
   have iso_x_bowtie_id: "isomorphism(x \<bowtie>\<^sub>f id(Y \<setminus> (X,m)))"
     by (typecheck_cfuncs, smt \<open>isomorphism \<phi>\<close> \<phi>_def comp_associative2 id_left_unit2 into_super_iso into_super_try_cast into_super_type isomorphism_sandwich m_def try_cast_type x_type)
@@ -101,36 +101,36 @@ proof(auto)
     using iso_imp_epi_and_monic iso_x_bowtie_id by blast
   then have "surjective(x \<bowtie>\<^sub>f id(Y \<setminus> (X,m)))"
     using  epi_is_surj x_type by (typecheck_cfuncs, blast)
-  then have "epimorphism(x)"
+  then have "epimorphism x"
     using x_type cfunc_bowtieprod_surj_converse id_type surjective_is_epimorphism by blast
-  then show "isomorphism(x)"
+  then show "isomorphism x"
     by (simp add: epi_mon_is_iso x_mono)
 qed
 
 lemma larger_than_infinite_is_infinite:
-  assumes "X \<le>\<^sub>c Y" "is_infinite(X)" 
-  shows "is_infinite(Y)"
+  assumes "X \<le>\<^sub>c Y" "is_infinite X" 
+  shows "is_infinite Y"
   using assms either_finite_or_infinite epi_is_surj is_finite_def is_infinite_def
     iso_imp_epi_and_monic smaller_than_finite_is_finite by blast
 
 lemma iso_pres_finite:
   assumes "X \<cong> Y"
-  assumes "is_finite(X)"
-  shows "is_finite(Y)"
+  assumes "is_finite X"
+  shows "is_finite Y"
   using assms is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic isomorphic_is_symmetric smaller_than_finite_is_finite by blast
 
 lemma not_finite_and_infinite:
-  "\<not>(is_finite(X) \<and> is_infinite(X))"
+  "\<not>(is_finite X \<and> is_infinite X)"
   using epi_is_surj is_finite_def is_infinite_def iso_imp_epi_and_monic by blast
 
 lemma iso_pres_infinite:
   assumes "X \<cong> Y"
-  assumes "is_infinite(X)"
-  shows "is_infinite(Y)"
+  assumes "is_infinite X"
+  shows "is_infinite Y"
   using assms either_finite_or_infinite not_finite_and_infinite iso_pres_finite isomorphic_is_symmetric by blast
 
 lemma size_2_sets:
-"(X \<cong> \<Omega>) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2) \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> (x=x1) \<or> (x=x2))  )))"
+"(X \<cong> \<Omega>) = (\<exists> x1. \<exists> x2. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2 \<and> (\<forall>x. x \<in>\<^sub>c X \<longrightarrow> x = x1 \<or> x = x2))"
 proof 
   assume "X \<cong> \<Omega>"
   then obtain \<phi> where \<phi>_type[type_rule]: "\<phi> : X \<rightarrow> \<Omega>" and \<phi>_iso: "isomorphism \<phi>"
@@ -160,7 +160,7 @@ next
 qed
 
 lemma size_2plus_sets:
-  "(\<Omega> \<le>\<^sub>c X) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2))))"
+  "(\<Omega> \<le>\<^sub>c X) = (\<exists> x1. \<exists> x2. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2)"
 proof(auto)
   show "\<Omega> \<le>\<^sub>c X \<Longrightarrow> \<exists>x1. x1 \<in>\<^sub>c X \<and> (\<exists>x2. x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2)"
     by (meson comp_type false_func_type is_smaller_than_def monomorphism_def3 true_false_distinct true_func_type)
@@ -179,11 +179,11 @@ next
 qed
 
 lemma not_init_not_term:
-  "(\<not>(initial_object X) \<and> \<not>(terminal_object X)) = (\<exists> x1. (\<exists> x2. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and> (x1\<noteq>x2)  )))"
+  "(\<not>(initial_object X) \<and> \<not>(terminal_object X)) = (\<exists> x1. \<exists> x2. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2)"
   by (metis is_empty_def initial_iso_empty iso_empty_initial iso_to1_is_term no_el_iff_iso_empty single_elem_iso_one terminal_object_def)
 
 lemma sets_size_3_plus:
-  "(\<not>(initial_object X) \<and> \<not>(terminal_object X) \<and> \<not>(X \<cong> \<Omega>)) = (\<exists> x1. (\<exists> x2.  \<exists> x3. ((x1 \<in>\<^sub>c X) \<and> (x2 \<in>\<^sub>c X) \<and>  (x3 \<in>\<^sub>c X) \<and> (x1\<noteq>x2) \<and>  (x2\<noteq>x3) \<and> (x1\<noteq>x3) )             ))"
+  "(\<not>(initial_object X) \<and> \<not>(terminal_object X) \<and> \<not>(X \<cong> \<Omega>)) = (\<exists> x1. \<exists> x2.  \<exists> x3. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x3 \<in>\<^sub>c X \<and> x1 \<noteq> x2 \<and> x2 \<noteq> x3 \<and> x1 \<noteq> x3)"
   by (metis not_init_not_term size_2_sets)
 
 text \<open>The next two lemmas below correspond to Proposition 2.6.3 in Halvorson.\<close>
@@ -200,14 +200,14 @@ lemma smaller_than_product1:
   assumes "nonempty Y"
   shows "X \<le>\<^sub>c X \<times>\<^sub>c Y"
   unfolding is_smaller_than_def  
-proof-
+proof -
   obtain y where y_type: "y \<in>\<^sub>c Y"
   using assms nonempty_def by blast
   have map_type: "\<langle>id(X),y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> : X \<rightarrow> X \<times>\<^sub>c Y"
    using y_type cfunc_prod_type cfunc_type_def codomain_comp domain_comp id_type terminal_func_type by auto
   have mono: "monomorphism(\<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>)"
     using map_type
-  proof (unfold monomorphism_def3, auto)
+  proof (unfold monomorphism_def3, clarify)
     fix g h A
     assume g_h_types: "g : A \<rightarrow> X" "h : A \<rightarrow> X"
     
@@ -220,7 +220,6 @@ proof-
       using g_h_types y_type
       by (metis (full_types) comp_type left_cart_proj_cfunc_prod terminal_func_type)
   qed
-
   show "\<exists>m. m : X \<rightarrow> X \<times>\<^sub>c Y \<and> monomorphism m"
     using mono map_type by auto
 qed
@@ -247,7 +246,7 @@ lemma coprod_leq_product:
   assumes Y_not_init: "\<not>(initial_object(Y))" 
   assumes X_not_term: "\<not>(terminal_object(X))"
   assumes Y_not_term: "\<not>(terminal_object(Y))"
-  shows "(X \<Coprod> Y) \<le>\<^sub>c (X \<times>\<^sub>c Y)"
+  shows "X \<Coprod> Y \<le>\<^sub>c X \<times>\<^sub>c Y"
 proof - 
   obtain x1 x2 where x1x2_def[type_rule]:  "(x1 \<in>\<^sub>c X)" "(x2 \<in>\<^sub>c X)" "(x1 \<noteq> x2)"
     using is_empty_def X_not_init X_not_term iso_empty_initial iso_to1_is_term no_el_iff_iso_empty single_elem_iso_one by blast
@@ -275,7 +274,7 @@ proof -
     by (simp add: cfunc_coprod_type m_def type1)
 
   have relative: "\<And>y. y \<in>\<^sub>c Y \<Longrightarrow> (y \<in>\<^bsub>Y\<^esub> (one, y1)) = (y = y1)"
-  proof(auto)
+  proof(safe)
     fix y 
     assume y_type: "y \<in>\<^sub>c Y"
     show "y \<in>\<^bsub>Y\<^esub> (one, y1) \<Longrightarrow> y = y1"
@@ -287,7 +286,7 @@ proof -
 
 
   have "injective(m)"
-  proof(unfold injective_def ,auto)
+  proof(unfold injective_def, clarify)
     fix a b 
     assume "a \<in>\<^sub>c domain m" "b \<in>\<^sub>c domain m"
     then have a_type[type_rule]: "a \<in>\<^sub>c X  \<Coprod> Y" and b_type[type_rule]: "b \<in>\<^sub>c X  \<Coprod> Y"
@@ -315,57 +314,56 @@ proof -
       qed
 
       have m_rightproj_y1_equals: "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y1 = \<langle>x2, y2\<rangle>"
-          proof - 
-            have "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y1 = (m \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y1"
-              using  comp_associative2 m_type by (typecheck_cfuncs, auto)
-            also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c y1"
-              using m_def right_coproj_cfunc_coprod type1 by (typecheck_cfuncs, auto)
-            also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1 \<circ>\<^sub>c y1"
-              using  comp_associative2 by (typecheck_cfuncs, auto)
-            also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c left_coproj one (Y \<setminus> (one,y1))"
-              using  try_cast_m_m y1_mono y1y2_def(1) by auto
-            also have "... =  \<langle>x2, y2\<rangle>"
-              using left_coproj_cfunc_coprod type4 type5 by blast
-            then show ?thesis using calculation by auto
-          qed
+      proof - 
+        have "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y1 = (m \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y1"
+          using  comp_associative2 m_type by (typecheck_cfuncs, auto)
+        also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c y1"
+          using m_def right_coproj_cfunc_coprod type1 by (typecheck_cfuncs, auto)
+        also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1 \<circ>\<^sub>c y1"
+          using  comp_associative2 by (typecheck_cfuncs, auto)
+        also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c left_coproj one (Y \<setminus> (one,y1))"
+          using  try_cast_m_m y1_mono y1y2_def(1) by auto
+        also have "... =  \<langle>x2, y2\<rangle>"
+          using left_coproj_cfunc_coprod type4 type5 by blast
+        then show ?thesis using calculation by auto
+      qed
 
-     have m_rightproj_not_y1_equals: "\<And> r. r  \<in>\<^sub>c Y \<and> r \<noteq> y1 \<Longrightarrow>
-          \<exists>k. k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k \<and> 
-          m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
-          proof(auto)
-           fix r 
-           assume r_type: "r \<in>\<^sub>c Y"
-           assume r_not_y1: "r \<noteq> y1"
-           then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k"
-            using r_type relative try_cast_not_in_X y1_mono y1y2_def(1) by blast
-           have m_rightproj_l_equals: "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
-           
-           proof -
-             have "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = (m \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c r"
-              using r_type comp_associative2 m_type by (typecheck_cfuncs, auto)
-            also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c r"
-              using m_def right_coproj_cfunc_coprod type1 by (typecheck_cfuncs, auto)
-            also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  (try_cast y1 \<circ>\<^sub>c r)"
-              using r_type comp_associative2 by (typecheck_cfuncs, auto)
-            also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c (right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k)"
-              using k_def by auto
-            also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c right_coproj one (Y \<setminus> (one,y1))) \<circ>\<^sub>c k"
-              using comp_associative2 k_def by (typecheck_cfuncs, blast)
-            also have "... =  \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle> \<circ>\<^sub>c k"
-              using right_coproj_cfunc_coprod type4 type5 by auto
-            also have "... =  \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub> \<circ>\<^sub>c k, y1\<^sup>c \<circ>\<^sub>c k \<rangle>"
-              using cfunc_prod_comp comp_associative2 k_def by (typecheck_cfuncs, auto)
-            also have "... =  \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
-              by (metis id_right_unit2 id_type k_def one_unique_element terminal_func_comp terminal_func_type x1x2_def(1))
-            then show ?thesis using calculation by auto
-          qed
-          then show "\<exists>k. k \<in>\<^sub>c Y \<setminus> (one, y1) \<and>
-             try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one, y1)) \<circ>\<^sub>c k \<and>
-             m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1,y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
-            using k_def by blast
+      have m_rightproj_not_y1_equals: "\<And> r. r  \<in>\<^sub>c Y \<and> r \<noteq> y1 \<Longrightarrow>
+            \<exists>k. k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k \<and> 
+            m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
+      proof clarify
+        fix r 
+        assume r_type: "r \<in>\<^sub>c Y"
+        assume r_not_y1: "r \<noteq> y1"
+        then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k"
+          using r_type relative try_cast_not_in_X y1_mono y1y2_def(1) by blast
+        have m_rightproj_l_equals: "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
+             
+        proof -
+          have "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = (m \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c r"
+            using r_type comp_associative2 m_type by (typecheck_cfuncs, auto)
+          also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c r"
+            using m_def right_coproj_cfunc_coprod type1 by (typecheck_cfuncs, auto)
+          also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  (try_cast y1 \<circ>\<^sub>c r)"
+            using r_type comp_associative2 by (typecheck_cfuncs, auto)
+          also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c (right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k)"
+            using k_def by auto
+          also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c right_coproj one (Y \<setminus> (one,y1))) \<circ>\<^sub>c k"
+            using comp_associative2 k_def by (typecheck_cfuncs, blast)
+          also have "... =  \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle> \<circ>\<^sub>c k"
+            using right_coproj_cfunc_coprod type4 type5 by auto
+          also have "... =  \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub> \<circ>\<^sub>c k, y1\<^sup>c \<circ>\<^sub>c k \<rangle>"
+            using cfunc_prod_comp comp_associative2 k_def by (typecheck_cfuncs, auto)
+          also have "... =  \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
+            by (metis id_right_unit2 id_type k_def one_unique_element terminal_func_comp terminal_func_type x1x2_def(1))
+          then show ?thesis using calculation by auto
         qed
-
-  
+        then show "\<exists>k. k \<in>\<^sub>c Y \<setminus> (one, y1) \<and>
+          try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one, y1)) \<circ>\<^sub>c k \<and> 
+          m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1,y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
+              using k_def by blast
+    qed
+ 
     show "a = b"
     proof(cases "\<exists>x. a = left_coproj X Y \<circ>\<^sub>c x  \<and> x \<in>\<^sub>c X")
       assume "\<exists>x. a = left_coproj X Y \<circ>\<^sub>c x  \<and> x \<in>\<^sub>c X"
@@ -410,7 +408,6 @@ proof -
       assume "\<nexists>x. a = left_coproj X Y \<circ>\<^sub>c x \<and> x \<in>\<^sub>c X"
       then obtain y where y_def: "a = right_coproj X Y \<circ>\<^sub>c y \<and> y \<in>\<^sub>c Y"
         using a_type coprojs_jointly_surj by blast
-
       show "a = b"
       proof(cases "y = y1")
         assume "y = y1"
@@ -439,7 +436,7 @@ proof -
             then have "c \<noteq> y1"
               by (simp add: \<open>y = y1\<close>)
             then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c c = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k \<and> 
-          m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c c = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
+                 m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c c = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
               using c_def m_rightproj_not_y1_equals by blast
             then have "\<langle>x2, y2\<rangle> = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
               using \<open>m \<circ>\<^sub>c a = \<langle>x2,y2\<rangle>\<close> c_def eqs by auto
@@ -515,16 +512,16 @@ proof -
 qed
 
 lemma prod_leq_exp:
-  assumes "\<not>(terminal_object Y)"
-  shows "(X \<times>\<^sub>c Y) \<le>\<^sub>c (Y\<^bsup>X\<^esup>)"
+  assumes "\<not> terminal_object Y"
+  shows "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
 proof(cases "initial_object Y")
   show "initial_object Y \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
     by (metis X_prod_empty initial_iso_empty initial_maps_mono initial_object_def is_smaller_than_def iso_empty_initial isomorphic_is_reflexive isomorphic_is_transitive prod_pres_iso)
 next
   assume "\<not> initial_object Y"
-  then obtain y1 y2 where y1_type[type_rule]: "y1 \<in>\<^sub>c Y" and y2_type[type_rule]: "y2 \<in>\<^sub>c Y" and y1_not_y2: "y1\<noteq>y2"
+  then obtain y1 y2 where y1_type[type_rule]: "y1 \<in>\<^sub>c Y" and y2_type[type_rule]: "y2 \<in>\<^sub>c Y" and y1_not_y2: "y1 \<noteq> y2"
     using assms not_init_not_term by blast
-  show "(X \<times>\<^sub>c Y) \<le>\<^sub>c (Y\<^bsup>X\<^esup>)"
+  show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
   proof(cases "X \<cong> \<Omega>")
       assume "X \<cong> \<Omega>"
       have "\<Omega>  \<le>\<^sub>c  Y"
@@ -585,7 +582,7 @@ next
           unfolding \<Theta>_def by typecheck_cfuncs
 
         have f0: "\<And>x. \<And> y. \<And> z. x \<in>\<^sub>c X \<and> y \<in>\<^sub>c Y \<and> z \<in>\<^sub>c X \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
-        proof(auto)
+        proof(clarify)
           fix x y z
           assume x_type[type_rule]: "x \<in>\<^sub>c X"
           assume y_type[type_rule]: "y \<in>\<^sub>c Y"
@@ -705,10 +702,7 @@ next
           then show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1"
             by (simp add: calculation)
         qed
-      
-  
-  
-  
+        
         have f3: "\<And>x z. x \<in>\<^sub>c X \<Longrightarrow>  z \<in>\<^sub>c X \<Longrightarrow> z \<noteq> x \<Longrightarrow>  (\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2"
         proof - 
           fix x y z
@@ -753,7 +747,7 @@ next
         qed
   
      have \<Theta>_injective: "injective(\<Theta>)"
-     proof(unfold injective_def, auto)
+     proof(unfold injective_def, clarify)
        fix xy st
        assume xy_type[type_rule]: "xy \<in>\<^sub>c domain \<Theta>"
        assume st_type[type_rule]: "st \<in>\<^sub>c domain \<Theta>"
@@ -805,13 +799,13 @@ next
            next
              assume "t \<noteq> y2"
              show "\<langle>x,y\<rangle> = \<langle>s,t\<rangle>"
-             proof(cases "x = s", auto)
+             proof(cases "x = s", clarify)
                show "x = s \<Longrightarrow> \<langle>s,y\<rangle> = \<langle>s,t\<rangle>"
                  by (metis equals2 f1 s_type t_type y_type)
              next
                assume "x \<noteq> s"
                show "\<langle>x,y\<rangle> = \<langle>s,t\<rangle>"
-               proof(cases "t = y1",auto)
+               proof(cases "t = y1",clarify)
                  show "t = y1 \<Longrightarrow> \<langle>x,y\<rangle> = \<langle>s,y1\<rangle>"
                    by (metis \<open>\<not> X \<cong> \<Omega>\<close> \<open>\<not> initial_object X\<close> \<open>\<not> terminal_object X\<close> \<open>y = y2\<close> \<open>y \<noteq> y1\<close> equals f2 f3 s_type sets_size_3_plus st_def x_type xy_def y2_type)
                next
@@ -824,7 +818,7 @@ next
          next
            assume "y \<noteq> y2"
            show "\<langle>x,y\<rangle> = \<langle>s,t\<rangle>"
-           proof(cases "s = x", auto)
+           proof(cases "s = x", clarify)
              show "s = x \<Longrightarrow> \<langle>x,y\<rangle> = \<langle>x,t\<rangle>"
                by (metis equals2 f1 t_type x_type y_type)
              show "s \<noteq> x \<Longrightarrow> \<langle>x,y\<rangle> = \<langle>s,t\<rangle>"
@@ -852,7 +846,7 @@ proof -
     by (simp add: right_cart_proj_type transpose_func_type)
   have mono_f: "injective(f)"
     unfolding injective_def
-  proof(auto)
+  proof(clarify)
     fix x y 
     assume x_type: "x \<in>\<^sub>c domain f"
     assume y_type: "y \<in>\<^sub>c domain f"
@@ -886,10 +880,6 @@ proof -
     using f_type injective_imp_monomorphism is_smaller_than_def by blast
 qed
 
-
-
-
-
 lemma non_init_non_ter_sets:
   assumes "\<not>(terminal_object X)"
   assumes "\<not>(initial_object X)"
@@ -899,12 +889,10 @@ proof -
                          x2_type[type_rule]: "x2 \<in>\<^sub>c X" and
                                    distinct: "x1 \<noteq> x2"
     using is_empty_def assms iso_empty_initial iso_to1_is_term no_el_iff_iso_empty single_elem_iso_one by blast
-
-
-    then have map_type: "(x1 \<amalg> x2) \<circ>\<^sub>c case_bool   : \<Omega> \<rightarrow> X"
+  then have map_type: "(x1 \<amalg> x2) \<circ>\<^sub>c case_bool   : \<Omega> \<rightarrow> X"
     by typecheck_cfuncs
   have injective: "injective((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
-  proof(unfold injective_def, auto)
+  proof(unfold injective_def, clarify)
     fix \<omega>1 \<omega>2 
     assume "\<omega>1 \<in>\<^sub>c domain (x1 \<amalg> x2 \<circ>\<^sub>c case_bool)"
     then have \<omega>1_type[type_rule]: "\<omega>1 \<in>\<^sub>c \<Omega>"
@@ -915,7 +903,7 @@ proof -
     
     assume equals: "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<omega>1 = (x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<omega>2"
     show "\<omega>1 = \<omega>2"
-    proof(cases "\<omega>1 = \<t>", auto)
+    proof(cases "\<omega>1 = \<t>", clarify)
       assume "\<omega>1 = \<t>"
       show "\<t> = \<omega>2"
       proof(rule ccontr)
@@ -960,17 +948,14 @@ lemma exp_preserves_card1:
   assumes "nonempty X"   
   shows "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
 proof (unfold is_smaller_than_def)
-
   obtain x where x_type[type_rule]: "x \<in>\<^sub>c X"
     using assms(2) unfolding nonempty_def by auto
-
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
     using assms(1) unfolding is_smaller_than_def by auto
-
   show "\<exists>m. m : X\<^bsup>A\<^esup> \<rightarrow> X\<^bsup>B\<^esup> \<and> monomorphism m"
   proof (rule_tac x="(((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>))
     \<circ>\<^sub>c dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) 
-    \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id (X\<^bsup>A\<^esup>)))\<^sup>\<sharp>" in exI, auto)
+    \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id (X\<^bsup>A\<^esup>)))\<^sup>\<sharp>" in exI, safe)
 
     show "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> : X\<^bsup>A\<^esup> \<rightarrow> X\<^bsup>B\<^esup>"
       by  typecheck_cfuncs
@@ -978,7 +963,7 @@ proof (unfold is_smaller_than_def)
       (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
         dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
         swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp>)"
-    proof (unfold monomorphism_def3, auto)
+    proof (unfold monomorphism_def3, clarify)
       fix g h Z
       assume g_type[type_rule]: "g : Z \<rightarrow> X\<^bsup>A\<^esup>"
       assume h_type[type_rule]: "h : Z \<rightarrow> X\<^bsup>A\<^esup>"
@@ -991,9 +976,9 @@ proof (unfold is_smaller_than_def)
           swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h"
 
       show "g = h"
-      proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=A, where X=X], auto)
+      proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=A, where X=X], clarify)
         show "eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f g = eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f h"
-        proof (typecheck_cfuncs, rule one_separator[where X="A \<times>\<^sub>c Z", where Y="X"], auto)
+        proof (typecheck_cfuncs, rule one_separator[where X="A \<times>\<^sub>c Z", where Y="X"], clarify)
           fix az
           assume az_type[type_rule]: "az \<in>\<^sub>c A \<times>\<^sub>c Z"
 
@@ -1117,18 +1102,18 @@ proof (unfold is_smaller_than_def)
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
         using assms unfolding is_smaller_than_def by auto
   show "\<exists>m. m : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup> \<and> monomorphism m"
-  proof (rule_tac x="(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>" in exI, auto)
+  proof (rule_tac x="(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>" in exI, safe)
     show "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup>"
       by typecheck_cfuncs
     then show "monomorphism((m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)"
-    proof (unfold monomorphism_def3, auto)
+    proof (unfold monomorphism_def3, clarify)
       fix g h Z
       assume g_type[type_rule]: "g : Z \<rightarrow> A\<^bsup>X\<^esup>"
       assume h_type[type_rule]: "h : Z \<rightarrow> A\<^bsup>X\<^esup>"
 
       assume eq: "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c g = (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c h"
       show "g = h"
-      proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=X, where X=A], auto)
+      proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=X, where X=A], clarify)
           have "((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f g)  = 
                 ((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f h)"
             by (typecheck_cfuncs, smt comp_associative2 eq inv_transpose_func_def3 inv_transpose_of_composition)

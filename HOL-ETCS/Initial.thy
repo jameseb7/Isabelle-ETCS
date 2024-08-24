@@ -83,7 +83,7 @@ lemma X_prod_empty:
 text \<open>The lemma below corresponds to Proposition 2.4.8 in Halvorson.\<close>
 lemma no_el_iff_iso_empty:
   "is_empty X \<longleftrightarrow> X \<cong> \<emptyset>"
-proof auto
+proof safe
   show "X \<cong> \<emptyset> \<Longrightarrow> is_empty X"
     by (meson is_empty_def comp_type emptyset_is_empty is_isomorphic_def)
 next 

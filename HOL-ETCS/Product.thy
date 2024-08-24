@@ -133,7 +133,7 @@ lemma cart_prod_eq2:
 lemma cart_prod_decomp:
   assumes "a : A \<rightarrow> X \<times>\<^sub>c Y"
   shows "\<exists> x y. a = \<langle>x, y\<rangle> \<and> x : A \<rightarrow> X \<and> y : A \<rightarrow> Y"
-proof (rule_tac x="left_cart_proj X Y \<circ>\<^sub>c a" in exI, rule_tac x="right_cart_proj X Y \<circ>\<^sub>c a" in exI, auto)
+proof (rule_tac x="left_cart_proj X Y \<circ>\<^sub>c a" in exI, rule_tac x="right_cart_proj X Y \<circ>\<^sub>c a" in exI, safe)
   show "a = \<langle>left_cart_proj X Y \<circ>\<^sub>c a,right_cart_proj X Y \<circ>\<^sub>c a\<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_prod_unique)
   show "left_cart_proj X Y \<circ>\<^sub>c a : A \<rightarrow>  X"
@@ -289,7 +289,7 @@ lemma cfunc_cross_prod_mono:
   assumes f_mono: "monomorphism f" and g_mono: "monomorphism g"
   shows "monomorphism (f \<times>\<^sub>f g)"
   using type_assms
-proof (typecheck_cfuncs, unfold monomorphism_def3, safe)
+proof (typecheck_cfuncs, unfold monomorphism_def3, clarify)
   fix x y A
   assume x_type: "x : A \<rightarrow> X \<times>\<^sub>c Z"
   assume y_type: "y : A \<rightarrow> X \<times>\<^sub>c Z"
@@ -530,7 +530,7 @@ lemma distribute_right_ap:
 
 lemma distribute_right_mono:
   "monomorphism (distribute_right X Y Z)"
-proof (typecheck_cfuncs, unfold monomorphism_def3, safe)
+proof (typecheck_cfuncs, unfold monomorphism_def3, clarify)
   fix g h A
   assume "g : A \<rightarrow> (X \<times>\<^sub>c Y) \<times>\<^sub>c Z"
   then obtain g1 g2 g3 where g_expand: "g = \<langle>\<langle>g1, g2\<rangle>, g3\<rangle>"
@@ -604,7 +604,7 @@ lemma distribute_left_ap:
 
 lemma distribute_left_mono:
   "monomorphism (distribute_left X Y Z)"
-proof (typecheck_cfuncs, unfold monomorphism_def3, safe)
+proof (typecheck_cfuncs, unfold monomorphism_def3, clarify)
   fix g h A
   assume g_type: "g : A \<rightarrow> X \<times>\<^sub>c (Y \<times>\<^sub>c Z)"
   then obtain g1 g2 g3 where g_expand: "g = \<langle>g1, \<langle>g2, g3\<rangle>\<rangle>"

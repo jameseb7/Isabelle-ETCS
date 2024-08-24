@@ -152,7 +152,7 @@ lemma NOR_is_pullback:
   "is_pullback  one one (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>one\<^esub>) \<t> \<langle>\<f>, \<f>\<rangle> NOR"
   unfolding NOR_def
   using characteristic_function_exists element_monomorphism
-  by (typecheck_cfuncs, rule_tac the1I2, simp_all)
+  by (typecheck_cfuncs, rule_tac the1I2, simp)
 
 lemma NOR_type[type_rule]:
   "NOR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
@@ -209,7 +209,7 @@ lemma NOR_true_implies_both_false:
   assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
   assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
   assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-  shows "(P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+  shows "P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<and> Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
 proof -
   obtain z where z_type[type_rule]: "z : X \<times>\<^sub>c Y \<rightarrow> one" and "P \<times>\<^sub>f Q = \<langle>\<f>,\<f>\<rangle> \<circ>\<^sub>c z"
     using NOR_is_pullback NOR_true unfolding is_pullback_def
@@ -223,14 +223,14 @@ proof -
   then have "\<langle>P \<circ>\<^sub>c left_cart_proj X Y, Q \<circ>\<^sub>c right_cart_proj X Y\<rangle>
       = \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c left_cart_proj X Y, \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c right_cart_proj X Y\<rangle>"
     by (typecheck_cfuncs, unfold cfunc_cross_prod_def2, auto)
-  then have "(P \<circ>\<^sub>c left_cart_proj X Y = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c left_cart_proj X Y)
-      \<and> (Q \<circ>\<^sub>c right_cart_proj X Y = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c right_cart_proj X Y)"
+  then have "P \<circ>\<^sub>c left_cart_proj X Y = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c left_cart_proj X Y
+      \<and> Q \<circ>\<^sub>c right_cart_proj X Y = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c right_cart_proj X Y"
     using  cart_prod_eq2 by (typecheck_cfuncs, auto simp add: comp_associative2)
-  then have eqs: "(P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+  then have eqs: "P = \<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<and> Q = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
     using assms epimorphism_def3 nonempty_left_imp_right_proj_epimorphism nonempty_right_imp_left_proj_epimorphism
     by (typecheck_cfuncs_prems, blast)
-  then have "(P \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<and> (Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
-  proof auto
+  then have "P \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<and> Q \<noteq> \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
+  proof safe
     show "\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<Longrightarrow> False"
       by (typecheck_cfuncs_prems, smt X_nonempty comp_associative2 nonempty_def one_separator_contrapos terminal_func_comp terminal_func_unique true_false_distinct)
     show "\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<Longrightarrow> False"
@@ -244,7 +244,7 @@ lemma NOR_true_implies_neither_true:
   assumes X_nonempty: "nonempty X" and Y_nonempty: "nonempty Y"
   assumes P_Q_types[type_rule]: "P : X \<rightarrow> \<Omega>" "Q : Y \<rightarrow> \<Omega>"
   assumes NOR_true: "NOR \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-  shows "\<not> ((P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<or> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>))"
+  shows "\<not> (P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<or> Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
   by (smt (verit, ccfv_SIG) NOR_true NOT_false_is_true NOT_true_is_false NOT_type X_nonempty Y_nonempty assms(3,4) comp_associative2 comp_type nonempty_def terminal_func_type true_false_distinct true_false_only_truth_values NOR_true_implies_both_false)
 
 subsection \<open>OR\<close>
@@ -261,19 +261,7 @@ lemma set_three:
  (left_coproj one (one\<Coprod>one)) , 
  (right_coproj one (one\<Coprod>one) \<circ>\<^sub>c left_coproj one one), 
   right_coproj one (one\<Coprod>one) \<circ>\<^sub>c(right_coproj one one)}"
-proof(auto)
-  show "left_coproj one (one \<Coprod> one) \<in>\<^sub>c one \<Coprod> one \<Coprod> one"
-    by (simp add: left_proj_type)
-  show "right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one \<in>\<^sub>c one \<Coprod> one \<Coprod> one"
-    by (meson comp_type left_proj_type right_proj_type)
-  show "right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one \<in>\<^sub>c one \<Coprod> one \<Coprod> one"
-    by (meson comp_type right_proj_type)
-  show "\<And>x. x \<noteq> left_coproj one (one \<Coprod> one) \<Longrightarrow>
-         x \<noteq> right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one \<Longrightarrow>
-         x \<in>\<^sub>c one \<Coprod> one \<Coprod> one \<Longrightarrow>
-         x = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one"
-    by (typecheck_cfuncs, smt (z3) comp_associative2 coprojs_jointly_surj one_unique_element)
-qed
+  by(typecheck_cfuncs, safe, typecheck_cfuncs, smt (z3) comp_associative2 coprojs_jointly_surj one_unique_element)
 
 lemma set_three_card: 
  "card {x. x \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))} = 3"
@@ -291,7 +279,7 @@ qed
 lemma pre_OR_injective:
   "injective(\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>))"
   unfolding injective_def
-proof(auto)
+proof(clarify)
   fix x y 
   assume "x \<in>\<^sub>c domain (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)" 
   then have x_type: "x \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))"  
@@ -387,7 +375,7 @@ lemma OR_true_right_is_true:
   assumes "p \<in>\<^sub>c \<Omega>"
   shows "OR \<circ>\<^sub>c \<langle>p,\<t>\<rangle> = \<t>"
 proof - 
-  have "\<exists> j. j \<in>\<^sub>c one\<Coprod>(one\<Coprod>one) \<and> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j  = \<langle>p,\<t>\<rangle>"
+  have "\<exists> j. j \<in>\<^sub>c one\<Coprod>(one\<Coprod>one) \<and> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) \<circ>\<^sub>c j = \<langle>p,\<t>\<rangle>"
     by (typecheck_cfuncs, smt (z3) assms comp_associative2 comp_type left_coproj_cfunc_coprod
         left_proj_type right_coproj_cfunc_coprod right_proj_type true_false_only_truth_values)
   then show ?thesis 
@@ -533,7 +521,7 @@ lemma pre_XOR_type[type_rule]:
 lemma pre_XOR_injective:
  "injective(\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)"
  unfolding injective_def
-proof(auto)
+proof(clarify)
   fix x y 
   assume "x \<in>\<^sub>c domain (\<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)" 
   then have x_type: "x \<in>\<^sub>c one\<Coprod>one"  
@@ -584,14 +572,14 @@ proof(auto)
     assume "\<nexists>w. w \<in>\<^sub>c one \<and> x = left_coproj one one \<circ>\<^sub>c w"
     then obtain w where x_def: "w \<in>\<^sub>c one \<and> x = right_coproj one one \<circ>\<^sub>c w"
       using x_form by force
-    then have w_is: "w = id(one)"
+    then have w_is: "w = id one"
       by (typecheck_cfuncs, metis terminal_func_unique x_def)
     have "\<exists> v. v \<in>\<^sub>c one \<and> y = right_coproj one one \<circ>\<^sub>c v"
     proof(rule ccontr)
       assume a2: "\<nexists>v. v \<in>\<^sub>c one \<and> y = right_coproj one one \<circ>\<^sub>c v"
       then obtain v where y_def:  "v \<in>\<^sub>c one \<and> y = left_coproj one one \<circ>\<^sub>c v"
         using y_form by (typecheck_cfuncs, blast)
-      then have "v = id(one)"
+      then have "v = id one"
         by (typecheck_cfuncs, metis terminal_func_unique y_def)
       then have "\<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c left_coproj one one = \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c right_coproj one one"
         using w_is eqs id_right_unit2 x_def y_def by (typecheck_cfuncs, force)
@@ -604,7 +592,7 @@ proof(auto)
     qed
     then obtain v where y_def: "v \<in>\<^sub>c one \<and> y = right_coproj one one \<circ>\<^sub>c v"
       by blast
-    then have "v = id(one)"
+    then have "v = id one"
       by (typecheck_cfuncs, metis terminal_func_unique)
     then show ?thesis
       by (simp add: w_is x_def y_def)
@@ -719,7 +707,7 @@ lemma pre_NAND_type[type_rule]:
 lemma pre_NAND_injective:
   "injective(\<langle>\<f>, \<f>\<rangle> \<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg> \<langle>\<f>, \<t>\<rangle>))"
   unfolding injective_def
-proof(auto)
+proof(clarify)
   fix x y 
   assume x_type: "x \<in>\<^sub>c domain (\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)" 
   then have x_type': "x \<in>\<^sub>c one \<Coprod> (one\<Coprod>one)"  
@@ -883,7 +871,7 @@ lemma NAND_true_implies_one_is_false:
   assumes "p \<in>\<^sub>c \<Omega>" 
   assumes "q \<in>\<^sub>c \<Omega>"
   assumes "NAND \<circ>\<^sub>c \<langle>p,q\<rangle> = \<t>"
-  shows "(p = \<f>) \<or> (q = \<f>)"
+  shows "p = \<f> \<or> q = \<f>"
   by (metis (no_types) NAND_true_true_is_false assms true_false_only_truth_values)
 
 lemma NOT_AND_is_NAND:
@@ -921,7 +909,7 @@ lemma pre_IFF_type[type_rule]:
 lemma pre_IFF_injective:
  "injective(\<langle>\<t>, \<t>\<rangle> \<amalg>\<langle>\<f>, \<f>\<rangle>)"
  unfolding injective_def
-proof(auto)
+proof(clarify)
   fix x y 
   assume "x \<in>\<^sub>c domain (\<langle>\<t>, \<t>\<rangle> \<amalg>\<langle>\<f>, \<f>\<rangle>)" 
   then have x_type: "x \<in>\<^sub>c (one\<Coprod>one)"  
@@ -964,7 +952,7 @@ proof(auto)
     qed
     then obtain v where y_def: "v \<in>\<^sub>c one \<and> y = left_coproj one one \<circ>\<^sub>c v"
       by blast
-    then have "v = id(one)"
+    then have "v = id one"
       by (typecheck_cfuncs, metis terminal_func_unique)
     then show ?thesis
       by (simp add: \<open>w = id\<^sub>c one\<close> x_def y_def)
@@ -972,14 +960,14 @@ proof(auto)
     assume "\<nexists>w. w \<in>\<^sub>c one \<and> x = left_coproj one one \<circ>\<^sub>c w"
     then obtain w where x_def: "w \<in>\<^sub>c one \<and> x = right_coproj one one \<circ>\<^sub>c w"
       using x_form by force
-    then have "w = id(one)"
+    then have "w = id one"
       by (typecheck_cfuncs, metis terminal_func_unique x_def)
     have "\<exists> v. v \<in>\<^sub>c one \<and> y = right_coproj one one \<circ>\<^sub>c v"
     proof(rule ccontr)
       assume a2: "\<nexists>v. v \<in>\<^sub>c one \<and> y = right_coproj one one \<circ>\<^sub>c v"
       then obtain v where y_def:  "v \<in>\<^sub>c one \<and> y = left_coproj one one \<circ>\<^sub>c v"
         using y_form by (typecheck_cfuncs, blast)
-      then have "v = id(one)"
+      then have "v = id one"
         by (typecheck_cfuncs, metis terminal_func_unique y_def)
       then have "\<langle>\<t>, \<t>\<rangle> \<amalg>\<langle>\<f>, \<f>\<rangle> \<circ>\<^sub>c left_coproj one one = \<langle>\<t>, \<t>\<rangle> \<amalg>\<langle>\<f>, \<f>\<rangle> \<circ>\<^sub>c right_coproj one one"
         using \<open>v = id\<^sub>c one\<close> \<open>w = id\<^sub>c one\<close> eqs id_right_unit2 x_def y_def by (typecheck_cfuncs, force)
@@ -992,7 +980,7 @@ proof(auto)
     qed
     then obtain v where y_def: "v \<in>\<^sub>c one \<and> y = (right_coproj one one) \<circ>\<^sub>c v"
       by blast
-    then have "v = id(one)"
+    then have "v = id one"
       by (typecheck_cfuncs, metis terminal_func_unique)
     then show ?thesis
       by (simp add: \<open>w = id\<^sub>c one\<close> x_def y_def)
@@ -1153,7 +1141,7 @@ lemma pre_IMPLIES_type[type_rule]:
 lemma pre_IMPLIES_injective:
   "injective(\<langle>\<t>, \<t>\<rangle> \<amalg> (\<langle>\<f>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>))"
   unfolding injective_def
-proof(auto)
+proof(clarify)
   fix x y 
   assume a1: "x \<in>\<^sub>c domain (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>)" 
   then have x_type[type_rule]: "x \<in>\<^sub>c (one\<Coprod>(one\<Coprod>one))"  
@@ -1532,10 +1520,10 @@ lemma IMPLIES_implies_implies:
   assumes P_type[type_rule]: "P : X \<rightarrow> \<Omega>" and Q_type[type_rule]: "Q : Y \<rightarrow> \<Omega>"
   assumes X_nonempty: "\<exists>x. x \<in>\<^sub>c X"
   assumes IMPLIES_true: "IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-  shows "(P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<Longrightarrow> (Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
+  shows "P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<Longrightarrow> Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
 proof -
   obtain z where z_type[type_rule]: "z : X \<times>\<^sub>c Y \<rightarrow> one \<Coprod> one \<Coprod> one"
-    and z_eq: "(P \<times>\<^sub>f Q) = (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c z"
+    and z_eq: "P \<times>\<^sub>f Q = (\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle>) \<circ>\<^sub>c z"
     using IMPLIES_is_pullback unfolding is_pullback_def
     by (auto, typecheck_cfuncs, metis IMPLIES_true terminal_func_type)  
   assume P_true: "P = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>"
@@ -1557,9 +1545,9 @@ proof -
     obtain x where x_in_X[type_rule]: "x \<in>\<^sub>c X"
       using X_nonempty by blast
 
-    have "(z \<circ>\<^sub>c \<langle>x,y\<rangle> = left_coproj one (one \<Coprod> one))
-        \<or> (z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one)
-        \<or> (z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one)"
+    have "z \<circ>\<^sub>c \<langle>x,y\<rangle> = left_coproj one (one \<Coprod> one)
+        \<or> z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c left_coproj one one
+        \<or> z \<circ>\<^sub>c \<langle>x,y\<rangle> = right_coproj one (one \<Coprod> one) \<circ>\<^sub>c right_coproj one one"
       by (typecheck_cfuncs, smt comp_associative2 coprojs_jointly_surj one_unique_element)
     then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
     proof auto
@@ -1677,6 +1665,4 @@ lemma deMorgan_Law2:
   shows "NOT \<circ>\<^sub>c AND \<circ>\<^sub>c \<langle>p,q\<rangle> = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c p, NOT \<circ>\<^sub>c q\<rangle>"
   by (metis AND_complementary AND_idempotent NOT_false_is_true NOT_true_is_false OR_complementary OR_false_false_is_false OR_idempotent assms true_false_only_truth_values true_func_type)
  
-
-
 end

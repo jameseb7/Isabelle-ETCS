@@ -22,7 +22,7 @@ lemma Lawveres_fixed_point_theorem:
   assumes p_type[type_rule]: "p : X \<rightarrow> A\<^bsup>X\<^esup>"
   assumes p_surj: "surjective p"
   shows "fixed_point_property A"
-proof(unfold fixed_point_property_def has_fixed_point_def ,auto) 
+proof(unfold fixed_point_property_def has_fixed_point_def, clarify) 
   fix g 
   assume g_type[type_rule]: "g : A \<rightarrow> A"
   obtain \<phi> where \<phi>_def: "\<phi> = p\<^sup>\<flat>"
@@ -73,8 +73,8 @@ qed
 
 text \<open>The theorem below corresponds to Theorem 2.6.14 in Halvorson.\<close>
 theorem Cantors_Negative_Theorem:
-  "\<nexists> s. s : X \<rightarrow> \<P> X \<and> surjective(s)"
-proof(rule ccontr, auto)
+  "\<nexists> s. s : X \<rightarrow> \<P> X \<and> surjective s"
+proof(rule ccontr, clarify)
   fix s 
   assume s_type: "s : X \<rightarrow> \<P> X"
   assume s_surj: "surjective s"
@@ -82,9 +82,9 @@ proof(rule ccontr, auto)
     using Lawveres_fixed_point_theorem powerset_def s_type by auto
   have Omega_doesnt_have_ffp: "\<not>(fixed_point_property \<Omega>)"
   proof(unfold fixed_point_property_def has_fixed_point_def fixed_point_def, auto)   
-    have  "NOT : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. (\<forall>A. a \<in>\<^sub>c A \<longrightarrow> NOT : A \<rightarrow> A \<longrightarrow> NOT \<circ>\<^sub>c a \<noteq> a) \<or> \<not> a \<in>\<^sub>c \<Omega>)"
+    have  "NOT : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. \<forall>A. a \<in>\<^sub>c A \<longrightarrow> NOT : A \<rightarrow> A \<longrightarrow> NOT \<circ>\<^sub>c a \<noteq> a \<or> \<not> a \<in>\<^sub>c \<Omega>)"
       by (typecheck_cfuncs, metis AND_complementary AND_idempotent OR_complementary OR_idempotent true_false_distinct)
-    then show "\<exists>g. g : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. (\<forall>A. a \<in>\<^sub>c A \<longrightarrow> g : A \<rightarrow> A \<longrightarrow> g \<circ>\<^sub>c a \<noteq> a))"
+    then show "\<exists>g. g : \<Omega> \<rightarrow> \<Omega> \<and> (\<forall>a. \<forall>A. a \<in>\<^sub>c A \<longrightarrow> g : A \<rightarrow> A \<longrightarrow> g \<circ>\<^sub>c a \<noteq> a)"
       by (metis cfunc_type_def)
   qed
   show False
@@ -99,7 +99,7 @@ proof -
     by typecheck_cfuncs
   have "injective(eq_pred X\<^sup>\<sharp>)"
     unfolding injective_def
-  proof (auto)
+  proof (clarify)
     fix x y 
     assume "x \<in>\<^sub>c domain (eq_pred X\<^sup>\<sharp>)" then have x_type[type_rule]: "x \<in>\<^sub>c X"
       using cfunc_type_def eq_pred_sharp_type by auto
@@ -140,8 +140,8 @@ corollary
   by (metis epi_is_surj injective_imp_monomorphism iso_imp_epi_and_monic)
 
 corollary Generalized_Cantors_Positive_Theorem:
-  assumes "\<not>(terminal_object Y)"
-  assumes "\<not>(initial_object Y)"
+  assumes "\<not> terminal_object Y"
+  assumes "\<not> initial_object Y"
   shows "X  \<le>\<^sub>c Y\<^bsup>X\<^esup>"
 proof - 
   have "\<Omega> \<le>\<^sub>c Y"
@@ -155,13 +155,13 @@ proof -
 qed
 
 corollary Generalized_Cantors_Negative_Theorem:
-  assumes "\<not>(initial_object X)"
-  assumes "\<not>(terminal_object Y)"
-  shows "\<nexists> s. s : X \<rightarrow> Y\<^bsup>X\<^esup> \<and> surjective(s)"
-proof(rule ccontr, auto) 
+  assumes "\<not> initial_object X"
+  assumes "\<not> terminal_object Y"
+  shows "\<nexists> s. s : X \<rightarrow> Y\<^bsup>X\<^esup> \<and> surjective s"
+proof(rule ccontr, clarify) 
   fix s 
   assume s_type: "s : X \<rightarrow> Y\<^bsup>X\<^esup>"
-  assume s_surj: "surjective(s)"
+  assume s_surj: "surjective s"
   obtain m where m_type: "m : Y\<^bsup>X\<^esup> \<rightarrow> X" and m_mono: "monomorphism(m)"
     by (meson epis_give_monos s_surj s_type surjective_is_epimorphism)
   have "nonempty X"

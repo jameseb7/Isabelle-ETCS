@@ -163,7 +163,7 @@ lemma is_odd_successor:
 
 lemma is_even_not_is_odd:
   "is_even = NOT \<circ>\<^sub>c is_odd"
-proof (typecheck_cfuncs, rule natural_number_object_func_unique[where f="NOT", where X="\<Omega>"], auto)
+proof (typecheck_cfuncs, rule natural_number_object_func_unique[where f="NOT", where X="\<Omega>"], clarify)
   show "is_even \<circ>\<^sub>c zero = (NOT \<circ>\<^sub>c is_odd) \<circ>\<^sub>c zero"
     by (typecheck_cfuncs, metis NOT_false_is_true cfunc_type_def comp_associative is_even_def2 is_odd_def2)
 
@@ -176,7 +176,7 @@ qed
 
 lemma is_odd_not_is_even:
   "is_odd = NOT \<circ>\<^sub>c is_even"
-proof (typecheck_cfuncs, rule natural_number_object_func_unique[where f="NOT", where X="\<Omega>"], auto)
+proof (typecheck_cfuncs, rule natural_number_object_func_unique[where f="NOT", where X="\<Omega>"], clarify)
   show "is_odd \<circ>\<^sub>c zero = (NOT \<circ>\<^sub>c is_even) \<circ>\<^sub>c zero"
     by (typecheck_cfuncs, metis NOT_true_is_false cfunc_type_def comp_associative is_even_def2 is_odd_def2)
 
@@ -194,7 +194,7 @@ lemma not_even_and_odd:
 
 lemma even_or_odd:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(is_even \<circ>\<^sub>c n = \<t>) \<or> (is_odd \<circ>\<^sub>c n = \<t>)"
+  shows "is_even \<circ>\<^sub>c n = \<t> \<or> is_odd \<circ>\<^sub>c n = \<t>"
   by (typecheck_cfuncs, metis NOT_false_is_true NOT_type comp_associative2 is_even_not_is_odd true_false_only_truth_values assms)
 
 lemma is_even_nth_even_true:
@@ -349,7 +349,6 @@ proof -
     proof auto
       fix x
       assume x_type[type_rule]: "x \<in>\<^sub>c \<nat>\<^sub>c"
-
       assume "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c x = \<t>"
       then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c x = \<t>"
         by (typecheck_cfuncs, simp add: comp_associative2)
@@ -574,7 +573,7 @@ lemma halve_with_parity_nth_even_nth_odd:
 
 lemma even_odd_iso:
   "isomorphism (nth_even \<amalg> nth_odd)"
-proof (unfold isomorphism_def, rule_tac x=halve_with_parity in exI, auto)
+proof (unfold isomorphism_def, rule_tac x=halve_with_parity in exI, safe)
   show "domain halve_with_parity = codomain (nth_even \<amalg> nth_odd)"
     by (typecheck_cfuncs, unfold cfunc_type_def, auto)
   show "codomain halve_with_parity = domain (nth_even \<amalg> nth_odd)"
@@ -587,7 +586,7 @@ qed
 
 lemma halve_with_parity_iso:
   "isomorphism halve_with_parity"
-proof (unfold isomorphism_def, rule_tac x="nth_even \<amalg> nth_odd" in exI, auto)
+proof (unfold isomorphism_def, rule_tac x="nth_even \<amalg> nth_odd" in exI, safe)
   show "domain (nth_even \<amalg> nth_odd) = codomain halve_with_parity"
     by (typecheck_cfuncs, unfold cfunc_type_def, auto)
   show "codomain (nth_even \<amalg> nth_odd) = domain halve_with_parity"
@@ -723,25 +722,27 @@ proof -
       \<or> (\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> halve_with_parity \<circ>\<^sub>c n = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m)"
     by (rule coprojs_jointly_surj, insert assms, typecheck_cfuncs)
   then show ?thesis
-  proof auto
-    fix m
-    assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
-    assume "halve_with_parity \<circ>\<^sub>c n = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
+  proof 
+    assume "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> halve_with_parity \<circ>\<^sub>c n = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
+    then obtain m where m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and m_def: "halve_with_parity \<circ>\<^sub>c n = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
+      by auto
     then have "((nth_even \<amalg> nth_odd) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c n = ((nth_even \<amalg> nth_odd) \<circ>\<^sub>c left_coproj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c m"
       by (typecheck_cfuncs, smt assms comp_associative2)
     then have "n = nth_even \<circ>\<^sub>c m"
       using assms by (typecheck_cfuncs_prems, smt comp_associative2 halve_with_parity_nth_even id_left_unit2 nth_even_nth_odd_halve_with_parity)
-    then show "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n"
+    then have "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n"
       using m_type by auto
+    then show ?thesis
+      by simp
   next
-    fix m
-    assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
-    assume "halve_with_parity \<circ>\<^sub>c n = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
+    assume "\<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> halve_with_parity \<circ>\<^sub>c n = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
+    then obtain m where m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and m_def: "halve_with_parity \<circ>\<^sub>c n = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
+      by auto
     then have "((nth_even \<amalg> nth_odd) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c n = ((nth_even \<amalg> nth_odd) \<circ>\<^sub>c right_coproj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c m"
       by (typecheck_cfuncs, smt assms comp_associative2)
     then have "n = nth_odd \<circ>\<^sub>c m"
       using assms by (typecheck_cfuncs_prems, smt comp_associative2 halve_with_parity_nth_odd id_left_unit2 nth_even_nth_odd_halve_with_parity)
-    then show "\<forall>m. m \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow> nth_odd \<circ>\<^sub>c m \<noteq> n \<Longrightarrow> \<exists>m. m \<in>\<^sub>c \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c m = n"
+    then show ?thesis
       using m_type by auto
   qed
 qed

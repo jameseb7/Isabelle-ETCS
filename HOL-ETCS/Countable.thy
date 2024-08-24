@@ -9,7 +9,7 @@ definition epi_countable :: "cset \<Rightarrow> bool" where
   "epi_countable X \<longleftrightarrow> (\<exists> f. f : \<nat>\<^sub>c \<rightarrow> X \<and> epimorphism f)"
 
 lemma emptyset_is_not_epi_countable:
-  "\<not> (epi_countable \<emptyset>)"
+  "\<not> epi_countable \<emptyset>"
   using comp_type emptyset_is_empty epi_countable_def zero_type by blast
 
 text \<open>The fact that the empty set is not countable according to the definition from Halvorson
@@ -27,12 +27,12 @@ lemma emptyset_is_countable:
   using countable_def empty_subset subobject_of_def2 by blast
 
 lemma natural_numbers_are_countably_infinite:
-  "(countable \<nat>\<^sub>c) \<and> (is_infinite \<nat>\<^sub>c)"
+  "countable \<nat>\<^sub>c \<and> is_infinite \<nat>\<^sub>c"
   by (meson CollectI Peano's_Axioms countable_def injective_imp_monomorphism is_infinite_def successor_type)
 
 lemma iso_to_N_is_countably_infinite:
   assumes "X \<cong> \<nat>\<^sub>c"
-  shows "(countable X) \<and> (is_infinite X)"
+  shows "countable X \<and> is_infinite X"
   by (meson assms countable_def is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic isomorphic_is_symmetric larger_than_infinite_is_infinite natural_numbers_are_countably_infinite)
 
 lemma smaller_than_countable_is_countable:

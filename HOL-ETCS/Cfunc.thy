@@ -139,7 +139,7 @@ lemma comp_monic_imp_monic:
   assumes "domain g = codomain f"
   shows "monomorphism (g \<circ>\<^sub>c f) \<Longrightarrow> monomorphism f"
   unfolding monomorphism_def
-proof auto
+proof clarify
   fix s t
   assume gf_monic: "\<forall>s. \<forall>t. 
     codomain s = domain (g \<circ>\<^sub>c f) \<and> codomain t = domain (g \<circ>\<^sub>c f) \<longrightarrow>
@@ -164,7 +164,7 @@ lemma composition_of_monic_pair_is_monic:
   assumes "codomain f = domain g"
   shows "monomorphism f \<Longrightarrow> monomorphism g \<Longrightarrow> monomorphism (g \<circ>\<^sub>c f)"
   unfolding monomorphism_def
-proof safe
+proof clarify
   fix h k
   assume f_mono: "\<forall>s t. 
     codomain s = domain f \<and> codomain t = domain f \<longrightarrow> f \<circ>\<^sub>c s = f \<circ>\<^sub>c t \<longrightarrow> s = t"
@@ -206,7 +206,7 @@ lemma comp_epi_imp_epi:
   assumes "domain g = codomain f"
   shows "epimorphism (g \<circ>\<^sub>c f) \<Longrightarrow> epimorphism g"
   unfolding epimorphism_def
-proof safe
+proof clarify
   fix s t
   assume gf_epi: "\<forall>s. \<forall>t.
     domain s = codomain (g \<circ>\<^sub>c f) \<and> domain t = codomain (g \<circ>\<^sub>c f) \<longrightarrow>
@@ -226,7 +226,7 @@ lemma composition_of_epi_pair_is_epi:
 assumes "codomain f = domain g"
   shows "epimorphism f \<Longrightarrow> epimorphism g \<Longrightarrow> epimorphism (g \<circ>\<^sub>c f)"
   unfolding epimorphism_def
-proof auto
+proof clarify
   fix h k
   assume f_epi :"\<forall> s h.
     (domain(s) = codomain(f) \<and> domain(h) = codomain(f)) \<longrightarrow> (s \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> s = h)"
@@ -270,7 +270,7 @@ definition inverse :: "cfunc \<Rightarrow> cfunc" ("_\<^bold>\<inverse>" [1000] 
 lemma inverse_def2:
   assumes "isomorphism(f)"
   shows "f\<^bold>\<inverse> : codomain(f) \<rightarrow> domain(f) \<and> f\<^bold>\<inverse> \<circ>\<^sub>c f = id(domain(f)) \<and> f \<circ>\<^sub>c f\<^bold>\<inverse> = id(codomain(f))"
-proof (unfold inverse_def, rule theI', auto)
+proof (unfold inverse_def, rule theI', safe)
   show "\<exists>g. g : codomain f \<rightarrow> domain f \<and> g \<circ>\<^sub>c f = id\<^sub>c (domain f) \<and> f \<circ>\<^sub>c g = id\<^sub>c (codomain f)"
     using assms unfolding isomorphism_def cfunc_type_def by auto
 next
@@ -308,7 +308,7 @@ lemma inv_idempotent:
   assumes "isomorphism(f)"
   shows "(f\<^bold>\<inverse>)\<^bold>\<inverse> = f"
   by (smt assms cfunc_type_def comp_associative id_left_unit inv_iso inverse_def2)
-  
+
 definition is_isomorphic :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<cong>" 50)  where
   "X \<cong> Y \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> Y \<and> isomorphism(f))"
 
@@ -339,7 +339,7 @@ lemma isomorphic_is_transitive: "(X \<cong> Y \<and> Y \<cong> Z) \<longrightarr
 lemma is_isomorphic_equiv:
   "equiv UNIV {(X, Y). X \<cong> Y}"
   unfolding equiv_def
-proof auto
+proof safe
   show "refl {(x, y). x \<cong> y}"
     unfolding refl_on_def using isomorphic_is_reflexive by auto
 next

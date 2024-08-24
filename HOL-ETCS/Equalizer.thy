@@ -42,7 +42,7 @@ proof -
     using assms equalizer_exists by blast
   then show ?thesis
     unfolding equalizer_def
-  proof (rule_tac x="E" in exI, rule_tac x="m" in exI, auto)
+  proof (rule_tac x="E" in exI, rule_tac x="m" in exI, safe)
     fix X' Y'
     assume f_type2: "f : X' \<rightarrow> Y'"
     assume g_type2: "g : X' \<rightarrow> Y'"
@@ -140,7 +140,7 @@ text \<open>The lemma below corresponds to Exercise 2.1.34 in Halvorson.\<close>
 lemma equalizer_is_monomorphism:
   "equalizer E m f g \<Longrightarrow>  monomorphism(m)"
   unfolding equalizer_def monomorphism_def
-proof safe
+proof clarify
   fix h1 h2 X Y
   assume f_type: "f : X \<rightarrow> Y"
   assume g_type: "g : X \<rightarrow> Y"
@@ -253,7 +253,7 @@ lemma relative_subobject_member:
   assumes "(A,n) \<subseteq>\<^bsub>X\<^esub> (B,m)" "x \<in>\<^sub>c X"
   shows "x \<in>\<^bsub>X\<^esub> (A,n) \<Longrightarrow> x \<in>\<^bsub>X\<^esub> (B,m)"
   using assms unfolding relative_member_def2 relative_subset_def2
-proof safe
+proof clarify
   fix k
   assume m_type: "m : B \<rightarrow> X"
   assume k_type: "k : A \<rightarrow> B"
@@ -315,7 +315,7 @@ lemma inverse_image_mapping_type[type_rule]:
 lemma inverse_image_mapping_eq:
   assumes "m : B \<rightarrow> Y" "f : X \<rightarrow> Y" "monomorphism m"
   shows "f \<circ>\<^sub>c left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m
-    = m \<circ>\<^sub>c right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m"
+      = m \<circ>\<^sub>c right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m"
   using assms cfunc_type_def comp_associative equalizer_def inverse_image_is_equalizer2
   by (typecheck_cfuncs, smt (verit))
 
@@ -329,7 +329,7 @@ lemma inverse_image_monomorphism:
   assumes "m : B \<rightarrow> Y" "f : X \<rightarrow> Y" "monomorphism m"
   shows "monomorphism (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m)"
   using assms
-proof (typecheck_cfuncs, unfold monomorphism_def3, safe)
+proof (typecheck_cfuncs, unfold monomorphism_def3, clarify)
   fix g h A
   assume g_type: "g : A \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>)"
   assume h_type: "h : A \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>)"
@@ -594,7 +594,7 @@ next
   then show "\<exists>j. j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
            fibered_product_right_proj X f g Y \<circ>\<^sub>c j = k \<and> fibered_product_left_proj X f g Y \<circ>\<^sub>c j = h"
     unfolding fibered_product_right_proj_def fibered_product_left_proj_def 
-  proof (auto, rule_tac x=j in exI, auto)
+  proof (clarify, rule_tac x=j in exI, safe)
     fix j
     assume j_type: "j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y"
 
@@ -668,14 +668,13 @@ next
   assume f_g_eq: "f \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
   show "\<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c Y\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y)"
     unfolding relative_member_def factors_through_def
-  proof auto
+  proof (safe)
     show "\<langle>x,y\<rangle> \<in>\<^sub>c X \<times>\<^sub>c Y"
       using assms by typecheck_cfuncs
-    show "monomorphism (fibered_product_morphism X f g Y)"
+    show "monomorphism (snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y))"
       using assms(1,2) fibered_product_morphism_monomorphism by auto
-    show "fibered_product_morphism X f g Y : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<rightarrow> X \<times>\<^sub>c Y"
-      using assms by typecheck_cfuncs
-
+    show "snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y) : fst (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y) \<rightarrow> X \<times>\<^sub>c Y"
+      using assms(1,2) fibered_product_morphism_type by force
     have j_exists: "\<And> Z k h. k : Z \<rightarrow> Y \<Longrightarrow> h : Z \<rightarrow> X \<Longrightarrow> g \<circ>\<^sub>c k = f \<circ>\<^sub>c h \<Longrightarrow>
       (\<exists>!j. j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
             fibered_product_right_proj X f g Y \<circ>\<^sub>c j = k \<and>
@@ -685,10 +684,10 @@ next
     obtain j where j_type: "j \<in>\<^sub>c X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y" and 
       j_projs: "fibered_product_right_proj X f g Y \<circ>\<^sub>c j = y" "fibered_product_left_proj X f g Y \<circ>\<^sub>c j = x"
       using j_exists[where Z=one, where k=y, where h=x] assms f_g_eq by auto
-    show "\<exists>h. h : domain \<langle>x,y\<rangle> \<rightarrow> domain (fibered_product_morphism X f g Y) \<and>
-        fibered_product_morphism X f g Y \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
+    show "\<exists>h. h : domain \<langle>x,y\<rangle> \<rightarrow> domain (snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y)) \<and>
+           snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y) \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
     proof (rule_tac x=j in exI, safe)
-      show "j : domain \<langle>x,y\<rangle> \<rightarrow> domain (fibered_product_morphism X f g Y)"
+      show "j : domain \<langle>x,y\<rangle> \<rightarrow> domain (snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y))"
         using assms j_type cfunc_type_def by (typecheck_cfuncs, auto)
 
       have left_eq: "left_cart_proj X Y \<circ>\<^sub>c fibered_product_morphism X f g Y \<circ>\<^sub>c j = x"
@@ -699,7 +698,7 @@ next
         using j_projs assms j_type comp_associative2
         unfolding fibered_product_right_proj_def by (typecheck_cfuncs, auto)
 
-      show "fibered_product_morphism X f g Y \<circ>\<^sub>c j = \<langle>x,y\<rangle>"
+      show "snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y) \<circ>\<^sub>c j = \<langle>x,y\<rangle>"
         using left_eq right_eq assms j_type by (typecheck_cfuncs, simp add: cfunc_prod_unique)
     qed
   qed
@@ -709,7 +708,7 @@ lemma fibered_product_pair_member2:
   assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> E" "x \<in>\<^sub>c X" "y \<in>\<^sub>c X"
   assumes "g \<circ>\<^sub>c fibered_product_left_proj X f f X = g \<circ>\<^sub>c fibered_product_right_proj X f f X"
   shows "\<forall>x y. x \<in>\<^sub>c X \<longrightarrow> y \<in>\<^sub>c X \<longrightarrow> \<langle>x,y\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X, fibered_product_morphism X f f X) \<longrightarrow> g \<circ>\<^sub>c x = g \<circ>\<^sub>c y"
-proof(safe)
+proof(clarify)
   fix x y  
   assume x_type[type_rule]: "x \<in>\<^sub>c X"
   assume y_type[type_rule]: "y \<in>\<^sub>c X"
@@ -739,7 +738,7 @@ text \<open>The three lemmas below correspond to Exercise 2.1.44 in Halvorson.\<
 lemma kern_pair_proj_iso_TFAE1:
   assumes "f: X \<rightarrow> Y" "monomorphism f"
   shows "(fibered_product_left_proj X f f X) = (fibered_product_right_proj X f f X)"
-proof (cases "\<exists>x. x\<in>\<^sub>c X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub>X", safe)
+proof (cases "\<exists>x. x\<in>\<^sub>c X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub>X", clarify)
   fix x
   assume x_type: "x\<in>\<^sub>c X\<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub>X"
   then have "(f \<circ>\<^sub>c (fibered_product_left_proj X f f X))\<circ>\<^sub>c x = (f\<circ>\<^sub>c (fibered_product_right_proj X f f X))\<circ>\<^sub>c x"
@@ -763,7 +762,7 @@ lemma kern_pair_proj_iso_TFAE2:
 proof safe
   have "injective f"
     unfolding injective_def
-  proof safe
+  proof clarify
     fix x y
     assume x_type: "x \<in>\<^sub>c domain f" and y_type: "y \<in>\<^sub>c domain f"
     then have x_type2: "x \<in>\<^sub>c X" and y_type2: "y \<in>\<^sub>c X"
@@ -862,7 +861,6 @@ next
   then show "isomorphism (fibered_product_right_proj X f f X)"
     unfolding isomorphism_def
     using assms(2) isomorphism_def by auto
-
 qed
 
 lemma kern_pair_proj_iso_TFAE3:
@@ -907,8 +905,7 @@ proof -
       by (typecheck_cfuncs, smt cfunc_type_def comp_associative2 fibered_product_left_proj_def
           fibered_product_morphism_type fibered_product_right_proj_def left_cart_proj_cfunc_prod
           left_cart_proj_type projection_prop right_cart_proj_cfunc_prod right_cart_proj_type x_type xx_assms(2))
-    then show "q0 \<circ>\<^sub>c x = q1 \<circ>\<^sub>c x"
-      
+    then show "q0 \<circ>\<^sub>c x = q1 \<circ>\<^sub>c x"      
       by (smt assms(1) cfunc_type_def codomain_comp comp_associative fibered_product_left_proj_type
           fun_fact id_left_unit2 q0_assms q1_assms xx_assms)
   qed
