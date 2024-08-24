@@ -15,27 +15,27 @@ where
   true_false_distinct: "\<t> \<noteq> \<f>" and
   true_false_only_truth_values: "x \<in>\<^sub>c \<Omega> \<Longrightarrow> x = \<f> \<or> x = \<t>" and
   characteristic_function_exists:
-    "m : B \<rightarrow> X \<Longrightarrow> monomorphism m \<Longrightarrow> \<exists>! \<chi>. is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi>"
+    "m : B \<rightarrow> X \<Longrightarrow> monomorphism m \<Longrightarrow> \<exists>! \<chi>. is_pullback B \<one> X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi>"
 
 definition characteristic_func :: "cfunc \<Rightarrow> cfunc" where
   "characteristic_func m =
-    (THE \<chi>. monomorphism m \<longrightarrow> is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m \<chi>)"
+    (THE \<chi>. monomorphism m \<longrightarrow> is_pullback (domain m) \<one> (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m \<chi>)"
 
 lemma characteristic_func_is_pullback:
   assumes "m : B \<rightarrow> X" "monomorphism m"
-  shows "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+  shows "is_pullback B \<one> X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
 proof -
-  obtain \<chi> where chi_is_pullback: "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi>"
+  obtain \<chi> where chi_is_pullback: "is_pullback B \<one> X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m \<chi>"
     using assms characteristic_function_exists by blast
 
-  have "monomorphism m \<longrightarrow> is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m (characteristic_func m)"
+  have "monomorphism m \<longrightarrow> is_pullback (domain m) \<one> (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m (characteristic_func m)"
   proof (unfold characteristic_func_def, rule theI', rule_tac a=\<chi> in ex1I, clarify)
-    show "is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m \<chi>"
+    show "is_pullback (domain m) \<one> (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m \<chi>"
       using assms(1) cfunc_type_def chi_is_pullback by auto
-    show "\<And>x. monomorphism m \<longrightarrow> is_pullback (domain m) one (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m x \<Longrightarrow> x = \<chi>"
+    show "\<And>x. monomorphism m \<longrightarrow> is_pullback (domain m) \<one> (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m x \<Longrightarrow> x = \<chi>"
       using assms cfunc_type_def characteristic_function_exists chi_is_pullback by fastforce
   qed
-  then show "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+  then show "is_pullback B \<one> X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
     using assms cfunc_type_def by auto
 qed
 
@@ -43,7 +43,7 @@ lemma characteristic_func_type[type_rule]:
   assumes "m : B \<rightarrow> X" "monomorphism m"
   shows "characteristic_func m : X \<rightarrow> \<Omega>"
 proof -
-  have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+  have "is_pullback B \<one> X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
     using assms by (rule characteristic_func_is_pullback)
   then show "characteristic_func m : X \<rightarrow> \<Omega>"
     unfolding is_pullback_def by auto
@@ -78,9 +78,9 @@ lemma characteristic_func_true_relative_member:
   assumes characteristic_func_true: "characteristic_func m \<circ>\<^sub>c x = \<t>"
   shows "x \<in>\<^bsub>X\<^esub> (B,m)"
 proof (insert assms, unfold relative_member_def2 factors_through_def, clarify)
-  have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+  have "is_pullback B \<one> X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
     by (simp add: assms characteristic_func_is_pullback)
-  then have "\<exists>j. j : one \<rightarrow> B \<and> \<beta>\<^bsub>B\<^esub> \<circ>\<^sub>c j = id one \<and> m \<circ>\<^sub>c j = x"
+  then have "\<exists>j. j : \<one> \<rightarrow> B \<and> \<beta>\<^bsub>B\<^esub> \<circ>\<^sub>c j = id \<one> \<and> m \<circ>\<^sub>c j = x"
     unfolding is_pullback_def using assms by (metis id_right_unit2 id_type true_func_type)
   then show "\<exists>j. j : domain x \<rightarrow> domain m \<and> m \<circ>\<^sub>c j = x"
     using assms(1,3) cfunc_type_def by auto
@@ -97,7 +97,7 @@ proof (insert assms, unfold relative_member_def2 factors_through_def, clarify)
   then have h_type: "h \<in>\<^sub>c B"
     using assms(1,3) cfunc_type_def x_def by auto
 
-  have "is_pullback B one X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
+  have "is_pullback B \<one> X \<Omega> (\<beta>\<^bsub>B\<^esub>) \<t> m (characteristic_func m)"
     by (simp add: assms characteristic_func_is_pullback)
   then have char_m_true: "characteristic_func m \<circ>\<^sub>c m = \<t> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub>"
     unfolding is_pullback_def by auto
@@ -140,9 +140,9 @@ qed
 subsection \<open>Equality Predicate\<close>
 
 definition eq_pred :: "cset \<Rightarrow> cfunc" where
-  "eq_pred X = (THE \<chi>. is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) \<chi>)"
+  "eq_pred X = (THE \<chi>. is_pullback X \<one> (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) \<chi>)"
 
-lemma eq_pred_pullback: "is_pullback X one (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) (eq_pred X)"
+lemma eq_pred_pullback: "is_pullback X \<one> (X \<times>\<^sub>c X) \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> (diagonal X) (eq_pred X)"
   unfolding eq_pred_def
   by (rule the1I2, simp_all add: characteristic_function_exists diag_mono diagonal_type)
 
@@ -154,7 +154,7 @@ lemma eq_pred_square: "eq_pred X \<circ>\<^sub>c diagonal X = \<t> \<circ>\<^sub
   using eq_pred_pullback unfolding is_pullback_def  by auto
 
 lemma eq_pred_iff_eq:
-  assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
+  assumes "x : \<one> \<rightarrow> X" "y : \<one> \<rightarrow> X"
   shows "(x = y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> = \<t>)"
 proof safe
   assume x_eq_y: "x = y"
@@ -169,9 +169,9 @@ proof safe
     by (typecheck_cfuncs, smt comp_associative2 terminal_func_comp terminal_func_type terminal_func_unique id_right_unit2)
 next
   assume "eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<t>"
-  then have "eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<t> \<circ>\<^sub>c id one"
+  then have "eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<t> \<circ>\<^sub>c id \<one>"
     using id_right_unit2 true_func_type by auto
-  then obtain j  where j_type: "j : one \<rightarrow> X" and "diagonal X \<circ>\<^sub>c j = \<langle>x,y\<rangle>"
+  then obtain j  where j_type: "j : \<one> \<rightarrow> X" and "diagonal X \<circ>\<^sub>c j = \<langle>x,y\<rangle>"
     using eq_pred_pullback assms unfolding is_pullback_def by (metis cfunc_prod_type id_type)
   then have "\<langle>j,j\<rangle> = \<langle>x,y\<rangle>"
     using diag_on_elements by auto
@@ -180,7 +180,7 @@ next
 qed
 
 lemma eq_pred_iff_eq_conv:
-  assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
+  assumes "x : \<one> \<rightarrow> X" "y : \<one> \<rightarrow> X"
   shows "(x \<noteq> y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> = \<f>)"
 proof(safe)
   assume "x \<noteq> y"
@@ -192,7 +192,7 @@ next
 qed
 
 lemma eq_pred_iff_eq_conv2:
-  assumes "x : one \<rightarrow> X" "y : one \<rightarrow> X"
+  assumes "x : \<one> \<rightarrow> X" "y : \<one> \<rightarrow> X"
   shows "(x \<noteq> y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> \<noteq> \<t>)"
   using assms eq_pred_iff_eq by presburger
 
@@ -353,7 +353,7 @@ proof -
       using assms(1) cfunc_type_def surj_f surjective_def by auto
     then obtain z where z_def: "z \<in>\<^sub>c Y \<and> f \<circ>\<^sub>c z = g \<circ>\<^sub>c y"
       by blast
-    then have "\<exists>! k. k: one \<rightarrow> A \<and> q0 \<circ>\<^sub>c k = y \<and> q1 \<circ>\<^sub>c k =z"
+    then have "\<exists>! k. k: \<one> \<rightarrow> A \<and> q0 \<circ>\<^sub>c k = y \<and> q1 \<circ>\<^sub>c k =z"
       by (smt (verit, ccfv_threshold) assms(3) cfunc_type_def is_pullback_def y_type)
     then show "\<exists>x. x \<in>\<^sub>c domain q0 \<and> q0 \<circ>\<^sub>c x = y"
       using assms(3) cfunc_type_def is_pullback_def  by auto
@@ -380,7 +380,7 @@ proof -
       using assms(1) cfunc_type_def surj_g surjective_def by auto
     then obtain z where z_def: "z \<in>\<^sub>c X \<and> g \<circ>\<^sub>c z = f \<circ>\<^sub>c y"
       by blast
-    then have "\<exists>! k. k: one \<rightarrow> A \<and> q0 \<circ>\<^sub>c k = z \<and> q1 \<circ>\<^sub>c k =y"
+    then have "\<exists>! k. k: \<one> \<rightarrow> A \<and> q0 \<circ>\<^sub>c k = z \<and> q1 \<circ>\<^sub>c k =y"
       by (smt (verit, ccfv_threshold) assms(3) cfunc_type_def is_pullback_def  y_type)      
     then show "\<exists>x. x \<in>\<^sub>c domain q1 \<and> q1 \<circ>\<^sub>c x = y"
       using assms(3) cfunc_type_def is_pullback_def  by auto
@@ -492,10 +492,10 @@ subsection \<open>Fiber Over an Element and its Connection to the Fibered Produc
 
 text \<open>The definition below corresponds to Definition 2.2.6 in Halvorson.\<close>
 definition fiber :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cset" ("_\<^sup>-\<^sup>1{_}" [100,100]100) where
-  "f\<^sup>-\<^sup>1{y} = (f\<^sup>-\<^sup>1\<lparr>one\<rparr>\<^bsub>y\<^esub>)"
+  "f\<^sup>-\<^sup>1{y} = (f\<^sup>-\<^sup>1\<lparr>\<one>\<rparr>\<^bsub>y\<^esub>)"
 
 definition fiber_morphism :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" where
-  "fiber_morphism f y = left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
+  "fiber_morphism f y = left_cart_proj (domain f) \<one> \<circ>\<^sub>c inverse_image_mapping f \<one> y"
 
 lemma fiber_morphism_type[type_rule]:
   assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
@@ -520,11 +520,11 @@ lemma fiber_morphism_eq:
   assumes "f : X \<rightarrow> Y" "y \<in>\<^sub>c Y"
   shows "f \<circ>\<^sub>c fiber_morphism f y  = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
 proof -
-  have "f \<circ>\<^sub>c fiber_morphism f y = f \<circ>\<^sub>c left_cart_proj (domain f) one \<circ>\<^sub>c inverse_image_mapping f one y"
+  have "f \<circ>\<^sub>c fiber_morphism f y = f \<circ>\<^sub>c left_cart_proj (domain f) \<one> \<circ>\<^sub>c inverse_image_mapping f \<one> y"
     unfolding fiber_morphism_def by auto
-  also have "... = y \<circ>\<^sub>c right_cart_proj X one \<circ>\<^sub>c inverse_image_mapping f one y"
+  also have "... = y \<circ>\<^sub>c right_cart_proj X \<one> \<circ>\<^sub>c inverse_image_mapping f \<one> y"
     using assms cfunc_type_def element_monomorphism inverse_image_mapping_eq by auto
-  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1\<lparr>one\<rparr>\<^bsub>y\<^esub>\<^esub>"
+  also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1\<lparr>\<one>\<rparr>\<^bsub>y\<^esub>\<^esub>"
     using assms by (typecheck_cfuncs, metis element_monomorphism terminal_func_unique)
   also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
     unfolding fiber_def by auto
@@ -562,8 +562,8 @@ qed
 
 lemma fiber_iso_fibered_prod:
   assumes f_type[type_rule]: "f : X \<rightarrow> Y"
-  assumes y_type[type_rule]: "y : one \<rightarrow> Y"
-  shows "f\<^sup>-\<^sup>1{y} \<cong> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>y\<^esub>one"
+  assumes y_type[type_rule]: "y : \<one> \<rightarrow> Y"
+  shows "f\<^sup>-\<^sup>1{y} \<cong> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>y\<^esub>\<one>"
   using element_monomorphism equalizers_isomorphic f_type fiber_def fibered_product_equalizer inverse_image_is_equalizer is_isomorphic_def y_type by moura
 
 lemma fib_prod_left_id_iso:
@@ -881,7 +881,7 @@ proof
     using assms characteristic_func_eq complement_morphism_eq by auto
   then have "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = \<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c m\<^sup>c \<circ>\<^sub>c x'"
     using assms comp_associative2 by (typecheck_cfuncs, smt terminal_func_comp terminal_func_type)
-  then have "\<t> \<circ>\<^sub>c id one = \<f> \<circ>\<^sub>c id one"
+  then have "\<t> \<circ>\<^sub>c id \<one> = \<f> \<circ>\<^sub>c id \<one>"
     using assms by (smt cfunc_type_def comp_associative complement_morphism_type id_type one_unique_element terminal_func_comp terminal_func_type)
   then have "\<t> = \<f>"
     using false_func_type id_right_unit2 true_func_type by auto
@@ -935,15 +935,15 @@ proof -
     using characteristic_func_type m_mono m_type by blast
   obtain \<chi>im where \<chi>im_type[type_rule]: "\<chi>im : B \<rightarrow> \<Omega>" and \<chi>im_def: "\<chi>im = characteristic_func (i \<circ>\<^sub>c m)"
     by (typecheck_cfuncs, simp)
-  have \<chi>im_pullback: "is_pullback C one B \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> (i \<circ>\<^sub>c m) \<chi>im"
+  have \<chi>im_pullback: "is_pullback C \<one> B \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> (i \<circ>\<^sub>c m) \<chi>im"
     using \<chi>im_def characteristic_func_is_pullback comp_type i_type im_mono m_type by blast
-  have "is_pullback C one A \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> m (\<chi>im \<circ>\<^sub>c i)"
+  have "is_pullback C \<one> A \<Omega> (\<beta>\<^bsub>C\<^esub>) \<t> m (\<chi>im \<circ>\<^sub>c i)"
   proof (unfold is_pullback_def, typecheck_cfuncs, safe)
     show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>C\<^esub> = (\<chi>im \<circ>\<^sub>c i) \<circ>\<^sub>c m"
       by (typecheck_cfuncs, etcs_assocr, metis \<chi>im_def characteristic_func_eq comp_type im_mono)
   next
     fix Z k h
-    assume k_type[type_rule]: "k : Z \<rightarrow> one" and h_type[type_rule]: "h : Z \<rightarrow> A"
+    assume k_type[type_rule]: "k : Z \<rightarrow> \<one>" and h_type[type_rule]: "h : Z \<rightarrow> A"
     assume eq: "\<t> \<circ>\<^sub>c k = (\<chi>im \<circ>\<^sub>c i) \<circ>\<^sub>c h"
     then obtain j where j_type[type_rule]: "j : Z \<rightarrow> C" and j_def: "i \<circ>\<^sub>c h = (i \<circ>\<^sub>c m) \<circ>\<^sub>c j"
       using \<chi>im_pullback unfolding is_pullback_def by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 k_type)

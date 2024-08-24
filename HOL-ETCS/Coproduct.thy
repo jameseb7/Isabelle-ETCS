@@ -4,7 +4,7 @@ theory Coproduct
   imports Equivalence
 begin
 
-(* We define our own (ETCS) case_bool later, so we need to hide the HOL one. *)
+(* We define our own (ETCS) case_bool later, so we need to hide the HOL \<one>. *)
 hide_const case_bool
 
 text \<open>The axiomatization below corresponds to Axiom 7 (Coproducts) in Halvorson.\<close>
@@ -265,8 +265,8 @@ proof (clarify, rule ccontr)
 qed
 
 lemma maps_into_1u1:
-  assumes x_type:  "x\<in>\<^sub>c (one \<Coprod> one)"
-  shows "(x = left_coproj one one) \<or> (x = right_coproj one one)"
+  assumes x_type:  "x\<in>\<^sub>c (\<one> \<Coprod> \<one>)"
+  shows "(x = left_coproj \<one> \<one>) \<or> (x = right_coproj \<one> \<one>)"
   using assms by (typecheck_cfuncs, metis coprojs_jointly_surj terminal_func_unique)
 
 lemma coprod_preserves_left_epi:
@@ -378,7 +378,7 @@ next
   then have u_not_left_coproj_x: "u  \<noteq> left_coproj X Y \<circ>\<^sub>c x"
     using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, blast)
   show "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,left_coproj X Y \<circ>\<^sub>c x\<rangle> = (eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c u"
-  proof (cases "\<exists> g. g : one \<rightarrow> X \<and> u = left_coproj X Y \<circ>\<^sub>c g")  
+  proof (cases "\<exists> g. g : \<one> \<rightarrow> X \<and> u = left_coproj X Y \<circ>\<^sub>c g")  
     assume "\<exists>g. g \<in>\<^sub>c X \<and> u = left_coproj X Y \<circ>\<^sub>c g"
     then obtain g where g_type[type_rule]: "g \<in>\<^sub>c X" and g_def: "u = left_coproj X Y \<circ>\<^sub>c g"
       by auto
@@ -445,7 +445,7 @@ next
     using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, blast)
 
   show "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c y\<rangle> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u"
-  proof (cases "\<exists> g. g : one \<rightarrow> Y \<and> u = right_coproj X Y \<circ>\<^sub>c g")
+  proof (cases "\<exists> g. g : \<one> \<rightarrow> Y \<and> u = right_coproj X Y \<circ>\<^sub>c g")
     assume "\<exists>g. g \<in>\<^sub>c Y \<and> u = right_coproj X Y \<circ>\<^sub>c g"
     then obtain g where g_type[type_rule]: "g \<in>\<^sub>c Y" and g_def: "u = right_coproj X Y \<circ>\<^sub>c g"
       by auto
@@ -1042,21 +1042,21 @@ qed
 subsection \<open>Boolean Cases\<close>
 
 definition case_bool :: "cfunc" where
-  "case_bool = (THE f. f : \<Omega> \<rightarrow> (one \<Coprod> one) \<and>  
-    (\<t> \<amalg> \<f>) \<circ>\<^sub>c f = id \<Omega> \<and> f \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (one \<Coprod> one))"
+  "case_bool = (THE f. f : \<Omega> \<rightarrow> (\<one> \<Coprod> \<one>) \<and>  
+    (\<t> \<amalg> \<f>) \<circ>\<^sub>c f = id \<Omega> \<and> f \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (\<one> \<Coprod> \<one>))"
 
 lemma case_bool_def2:
-  "case_bool : \<Omega> \<rightarrow> (one \<Coprod> one) \<and>  
-    (\<t> \<amalg> \<f>) \<circ>\<^sub>c case_bool = id \<Omega> \<and> case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (one \<Coprod> one)"
+  "case_bool : \<Omega> \<rightarrow> (\<one> \<Coprod> \<one>) \<and>  
+    (\<t> \<amalg> \<f>) \<circ>\<^sub>c case_bool = id \<Omega> \<and> case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (\<one> \<Coprod> \<one>)"
 proof (unfold case_bool_def, rule theI', safe)
-  show "\<exists>x. x : \<Omega> \<rightarrow> one \<Coprod> one \<and> \<t> \<amalg> \<f> \<circ>\<^sub>c x = id\<^sub>c \<Omega> \<and> x \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (one \<Coprod> one)"
+  show "\<exists>x. x : \<Omega> \<rightarrow> \<one> \<Coprod> \<one> \<and> \<t> \<amalg> \<f> \<circ>\<^sub>c x = id\<^sub>c \<Omega> \<and> x \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (\<one> \<Coprod> \<one>)"
     using truth_value_set_iso_1u1 unfolding isomorphism_def
     by (auto, rule_tac x=g in exI, typecheck_cfuncs, simp add: cfunc_type_def)
 next
   fix x y
-  assume x_type[type_rule]: "x : \<Omega> \<rightarrow> one \<Coprod> one" and y_type[type_rule]: "y : \<Omega> \<rightarrow> one \<Coprod> one"
+  assume x_type[type_rule]: "x : \<Omega> \<rightarrow> \<one> \<Coprod> \<one>" and y_type[type_rule]: "y : \<Omega> \<rightarrow> \<one> \<Coprod> \<one>"
   assume x_left_inv: "\<t> \<amalg> \<f> \<circ>\<^sub>c x = id\<^sub>c \<Omega>"
-  assume "x \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (one \<Coprod> one)" "y \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (one \<Coprod> one)"
+  assume "x \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (\<one> \<Coprod> \<one>)" "y \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (\<one> \<Coprod> \<one>)"
   then have "x \<circ>\<^sub>c \<t> \<amalg> \<f> = y \<circ>\<^sub>c \<t> \<amalg> \<f>"
     by auto
   then have "x \<circ>\<^sub>c \<t> \<amalg> \<f> \<circ>\<^sub>c x = y \<circ>\<^sub>c \<t> \<amalg> \<f> \<circ>\<^sub>c x"
@@ -1066,11 +1066,11 @@ next
 qed
 
 lemma case_bool_type[type_rule]: 
-  "case_bool : \<Omega> \<rightarrow> one \<Coprod> one"
+  "case_bool : \<Omega> \<rightarrow> \<one> \<Coprod> \<one>"
   using case_bool_def2 by auto
 
 lemma case_bool_true_coprod_false:
-  "case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (one \<Coprod> one)"
+  "case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (\<one> \<Coprod> \<one>)"
   using case_bool_def2 by auto
 
 lemma true_coprod_false_case_bool:
@@ -1083,9 +1083,9 @@ lemma case_bool_iso:
   by (rule_tac x="\<t> \<amalg> \<f>" in exI, typecheck_cfuncs, auto simp add: cfunc_type_def)
 
 lemma case_bool_true_and_false:
-  "(case_bool \<circ>\<^sub>c \<t> = left_coproj one one) \<and> (case_bool \<circ>\<^sub>c \<f> = right_coproj one one)"
+  "(case_bool \<circ>\<^sub>c \<t> = left_coproj \<one> \<one>) \<and> (case_bool \<circ>\<^sub>c \<f> = right_coproj \<one> \<one>)"
 proof -
-  have "(left_coproj one one) \<amalg>  (right_coproj one one) = id(one \<Coprod> one)"
+  have "(left_coproj \<one> \<one>) \<amalg>  (right_coproj \<one> \<one>) = id(\<one> \<Coprod> \<one>)"
     by (simp add: id_coprod)
   also have "... = case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>)"
     by (simp add: case_bool_def2)
@@ -1096,11 +1096,11 @@ proof -
 qed
 
 lemma case_bool_true:
-  "case_bool \<circ>\<^sub>c \<t> = left_coproj one one"
+  "case_bool \<circ>\<^sub>c \<t> = left_coproj \<one> \<one>"
   by (simp add: case_bool_true_and_false)
 
 lemma case_bool_false:
-  "case_bool \<circ>\<^sub>c \<f> = right_coproj one one"
+  "case_bool \<circ>\<^sub>c \<f> = right_coproj \<one> \<one>"
   by (simp add: case_bool_true_and_false)
 
 lemma coprod_case_bool_true:
@@ -1110,7 +1110,7 @@ lemma coprod_case_bool_true:
 proof - 
   have "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<t> = (x1 \<amalg> x2) \<circ>\<^sub>c case_bool \<circ>\<^sub>c \<t>"
     using assms by (typecheck_cfuncs , simp add: comp_associative2)
-  also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c  left_coproj one one"
+  also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c  left_coproj \<one> \<one>"
     using assms case_bool_true by presburger
   also have "... = x1"
     using assms left_coproj_cfunc_coprod by force
@@ -1125,7 +1125,7 @@ lemma coprod_case_bool_false:
 proof - 
   have "(x1 \<amalg> x2 \<circ>\<^sub>c case_bool) \<circ>\<^sub>c \<f> = (x1 \<amalg> x2) \<circ>\<^sub>c case_bool \<circ>\<^sub>c \<f>"
     using assms by (typecheck_cfuncs , simp add: comp_associative2)
-  also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c  right_coproj one one"
+  also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c  right_coproj \<one> \<one>"
     using assms case_bool_false by presburger
   also have "... = x2"
     using assms right_coproj_cfunc_coprod by force
@@ -2345,7 +2345,7 @@ proof -
 qed
 
 lemma oneUone_iso_\<Omega>:
-  "one \<Coprod> one \<cong> \<Omega>"
+  "\<one> \<Coprod> \<one> \<cong> \<Omega>"
   by (meson truth_value_set_iso_1u1 cfunc_coprod_type false_func_type is_isomorphic_def true_func_type)
 
 text \<open>The lemma below is dual to Proposition 2.2.2 in Halvorson.\<close>

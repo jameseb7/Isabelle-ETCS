@@ -301,11 +301,11 @@ proof -
     by (typecheck_cfuncs, simp add: comp_associative2 sharp_comp)
   also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_even \<times>\<^sub>f zero))\<^sup>\<sharp>"
     by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
-  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>cone\<^esub>\<rangle> )\<^sup>\<sharp>"
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<one>\<^esub>\<rangle> )\<^sup>\<sharp>"
     by (typecheck_cfuncs, metis cfunc_cross_prod_def cfunc_type_def right_cart_proj_type terminal_func_unique)
-  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one\<rangle> )\<^sup>\<sharp>"
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>, (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>\<rangle> )\<^sup>\<sharp>"
     by (typecheck_cfuncs, smt comp_associative2 terminal_func_comp)
-  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp>"
     by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
   also have "... = \<t>"
   proof (rule exists_true_implies_EXISTS_true)
@@ -337,11 +337,11 @@ proof -
     by (typecheck_cfuncs, simp add: comp_associative2 sharp_comp)
   also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c (nth_odd \<times>\<^sub>f zero))\<^sup>\<sharp>"
     by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
-  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<times>\<^sub>cone\<^esub>\<rangle> )\<^sup>\<sharp>"
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c \<times>\<^sub>c \<one>\<^esub>\<rangle> )\<^sup>\<sharp>"
     by (typecheck_cfuncs, metis cfunc_cross_prod_def cfunc_type_def right_cart_proj_type terminal_func_unique)
-  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one, (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one\<rangle> )\<^sup>\<sharp>"
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>, (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>\<rangle> )\<^sup>\<sharp>"
     by (typecheck_cfuncs, smt comp_associative2 terminal_func_comp)
-  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
+  also have "... = EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp>"
     by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
   also have "... = \<f>"
   proof -
@@ -361,9 +361,9 @@ proof -
       then show False
         by (typecheck_cfuncs_prems, smt comp_associative2 comp_type nth_even_def2 nth_odd_is_succ_nth_even successor_type zero_is_not_successor)
     qed
-    then have "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> \<noteq> \<t>"
+    then have "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> \<noteq> \<t>"
       using EXISTS_true_implies_exists_true by (typecheck_cfuncs, blast)
-    then show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> = \<f>"
+    then show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> = \<f>"
       using true_false_only_truth_values by (typecheck_cfuncs, blast)
   qed
   then show ?thesis

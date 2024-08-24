@@ -26,6 +26,14 @@ definition is_cart_prod :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Right
       (\<exists> h. h : Z \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h = f \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h = g \<and>
         (\<forall> h2. (h2 : Z \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h2 = f \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h2 = g) \<longrightarrow> h2 = h))))"
 
+lemma is_cart_prod_def2:
+  assumes "\<pi>\<^sub>0 : W \<rightarrow> X" "\<pi>\<^sub>1 : W \<rightarrow> Y"
+  shows "is_cart_prod W \<pi>\<^sub>0 \<pi>\<^sub>1 X Y \<longleftrightarrow> 
+    (\<forall> f g Z. (f : Z \<rightarrow> X \<and> g : Z \<rightarrow> Y) \<longrightarrow> 
+      (\<exists> h. h : Z \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h = f \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h = g \<and>
+        (\<forall> h2. (h2 : Z \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h2 = f \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h2 = g) \<longrightarrow> h2 = h)))"
+  unfolding is_cart_prod_def using assms by auto
+
 abbreviation is_cart_prod_triple :: "cset \<times> cfunc \<times> cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" where
   "is_cart_prod_triple W\<pi> X Y \<equiv> is_cart_prod (fst W\<pi>) (fst (snd W\<pi>)) (snd (snd W\<pi>)) X Y"
 

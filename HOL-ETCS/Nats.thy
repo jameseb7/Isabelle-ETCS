@@ -13,18 +13,18 @@ axiomatization
   zero_type[type_rule]: "zero \<in>\<^sub>c \<nat>\<^sub>c" and 
   successor_type[type_rule]: "successor: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c" and 
   natural_number_object_property: 
-  "q : one \<rightarrow> X \<Longrightarrow> f: X \<rightarrow> X \<Longrightarrow>
+  "q : \<one> \<rightarrow> X \<Longrightarrow> f: X \<rightarrow> X \<Longrightarrow>
    (\<exists>!u. u: \<nat>\<^sub>c \<rightarrow> X \<and>
    q = u \<circ>\<^sub>c zero \<and>
    f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
 
 lemma beta_N_succ_nEqs_Id1:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n = id one"
+  shows "\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n = id \<one>"
   by (typecheck_cfuncs, simp add: terminal_func_comp_elem)
 
 lemma natural_number_object_property2:
-  assumes "q : one \<rightarrow> X" "f: X \<rightarrow> X"
+  assumes "q : \<one> \<rightarrow> X" "f: X \<rightarrow> X"
   shows "\<exists>!u. u: \<nat>\<^sub>c \<rightarrow> X \<and> u \<circ>\<^sub>c zero = q \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
   using assms natural_number_object_property[where q=q, where f=f, where X=X]
   by metis
@@ -38,7 +38,7 @@ lemma natural_number_object_func_unique:
   by (smt (verit, best) comp_type f_type natural_number_object_property2 u_successor_eq u_type v_successor_eq v_type zero_type zeros_eq)
 
 definition is_NNO :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> bool"  where
-   "is_NNO Y z s \<longleftrightarrow>(z: one \<rightarrow> Y \<and> s: Y \<rightarrow> Y  \<and> (\<forall> X f q. ((q : one \<rightarrow> X) \<and> (f: X \<rightarrow> X))\<longrightarrow>
+   "is_NNO Y z s \<longleftrightarrow>(z: \<one> \<rightarrow> Y \<and> s: Y \<rightarrow> Y  \<and> (\<forall> X f q. ((q : \<one> \<rightarrow> X) \<and> (f: X \<rightarrow> X))\<longrightarrow>
    (\<exists>!u. u: Y \<rightarrow> X \<and>
    q = u \<circ>\<^sub>c z \<and>
    f \<circ>\<^sub>c u = u \<circ>\<^sub>c s)))"
@@ -52,7 +52,7 @@ lemma NNOs_are_iso_N:
   assumes "is_NNO N z s"
   shows "N \<cong> \<nat>\<^sub>c"
 proof-
-  have z_type[type_rule]: "(z : one \<rightarrow>  N)" 
+  have z_type[type_rule]: "(z : \<one> \<rightarrow>  N)" 
     using assms is_NNO_def by blast
   have s_type[type_rule]: "(s : N \<rightarrow>  N)"
     using assms is_NNO_def by blast 
@@ -101,7 +101,7 @@ proof -
   have "is_NNO N z s"
   proof(unfold is_NNO_def, typecheck_cfuncs)
     fix X q f 
-    assume q_type[type_rule]: "q: one \<rightarrow> X"
+    assume q_type[type_rule]: "q: \<one> \<rightarrow> X"
     assume f_type[type_rule]: "f:   X \<rightarrow> X"
 
     obtain u where u_type[type_rule]: "u: \<nat>\<^sub>c \<rightarrow> X" and u_def:  "u \<circ>\<^sub>c zero =  q \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
@@ -195,11 +195,11 @@ text \<open>The lemma below corresponds to Proposition 2.6.6 in Halvorson.\<clos
 lemma oneUN_iso_N_isomorphism:
  "isomorphism(zero \<amalg> successor)" 
 proof - 
-  obtain i0 where i0_type[type_rule]:  "i0: one \<rightarrow> (one \<Coprod> \<nat>\<^sub>c)" and i0_def: "i0 = left_coproj one \<nat>\<^sub>c"
+  obtain i0 where i0_type[type_rule]:  "i0: \<one> \<rightarrow> (\<one> \<Coprod> \<nat>\<^sub>c)" and i0_def: "i0 = left_coproj \<one> \<nat>\<^sub>c"
     by (typecheck_cfuncs, simp)
-  obtain i1 where i1_type[type_rule]:  "i1: \<nat>\<^sub>c \<rightarrow> (one \<Coprod> \<nat>\<^sub>c)" and i1_def: "i1 = right_coproj one \<nat>\<^sub>c"
+  obtain i1 where i1_type[type_rule]:  "i1: \<nat>\<^sub>c \<rightarrow> (\<one> \<Coprod> \<nat>\<^sub>c)" and i1_def: "i1 = right_coproj \<one> \<nat>\<^sub>c"
     by (typecheck_cfuncs, simp)
-  obtain g where g_type[type_rule]: "g: \<nat>\<^sub>c \<rightarrow> (one \<Coprod> \<nat>\<^sub>c)" and
+  obtain g where g_type[type_rule]: "g: \<nat>\<^sub>c \<rightarrow> (\<one> \<Coprod> \<nat>\<^sub>c)" and
    g_triangle: " g \<circ>\<^sub>c zero = i0" and
    g_square: "g \<circ>\<^sub>c successor = ((i1 \<circ>\<^sub>c zero) \<amalg> (i1 \<circ>\<^sub>c successor)) \<circ>\<^sub>c g"
     by (typecheck_cfuncs, metis natural_number_object_property)
@@ -213,13 +213,13 @@ proof -
     by (typecheck_cfuncs, smt (verit, ccfv_SIG) comp_associative2 g_square second_diagram3)
   then have i1_sEqs_i1zUi1s_i1: "i1 \<circ>\<^sub>c successor = ((i1 \<circ>\<^sub>c zero) \<amalg> (i1 \<circ>\<^sub>c successor)) \<circ>\<^sub>c i1"
     by (typecheck_cfuncs, simp add: i1_def right_coproj_cfunc_coprod)   
-  then obtain u where u_type[type_rule]: "(u: \<nat>\<^sub>c \<rightarrow> (one \<Coprod> \<nat>\<^sub>c))" and
+  then obtain u where u_type[type_rule]: "(u: \<nat>\<^sub>c \<rightarrow> (\<one> \<Coprod> \<nat>\<^sub>c))" and
       u_triangle: "u \<circ>\<^sub>c zero = i1 \<circ>\<^sub>c zero" and
       u_square: "u \<circ>\<^sub>c successor =  ((i1 \<circ>\<^sub>c zero) \<amalg> (i1 \<circ>\<^sub>c successor)) \<circ>\<^sub>c u "
     using i1_sEqs_i1zUi1s_i1 by (typecheck_cfuncs, blast)    
   then have u_Eqs_i1: "u=i1"
     by (typecheck_cfuncs, meson cfunc_coprod_type comp_type i1_sEqs_i1zUi1s_i1 natural_number_object_func_unique successor_type zero_type)
-  have g_s_type[type_rule]: "g \<circ>\<^sub>c successor: \<nat>\<^sub>c \<rightarrow> (one \<Coprod> \<nat>\<^sub>c)"
+  have g_s_type[type_rule]: "g \<circ>\<^sub>c successor: \<nat>\<^sub>c \<rightarrow> (\<one> \<Coprod> \<nat>\<^sub>c)"
     by typecheck_cfuncs
   have g_s_triangle: "(g\<circ>\<^sub>c successor) \<circ>\<^sub>c zero = i1 \<circ>\<^sub>c zero"
     using comp_associative2 second_diagram3 by (typecheck_cfuncs, force)
@@ -229,7 +229,7 @@ proof -
     using u_Eqs_i1 by blast
   have eq1: "(zero \<amalg> successor) \<circ>\<^sub>c g = id(\<nat>\<^sub>c)"
     by (typecheck_cfuncs, smt (verit, best) cfunc_coprod_comp comp_associative2 g_square g_triangle i0_def i1_def i1_type id_left_unit2 id_right_unit2 left_coproj_cfunc_coprod natural_number_object_func_unique right_coproj_cfunc_coprod)
-  then have eq2: "g \<circ>\<^sub>c (zero \<amalg> successor) = id(one \<Coprod> \<nat>\<^sub>c)"
+  then have eq2: "g \<circ>\<^sub>c (zero \<amalg> successor) = id(\<one> \<Coprod> \<nat>\<^sub>c)"
     by (typecheck_cfuncs, metis cfunc_coprod_comp g_sEqs_i1 g_triangle i0_def i1_def id_coprod)
   show "isomorphism(zero \<amalg> successor)"
     using cfunc_coprod_type eq1 eq2 g_type isomorphism_def3 successor_type zero_type by blast
@@ -244,9 +244,9 @@ lemma zUs_surj:
   by (simp add: cfunc_type_def epi_is_surj zUs_epic)
 
 lemma nonzero_is_succ_aux:
-  assumes "x \<in>\<^sub>c (one \<Coprod> \<nat>\<^sub>c)"
-  shows "(x = (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one) \<or>
-         (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c) \<and> (x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n))"
+  assumes "x \<in>\<^sub>c (\<one> \<Coprod> \<nat>\<^sub>c)"
+  shows "(x = (left_coproj \<one> \<nat>\<^sub>c) \<circ>\<^sub>c id \<one>) \<or>
+         (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c) \<and> (x = (right_coproj \<one> \<nat>\<^sub>c) \<circ>\<^sub>c n))"
   by(clarify, metis assms coprojs_jointly_surj id_type one_unique_element)
 
 lemma nonzero_is_succ:
@@ -254,28 +254,28 @@ lemma nonzero_is_succ:
   assumes "k \<noteq> zero"
   shows "\<exists>n.(n\<in>\<^sub>c \<nat>\<^sub>c \<and> k = successor \<circ>\<^sub>c n)"
 proof - 
-  have x_exists: "\<exists>x. ((x \<in>\<^sub>c one \<Coprod> \<nat>\<^sub>c) \<and> (zero \<amalg> successor \<circ>\<^sub>c x = k))"
+  have x_exists: "\<exists>x. ((x \<in>\<^sub>c \<one> \<Coprod> \<nat>\<^sub>c) \<and> (zero \<amalg> successor \<circ>\<^sub>c x = k))"
     using assms cfunc_type_def surjective_def zUs_surj by (typecheck_cfuncs, auto)
-  obtain x where x_def: "((x \<in>\<^sub>c one \<Coprod> \<nat>\<^sub>c) \<and> (zero \<amalg> successor \<circ>\<^sub>c x = k))"
+  obtain x where x_def: "((x \<in>\<^sub>c \<one> \<Coprod> \<nat>\<^sub>c) \<and> (zero \<amalg> successor \<circ>\<^sub>c x = k))"
     using x_exists by blast
-  have cases: "(x = (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one) \<or> 
-                (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c \<and> x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n))"
+  have cases: "(x = (left_coproj \<one> \<nat>\<^sub>c) \<circ>\<^sub>c id \<one>) \<or> 
+                (\<exists>n. (n \<in>\<^sub>c \<nat>\<^sub>c \<and> x = (right_coproj \<one> \<nat>\<^sub>c) \<circ>\<^sub>c n))"
     by (simp add: nonzero_is_succ_aux x_def)
-  have not_case_1: "x \<noteq> (left_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c id one"
+  have not_case_1: "x \<noteq> (left_coproj \<one> \<nat>\<^sub>c) \<circ>\<^sub>c id \<one>"
   proof(rule ccontr,clarify)
-    assume bwoc: "x = left_coproj one \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c one"
+    assume bwoc: "x = left_coproj \<one> \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<one>"
     have contradiction: "k = zero"
       by (metis bwoc id_right_unit2 left_coproj_cfunc_coprod left_proj_type successor_type x_def zero_type)
     show False
       using contradiction assms(2) by force
   qed
-  then obtain n where n_def: "n \<in>\<^sub>c \<nat>\<^sub>c \<and> x = (right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n"
+  then obtain n where n_def: "n \<in>\<^sub>c \<nat>\<^sub>c \<and> x = (right_coproj \<one> \<nat>\<^sub>c) \<circ>\<^sub>c n"
     using cases by blast
   then have "k = zero \<amalg> successor \<circ>\<^sub>c x"
     using x_def by blast
-  also have "... = zero \<amalg> successor \<circ>\<^sub>c  right_coproj one \<nat>\<^sub>c \<circ>\<^sub>c n"
+  also have "... = zero \<amalg> successor \<circ>\<^sub>c  right_coproj \<one> \<nat>\<^sub>c \<circ>\<^sub>c n"
     by (simp add: n_def)
-  also have "... =  (zero \<amalg> successor \<circ>\<^sub>c  right_coproj one \<nat>\<^sub>c) \<circ>\<^sub>c n"
+  also have "... =  (zero \<amalg> successor \<circ>\<^sub>c  right_coproj \<one> \<nat>\<^sub>c) \<circ>\<^sub>c n"
     using cfunc_coprod_type cfunc_type_def comp_associative n_def right_proj_type successor_type zero_type by auto
   also have "... = successor \<circ>\<^sub>c n"
     using right_coproj_cfunc_coprod successor_type zero_type by auto
@@ -286,21 +286,21 @@ qed
 subsection \<open>Predecessor\<close>
 
 definition predecessor :: "cfunc" where
-  "predecessor = (THE f. f : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c 
-    \<and> f \<circ>\<^sub>c (zero \<amalg> successor) = id (one \<Coprod> \<nat>\<^sub>c) \<and>  (zero \<amalg> successor) \<circ>\<^sub>c f = id \<nat>\<^sub>c)"
+  "predecessor = (THE f. f : \<nat>\<^sub>c \<rightarrow> \<one> \<Coprod> \<nat>\<^sub>c 
+    \<and> f \<circ>\<^sub>c (zero \<amalg> successor) = id (\<one> \<Coprod> \<nat>\<^sub>c) \<and>  (zero \<amalg> successor) \<circ>\<^sub>c f = id \<nat>\<^sub>c)"
 
 lemma predecessor_def2:
-  "predecessor : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c \<and> predecessor \<circ>\<^sub>c (zero \<amalg> successor) = id (one \<Coprod> \<nat>\<^sub>c)
+  "predecessor : \<nat>\<^sub>c \<rightarrow> \<one> \<Coprod> \<nat>\<^sub>c \<and> predecessor \<circ>\<^sub>c (zero \<amalg> successor) = id (\<one> \<Coprod> \<nat>\<^sub>c)
     \<and> (zero \<amalg> successor) \<circ>\<^sub>c predecessor = id \<nat>\<^sub>c"
 proof (unfold predecessor_def, rule theI', safe)
-  show "\<exists>x. x : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c \<and>
-        x \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (one \<Coprod> \<nat>\<^sub>c) \<and> zero \<amalg> successor \<circ>\<^sub>c x = id\<^sub>c \<nat>\<^sub>c"
+  show "\<exists>x. x : \<nat>\<^sub>c \<rightarrow> \<one> \<Coprod> \<nat>\<^sub>c \<and>
+        x \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (\<one> \<Coprod> \<nat>\<^sub>c) \<and> zero \<amalg> successor \<circ>\<^sub>c x = id\<^sub>c \<nat>\<^sub>c"
     using oneUN_iso_N_isomorphism by (typecheck_cfuncs, unfold isomorphism_def cfunc_type_def, auto)
 next
   fix x y
-  assume x_type[type_rule]: "x : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c" and y_type[type_rule]: "y : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c"
+  assume x_type[type_rule]: "x : \<nat>\<^sub>c \<rightarrow> \<one> \<Coprod> \<nat>\<^sub>c" and y_type[type_rule]: "y : \<nat>\<^sub>c \<rightarrow> \<one> \<Coprod> \<nat>\<^sub>c"
   assume x_left_inv: "zero \<amalg> successor \<circ>\<^sub>c x = id\<^sub>c \<nat>\<^sub>c"
-  assume "x \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (one \<Coprod> \<nat>\<^sub>c)" "y \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (one \<Coprod> \<nat>\<^sub>c)"
+  assume "x \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (\<one> \<Coprod> \<nat>\<^sub>c)" "y \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (\<one> \<Coprod> \<nat>\<^sub>c)"
   then have "x \<circ>\<^sub>c zero \<amalg> successor = y \<circ>\<^sub>c zero \<amalg> successor"
     by auto
   then have "x \<circ>\<^sub>c zero \<amalg> successor \<circ>\<^sub>c x = y \<circ>\<^sub>c zero \<amalg> successor \<circ>\<^sub>c x"
@@ -310,7 +310,7 @@ next
 qed
 
 lemma predecessor_type[type_rule]:
-  "predecessor : \<nat>\<^sub>c \<rightarrow> one \<Coprod> \<nat>\<^sub>c"
+  "predecessor : \<nat>\<^sub>c \<rightarrow> \<one> \<Coprod> \<nat>\<^sub>c"
   by (simp add: predecessor_def2)
 
 lemma predecessor_left_inv:
@@ -318,30 +318,30 @@ lemma predecessor_left_inv:
   by (simp add: predecessor_def2)
 
 lemma predecessor_right_inv:
-  "predecessor \<circ>\<^sub>c (zero \<amalg> successor) = id (one \<Coprod> \<nat>\<^sub>c)"
+  "predecessor \<circ>\<^sub>c (zero \<amalg> successor) = id (\<one> \<Coprod> \<nat>\<^sub>c)"
   by (simp add: predecessor_def2)
 
 lemma predecessor_successor:
-  "predecessor \<circ>\<^sub>c successor = right_coproj one \<nat>\<^sub>c"
+  "predecessor \<circ>\<^sub>c successor = right_coproj \<one> \<nat>\<^sub>c"
 proof -
-  have "predecessor \<circ>\<^sub>c successor = predecessor \<circ>\<^sub>c (zero \<amalg> successor) \<circ>\<^sub>c right_coproj one \<nat>\<^sub>c"
+  have "predecessor \<circ>\<^sub>c successor = predecessor \<circ>\<^sub>c (zero \<amalg> successor) \<circ>\<^sub>c right_coproj \<one> \<nat>\<^sub>c"
     using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
-  also have "... = (predecessor \<circ>\<^sub>c (zero \<amalg> successor)) \<circ>\<^sub>c right_coproj one \<nat>\<^sub>c"
+  also have "... = (predecessor \<circ>\<^sub>c (zero \<amalg> successor)) \<circ>\<^sub>c right_coproj \<one> \<nat>\<^sub>c"
     by (typecheck_cfuncs, auto simp add: comp_associative2)
-  also have "... = right_coproj one \<nat>\<^sub>c"
+  also have "... = right_coproj \<one> \<nat>\<^sub>c"
     by (typecheck_cfuncs, simp add: id_left_unit2 predecessor_def2)
   then show ?thesis
     using calculation by auto
 qed
 
 lemma predecessor_zero:
-  "predecessor \<circ>\<^sub>c zero = left_coproj one \<nat>\<^sub>c"
+  "predecessor \<circ>\<^sub>c zero = left_coproj \<one> \<nat>\<^sub>c"
 proof -
-  have "predecessor \<circ>\<^sub>c zero = predecessor \<circ>\<^sub>c (zero \<amalg> successor) \<circ>\<^sub>c left_coproj one \<nat>\<^sub>c"
+  have "predecessor \<circ>\<^sub>c zero = predecessor \<circ>\<^sub>c (zero \<amalg> successor) \<circ>\<^sub>c left_coproj \<one> \<nat>\<^sub>c"
     using left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
-  also have "... = (predecessor \<circ>\<^sub>c (zero \<amalg> successor)) \<circ>\<^sub>c left_coproj one \<nat>\<^sub>c"
+  also have "... = (predecessor \<circ>\<^sub>c (zero \<amalg> successor)) \<circ>\<^sub>c left_coproj \<one> \<nat>\<^sub>c"
     by (typecheck_cfuncs, auto simp add: comp_associative2)
-  also have "... = left_coproj one \<nat>\<^sub>c"
+  also have "... = left_coproj \<one> \<nat>\<^sub>c"
     by (typecheck_cfuncs, simp add: id_left_unit2 predecessor_def2)
   then show ?thesis
     using calculation by auto
@@ -353,11 +353,11 @@ text \<open>The lemma below corresponds to Proposition 2.6.7 in Halvorson.\<clos
 lemma Peano's_Axioms:
  "injective successor  \<and> \<not> surjective successor"
 proof - 
-  have i1_mono: "monomorphism(right_coproj one \<nat>\<^sub>c)"
+  have i1_mono: "monomorphism(right_coproj \<one> \<nat>\<^sub>c)"
     by (simp add: right_coproj_are_monomorphisms)
   have zUs_iso: "isomorphism(zero \<amalg> successor)"
     using oneUN_iso_N_isomorphism by blast
-  have zUsi1EqsS: "(zero \<amalg> successor) \<circ>\<^sub>c (right_coproj one \<nat>\<^sub>c) = successor"
+  have zUsi1EqsS: "(zero \<amalg> successor) \<circ>\<^sub>c (right_coproj \<one> \<nat>\<^sub>c) = successor"
     using right_coproj_cfunc_coprod successor_type zero_type by auto
   then have succ_mono: "monomorphism(successor)"
     by (metis cfunc_coprod_type cfunc_type_def composition_of_monic_pair_is_monic i1_mono iso_imp_epi_and_monic oneUN_iso_N_isomorphism right_proj_type successor_type zero_type)
@@ -366,7 +366,7 @@ proof -
   have s_not_surj: "\<not> surjective successor"
     proof (rule ccontr, clarify)
       assume BWOC : "surjective successor"
-      obtain n where n_type: "n : one \<rightarrow> \<nat>\<^sub>c" and snEqz: "successor \<circ>\<^sub>c n = zero"
+      obtain n where n_type: "n : \<one> \<rightarrow> \<nat>\<^sub>c" and snEqz: "successor \<circ>\<^sub>c n = zero"
         using BWOC cfunc_type_def successor_type surjective_def zero_type by auto
       then show False
         by (metis zero_is_not_successor)
@@ -443,11 +443,11 @@ qed
 subsection \<open>Function Iteration\<close>
 
 definition ITER_curried :: "cset \<Rightarrow> cfunc" where 
-  "ITER_curried U = (THE u . u : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  u \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp> \<and>
+  "ITER_curried U = (THE u . u : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  u \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) \<one>))\<^sup>\<sharp> \<and>
     ((meta_comp U U U) \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>    \<circ>\<^sub>c u = u \<circ>\<^sub>c successor)"
 
 lemma ITER_curried_def2: 
-"ITER_curried U : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  ITER_curried U \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp> \<and>
+"ITER_curried U : \<nat>\<^sub>c \<rightarrow> (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup> \<and>  ITER_curried U \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) \<one>))\<^sup>\<sharp> \<and>
   ((meta_comp U U U) \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp>    \<circ>\<^sub>c ITER_curried U = ITER_curried U  \<circ>\<^sub>c successor"
   unfolding ITER_curried_def
   by(rule theI', etcs_rule natural_number_object_property2)
@@ -457,7 +457,7 @@ lemma ITER_curried_type[type_rule]:
   by (simp add: ITER_curried_def2)
 
 lemma ITER_curried_zero: 
-  "ITER_curried U \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>"
+  "ITER_curried U \<circ>\<^sub>c zero = (metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) \<one>))\<^sup>\<sharp>"
   by (simp add: ITER_curried_def2)
 
 lemma ITER_curried_successor:
@@ -490,15 +490,15 @@ next
     using assms ITER_def comp_associative2 inv_transpose_func_def3 by (typecheck_cfuncs, auto)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,ITER_curried U \<circ>\<^sub>c zero\<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
-  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,(metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>\<rangle>"
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,(metafunc (id U) \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) \<one>))\<^sup>\<sharp>\<rangle>"
     using assms by (simp add: ITER_curried_def2)   
-  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,((left_cart_proj (U) one)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>\<rangle>"
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z,((left_cart_proj (U) \<one>)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) \<one>))\<^sup>\<sharp>\<rangle>"
     using assms by (typecheck_cfuncs, simp add: id_left_unit2 metafunc_def2)
-  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (id\<^sub>c (U\<^bsup>U\<^esup>) \<times>\<^sub>f  ((left_cart_proj (U) one)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one))\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>f  \<circ>\<^sub>c z,id\<^sub>c one\<rangle>"
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (id\<^sub>c (U\<^bsup>U\<^esup>) \<times>\<^sub>f  ((left_cart_proj (U) \<one>)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) \<one>))\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>f  \<circ>\<^sub>c z,id\<^sub>c \<one>\<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
-  also have "... = (left_cart_proj (U) one)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) one)  \<circ>\<^sub>c \<langle>f  \<circ>\<^sub>c z,id\<^sub>c one\<rangle>"
+  also have "... = (left_cart_proj (U) \<one>)\<^sup>\<sharp> \<circ>\<^sub>c (right_cart_proj (U\<^bsup>U\<^esup>) \<one>)  \<circ>\<^sub>c \<langle>f  \<circ>\<^sub>c z,id\<^sub>c \<one>\<rangle>"
     using assms by (typecheck_cfuncs,simp add: cfunc_type_def comp_associative transpose_func_def)
-  also have "... = (left_cart_proj (U) one)\<^sup>\<sharp>"
+  also have "... = (left_cart_proj (U) \<one>)\<^sup>\<sharp>"
     using assms by (typecheck_cfuncs, simp add: id_right_unit2 right_cart_proj_cfunc_prod)
   also have "... = (metafunc (id\<^sub>c U))"
     using assms by (typecheck_cfuncs, simp add: id_left_unit2 metafunc_def2)
@@ -537,7 +537,7 @@ next
     using assms by(typecheck_cfuncs, metis comp_associative2)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, ((meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp> \<circ>\<^sub>c ITER_curried U) \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
     using assms ITER_curried_successor by presburger
-  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f ((meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp> \<circ>\<^sub>c ITER_curried U) \<circ>\<^sub>c (n  \<circ>\<^sub>c z))\<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, id one\<rangle>"
+  also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f ((meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp> \<circ>\<^sub>c ITER_curried U) \<circ>\<^sub>c (n  \<circ>\<^sub>c z))\<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, id \<one>\<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
   also have "... = (eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f ((meta_comp U U U \<circ>\<^sub>c (id (U\<^bsup>U\<^esup>) \<times>\<^sub>f eval_func (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>)) \<circ>\<^sub>c (associate_right (U\<^bsup>U\<^esup>) (U\<^bsup>U\<^esup>) ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)) \<circ>\<^sub>c (diagonal(U\<^bsup>U\<^esup>)\<times>\<^sub>f id ((U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)))\<^sup>\<sharp> ))\<circ>\<^sub>c \<langle>f \<circ>\<^sub>c z, ITER_curried U \<circ>\<^sub>c (n  \<circ>\<^sub>c z)\<rangle>"
     using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_right_unit2)
@@ -713,11 +713,11 @@ qed
 subsection \<open>Relation of Nat to Other Sets\<close>
 
 lemma oneUN_iso_N:
-  "one \<Coprod> \<nat>\<^sub>c \<cong> \<nat>\<^sub>c"
+  "\<one> \<Coprod> \<nat>\<^sub>c \<cong> \<nat>\<^sub>c"
   using cfunc_coprod_type is_isomorphic_def oneUN_iso_N_isomorphism successor_type zero_type by blast
 
 lemma NUone_iso_N:
-  "\<nat>\<^sub>c \<Coprod> one \<cong> \<nat>\<^sub>c"
+  "\<nat>\<^sub>c \<Coprod> \<one> \<cong> \<nat>\<^sub>c"
   using coproduct_commutes isomorphic_is_transitive oneUN_iso_N by blast
   
 end

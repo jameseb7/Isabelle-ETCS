@@ -7,15 +7,15 @@ begin
 text \<open>The axiomatization below corresponds to Axiom 3 (Terminal Object) in Halvorson.\<close>
 axiomatization
   terminal_func :: "cset \<Rightarrow> cfunc" ("\<beta>\<^bsub>_\<^esub>" 100) and
-  one :: "cset"
+  one_set :: "cset" ("\<one>")
 where
-  terminal_func_type[type_rule]: "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> one" and
-  terminal_func_unique: "h :  X \<rightarrow> one \<Longrightarrow> h = \<beta>\<^bsub>X\<^esub>" and
-  one_separator: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> (\<And> x. x : one \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c x = g \<circ>\<^sub>c x) \<Longrightarrow> f = g"
+  terminal_func_type[type_rule]: "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> \<one>" and
+  terminal_func_unique: "h :  X \<rightarrow> \<one> \<Longrightarrow> h = \<beta>\<^bsub>X\<^esub>" and
+  one_separator: "f : X \<rightarrow> Y \<Longrightarrow> g : X \<rightarrow> Y \<Longrightarrow> (\<And> x. x : \<one> \<rightarrow> X \<Longrightarrow> f \<circ>\<^sub>c x = g \<circ>\<^sub>c x) \<Longrightarrow> f = g"
 
 lemma one_separator_contrapos:
   assumes "f : X \<rightarrow> Y" "g : X \<rightarrow> Y"
-  shows "f \<noteq> g \<Longrightarrow> \<exists> x. x : one \<rightarrow> X \<and> f \<circ>\<^sub>c x \<noteq> g \<circ>\<^sub>c x"
+  shows "f \<noteq> g \<Longrightarrow> \<exists> x. x : \<one> \<rightarrow> X \<and> f \<circ>\<^sub>c x \<noteq> g \<circ>\<^sub>c x"
   using assms one_separator by (typecheck_cfuncs, blast)
 
 lemma terminal_func_comp:
@@ -23,14 +23,14 @@ lemma terminal_func_comp:
   by (simp add: comp_type terminal_func_type terminal_func_unique)
 
 lemma terminal_func_comp_elem:
-  "x : one \<rightarrow> X \<Longrightarrow> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = id one"
+  "x : \<one> \<rightarrow> X \<Longrightarrow> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = id \<one>"
   by (metis id_type terminal_func_comp terminal_func_unique)
 
 subsection \<open>Set Membership and Emptiness\<close>
 
 text \<open>The abbreviation below captures Definition 2.1.16 in Halvorson.\<close>
 abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
-  "x \<in>\<^sub>c X \<equiv> (x : one \<rightarrow> X)"
+  "x \<in>\<^sub>c X \<equiv> (x : \<one> \<rightarrow> X)"
 
 definition nonempty :: "cset \<Rightarrow> bool" where
   "nonempty X \<equiv> (\<exists>x. x \<in>\<^sub>c X)"
@@ -45,7 +45,7 @@ lemma element_monomorphism:
   by (metis cfunc_type_def domain_comp terminal_func_unique)
 
 lemma one_unique_element:
-  "\<exists>! x. x \<in>\<^sub>c one"
+  "\<exists>! x. x \<in>\<^sub>c \<one>"
   using terminal_func_type terminal_func_unique by blast
 
 lemma prod_with_empty_is_empty1:
@@ -58,12 +58,12 @@ lemma prod_with_empty_is_empty2:
   shows "is_empty (A \<times>\<^sub>c B)"
   using assms cart_prod_decomp is_empty_def by blast
 
-subsection \<open>Terminal Objects (sets with one element)\<close>
+subsection \<open>Terminal Objects (sets with \<one> element)\<close>
 
 definition terminal_object :: "cset \<Rightarrow> bool" where
   "terminal_object X \<longleftrightarrow> (\<forall> Y. \<exists>! f. f : Y \<rightarrow> X)"
 
-lemma one_terminal_object: "terminal_object(one)"
+lemma one_terminal_object: "terminal_object(\<one>)"
   unfolding terminal_object_def using terminal_func_type terminal_func_unique by blast
 
 text \<open>The lemma below is a generalisation of @{thm element_monomorphism}\<close>
@@ -103,12 +103,12 @@ qed
 
 text \<open>The two lemmas below show the converse to Exercise 2.1.15 in Halvorson.\<close>
 lemma iso_to1_is_term:
-  assumes "X \<cong> one"
+  assumes "X \<cong> \<one>"
   shows "terminal_object X"
   unfolding terminal_object_def
 proof 
   fix Y
-  obtain x where x_type[type_rule]: "x : one \<rightarrow> X" and x_unique: "\<forall> y. y : one \<rightarrow> X \<longrightarrow> x = y"
+  obtain x where x_type[type_rule]: "x : \<one> \<rightarrow> X" and x_unique: "\<forall> y. y : \<one> \<rightarrow> X \<longrightarrow> x = y"
     by (smt assms is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric monomorphism_def2 terminal_func_comp terminal_func_unique)
   show  "\<exists>!f. f : Y \<rightarrow> X"
   proof (rule_tac a="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" in ex1I)
@@ -120,7 +120,7 @@ proof
     show "xa = x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
     proof (rule ccontr)
       assume "xa \<noteq> x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-      then obtain y where elems_neq: "xa \<circ>\<^sub>c y \<noteq> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y" and y_type: "y : one \<rightarrow> Y"
+      then obtain y where elems_neq: "xa \<circ>\<^sub>c y \<noteq> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y" and y_type: "y : \<one> \<rightarrow> Y"
         using one_separator_contrapos comp_type terminal_func_type x_type xa_type by blast
       then show False
         by (smt (z3) comp_type elems_neq terminal_func_type x_unique xa_type y_type)     
@@ -136,12 +136,12 @@ lemma iso_to_term_is_term:
 
 text \<open>The lemma below corresponds to Proposition 2.1.19 in Halvorson.\<close>
 lemma single_elem_iso_one:
-  "(\<exists>! x. x \<in>\<^sub>c X) \<longleftrightarrow> X \<cong> one"
+  "(\<exists>! x. x \<in>\<^sub>c X) \<longleftrightarrow> X \<cong> \<one>"
 proof
-  assume X_iso_one: "X \<cong> one"
-  then have "one \<cong> X"
+  assume X_iso_one: "X \<cong> \<one>"
+  then have "\<one> \<cong> X"
     by (simp add: isomorphic_is_symmetric)
-  then obtain f where f_type: "f : one \<rightarrow> X" and f_iso: "isomorphism f"
+  then obtain f where f_type: "f : \<one> \<rightarrow> X" and f_iso: "isomorphism f"
     using is_isomorphic_def by blast
   show "\<exists>!x. x \<in>\<^sub>c X"
   proof(safe)
@@ -162,7 +162,7 @@ proof
   qed
 next
   assume "\<exists>!x. x \<in>\<^sub>c X"
-  then obtain x where x_type: "x : one \<rightarrow> X" and x_unique: "\<forall> y. y : one \<rightarrow> X \<longrightarrow> x = y"
+  then obtain x where x_type: "x : \<one> \<rightarrow> X" and x_unique: "\<forall> y. y : \<one> \<rightarrow> X \<longrightarrow> x = y"
     by blast
   have "terminal_object X"
     unfolding terminal_object_def  
@@ -178,7 +178,7 @@ next
       show "xa = x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
       proof (rule ccontr)
         assume "xa \<noteq> x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-        then obtain y where elems_neq: "xa \<circ>\<^sub>c y \<noteq> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y" and y_type: "y : one \<rightarrow> Y"
+        then obtain y where elems_neq: "xa \<circ>\<^sub>c y \<noteq> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y" and y_type: "y : \<one> \<rightarrow> Y"
           using one_separator_contrapos[where f=xa, where g="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>", where X=Y, where Y=X]
           using comp_type terminal_func_type x_type xa_type by blast
         have elem1: "xa \<circ>\<^sub>c y \<in>\<^sub>c X"
@@ -190,7 +190,7 @@ next
       qed
     qed
   qed
-  then show "X \<cong> one"
+  then show "X \<cong> \<one>"
     by (simp add: one_terminal_object terminal_objects_isomorphic)
 qed
 
@@ -484,36 +484,36 @@ lemma diag_on_elements:
   using assms cfunc_prod_comp cfunc_type_def diagonal_def id_left_unit id_type by auto
 
 lemma one_cross_one_unique_element:
-  "\<exists>! x. x \<in>\<^sub>c one \<times>\<^sub>c one"
-proof (rule_tac a="diagonal one" in ex1I)
-  show "diagonal one \<in>\<^sub>c one \<times>\<^sub>c one"
+  "\<exists>! x. x \<in>\<^sub>c \<one> \<times>\<^sub>c \<one>"
+proof (rule_tac a="diagonal \<one>" in ex1I)
+  show "diagonal \<one> \<in>\<^sub>c \<one> \<times>\<^sub>c \<one>"
     by (simp add: cfunc_prod_type diagonal_def id_type)
 next
   fix x
-  assume x_type: "x \<in>\<^sub>c one \<times>\<^sub>c one"
+  assume x_type: "x \<in>\<^sub>c \<one> \<times>\<^sub>c \<one>"
   
-  have left_eq: "left_cart_proj one one \<circ>\<^sub>c x = id one"
+  have left_eq: "left_cart_proj \<one> \<one> \<circ>\<^sub>c x = id \<one>"
     using x_type one_unique_element by (typecheck_cfuncs, blast)
-  have right_eq: "right_cart_proj one one \<circ>\<^sub>c x = id one"
+  have right_eq: "right_cart_proj \<one> \<one> \<circ>\<^sub>c x = id \<one>"
     using x_type one_unique_element by (typecheck_cfuncs, blast)
 
-  then show "x = diagonal one"
+  then show "x = diagonal \<one>"
     unfolding diagonal_def using cfunc_prod_unique id_type left_eq x_type by blast
 qed
 
 text \<open>The lemma below corresponds to Proposition 2.1.20 in Halvorson.\<close>
 lemma X_is_cart_prod1:
-  "is_cart_prod X (id X) (\<beta>\<^bsub>X\<^esub>) X one"
+  "is_cart_prod X (id X) (\<beta>\<^bsub>X\<^esub>) X \<one>"
   unfolding is_cart_prod_def
 proof safe
   show "id\<^sub>c X : X \<rightarrow> X"
     by typecheck_cfuncs
 next
-  show "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> one"
+  show "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> \<one>"
     by typecheck_cfuncs
 next
   fix f g Y
-  assume f_type: "f : Y \<rightarrow> X" and g_type: "g : Y \<rightarrow> one"
+  assume f_type: "f : Y \<rightarrow> X" and g_type: "g : Y \<rightarrow> \<one>"
   then show "\<exists>h. h : Y \<rightarrow> X \<and>
            id\<^sub>c X \<circ>\<^sub>c h = f \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h = g \<and> (\<forall>h2. h2 : Y \<rightarrow> X \<and> id\<^sub>c X \<circ>\<^sub>c h2 = f \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h2 = g \<longrightarrow> h2 = h)"
   proof (rule_tac x=f in exI, safe)
@@ -527,17 +527,17 @@ next
 qed
 
 lemma X_is_cart_prod2:
-  "is_cart_prod X (\<beta>\<^bsub>X\<^esub>) (id X) one X"
+  "is_cart_prod X (\<beta>\<^bsub>X\<^esub>) (id X) \<one> X"
   unfolding is_cart_prod_def
 proof safe
   show "id\<^sub>c X : X \<rightarrow> X"
     by typecheck_cfuncs
 next
-  show "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> one"
+  show "\<beta>\<^bsub>X\<^esub> : X \<rightarrow> \<one>"
     by typecheck_cfuncs
 next
   fix f g Z
-  assume f_type: "f : Z \<rightarrow> one" and g_type: "g : Z \<rightarrow> X"
+  assume f_type: "f : Z \<rightarrow> \<one>" and g_type: "g : Z \<rightarrow> X"
   then show "\<exists>h. h : Z \<rightarrow> X \<and>
            \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h = f \<and> id\<^sub>c X \<circ>\<^sub>c h = g \<and> (\<forall>h2. h2 : Z \<rightarrow> X \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h2 = f \<and> id\<^sub>c X \<circ>\<^sub>c h2 = g \<longrightarrow> h2 = h)"
   proof (rule_tac x=g in exI, safe)
@@ -551,33 +551,33 @@ next
 qed
 
 lemma A_x_one_iso_A:
-  "X \<times>\<^sub>c one \<cong> X"
+  "X \<times>\<^sub>c \<one> \<cong> X"
   by (metis X_is_cart_prod1 canonical_cart_prod_is_cart_prod cart_prods_isomorphic fst_conv is_isomorphic_def snd_conv)
 
 lemma one_x_A_iso_A:
-  "one \<times>\<^sub>c X \<cong> X"
+  "\<one> \<times>\<^sub>c X \<cong> X"
   by (meson A_x_one_iso_A isomorphic_is_transitive product_commutes)
 
 text \<open>The following four lemmas provide some concrete examples of the above isomorphisms\<close>
 lemma left_cart_proj_one_left_inverse:
-  "\<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X one = id (X \<times>\<^sub>c one)"
+  "\<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X \<one> = id (X \<times>\<^sub>c \<one>)"
   by (typecheck_cfuncs, smt (z3) cfunc_prod_comp cfunc_prod_unique id_left_unit2 id_right_unit2 right_cart_proj_type terminal_func_comp terminal_func_unique)
 
 lemma left_cart_proj_one_right_inverse:
-  "left_cart_proj X one \<circ>\<^sub>c \<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> = id X"
+  "left_cart_proj X \<one> \<circ>\<^sub>c \<langle>id X,\<beta>\<^bsub>X\<^esub>\<rangle> = id X"
   using left_cart_proj_cfunc_prod by (typecheck_cfuncs, blast)
 
 lemma right_cart_proj_one_left_inverse:
-  "\<langle>\<beta>\<^bsub>X\<^esub>,id X\<rangle> \<circ>\<^sub>c right_cart_proj one X = id (one \<times>\<^sub>c X)"
+  "\<langle>\<beta>\<^bsub>X\<^esub>,id X\<rangle> \<circ>\<^sub>c right_cart_proj \<one> X = id (\<one> \<times>\<^sub>c X)"
   by (typecheck_cfuncs, smt (z3) cart_prod_decomp cfunc_prod_comp id_left_unit2 id_right_unit2 right_cart_proj_cfunc_prod terminal_func_comp terminal_func_unique)
 
 lemma right_cart_proj_one_right_inverse:
-  "right_cart_proj one X \<circ>\<^sub>c \<langle>\<beta>\<^bsub>X\<^esub>,id X\<rangle> = id X"
+  "right_cart_proj \<one> X \<circ>\<^sub>c \<langle>\<beta>\<^bsub>X\<^esub>,id X\<rangle> = id X"
   using right_cart_proj_cfunc_prod by (typecheck_cfuncs, blast)
 
 lemma cfunc_cross_prod_right_terminal_decomp:
-  assumes "f : X \<rightarrow> Y" "x : one \<rightarrow> Z"
-  shows "f \<times>\<^sub>f x = \<langle>f, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X one"
+  assumes "f : X \<rightarrow> Y" "x : \<one> \<rightarrow> Z"
+  shows "f \<times>\<^sub>f x = \<langle>f, x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c left_cart_proj X \<one>"
   using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_def cfunc_prod_comp cfunc_type_def
       comp_associative2 right_cart_proj_type terminal_func_comp terminal_func_unique)
 
@@ -600,7 +600,7 @@ lemma nonempty_right_imp_left_proj_epimorphism:
   "nonempty Y \<Longrightarrow> epimorphism (left_cart_proj X Y)"
 proof -
   assume "nonempty Y"
-  then obtain y where y_in_Y: "y : one \<rightarrow> Y"
+  then obtain y where y_in_Y: "y : \<one> \<rightarrow> Y"
     using nonempty_def by blast
   then have id_eq: "(left_cart_proj X Y) \<circ>\<^sub>c \<langle>id X, y \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> = id X"
     using comp_type id_type left_cart_proj_cfunc_prod terminal_func_type by blast
@@ -623,7 +623,7 @@ lemma nonempty_left_imp_right_proj_epimorphism:
   "nonempty X \<Longrightarrow> epimorphism (right_cart_proj X Y)"
 proof - 
   assume "nonempty X"
-  then obtain y where y_in_Y: "y: one \<rightarrow> X"
+  then obtain y where y_in_Y: "y: \<one> \<rightarrow> X"
     using nonempty_def by blast
   then have id_eq: "(right_cart_proj X Y) \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> = id Y"
      using comp_type id_type right_cart_proj_cfunc_prod terminal_func_type by blast
@@ -642,7 +642,7 @@ proof -
 qed
 
 lemma cart_prod_extract_left:
-  assumes "f : one \<rightarrow> X" "g : one \<rightarrow> Y"
+  assumes "f : \<one> \<rightarrow> X" "g : \<one> \<rightarrow> Y"
   shows "\<langle>f, g\<rangle> = \<langle>id X, g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c f"
 proof -
   have "\<langle>f, g\<rangle> = \<langle>id X \<circ>\<^sub>c f, g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c f\<rangle>"
@@ -654,7 +654,7 @@ proof -
 qed
 
 lemma cart_prod_extract_right:
-  assumes "f : one \<rightarrow> X" "g : one \<rightarrow> Y"
+  assumes "f : \<one> \<rightarrow> X" "g : \<one> \<rightarrow> Y"
   shows "\<langle>f, g\<rangle> = \<langle>f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> \<circ>\<^sub>c g"
 proof -
   have "\<langle>f, g\<rangle> = \<langle>f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> \<circ>\<^sub>c g, id Y \<circ>\<^sub>c g\<rangle>"

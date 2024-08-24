@@ -255,33 +255,33 @@ proof -
     using is_empty_def Y_not_init Y_not_term iso_empty_initial iso_to1_is_term no_el_iff_iso_empty single_elem_iso_one by blast
   then have y1_mono[type_rule]: "monomorphism(y1)"
     using element_monomorphism by blast
-  obtain m where m_def: "m = \<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1)"
+  obtain m where m_def: "m = \<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1)"
     by simp
   have type1: "\<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> : X \<rightarrow> (X \<times>\<^sub>c Y)"
     by (meson cfunc_prod_type comp_type id_type terminal_func_type y1y2_def)
-  have trycast_y1_type: "try_cast y1 : Y \<rightarrow> one \<Coprod> (Y \<setminus> (one,y1))"
+  have trycast_y1_type: "try_cast y1 : Y \<rightarrow> \<one> \<Coprod> (Y \<setminus> (\<one>,y1))"
     by (meson element_monomorphism try_cast_type y1y2_def)
-  have y1'_type[type_rule]: "y1\<^sup>c : Y \<setminus> (one,y1) \<rightarrow> Y"
+  have y1'_type[type_rule]: "y1\<^sup>c : Y \<setminus> (\<one>,y1) \<rightarrow> Y"
     using complement_morphism_type one_terminal_object terminal_el_monomorphism y1y2_def by blast
-  have type4: "\<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle> : Y \<setminus> (one,y1) \<rightarrow> (X \<times>\<^sub>c Y)"
+  have type4: "\<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle> : Y \<setminus> (\<one>,y1) \<rightarrow> (X \<times>\<^sub>c Y)"
     using cfunc_prod_type comp_type terminal_func_type x1x2_def y1'_type by blast
   have type5: "\<langle>x2, y2\<rangle> \<in>\<^sub>c (X \<times>\<^sub>c Y)"
     by (simp add: cfunc_prod_type x1x2_def y1y2_def)
-  then have type6: "\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle> :(one \<Coprod> (Y \<setminus> (one,y1))) \<rightarrow> (X \<times>\<^sub>c Y)"
+  then have type6: "\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle> :(\<one> \<Coprod> (Y \<setminus> (\<one>,y1))) \<rightarrow> (X \<times>\<^sub>c Y)"
     using cfunc_coprod_type type4 by blast
-  then have type7: "((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) : Y \<rightarrow> (X \<times>\<^sub>c Y)"
+  then have type7: "((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) : Y \<rightarrow> (X \<times>\<^sub>c Y)"
     using comp_type trycast_y1_type by blast
   then have m_type: "m : X  \<Coprod> Y \<rightarrow> (X \<times>\<^sub>c Y)"
     by (simp add: cfunc_coprod_type m_def type1)
 
-  have relative: "\<And>y. y \<in>\<^sub>c Y \<Longrightarrow> (y \<in>\<^bsub>Y\<^esub> (one, y1)) = (y = y1)"
+  have relative: "\<And>y. y \<in>\<^sub>c Y \<Longrightarrow> (y \<in>\<^bsub>Y\<^esub> (\<one>, y1)) = (y = y1)"
   proof(safe)
     fix y 
     assume y_type: "y \<in>\<^sub>c Y"
-    show "y \<in>\<^bsub>Y\<^esub> (one, y1) \<Longrightarrow> y = y1"
+    show "y \<in>\<^bsub>Y\<^esub> (\<one>, y1) \<Longrightarrow> y = y1"
       by (metis cfunc_type_def factors_through_def id_right_unit2 id_type one_unique_element relative_member_def2)
   next 
-    show "y1 \<in>\<^sub>c Y \<Longrightarrow> y1 \<in>\<^bsub>Y\<^esub> (one, y1)"
+    show "y1 \<in>\<^sub>c Y \<Longrightarrow> y1 \<in>\<^bsub>Y\<^esub> (\<one>, y1)"
       by (metis cfunc_type_def factors_through_def id_right_unit2 id_type relative_member_def2 y1_mono)
   qed
 
@@ -298,9 +298,9 @@ proof -
       proof-
         fix l 
         assume l_type: "l \<in>\<^sub>c X"
-        have "m \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c l = (\<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1)) \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c l"
+        have "m \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c l = (\<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1)) \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c l"
           by (simp add: m_def)
-        also have "... = (\<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c l"
+        also have "... = (\<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<amalg> ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c l"
           using comp_associative2 l_type by (typecheck_cfuncs, blast)
         also have "... = \<langle>id(X), y1 \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c l"
           by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
@@ -318,11 +318,11 @@ proof -
       proof - 
         have "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y1 = (m \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c y1"
           using  comp_associative2 m_type by (typecheck_cfuncs, auto)
-        also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c y1"
+        also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c y1"
           using m_def right_coproj_cfunc_coprod type1 by (typecheck_cfuncs, auto)
-        also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1 \<circ>\<^sub>c y1"
+        also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1 \<circ>\<^sub>c y1"
           using  comp_associative2 by (typecheck_cfuncs, auto)
-        also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c left_coproj one (Y \<setminus> (one,y1))"
+        also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c left_coproj \<one> (Y \<setminus> (\<one>,y1))"
           using  try_cast_m_m y1_mono y1y2_def(1) by auto
         also have "... =  \<langle>x2, y2\<rangle>"
           using left_coproj_cfunc_coprod type4 type5 by blast
@@ -330,37 +330,37 @@ proof -
       qed
 
       have m_rightproj_not_y1_equals: "\<And> r. r  \<in>\<^sub>c Y \<and> r \<noteq> y1 \<Longrightarrow>
-            \<exists>k. k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k \<and> 
+            \<exists>k. k \<in>\<^sub>c Y \<setminus> (\<one>,y1) \<and> try_cast y1 \<circ>\<^sub>c r = right_coproj \<one> (Y \<setminus> (\<one>,y1)) \<circ>\<^sub>c k \<and> 
             m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
       proof clarify
         fix r 
         assume r_type: "r \<in>\<^sub>c Y"
         assume r_not_y1: "r \<noteq> y1"
-        then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k"
+        then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (\<one>,y1) \<and> try_cast y1 \<circ>\<^sub>c r = right_coproj \<one> (Y \<setminus> (\<one>,y1)) \<circ>\<^sub>c k"
           using r_type relative try_cast_not_in_X y1_mono y1y2_def(1) by blast
         have m_rightproj_l_equals: "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
              
         proof -
           have "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = (m \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c r"
             using r_type comp_associative2 m_type by (typecheck_cfuncs, auto)
-          also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c r"
+          also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  try_cast y1) \<circ>\<^sub>c r"
             using m_def right_coproj_cfunc_coprod type1 by (typecheck_cfuncs, auto)
-          also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  (try_cast y1 \<circ>\<^sub>c r)"
+          also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c  (try_cast y1 \<circ>\<^sub>c r)"
             using r_type comp_associative2 by (typecheck_cfuncs, auto)
-          also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c (right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k)"
+          also have "... = (\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c (right_coproj \<one> (Y \<setminus> (\<one>,y1)) \<circ>\<^sub>c k)"
             using k_def by auto
-          also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c right_coproj one (Y \<setminus> (one,y1))) \<circ>\<^sub>c k"
+          also have "... = ((\<langle>x2, y2\<rangle> \<amalg> \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle>) \<circ>\<^sub>c right_coproj \<one> (Y \<setminus> (\<one>,y1))) \<circ>\<^sub>c k"
             using comp_associative2 k_def by (typecheck_cfuncs, blast)
-          also have "... =  \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub>, y1\<^sup>c\<rangle> \<circ>\<^sub>c k"
+          also have "... =  \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub>, y1\<^sup>c\<rangle> \<circ>\<^sub>c k"
             using right_coproj_cfunc_coprod type4 type5 by auto
-          also have "... =  \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (one,y1)\<^esub> \<circ>\<^sub>c k, y1\<^sup>c \<circ>\<^sub>c k \<rangle>"
+          also have "... =  \<langle>x1 \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (\<one>,y1)\<^esub> \<circ>\<^sub>c k, y1\<^sup>c \<circ>\<^sub>c k \<rangle>"
             using cfunc_prod_comp comp_associative2 k_def by (typecheck_cfuncs, auto)
           also have "... =  \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
             by (metis id_right_unit2 id_type k_def one_unique_element terminal_func_comp terminal_func_type x1x2_def(1))
           then show ?thesis using calculation by auto
         qed
-        then show "\<exists>k. k \<in>\<^sub>c Y \<setminus> (one, y1) \<and>
-          try_cast y1 \<circ>\<^sub>c r = right_coproj one (Y \<setminus> (one, y1)) \<circ>\<^sub>c k \<and> 
+        then show "\<exists>k. k \<in>\<^sub>c Y \<setminus> (\<one>, y1) \<and>
+          try_cast y1 \<circ>\<^sub>c r = right_coproj \<one> (Y \<setminus> (\<one>, y1)) \<circ>\<^sub>c k \<and> 
           m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c r = \<langle>x1,y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
               using k_def by blast
     qed
@@ -436,7 +436,7 @@ proof -
             assume "c \<noteq> y"
             then have "c \<noteq> y1"
               by (simp add: \<open>y = y1\<close>)
-            then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c c = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k \<and> 
+            then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (\<one>,y1) \<and> try_cast y1 \<circ>\<^sub>c c = right_coproj \<one> (Y \<setminus> (\<one>,y1)) \<circ>\<^sub>c k \<and> 
                  m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c c = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
               using c_def m_rightproj_not_y1_equals by blast
             then have "\<langle>x2, y2\<rangle> = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
@@ -449,7 +449,7 @@ proof -
         qed
       next
         assume "y \<noteq> y1"
-        then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c y = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k \<and> 
+        then obtain k where k_def: "k \<in>\<^sub>c Y \<setminus> (\<one>,y1) \<and> try_cast y1 \<circ>\<^sub>c y = right_coproj \<one> (Y \<setminus> (\<one>,y1)) \<circ>\<^sub>c k \<and> 
           m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
           using m_rightproj_not_y1_equals y_def by blast  
         then have "m \<circ>\<^sub>c a  = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
@@ -465,8 +465,8 @@ proof -
             show "a = b"
               proof -
                 obtain cc :: cfunc where
-                  f1: "cc \<in>\<^sub>c Y \<setminus> (one, y1) \<and> try_cast y1 \<circ>\<^sub>c y = right_coproj one (Y \<setminus> (one, y1)) \<circ>\<^sub>c cc \<and> m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y = \<langle>x1,y1\<^sup>c \<circ>\<^sub>c cc\<rangle>"
-                  using \<open>\<And>thesis. (\<And>k. k \<in>\<^sub>c Y \<setminus> (one, y1) \<and> try_cast y1 \<circ>\<^sub>c y = right_coproj one (Y \<setminus> (one, y1)) \<circ>\<^sub>c k \<and> m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y = \<langle>x1,y1\<^sup>c \<circ>\<^sub>c k\<rangle> \<Longrightarrow> thesis) \<Longrightarrow> thesis\<close> by blast
+                  f1: "cc \<in>\<^sub>c Y \<setminus> (\<one>, y1) \<and> try_cast y1 \<circ>\<^sub>c y = right_coproj \<one> (Y \<setminus> (\<one>, y1)) \<circ>\<^sub>c cc \<and> m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y = \<langle>x1,y1\<^sup>c \<circ>\<^sub>c cc\<rangle>"
+                  using \<open>\<And>thesis. (\<And>k. k \<in>\<^sub>c Y \<setminus> (\<one>, y1) \<and> try_cast y1 \<circ>\<^sub>c y = right_coproj \<one> (Y \<setminus> (\<one>, y1)) \<circ>\<^sub>c k \<and> m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y = \<langle>x1,y1\<^sup>c \<circ>\<^sub>c k\<rangle> \<Longrightarrow> thesis) \<Longrightarrow> thesis\<close> by blast
                 have "\<langle>x2,y2\<rangle> = m \<circ>\<^sub>c a"
               using \<open>c = y1\<close> c_def eqs m_rightproj_y1_equals by presburger
               then show ?thesis
@@ -474,7 +474,7 @@ proof -
               qed
           next
               assume "c \<noteq> y1"              
-              then obtain k' where k'_def: "k' \<in>\<^sub>c Y \<setminus> (one,y1) \<and> try_cast y1 \<circ>\<^sub>c c = right_coproj one (Y \<setminus> (one,y1)) \<circ>\<^sub>c k' \<and> 
+              then obtain k' where k'_def: "k' \<in>\<^sub>c Y \<setminus> (\<one>,y1) \<and> try_cast y1 \<circ>\<^sub>c c = right_coproj \<one> (Y \<setminus> (\<one>,y1)) \<circ>\<^sub>c k' \<and> 
               m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c c = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k'\<rangle>"
                 using c_def m_rightproj_not_y1_equals by blast
               then have "\<langle>x1, y1\<^sup>c \<circ>\<^sub>c k'\<rangle> = \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
@@ -558,19 +558,19 @@ next
       show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
       proof(cases "terminal_object X")
         assume "terminal_object X"
-        then have "X \<cong> one"
+        then have "X \<cong> \<one>"
           by (simp add: one_terminal_object terminal_objects_isomorphic)
         have "X \<times>\<^sub>c Y \<cong> Y"
           by (simp add: \<open>terminal_object X\<close> prod_with_term_obj1)
         then have "X \<times>\<^sub>c Y \<cong> Y\<^bsup>X\<^esup>"
-          by (meson \<open>X \<cong> one\<close> exp_pres_iso_right exp_set_inj isomorphic_is_symmetric isomorphic_is_transitive exp_one)
+          by (meson \<open>X \<cong> \<one>\<close> exp_pres_iso_right exp_set_inj isomorphic_is_symmetric isomorphic_is_transitive exp_one)
         then show ?thesis
           using is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic by blast
       next
         assume "\<not> terminal_object X"
 
-        obtain into where into_def: "into = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                               \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) "
+        obtain into where into_def: "into = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                               \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) "
           by simp
         then have into_type[type_rule]: "into : Y \<times>\<^sub>c (X \<times>\<^sub>c X) \<rightarrow> Y"
           by (simp, typecheck_cfuncs)
@@ -592,13 +592,13 @@ next
           proof - 
             have "(\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id\<^sub>c X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = (\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id\<^sub>c X \<circ>\<^sub>c z,\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c z\<rangle>"
               by (typecheck_cfuncs, simp add: cfunc_prod_comp)
-            also have "... = (\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>z,id one\<rangle>"
+            also have "... = (\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
               by (typecheck_cfuncs, metis id_left_unit2 one_unique_element)
-            also have "... = (\<Theta>\<^sup>\<flat> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<langle>x,y\<rangle>)) \<circ>\<^sub>c \<langle>z,id one\<rangle>"
+            also have "... = (\<Theta>\<^sup>\<flat> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<langle>x,y\<rangle>)) \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
               using inv_transpose_of_composition by (typecheck_cfuncs, presburger)
-            also have "... = \<Theta>\<^sup>\<flat> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<langle>x,y\<rangle>) \<circ>\<^sub>c \<langle>z,id one\<rangle>"
+            also have "... = \<Theta>\<^sup>\<flat> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<langle>x,y\<rangle>) \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
               using comp_associative2 by (typecheck_cfuncs, auto)
-            also have "... = \<Theta>\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c  z, \<langle>x,y\<rangle> \<circ>\<^sub>c  id one\<rangle>"
+            also have "... = \<Theta>\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c  z, \<langle>x,y\<rangle> \<circ>\<^sub>c  id \<one>\<rangle>"
               by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
             also have "... = \<Theta>\<^sup>\<flat> \<circ>\<^sub>c \<langle>z,\<langle>x,y\<rangle>\<rangle>"
               by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2)
@@ -630,28 +630,28 @@ next
           assume y_type[type_rule]: "y \<in>\<^sub>c Y"
           have "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = into \<circ>\<^sub>c   \<langle>y, \<langle>x, x\<rangle>\<rangle>"
             by (simp add: f0 x_type y_type)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y, \<langle>x, x\<rangle>\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y, \<langle>x, x\<rangle>\<rangle>"
             using cfunc_type_def comp_associative comp_type into_def by (typecheck_cfuncs, fastforce)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>id Y \<circ>\<^sub>c y, eq_pred X \<circ>\<^sub>c  \<langle>x, x\<rangle>\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>id Y \<circ>\<^sub>c y, eq_pred X \<circ>\<^sub>c  \<langle>x, x\<rangle>\<rangle>"
             by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-         also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>y, \<t>\<rangle>"
+         also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>y, \<t>\<rangle>"
             by (typecheck_cfuncs, metis eq_pred_iff_eq id_left_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one  \<circ>\<^sub>c  \<langle>y, left_coproj one one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one>  \<circ>\<^sub>c  \<langle>y, left_coproj \<one> \<one>\<rangle>"
             by (typecheck_cfuncs, simp add: case_bool_true cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one  \<circ>\<^sub>c  \<langle>y, left_coproj one one \<circ>\<^sub>c id one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one>  \<circ>\<^sub>c  \<langle>y, left_coproj \<one> \<one> \<circ>\<^sub>c id \<one>\<rangle>"
             by (typecheck_cfuncs, metis id_right_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c left_coproj (Y \<times>\<^sub>c one) (Y \<times>\<^sub>c one) \<circ>\<^sub>c \<langle>y,id one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c left_coproj (Y \<times>\<^sub>c \<one>) (Y \<times>\<^sub>c \<one>) \<circ>\<^sub>c \<langle>y,id \<one>\<rangle>"
             using dist_prod_coprod_left_ap_left by (typecheck_cfuncs, auto)
-          also have "... = ((left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c left_coproj (Y \<times>\<^sub>c one) (Y \<times>\<^sub>c one)) \<circ>\<^sub>c \<langle>y,id one\<rangle>"
+          also have "... = ((left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c left_coproj (Y \<times>\<^sub>c \<one>) (Y \<times>\<^sub>c \<one>)) \<circ>\<^sub>c \<langle>y,id \<one>\<rangle>"
             by (typecheck_cfuncs, meson comp_associative2)
-          also have "... = left_cart_proj Y one \<circ>\<^sub>c \<langle>y,id one\<rangle>"
+          also have "... = left_cart_proj Y \<one> \<circ>\<^sub>c \<langle>y,id \<one>\<rangle>"
             using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
           also have "... = y"
             by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
@@ -669,30 +669,30 @@ next
           assume "y \<noteq> y1"
           have "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
             by (simp add: f0 x_type y_type z_type)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
             using cfunc_type_def comp_associative comp_type into_def by (typecheck_cfuncs, fastforce)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>id Y \<circ>\<^sub>c y, eq_pred X \<circ>\<^sub>c  \<langle>x, z\<rangle>\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>id Y \<circ>\<^sub>c y, eq_pred X \<circ>\<^sub>c  \<langle>x, z\<rangle>\<rangle>"
             by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>y, \<f>\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>y, \<f>\<rangle>"
             by (typecheck_cfuncs, metis \<open>z \<noteq> x\<close> eq_pred_iff_eq_conv id_left_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one  \<circ>\<^sub>c  \<langle>y, right_coproj one one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one>  \<circ>\<^sub>c  \<langle>y, right_coproj \<one> \<one>\<rangle>"
             by (typecheck_cfuncs, simp add: case_bool_false cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one  \<circ>\<^sub>c  \<langle>y, right_coproj one one \<circ>\<^sub>c id one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one>  \<circ>\<^sub>c  \<langle>y, right_coproj \<one> \<one> \<circ>\<^sub>c id \<one>\<rangle>"
             by (typecheck_cfuncs, simp add: id_right_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c right_coproj (Y \<times>\<^sub>c one) (Y \<times>\<^sub>c one) \<circ>\<^sub>c \<langle>y,id one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c right_coproj (Y \<times>\<^sub>c \<one>) (Y \<times>\<^sub>c \<one>) \<circ>\<^sub>c \<langle>y,id \<one>\<rangle>"
             using dist_prod_coprod_left_ap_right by (typecheck_cfuncs, auto)
-          also have "... = ((left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c right_coproj (Y \<times>\<^sub>c one) (Y \<times>\<^sub>c one)) \<circ>\<^sub>c \<langle>y,id one\<rangle>"
+          also have "... = ((left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c right_coproj (Y \<times>\<^sub>c \<one>) (Y \<times>\<^sub>c \<one>)) \<circ>\<^sub>c \<langle>y,id \<one>\<rangle>"
             by (typecheck_cfuncs, meson comp_associative2)
-          also have "... = ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)) \<circ>\<^sub>c \<langle>y,id one\<rangle>"
+          also have "... = ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)) \<circ>\<^sub>c \<langle>y,id \<one>\<rangle>"
             using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
-          also have "... = (y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1) \<circ>\<^sub>c \<langle>y,id one\<rangle>"
+          also have "... = (y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1) \<circ>\<^sub>c \<langle>y,id \<one>\<rangle>"
             using comp_associative2 by (typecheck_cfuncs, force)
           also have "... = (y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y  \<circ>\<^sub>c \<langle>y,y1\<rangle>"
             by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
@@ -712,30 +712,30 @@ next
           assume "z \<noteq> x"
           have "(\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y1, \<langle>x, z\<rangle>\<rangle>"
             by (simp add: f0 x_type y1_type z_type)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y1, \<langle>x, z\<rangle>\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y1, \<langle>x, z\<rangle>\<rangle>"
             using cfunc_type_def comp_associative comp_type into_def by (typecheck_cfuncs, fastforce)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>id Y \<circ>\<^sub>c y1, eq_pred X \<circ>\<^sub>c  \<langle>x, z\<rangle>\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>id Y \<circ>\<^sub>c y1, eq_pred X \<circ>\<^sub>c  \<langle>x, z\<rangle>\<rangle>"
             by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>y1, \<f>\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c  \<langle>y1, \<f>\<rangle>"
             by (typecheck_cfuncs, metis \<open>z \<noteq> x\<close> eq_pred_iff_eq_conv id_left_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one  \<circ>\<^sub>c  \<langle>y1, right_coproj one one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one>  \<circ>\<^sub>c  \<langle>y1, right_coproj \<one> \<one>\<rangle>"
             by (typecheck_cfuncs, simp add: case_bool_false cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c dist_prod_coprod_left Y one one  \<circ>\<^sub>c  \<langle>y1, right_coproj one one \<circ>\<^sub>c id one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one>  \<circ>\<^sub>c  \<langle>y1, right_coproj \<one> \<one> \<circ>\<^sub>c id \<one>\<rangle>"
             by (typecheck_cfuncs, simp add: id_right_unit2)
-          also have "... = (left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
-                                 \<circ>\<^sub>c right_coproj (Y \<times>\<^sub>c one) (Y \<times>\<^sub>c one) \<circ>\<^sub>c \<langle>y1,id one\<rangle>"
+          also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
+                                 \<circ>\<^sub>c right_coproj (Y \<times>\<^sub>c \<one>) (Y \<times>\<^sub>c \<one>) \<circ>\<^sub>c \<langle>y1,id \<one>\<rangle>"
             using dist_prod_coprod_left_ap_right by (typecheck_cfuncs, auto)
-          also have "... = ((left_cart_proj Y one \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
-                                 \<circ>\<^sub>c right_coproj (Y \<times>\<^sub>c one) (Y \<times>\<^sub>c one)) \<circ>\<^sub>c \<langle>y1,id one\<rangle>"
+          also have "... = ((left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1))) 
+                                 \<circ>\<^sub>c right_coproj (Y \<times>\<^sub>c \<one>) (Y \<times>\<^sub>c \<one>)) \<circ>\<^sub>c \<langle>y1,id \<one>\<rangle>"
             by (typecheck_cfuncs, meson comp_associative2)
-          also have "... = ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)) \<circ>\<^sub>c \<langle>y1,id one\<rangle>"
+          also have "... = ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)) \<circ>\<^sub>c \<langle>y1,id \<one>\<rangle>"
             using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
-          also have "... = (y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1) \<circ>\<^sub>c \<langle>y1,id one\<rangle>"
+          also have "... = (y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1) \<circ>\<^sub>c \<langle>y1,id \<one>\<rangle>"
             using comp_associative2 by (typecheck_cfuncs, force)
           also have "... = (y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y  \<circ>\<^sub>c \<langle>y1,y1\<rangle>"
             by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
@@ -856,7 +856,7 @@ proof -
       using cfunc_type_def f_type x_type by auto
     have y_type2 : "y \<in>\<^sub>c X"
       using cfunc_type_def f_type y_type by auto
-    have "x \<circ>\<^sub>c (right_cart_proj Y one) = (right_cart_proj Y X) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f x)"
+    have "x \<circ>\<^sub>c (right_cart_proj Y \<one>) = (right_cart_proj Y X) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f x)"
       using right_cart_proj_cfunc_cross_prod x_type2 by (typecheck_cfuncs, auto)
     also have "... = ((eval_func X Y) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f f)) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f x)"
       by (typecheck_cfuncs, simp add: f_def transpose_func_def)
@@ -872,7 +872,7 @@ proof -
       using comp_associative2 f_type y_type2 by (typecheck_cfuncs, fastforce)
     also have "... = (right_cart_proj Y X) \<circ>\<^sub>c (id(Y) \<times>\<^sub>f y)"
       by (typecheck_cfuncs, simp add: f_def transpose_func_def)
-    also have "... = y \<circ>\<^sub>c (right_cart_proj Y one)"
+    also have "... = y \<circ>\<^sub>c (right_cart_proj Y \<one>)"
       using right_cart_proj_cfunc_cross_prod y_type2 by (typecheck_cfuncs, auto)
     then show "x = y"
       using  assms calculation epimorphism_def3 nonempty_left_imp_right_proj_epimorphism right_cart_proj_type x_type2 y_type2 by fastforce

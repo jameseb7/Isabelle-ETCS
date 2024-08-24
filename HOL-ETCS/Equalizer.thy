@@ -683,7 +683,7 @@ next
 
     obtain j where j_type: "j \<in>\<^sub>c X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y" and 
       j_projs: "fibered_product_right_proj X f g Y \<circ>\<^sub>c j = y" "fibered_product_left_proj X f g Y \<circ>\<^sub>c j = x"
-      using j_exists[where Z=one, where k=y, where h=x] assms f_g_eq by auto
+      using j_exists[where Z=\<one>, where k=y, where h=x] assms f_g_eq by auto
     show "\<exists>h. h : domain \<langle>x,y\<rangle> \<rightarrow> domain (snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y)) \<and>
            snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y) \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
     proof (rule_tac x=j in exI, safe)
@@ -768,7 +768,7 @@ proof safe
     then have x_type2: "x \<in>\<^sub>c X" and y_type2: "y \<in>\<^sub>c X"
       using assms(1) cfunc_type_def by auto
 
-    have x_y_type: "\<langle>x,y\<rangle> : one \<rightarrow> X \<times>\<^sub>c X"
+    have x_y_type: "\<langle>x,y\<rangle> : \<one> \<rightarrow> X \<times>\<^sub>c X"
       using x_type2 y_type2 by (typecheck_cfuncs)
     have fibered_product_type: "fibered_product_morphism X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X \<times>\<^sub>c X"
       using assms by typecheck_cfuncs
@@ -776,7 +776,7 @@ proof safe
     assume "f \<circ>\<^sub>c x = f \<circ>\<^sub>c y"
     then have factorsthru: "\<langle>x,y\<rangle> factorsthru fibered_product_morphism X f f X"
       using assms(1) pair_factorsthru_fibered_product_morphism x_type2 y_type2 by auto
-    then obtain xy where xy_assms: "xy : one \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" "fibered_product_morphism X f f X \<circ>\<^sub>c xy = \<langle>x,y\<rangle>"
+    then obtain xy where xy_assms: "xy : \<one> \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" "fibered_product_morphism X f f X \<circ>\<^sub>c xy = \<langle>x,y\<rangle>"
       using factors_through_def2 fibered_product_type x_y_type by blast
 
     have left_proj: "fibered_product_left_proj X f f X \<circ>\<^sub>c xy = x"
@@ -820,7 +820,7 @@ next
       using a_assms(2) right_cart_proj_cfunc_prod by auto
     also have "... = x"
     proof -
-      have f2: "\<forall>c. c : one \<rightarrow> X \<longrightarrow> fibered_product_morphism X f f X \<circ>\<^sub>c xx \<circ>\<^sub>c c = diagonal X \<circ>\<^sub>c c"
+      have f2: "\<forall>c. c : \<one> \<rightarrow> X \<longrightarrow> fibered_product_morphism X f f X \<circ>\<^sub>c xx \<circ>\<^sub>c c = diagonal X \<circ>\<^sub>c c"
       proof safe
         fix c
         assume "c \<in>\<^sub>c X"
@@ -835,11 +835,11 @@ next
         using f4 by (meson a_assms cfunc_type_def comp_type)
       then have f9: "x : domain x \<rightarrow> codomain xx"
         using cfunc_type_def x_type xx_assms by auto
-      have f10: "\<forall>c ca. domain (ca \<circ>\<^sub>c a) = one \<or> \<not> ca : X \<rightarrow> c"
+      have f10: "\<forall>c ca. domain (ca \<circ>\<^sub>c a) = \<one> \<or> \<not> ca : X \<rightarrow> c"
         by (meson a_assms cfunc_type_def comp_type)
-      then have "domain \<langle>a,a\<rangle> = one"
+      then have "domain \<langle>a,a\<rangle> = \<one>"
         using diagonal_type f5 by force
-      then have f11: "domain x = one"
+      then have f11: "domain x = \<one>"
         using cfunc_type_def x_type by blast
       have "xx \<circ>\<^sub>c a \<in>\<^sub>c codomain xx"
         using a_assms comp_type f4 by auto
@@ -888,7 +888,7 @@ proof -
     assume x_type: "x \<in>\<^sub>c domain f"
     have factorsthru: "\<langle>x,x\<rangle> factorsthru fibered_product_morphism X f f X"
       using assms(1) cfunc_type_def fxfx pair_factorsthru_fibered_product_morphism x_type  by auto
-    then obtain xx where xx_assms: "xx : one \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" "\<langle>x,x\<rangle> = fibered_product_morphism X f f X \<circ>\<^sub>c xx"
+    then obtain xx where xx_assms: "xx : \<one> \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" "\<langle>x,x\<rangle> = fibered_product_morphism X f f X \<circ>\<^sub>c xx"
       by (smt assms(1) cfunc_type_def diag_on_elements diagonal_type domain_comp factors_through_def factorsthru fibered_product_morphism_type x_type)
       
     have projection_prop: "q0 \<circ>\<^sub>c ((fibered_product_left_proj X f f X)\<circ>\<^sub>c xx) = 

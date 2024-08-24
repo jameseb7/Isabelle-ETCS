@@ -140,30 +140,30 @@ lemma empty_subset: "(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>
 
 text \<open>The lemma below corresponds to Proposition 2.2.1 in Halvorson.\<close>
 lemma one_has_two_subsets:
-  "card ({(X,m). (X,m) \<subseteq>\<^sub>c one}//{((X1,m1),(X2,m2)). X1 \<cong> X2}) = 2"
+  "card ({(X,m). (X,m) \<subseteq>\<^sub>c \<one>}//{((X1,m1),(X2,m2)). X1 \<cong> X2}) = 2"
 proof -
-  have one_subobject: "(one, id one) \<subseteq>\<^sub>c one"
+  have one_subobject: "(\<one>, id \<one>) \<subseteq>\<^sub>c \<one>"
     using element_monomorphism id_type subobject_of_def2 by blast
-  have empty_subobject: "(\<emptyset>, \<alpha>\<^bsub>one\<^esub>) \<subseteq>\<^sub>c one"
+  have empty_subobject: "(\<emptyset>, \<alpha>\<^bsub>\<one>\<^esub>) \<subseteq>\<^sub>c \<one>"
     by (simp add: empty_subset)
 
-  have subobject_one_or_empty: "\<And>X m. (X,m) \<subseteq>\<^sub>c one \<Longrightarrow> X \<cong> one \<or> X \<cong> \<emptyset>"
+  have subobject_one_or_empty: "\<And>X m. (X,m) \<subseteq>\<^sub>c \<one> \<Longrightarrow> X \<cong> \<one> \<or> X \<cong> \<emptyset>"
   proof -
     fix X m
-    assume X_m_subobject: "(X, m) \<subseteq>\<^sub>c one"
+    assume X_m_subobject: "(X, m) \<subseteq>\<^sub>c \<one>"
 
-    obtain \<chi> where \<chi>_pullback: "is_pullback X one one \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> m \<chi>"
+    obtain \<chi> where \<chi>_pullback: "is_pullback X \<one> \<one> \<Omega> (\<beta>\<^bsub>X\<^esub>) \<t> m \<chi>"
       using X_m_subobject characteristic_function_exists subobject_of_def2 by blast
     then have \<chi>_true_or_false: "\<chi> = \<t> \<or> \<chi> = \<f>"
       unfolding is_pullback_def  using true_false_only_truth_values by auto
 
-    have true_iso_one: "\<chi> = \<t> \<Longrightarrow> X \<cong> one"
+    have true_iso_one: "\<chi> = \<t> \<Longrightarrow> X \<cong> \<one>"
     proof -
       assume \<chi>_true: "\<chi> = \<t>"
       then have "\<exists>! x. x \<in>\<^sub>c X"
         using \<chi>_pullback unfolding is_pullback_def         
-        by (clarsimp, (erule_tac x=one in allE, erule_tac x="id one" in allE, erule_tac x="id one" in allE), metis comp_type id_type terminal_func_unique)
-      then show "X \<cong> one"
+        by (clarsimp, (erule_tac x=\<one> in allE, erule_tac x="id \<one>" in allE, erule_tac x="id \<one>" in allE), metis comp_type id_type terminal_func_unique)
+      then show "X \<cong> \<one>"
         using single_elem_iso_one by auto
     qed
 
@@ -189,22 +189,22 @@ proof -
         using is_empty_def \<open>\<nexists>x. x \<in>\<^sub>c X\<close> no_el_iff_iso_empty by blast
     qed
 
-    show "X \<cong> one \<or> X \<cong> \<emptyset>"
+    show "X \<cong> \<one> \<or> X \<cong> \<emptyset>"
       using \<chi>_true_or_false false_iso_one true_iso_one by blast
   qed
 
-  have classes_distinct: "{(X, m). X \<cong> \<emptyset>} \<noteq> {(X, m). X \<cong> one}"
+  have classes_distinct: "{(X, m). X \<cong> \<emptyset>} \<noteq> {(X, m). X \<cong> \<one>}"
     by (metis case_prod_eta curry_case_prod emptyset_is_empty id_isomorphism id_type is_isomorphic_def mem_Collect_eq)
 
-  have "{(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X1, m1), (X2, m2)). X1 \<cong> X2} = {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> one}}"
+  have "{(X, m). (X, m) \<subseteq>\<^sub>c \<one>} // {((X1, m1), (X2, m2)). X1 \<cong> X2} = {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> \<one>}}"
   proof
-    show "{(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X1, m1), (X2, m2)). X1 \<cong> X2} \<subseteq> {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> one}}"
+    show "{(X, m). (X, m) \<subseteq>\<^sub>c \<one>} // {((X1, m1), (X2, m2)). X1 \<cong> X2} \<subseteq> {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> \<one>}}"
       by (unfold quotient_def, auto, insert isomorphic_is_symmetric isomorphic_is_transitive subobject_one_or_empty, blast+)
   next
-    show "{{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> one}} \<subseteq> {(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X1, m1), X2, m2). X1 \<cong> X2}"
+    show "{{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> \<one>}} \<subseteq> {(X, m). (X, m) \<subseteq>\<^sub>c \<one>} // {((X1, m1), X2, m2). X1 \<cong> X2}"
       by (unfold quotient_def, insert empty_subobject one_subobject, auto simp add: isomorphic_is_symmetric)
   qed
-  then show "card ({(X, m). (X, m) \<subseteq>\<^sub>c one} // {((X, m1), (Y, m2)). X \<cong> Y}) = 2"
+  then show "card ({(X, m). (X, m) \<subseteq>\<^sub>c \<one>} // {((X, m1), (Y, m2)). X \<cong> Y}) = 2"
     by (simp add: classes_distinct)
 qed
 
