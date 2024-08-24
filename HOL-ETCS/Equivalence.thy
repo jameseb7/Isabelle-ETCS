@@ -265,39 +265,39 @@ next
     by (rule_tac x="quotient_func h (R, m)" in exI, safe)
 next
   fix F k y
-  assume k_type: "k : X \<sslash> (R, m) \<rightarrow> F"
-  assume y_type: "y : X \<sslash> (R, m) \<rightarrow> F"
-  assume k_equiv_class_type: "k \<circ>\<^sub>c equiv_class (R, m) : X \<rightarrow> F"
+  assume k_type[type_rule]: "k : X \<sslash> (R, m) \<rightarrow> F"
+  assume y_type[type_rule]: "y : X \<sslash> (R, m) \<rightarrow> F"
+  assume k_equiv_class_type[type_rule]: "k \<circ>\<^sub>c equiv_class (R, m) : X \<rightarrow> F"
   assume k_equiv_class_eq: "(k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c m =
        (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c m"
   assume y_k_eq: "y \<circ>\<^sub>c equiv_class (R, m) = k \<circ>\<^sub>c equiv_class (R, m)"
 
-  have m_type: "m : R \<rightarrow> X \<times>\<^sub>c X"
+  have m_type[type_rule]: "m : R \<rightarrow> X \<times>\<^sub>c X"
     using assms equiv_rel_on_def reflexive_on_def subobject_of_def2 by blast
 
   have y_eq: "y = quotient_func (y \<circ>\<^sub>c equiv_class (R, m)) (R, m)"
-    using assms y_type k_equiv_class_type y_k_eq
-  proof (rule_tac quotient_func_unique[where X=X, where Y=F], simp_all, unfold const_on_rel_def, clarify)
+    using assms y_k_eq
+  proof (etcs_rule quotient_func_unique[where X=X, where Y=F], unfold const_on_rel_def, safe)
     fix a b
-    assume a_type: "a \<in>\<^sub>c X" and b_type: "b \<in>\<^sub>c X"
+    assume a_type[type_rule]: "a \<in>\<^sub>c X" and b_type[type_rule]: "b \<in>\<^sub>c X"
     assume ab_in_R: "\<langle>a,b\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (R, m)"
-    then obtain h where h_type: "h \<in>\<^sub>c R" and m_h_eq: "m \<circ>\<^sub>c h = \<langle>a, b\<rangle>"
+    then obtain h where h_type[type_rule]: "h \<in>\<^sub>c R" and m_h_eq: "m \<circ>\<^sub>c h = \<langle>a, b\<rangle>"
       unfolding relative_member_def factors_through_def using cfunc_type_def by auto 
 
     have "(k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c m \<circ>\<^sub>c h =
        (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c m \<circ>\<^sub>c h"
-      using k_type m_type h_type assms 
+      using assms 
       by (typecheck_cfuncs, smt comp_associative2 comp_type k_equiv_class_eq)
     then have "(k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c \<langle>a, b\<rangle> =
        (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c \<langle>a, b\<rangle>"
       by (simp add: m_h_eq)
-    then show "(k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c a = (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c b"
-      using a_type b_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
+    then show "(y \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c a = (y \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c b"
+      using a_type b_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod y_k_eq by auto
   qed
 
   have k_eq: "k = quotient_func (y \<circ>\<^sub>c equiv_class (R, m)) (R, m)"
-    using assms k_type k_equiv_class_type y_k_eq
-  proof (rule_tac quotient_func_unique[where X=X, where Y=F], simp_all, unfold const_on_rel_def, clarify)
+    using assms sym[OF y_k_eq]
+  proof (etcs_rule quotient_func_unique[where X=X, where Y=F], unfold const_on_rel_def, safe)
     fix a b
     assume a_type: "a \<in>\<^sub>c X" and b_type: "b \<in>\<^sub>c X"
     assume ab_in_R: "\<langle>a,b\<rangle> \<in>\<^bsub>X \<times>\<^sub>c X\<^esub> (R, m)"
@@ -311,8 +311,8 @@ next
     then have "(k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c left_cart_proj X X \<circ>\<^sub>c \<langle>a, b\<rangle> =
        (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c \<langle>a, b\<rangle>"
       by (simp add: m_h_eq)
-    then show "(k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c a = (k \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c b"
-      using a_type b_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
+    then show "(y \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c a = (y \<circ>\<^sub>c equiv_class (R, m)) \<circ>\<^sub>c b"
+      using a_type b_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod y_k_eq by auto
   qed
   show "k = y"
     using y_eq k_eq by auto
@@ -1504,4 +1504,3 @@ lemma right_pair_equiv_rel:
   by (unfold equiv_rel_on_def, auto)
 
 end
-
