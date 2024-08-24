@@ -33,40 +33,33 @@ proof(unfold fixed_point_property_def has_fixed_point_def, clarify)
     by auto
   then have f_type[type_rule]:"f : X \<rightarrow> A"
     using \<phi>_type comp_type diagonal_type f_def g_type by blast
-  obtain x_f where x_f: "metafunc f = p \<circ>\<^sub>c x_f \<and> x_f \<in>\<^sub>c X"
+  obtain x_f where x_f: "metafunc f = p \<circ>\<^sub>c x_f" and x_f_type[type_rule]: "x_f \<in>\<^sub>c X"
     using assms by (typecheck_cfuncs, metis p_surj surjective_def2)
   have "\<phi>\<^bsub>[-,x_f]\<^esub> = f"
-  proof(rule one_separator[where X = "X", where Y = A])
-    show "\<phi>\<^bsub>[-,x_f]\<^esub> : X \<rightarrow> A"
-      using assms by (typecheck_cfuncs, simp add: x_f)
-    show "f : X \<rightarrow> A"
-      by (simp add: f_type)
-    show "\<And>x. x \<in>\<^sub>c X \<Longrightarrow> \<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
-    proof - 
-      fix x 
-      assume x_type[type_rule]: "x \<in>\<^sub>c X"
-      have "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
-        using assms by (typecheck_cfuncs, meson right_param_on_el x_f)
-      also have "... = ((eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f p)) \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
-        using assms \<phi>_def inv_transpose_func_def3 by auto
-      also have "... = (eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f p) \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
-        by (typecheck_cfuncs, metis comp_associative2 x_f)
-      also have "... = (eval_func A X) \<circ>\<^sub>c \<langle>id X  \<circ>\<^sub>c  x, p \<circ>\<^sub>c x_f\<rangle>"
-        using cfunc_cross_prod_comp_cfunc_prod x_f by (typecheck_cfuncs, force)
-      also have "... = (eval_func A X) \<circ>\<^sub>c \<langle>x, metafunc f\<rangle>"
-        using id_left_unit2 x_f by (typecheck_cfuncs, auto)
-      also have "... = f \<circ>\<^sub>c x"
-        by (simp add: eval_lemma f_type x_type)
-      then show "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
-        by (simp add: calculation)
-    qed
+  proof(etcs_rule one_separator)
+    fix x 
+    assume x_type[type_rule]: "x \<in>\<^sub>c X"
+    have "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
+      by (typecheck_cfuncs, meson right_param_on_el x_f)
+    also have "... = ((eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f p)) \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
+      using assms \<phi>_def inv_transpose_func_def3 by auto
+    also have "... = (eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f p) \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
+      by (typecheck_cfuncs, metis comp_associative2)
+    also have "... = (eval_func A X) \<circ>\<^sub>c \<langle>id X  \<circ>\<^sub>c  x, p \<circ>\<^sub>c x_f\<rangle>"
+      using cfunc_cross_prod_comp_cfunc_prod x_f by (typecheck_cfuncs, force)
+    also have "... = (eval_func A X) \<circ>\<^sub>c \<langle>x, metafunc f\<rangle>"
+      using id_left_unit2 x_f by (typecheck_cfuncs, auto)
+    also have "... = f \<circ>\<^sub>c x"
+      by (simp add: eval_lemma f_type x_type)
+    then show "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
+      by (simp add: calculation)
   qed
   then have "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x_f = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c diagonal(X) \<circ>\<^sub>c x_f"
     by (typecheck_cfuncs, smt (z3) cfunc_type_def comp_associative domain_comp f_def x_f)
   then have "\<phi> \<circ>\<^sub>c \<langle>x_f, x_f\<rangle> = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c \<langle>x_f, x_f\<rangle>"
     using  diag_on_elements right_param_on_el x_f by (typecheck_cfuncs, auto)
   then have "fixed_point (\<phi> \<circ>\<^sub>c \<langle>x_f, x_f\<rangle>) g"
-    by (metis \<open>\<phi>\<^bsub>[-,x_f]\<^esub> = f\<close> \<open>\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x_f = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c diagonal X \<circ>\<^sub>c x_f\<close> comp_type diag_on_elements f_type fixed_point_def2 g_type x_f)
+    using fixed_point_def2 by (typecheck_cfuncs, auto)
   then show "\<exists>a. fixed_point a g"
     using fixed_point_def by auto
 qed

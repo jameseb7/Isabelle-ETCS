@@ -20,16 +20,11 @@ lemma FORALL_type[type_rule]:
   using FORALL_is_pullback unfolding is_pullback_def  by auto
 
 lemma all_true_implies_FORALL_true:
-  assumes p_type: "p : X \<rightarrow> \<Omega>" and all_p_true: "\<And> x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c x = \<t>"
+  assumes p_type[type_rule]: "p : X \<rightarrow> \<Omega>" and all_p_true: "\<And> x. x \<in>\<^sub>c X \<Longrightarrow> p \<circ>\<^sub>c x = \<t>"
   shows "FORALL X \<circ>\<^sub>c (p \<circ>\<^sub>c left_cart_proj X \<one>)\<^sup>\<sharp> = \<t>"
 proof -
   have "p \<circ>\<^sub>c left_cart_proj X \<one> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>"
-  proof (rule one_separator[where X="X \<times>\<^sub>c \<one>", where Y="\<Omega>"])
-    show "p \<circ>\<^sub>c left_cart_proj X \<one> : X \<times>\<^sub>c \<one> \<rightarrow> \<Omega>"
-      using p_type by typecheck_cfuncs
-    show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub> : X \<times>\<^sub>c \<one> \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
-  next
+  proof (etcs_rule one_separator)
     fix x
     assume x_type: "x \<in>\<^sub>c X \<times>\<^sub>c \<one>"
 
@@ -58,12 +53,7 @@ lemma all_true_implies_FORALL_true2:
   shows "FORALL X \<circ>\<^sub>c p\<^sup>\<sharp> = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
 proof -
   have "p = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>"
-  proof (rule one_separator[where X="X \<times>\<^sub>c Y", where Y=\<Omega>])
-    show "p : X \<times>\<^sub>c Y \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
-    show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub> : X \<times>\<^sub>c Y \<rightarrow> \<Omega>"
-      by typecheck_cfuncs
-  next
+  proof (etcs_rule one_separator)
     fix xy
     assume xy_type[type_rule]: "xy \<in>\<^sub>c X \<times>\<^sub>c Y"
     then have "p \<circ>\<^sub>c xy = \<t>"

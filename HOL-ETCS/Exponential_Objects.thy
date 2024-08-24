@@ -185,13 +185,9 @@ lemma same_evals_equal:
   by (metis assms inv_transpose_func_def3 sharp_cancels_flat)
 
 lemma sharp_comp:
-  assumes "f : A \<times>\<^sub>c Z \<rightarrow> X" "g : W \<rightarrow> Z"
+  assumes f_type[type_rule]: "f : A \<times>\<^sub>c Z \<rightarrow> X" and g_type[type_rule]: "g : W \<rightarrow> Z"
   shows "f\<^sup>\<sharp> \<circ>\<^sub>c g = (f \<circ>\<^sub>c (id A \<times>\<^sub>f g))\<^sup>\<sharp>"
-proof (rule same_evals_equal[where Z=W, where X=X, where A=A])
-  show "f\<^sup>\<sharp> \<circ>\<^sub>c g : W \<rightarrow> X\<^bsup>A\<^esup>"
-    using assms by typecheck_cfuncs
-  show "(f \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f g)\<^sup>\<sharp> : W \<rightarrow> X\<^bsup>A\<^esup>"
-    using assms by typecheck_cfuncs
+proof (etcs_rule same_evals_equal[where X=X, where A=A])
 
   have "eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f (f\<^sup>\<sharp> \<circ>\<^sub>c g)) = eval_func X A \<circ>\<^sub>c (id A \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (id A \<times>\<^sub>f g)"
     using assms by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
@@ -413,68 +409,49 @@ lemma cnufatem_type[type_rule]:
   by (auto, typecheck_cfuncs)
 
 lemma cnufatem_metafunc:
-  assumes "f : X \<rightarrow> Y"
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y"
   shows "cnufatem (metafunc f) = f"
-proof(rule one_separator[where X = X, where Y = Y])
-  show "cnufatem (metafunc f) : X \<rightarrow> Y"
-    using assms by typecheck_cfuncs
-  show "f : X \<rightarrow> Y"
-    using assms by simp
-  show "\<And>x. x \<in>\<^sub>c X \<Longrightarrow> cnufatem (metafunc f) \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
-  proof -
-    fix x
-    assume x_type[type_rule]: "x \<in>\<^sub>c X"
+proof(etcs_rule one_separator)
+  fix x
+  assume x_type[type_rule]: "x \<in>\<^sub>c X"
 
-    have "cnufatem (metafunc f) \<circ>\<^sub>c x =  eval_func Y X \<circ>\<^sub>c \<langle>id X, (metafunc f) \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x"
-      using assms cnufatem_def2 comp_associative2 by (typecheck_cfuncs, fastforce)
-    also have "... = eval_func Y X \<circ>\<^sub>c \<langle>x, (metafunc f)\<rangle>"
-      by (typecheck_cfuncs, metis assms cart_prod_extract_left)
-    also have "... = f \<circ>\<^sub>c x"
-      using assms eval_lemma by (typecheck_cfuncs, presburger)
-    then show "cnufatem (metafunc f) \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
-      by (simp add: calculation)
-  qed
+  have "cnufatem (metafunc f) \<circ>\<^sub>c x =  eval_func Y X \<circ>\<^sub>c \<langle>id X, (metafunc f) \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x"
+    using cnufatem_def2 comp_associative2 by (typecheck_cfuncs, fastforce)
+  also have "... = eval_func Y X \<circ>\<^sub>c \<langle>x, (metafunc f)\<rangle>"
+    by (typecheck_cfuncs, metis cart_prod_extract_left)
+  also have "... = f \<circ>\<^sub>c x"
+    using eval_lemma by (typecheck_cfuncs, presburger)
+  then show "cnufatem (metafunc f) \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
+    by (simp add: calculation)
 qed
 
 lemma metafunc_cnufatem:
-  assumes "f \<in>\<^sub>c Y\<^bsup>X\<^esup>"
+  assumes f_type[type_rule]: "f \<in>\<^sub>c Y\<^bsup>X\<^esup>"
   shows "metafunc (cnufatem f) = f"
-proof (rule same_evals_equal[where Z = \<one>, where X = Y, where A = X])
-  show "metafunc (cnufatem f) \<in>\<^sub>c Y\<^bsup>X\<^esup>"
-    using assms by typecheck_cfuncs
-  show "f \<in>\<^sub>c Y\<^bsup>X\<^esup>"
-    using assms by simp 
-  show "eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f (metafunc (cnufatem f))) = eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f"
-  proof(rule one_separator[where X = "X \<times>\<^sub>c \<one>", where Y = Y])
-    show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f (metafunc (cnufatem f)) : X \<times>\<^sub>c \<one> \<rightarrow> Y"
-      using assms by (typecheck_cfuncs)
-    show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f : X \<times>\<^sub>c \<one> \<rightarrow> Y"
-      using assms by typecheck_cfuncs
-  next 
-    fix x1
-    assume x1_type[type_rule]: "x1 \<in>\<^sub>c X \<times>\<^sub>c \<one>"
-    then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: " x1 = \<langle>x, id \<one>\<rangle>"
-      by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)
-    have "(eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f metafunc (cnufatem f)) \<circ>\<^sub>c \<langle>x, id \<one>\<rangle> =
-           eval_func Y X \<circ>\<^sub>c \<langle>x , metafunc (cnufatem f)\<rangle>"
-      using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 id_right_unit2)
-    also have "... = (cnufatem f) \<circ>\<^sub>c x"
-      using assms eval_lemma by (typecheck_cfuncs, presburger)
-    also have "... = (eval_func Y X \<circ>\<^sub>c \<langle>id X, f \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c x"
-      using assms cnufatem_def2 by presburger
-    also have "... = eval_func Y X \<circ>\<^sub>c \<langle>id X, f \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x"
-      by (typecheck_cfuncs, metis assms comp_associative2)
-    also have "... = eval_func Y X \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x , f \<circ>\<^sub>c (\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x)\<rangle>"
-      by (typecheck_cfuncs, metis assms cart_prod_extract_left id_left_unit2 id_right_unit2 terminal_func_comp_elem)
-    also have "... = eval_func Y X \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x , f \<circ>\<^sub>c id \<one>\<rangle>"
-      by (simp add: terminal_func_comp_elem x_type)
-    also have "... = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>"
-      using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
-    also have "... = (eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f) \<circ>\<^sub>c x1"
-      by (typecheck_cfuncs,metis assms comp_associative2 x_def)
-    then show "(eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f metafunc (cnufatem f)) \<circ>\<^sub>c x1 = (eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f) \<circ>\<^sub>c x1"
-      using  calculation x_def by presburger
-  qed
+proof (etcs_rule same_evals_equal[where X = Y, where A = X], etcs_rule one_separator)
+  fix x1
+  assume x1_type[type_rule]: "x1 \<in>\<^sub>c X \<times>\<^sub>c \<one>"
+  then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: " x1 = \<langle>x, id \<one>\<rangle>"
+    by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)
+  have "(eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f metafunc (cnufatem f)) \<circ>\<^sub>c \<langle>x, id \<one>\<rangle> =
+         eval_func Y X \<circ>\<^sub>c \<langle>x , metafunc (cnufatem f)\<rangle>"
+    by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 id_right_unit2)
+  also have "... = (cnufatem f) \<circ>\<^sub>c x"
+    using eval_lemma by (typecheck_cfuncs, presburger)
+  also have "... = (eval_func Y X \<circ>\<^sub>c \<langle>id X, f \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c x"
+    using assms cnufatem_def2 by presburger
+  also have "... = eval_func Y X \<circ>\<^sub>c \<langle>id X, f \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x"
+    by (typecheck_cfuncs, metis comp_associative2)
+  also have "... = eval_func Y X \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x , f \<circ>\<^sub>c (\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x)\<rangle>"
+    by (typecheck_cfuncs, metis cart_prod_extract_left id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+  also have "... = eval_func Y X \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x , f \<circ>\<^sub>c id \<one>\<rangle>"
+    by (simp add: terminal_func_comp_elem x_type)
+  also have "... = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>"
+    using cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
+  also have "... = (eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f) \<circ>\<^sub>c x1"
+    by (typecheck_cfuncs, metis comp_associative2 x_def)
+  then show "(eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f metafunc (cnufatem f)) \<circ>\<^sub>c x1 = (eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f f) \<circ>\<^sub>c x1"
+    using  calculation x_def by presburger
 qed
 
 subsubsection \<open>Metafunction Composition\<close>
@@ -568,40 +545,34 @@ proof(unfold meta_comp2_def2 cnufatem_def2 metafunc_def meta_comp_def)
 qed
 
 lemma meta_comp2_def4:
-  assumes "f \<in>\<^sub>c Z\<^bsup>Y\<^esup>"
-  assumes "g \<in>\<^sub>c Y\<^bsup>X\<^esup>"
+  assumes f_type[type_rule]: "f \<in>\<^sub>c Z\<^bsup>Y\<^esup>" and g_type[type_rule]: "g \<in>\<^sub>c Y\<^bsup>X\<^esup>"
   shows "f \<box> g   = meta_comp X Y Z \<circ>\<^sub>c \<langle>f,g\<rangle>"
   using assms 
 proof(unfold meta_comp2_def2 cnufatem_def2 metafunc_def meta_comp_def)          
   have "(((eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj X \<one>) =  
           (eval_func Z Y \<circ>\<^sub>c  swap (Z\<^bsup>Y\<^esup>) Y \<circ>\<^sub>c  (id\<^sub>c (Z\<^bsup>Y\<^esup>) \<times>\<^sub>f (eval_func Y X \<circ>\<^sub>c swap (Y\<^bsup>X\<^esup>) X)) \<circ>\<^sub>c associate_right (Z\<^bsup>Y\<^esup>) (Y\<^bsup>X\<^esup>) X \<circ>\<^sub>c swap X (Z\<^bsup>Y\<^esup> \<times>\<^sub>c Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c (id (X)  \<times>\<^sub>f  \<langle>f,g\<rangle>)"
-  proof(rule one_separator[where X = "X \<times>\<^sub>c \<one>", where Y = Z])
-    show "((eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj X \<one> : X \<times>\<^sub>c \<one> \<rightarrow> Z"
-      by (typecheck_cfuncs, meson assms)
-    show "(eval_func Z Y \<circ>\<^sub>c swap (Z\<^bsup>Y\<^esup>) Y \<circ>\<^sub>c (id\<^sub>c (Z\<^bsup>Y\<^esup>) \<times>\<^sub>f eval_func Y X \<circ>\<^sub>c swap (Y\<^bsup>X\<^esup>) X) \<circ>\<^sub>c associate_right (Z\<^bsup>Y\<^esup>) (Y\<^bsup>X\<^esup>) X \<circ>\<^sub>c swap X (Z\<^bsup>Y\<^esup> \<times>\<^sub>c Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle> : X \<times>\<^sub>c \<one> \<rightarrow> Z"
-      using assms by typecheck_cfuncs
-  next
+  proof(etcs_rule one_separator)
     fix x1 
     assume x1_type[type_rule]: "x1  \<in>\<^sub>c X \<times>\<^sub>c \<one>"
     then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "x1 = \<langle>x, id\<^sub>c \<one>\<rangle>"
       by (metis cart_prod_decomp id_type terminal_func_unique)
     have "(((eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj X \<one>) \<circ>\<^sub>c x1 = 
            ((eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj X \<one> \<circ>\<^sub>c x1"
-      by (typecheck_cfuncs, metis assms cfunc_type_def comp_associative)
+      by (typecheck_cfuncs, metis cfunc_type_def comp_associative)
     also have "... = ((eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c x"
       using id_type left_cart_proj_cfunc_prod x_def by (typecheck_cfuncs, presburger)
     also have "... =  (eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x"
-      by (typecheck_cfuncs, metis assms cfunc_type_def comp_associative)
+      by (typecheck_cfuncs, metis cfunc_type_def comp_associative)
     also have "... = eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle> \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x"
-      by (typecheck_cfuncs, metis assms cfunc_type_def comp_associative)
+      by (typecheck_cfuncs, metis cfunc_type_def comp_associative)
     also have "... = eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle> \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>x ,g\<rangle>"
-      by (typecheck_cfuncs, metis assms(2) cart_prod_extract_left)
+      by (typecheck_cfuncs, metis cart_prod_extract_left)
     also have "... = eval_func Z Y \<circ>\<^sub>c \<langle>eval_func Y X \<circ>\<^sub>c \<langle>x ,g\<rangle> ,f\<rangle>"
-      by (typecheck_cfuncs, metis assms cart_prod_extract_left)
+      by (typecheck_cfuncs, metis cart_prod_extract_left)
     also have "... = (eval_func Z Y \<circ>\<^sub>c swap (Z\<^bsup>Y\<^esup>) Y) \<circ>\<^sub>c \<langle>f , eval_func Y X \<circ>\<^sub>c  \<langle>x, g\<rangle>\<rangle>"
-      by (typecheck_cfuncs, metis assms comp_associative2 swap_ap)
+      by (typecheck_cfuncs, metis comp_associative2 swap_ap)
     also have "... = (eval_func Z Y \<circ>\<^sub>c swap (Z\<^bsup>Y\<^esup>) Y) \<circ>\<^sub>c \<langle>id\<^sub>c (Z\<^bsup>Y\<^esup>)  \<circ>\<^sub>c  f , (eval_func Y X \<circ>\<^sub>c swap (Y\<^bsup>X\<^esup>) X)  \<circ>\<^sub>c \<langle>g, x\<rangle>\<rangle>"
-      by (typecheck_cfuncs, smt (z3) assms comp_associative2 id_left_unit2 swap_ap)
+      by (typecheck_cfuncs, smt (z3) comp_associative2 id_left_unit2 swap_ap)
     also have "... = (eval_func Z Y \<circ>\<^sub>c swap (Z\<^bsup>Y\<^esup>) Y) \<circ>\<^sub>c (id\<^sub>c (Z\<^bsup>Y\<^esup>) \<times>\<^sub>f (eval_func Y X \<circ>\<^sub>c swap (Y\<^bsup>X\<^esup>) X)) \<circ>\<^sub>c   \<langle>f,\<langle>g, x\<rangle>\<rangle>"
       using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
     also have "... = (eval_func Z Y \<circ>\<^sub>c swap (Z\<^bsup>Y\<^esup>) Y \<circ>\<^sub>c (id\<^sub>c (Z\<^bsup>Y\<^esup>) \<times>\<^sub>f eval_func Y X \<circ>\<^sub>c swap (Y\<^bsup>X\<^esup>) X)) \<circ>\<^sub>c   \<langle>f,\<langle>g, x\<rangle>\<rangle>"
@@ -617,7 +588,7 @@ proof(unfold meta_comp2_def2 cnufatem_def2 metafunc_def meta_comp_def)
     also have "... = (eval_func Z Y \<circ>\<^sub>c swap (Z\<^bsup>Y\<^esup>) Y \<circ>\<^sub>c (id\<^sub>c (Z\<^bsup>Y\<^esup>) \<times>\<^sub>f eval_func Y X \<circ>\<^sub>c swap (Y\<^bsup>X\<^esup>) X) \<circ>\<^sub>c associate_right (Z\<^bsup>Y\<^esup>) (Y\<^bsup>X\<^esup>) X \<circ>\<^sub>c swap X (Z\<^bsup>Y\<^esup> \<times>\<^sub>c Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c   ((id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c  x1)"
       using assms by (typecheck_cfuncs, smt (z3) cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 id_type x_def)
     also have "... = ((eval_func Z Y \<circ>\<^sub>c swap (Z\<^bsup>Y\<^esup>) Y \<circ>\<^sub>c (id\<^sub>c (Z\<^bsup>Y\<^esup>) \<times>\<^sub>f eval_func Y X \<circ>\<^sub>c swap (Y\<^bsup>X\<^esup>) X) \<circ>\<^sub>c associate_right (Z\<^bsup>Y\<^esup>) (Y\<^bsup>X\<^esup>) X \<circ>\<^sub>c swap X (Z\<^bsup>Y\<^esup> \<times>\<^sub>c Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c x1"
-      by (typecheck_cfuncs, meson assms comp_associative2)
+      by (typecheck_cfuncs, meson comp_associative2)
     then show "(((eval_func Z Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c eval_func Y X \<circ>\<^sub>c \<langle>id\<^sub>c X,g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj X \<one>) \<circ>\<^sub>c x1 =
          ((eval_func Z Y \<circ>\<^sub>c swap (Z\<^bsup>Y\<^esup>) Y \<circ>\<^sub>c (id\<^sub>c (Z\<^bsup>Y\<^esup>) \<times>\<^sub>f eval_func Y X \<circ>\<^sub>c swap (Y\<^bsup>X\<^esup>) X) \<circ>\<^sub>c associate_right (Z\<^bsup>Y\<^esup>) (Y\<^bsup>X\<^esup>) X \<circ>\<^sub>c swap X (Z\<^bsup>Y\<^esup> \<times>\<^sub>c Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c x1"
       using calculation by presburger
@@ -1192,18 +1163,10 @@ proof -
     using transpose_func_type by (typecheck_cfuncs, blast)
 
   have "\<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> = id((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)"
-  proof(rule same_evals_equal[where Z= "((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)", where X = "(A\<^bsup>B\<^esup>)", where A = "C"])
-    show "\<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> : A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>\<^bsup>C\<^esup>"
-      by typecheck_cfuncs
-    show "id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>) : A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>\<^bsup>C\<^esup>"
-      by typecheck_cfuncs
+  proof(etcs_rule same_evals_equal[where X = "(A\<^bsup>B\<^esup>)", where A = "C"])
     show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> =
           eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
-    proof(rule same_evals_equal[where Z= "C \<times>\<^sub>c ((A\<^bsup>B\<^esup>)\<^bsup>C\<^esup>)", where X = "A", where A = "B"])
-      show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp> : C \<times>\<^sub>c A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>"
-        by typecheck_cfuncs
-      show "eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>) : C \<times>\<^sub>c A\<^bsup>B\<^esup>\<^bsup>C\<^esup> \<rightarrow> A\<^bsup>B\<^esup>"
-        by typecheck_cfuncs
+    proof(etcs_rule same_evals_equal[where X = "A", where A = "B"])
       show "eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f (eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c (id\<^sub>c C \<times>\<^sub>f \<phi>\<^sup>\<sharp>\<^sup>\<sharp> \<circ>\<^sub>c \<psi>\<^sup>\<sharp>)) =
             eval_func A B \<circ>\<^sub>c id\<^sub>c B \<times>\<^sub>f eval_func (A\<^bsup>B\<^esup>) C \<circ>\<^sub>c id\<^sub>c C \<times>\<^sub>f id\<^sub>c (A\<^bsup>B\<^esup>\<^bsup>C\<^esup>)"
       proof - 
@@ -1243,11 +1206,7 @@ proof -
     qed
   qed
   have "\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp> = id(A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)"
-  proof(rule same_evals_equal[where Z= "A\<^bsup>(B \<times>\<^sub>c C)\<^esup>", where X = "A", where A = "(B \<times>\<^sub>c C)"])
-    show "\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp> : A\<^bsup>(B \<times>\<^sub>c C)\<^esup> \<rightarrow> A\<^bsup>(B \<times>\<^sub>c C)\<^esup>"
-      by typecheck_cfuncs
-    show "id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>) : A\<^bsup>(B \<times>\<^sub>c C)\<^esup> \<rightarrow> A\<^bsup>(B \<times>\<^sub>c C)\<^esup>"
-      by typecheck_cfuncs
+  proof(etcs_rule same_evals_equal[where X = "A", where A = "(B \<times>\<^sub>c C)"])
     show "eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c (id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f (\<psi>\<^sup>\<sharp> \<circ>\<^sub>c \<phi>\<^sup>\<sharp>\<^sup>\<sharp>)) = 
           eval_func A (B \<times>\<^sub>c C) \<circ>\<^sub>c id\<^sub>c (B \<times>\<^sub>c C) \<times>\<^sub>f id\<^sub>c (A\<^bsup>(B \<times>\<^sub>c C)\<^esup>)"
     proof -
@@ -1303,57 +1262,43 @@ proof -
     using \<phi>_def transpose_func_type by (typecheck_cfuncs, presburger)
 
   have fsharp_gsharp_id: "f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = id(Y\<^bsup>A\<^esup>)"
-  proof(rule same_evals_equal[where Z = "Y\<^bsup>A\<^esup>", where X = Y, where A = A])
-    show "f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> : Y\<^bsup>A\<^esup> \<rightarrow> Y\<^bsup>A\<^esup>"
-      by typecheck_cfuncs
-    show idYA_type: "id\<^sub>c (Y\<^bsup>A\<^esup>) : Y\<^bsup>A\<^esup> \<rightarrow> Y\<^bsup>A\<^esup>"
-      by typecheck_cfuncs
-    show "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)"
-    proof - 
-      have "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g\<^sup>\<sharp>)"
-        using fsharp_type gsharp_type identity_distributes_across_composition by auto
-      also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g\<^sup>\<sharp>)"
-        using \<psi>_def cfunc_type_def comp_associative f_def f_type gsharp_type transpose_func_def by (typecheck_cfuncs, smt)
-      also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f g\<^sup>\<sharp>)"
-        by (smt \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod gsharp_type id_left_unit2 id_right_unit2 id_type)
-      also have "... = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g\<^sup>\<sharp>) \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))"
-        by (smt \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod gsharp_type id_left_unit2 id_right_unit2 id_type)
-      also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>)) \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))"
-        by (typecheck_cfuncs, smt \<phi>_def \<psi>_def comp_associative2 flat_cancels_sharp g_def g_type inv_transpose_func_def3)
-      also have "... = eval_func Y A \<circ>\<^sub>c ((\<phi> \<circ>\<^sub>c \<psi>) \<times>\<^sub>f (id(Y\<^bsup>A\<^esup>) \<circ>\<^sub>c id(Y\<^bsup>A\<^esup>)))"
-        using \<phi>_def \<psi>_def idYA_type cfunc_cross_prod_comp_cfunc_cross_prod by auto        
-      also have "... = eval_func Y A \<circ>\<^sub>c id(A) \<times>\<^sub>f id(Y\<^bsup>A\<^esup>)"
-        using idA idYA_type id_right_unit2 by auto
-      then show "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)"
-        by (simp add: calculation)
-    qed
+  proof(etcs_rule same_evals_equal[where X = Y, where A = A])
+    have "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g\<^sup>\<sharp>)"
+      using fsharp_type gsharp_type identity_distributes_across_composition by auto
+    also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c (id\<^sub>c A \<times>\<^sub>f g\<^sup>\<sharp>)"
+      using \<psi>_def cfunc_type_def comp_associative f_def f_type gsharp_type transpose_func_def by (typecheck_cfuncs, smt)
+    also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f g\<^sup>\<sharp>)"
+      by (smt \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod gsharp_type id_left_unit2 id_right_unit2 id_type)
+    also have "... = eval_func Y X \<circ>\<^sub>c (id X \<times>\<^sub>f g\<^sup>\<sharp>) \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))"
+      by (smt \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod gsharp_type id_left_unit2 id_right_unit2 id_type)
+    also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>)) \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id(Y\<^bsup>A\<^esup>))"
+      by (typecheck_cfuncs, smt \<phi>_def \<psi>_def comp_associative2 flat_cancels_sharp g_def g_type inv_transpose_func_def3)
+    also have "... = eval_func Y A \<circ>\<^sub>c ((\<phi> \<circ>\<^sub>c \<psi>) \<times>\<^sub>f (id(Y\<^bsup>A\<^esup>) \<circ>\<^sub>c id(Y\<^bsup>A\<^esup>)))"
+      using \<phi>_def \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod by (typecheck_cfuncs, auto)
+    also have "... = eval_func Y A \<circ>\<^sub>c id(A) \<times>\<^sub>f id(Y\<^bsup>A\<^esup>)"
+      using idA id_right_unit2 by (typecheck_cfuncs, auto)
+    then show "eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f f\<^sup>\<sharp> \<circ>\<^sub>c g\<^sup>\<sharp> = eval_func Y A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)"
+      by (simp add: calculation)
   qed
 
   have gsharp_fsharp_id: "g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = id(Y\<^bsup>X\<^esup>)"
-  proof(rule same_evals_equal[where Z = "Y\<^bsup>X\<^esup>", where X = Y, where A = X])
-    show "g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> : Y\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>"
-      by typecheck_cfuncs
-    show idYX_type: "id\<^sub>c (Y\<^bsup>X\<^esup>) : Y\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>"
-      by typecheck_cfuncs
-    show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)"
-    proof - 
-      have "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
-        using fsharp_type gsharp_type identity_distributes_across_composition by auto
-      also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
-        using \<phi>_def cfunc_type_def comp_associative fsharp_type g_def g_type transpose_func_def by (typecheck_cfuncs, smt)
-      also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f f\<^sup>\<sharp>)"
-        by (smt \<phi>_def cfunc_cross_prod_comp_cfunc_cross_prod fsharp_type id_left_unit2 id_right_unit2 id_type)
-      also have "... = eval_func Y A \<circ>\<^sub>c (id(A) \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>))"
-        by (smt \<phi>_def cfunc_cross_prod_comp_cfunc_cross_prod fsharp_type id_left_unit2 id_right_unit2 id_type)
-      also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>))"
-        by (typecheck_cfuncs, smt \<phi>_def \<psi>_def comp_associative2 f_def f_type flat_cancels_sharp inv_transpose_func_def3)
-      also have "... = eval_func Y X \<circ>\<^sub>c ((\<psi> \<circ>\<^sub>c \<phi>) \<times>\<^sub>f (id(Y\<^bsup>X\<^esup>) \<circ>\<^sub>c id(Y\<^bsup>X\<^esup>)))"
-        using \<phi>_def \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod idYX_type by auto
-      also have "... = eval_func Y X \<circ>\<^sub>c id(X) \<times>\<^sub>f id(Y\<^bsup>X\<^esup>)"
-        using \<psi>_def idYX_type id_left_unit2 by auto
-      then show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)"
-        by (simp add: calculation)
-    qed
+  proof(etcs_rule same_evals_equal[where X = Y, where A = X])
+    have "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
+      using fsharp_type gsharp_type identity_distributes_across_composition by auto
+    also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id\<^sub>c X \<times>\<^sub>f f\<^sup>\<sharp>)"
+      using \<phi>_def cfunc_type_def comp_associative fsharp_type g_def g_type transpose_func_def by (typecheck_cfuncs, smt)
+    also have "... = eval_func Y A \<circ>\<^sub>c (\<phi> \<times>\<^sub>f f\<^sup>\<sharp>)"
+      by (smt \<phi>_def cfunc_cross_prod_comp_cfunc_cross_prod fsharp_type id_left_unit2 id_right_unit2 id_type)
+    also have "... = eval_func Y A \<circ>\<^sub>c (id(A) \<times>\<^sub>f f\<^sup>\<sharp>) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>))"
+      by (smt \<phi>_def cfunc_cross_prod_comp_cfunc_cross_prod fsharp_type id_left_unit2 id_right_unit2 id_type)
+    also have "... = eval_func Y X \<circ>\<^sub>c (\<psi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)) \<circ>\<^sub>c (\<phi> \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>))"
+      by (typecheck_cfuncs, smt \<phi>_def \<psi>_def comp_associative2 f_def f_type flat_cancels_sharp inv_transpose_func_def3)
+    also have "... = eval_func Y X \<circ>\<^sub>c ((\<psi> \<circ>\<^sub>c \<phi>) \<times>\<^sub>f (id(Y\<^bsup>X\<^esup>) \<circ>\<^sub>c id(Y\<^bsup>X\<^esup>)))"
+      using \<phi>_def \<psi>_def cfunc_cross_prod_comp_cfunc_cross_prod by (typecheck_cfuncs, auto)
+    also have "... = eval_func Y X \<circ>\<^sub>c id(X) \<times>\<^sub>f id(Y\<^bsup>X\<^esup>)"
+      using \<psi>_def id_left_unit2 by (typecheck_cfuncs, auto)
+    then show "eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f g\<^sup>\<sharp> \<circ>\<^sub>c f\<^sup>\<sharp> = eval_func Y X \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f id\<^sub>c (Y\<^bsup>X\<^esup>)"
+      by (simp add: calculation)
   qed
   show ?thesis
     by (metis cfunc_type_def comp_epi_imp_epi comp_monic_imp_monic epi_mon_is_iso fsharp_gsharp_id fsharp_type gsharp_fsharp_id gsharp_type id_isomorphism is_isomorphic_def iso_imp_epi_and_monic)
@@ -1396,7 +1341,7 @@ proof -
                  \<phi>_type[type_rule]: "\<phi> : A\<^bsup>\<Omega>\<^esup> \<rightarrow> A \<times>\<^sub>c A"
                   by (typecheck_cfuncs, simp)
   have "injective \<phi>"
-  proof(unfold injective_def,clarify)
+  proof(unfold injective_def, clarify)
     fix f g 
     assume "f \<in>\<^sub>c domain \<phi>" then have f_type[type_rule]: "f \<in>\<^sub>c A\<^bsup>\<Omega>\<^esup>" 
       using \<phi>_type cfunc_type_def by (typecheck_cfuncs, auto)
@@ -1404,133 +1349,111 @@ proof -
       using \<phi>_type cfunc_type_def by (typecheck_cfuncs, auto)
     assume eqs: "\<phi> \<circ>\<^sub>c f = \<phi> \<circ>\<^sub>c g"
     show "f = g"
-    proof(rule one_separator[where X = \<one>, where Y = "A\<^bsup>\<Omega>\<^esup>"])
-      show "f \<in>\<^sub>c A\<^bsup>\<Omega>\<^esup>" 
-        by typecheck_cfuncs
-      show "g \<in>\<^sub>c A\<^bsup>\<Omega>\<^esup>"
-        by typecheck_cfuncs
+    proof(etcs_rule one_separator)
       show "\<And>id_1. id_1 \<in>\<^sub>c \<one> \<Longrightarrow> f \<circ>\<^sub>c id_1 = g \<circ>\<^sub>c id_1"
-      proof(rule same_evals_equal[where Z = \<one>, where X = A, where A = \<Omega>])
-        show "\<And>id_1. id_1 \<in>\<^sub>c \<one> \<Longrightarrow> f \<circ>\<^sub>c id_1 \<in>\<^sub>c A\<^bsup>\<Omega>\<^esup>"
-          by (simp add: comp_type f_type)
-        show "\<And>id_1. id_1 \<in>\<^sub>c \<one> \<Longrightarrow> g \<circ>\<^sub>c id_1 \<in>\<^sub>c A\<^bsup>\<Omega>\<^esup>"
-          by (simp add: comp_type g_type)
-        show "\<And>id_1.
-       id_1 \<in>\<^sub>c \<one> \<Longrightarrow>
-       eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f \<circ>\<^sub>c id_1 =
-       eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g \<circ>\<^sub>c id_1"
-        proof  -
-          fix id_1
-          assume id1_is: "id_1 \<in>\<^sub>c \<one>"
-          then have id1_eq: "id_1 = id(\<one>)"
-            using id_type one_unique_element by auto
+      proof(etcs_rule same_evals_equal[where X = A, where A = \<Omega>])
+        fix id_1
+        assume id1_is: "id_1 \<in>\<^sub>c \<one>"
+        then have id1_eq: "id_1 = id(\<one>)"
+          using id_type one_unique_element by auto
 
-          obtain a1 a2 where phi_f_def: "\<phi> \<circ>\<^sub>c f = \<langle>a1,a2\<rangle> \<and> a1 \<in>\<^sub>c A \<and> a2 \<in>\<^sub>c A"
-            using \<phi>_type cart_prod_decomp comp_type f_type by blast
-          have equation1: "\<langle>a1,a2\<rangle> =  \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f\<rangle>,
-                              eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f\<rangle>\<rangle>"
-          proof - 
-              have "\<langle>a1,a2\<rangle> = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle>,
-                                  eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle>\<rangle> \<circ>\<^sub>c f"
-                using \<phi>_def phi_f_def by auto
-              also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle> \<circ>\<^sub>c f,
-                                  eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle> \<circ>\<^sub>c f\<rangle>"
-                by (typecheck_cfuncs,smt cfunc_prod_comp comp_associative2)
-              also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub> \<circ>\<^sub>c f, id(A\<^bsup>\<Omega>\<^esup>) \<circ>\<^sub>c f\<rangle>,
-                                  eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub> \<circ>\<^sub>c f, id(A\<^bsup>\<Omega>\<^esup>)\<circ>\<^sub>c f\<rangle>\<rangle>"
-                by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
-              also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f\<rangle>,
-                                  eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f\<rangle>\<rangle>"    
-                by (typecheck_cfuncs, metis id1_eq id1_is id_left_unit2 id_right_unit2 terminal_func_unique)
-              then show ?thesis using calculation by auto
+        obtain a1 a2 where phi_f_def: "\<phi> \<circ>\<^sub>c f = \<langle>a1,a2\<rangle> \<and> a1 \<in>\<^sub>c A \<and> a2 \<in>\<^sub>c A"
+          using \<phi>_type cart_prod_decomp comp_type f_type by blast
+        have equation1: "\<langle>a1,a2\<rangle> =  \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f\<rangle>,
+                            eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f\<rangle>\<rangle>"
+        proof - 
+          have "\<langle>a1,a2\<rangle> = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle>,
+                              eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle>\<rangle> \<circ>\<^sub>c f"
+            using \<phi>_def phi_f_def by auto
+          also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle> \<circ>\<^sub>c f,
+                              eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle> \<circ>\<^sub>c f\<rangle>"
+            by (typecheck_cfuncs,smt cfunc_prod_comp comp_associative2)
+          also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub> \<circ>\<^sub>c f, id(A\<^bsup>\<Omega>\<^esup>) \<circ>\<^sub>c f\<rangle>,
+                              eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub> \<circ>\<^sub>c f, id(A\<^bsup>\<Omega>\<^esup>)\<circ>\<^sub>c f\<rangle>\<rangle>"
+            by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+          also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f\<rangle>,
+                              eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f\<rangle>\<rangle>"    
+            by (typecheck_cfuncs, metis id1_eq id1_is id_left_unit2 id_right_unit2 terminal_func_unique)
+          then show ?thesis using calculation by auto
+        qed
+        have equation2: "\<langle>a1,a2\<rangle> =  \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>,
+                                    eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>\<rangle>"
+        proof - 
+          have "\<langle>a1,a2\<rangle> = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle>,
+                          eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle>\<rangle> \<circ>\<^sub>c g"
+            using \<phi>_def eqs phi_f_def by auto
+          also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle> \<circ>\<^sub>c g ,
+                            eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle> \<circ>\<^sub>c g\<rangle>"
+            by (typecheck_cfuncs,smt cfunc_prod_comp comp_associative2)
+          also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub> \<circ>\<^sub>c g, id(A\<^bsup>\<Omega>\<^esup>) \<circ>\<^sub>c g\<rangle>,
+                            eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub> \<circ>\<^sub>c g, id(A\<^bsup>\<Omega>\<^esup>)\<circ>\<^sub>c g \<rangle>\<rangle>"
+            by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+          also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>,
+                            eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>\<rangle>"    
+            by (typecheck_cfuncs, metis id1_eq id1_is id_left_unit2 id_right_unit2 terminal_func_unique)
+          then show ?thesis using calculation by auto
+        qed
+        have "\<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f\<rangle>, eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f\<rangle>\<rangle> = 
+              \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>, eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>\<rangle>"
+          using equation1 equation2 by auto
+        then have equation3: "(eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f\<rangle> = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>) \<and> 
+                              (eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f\<rangle> = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>)"
+          using  cart_prod_eq2 by (typecheck_cfuncs, auto)
+        have "eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f  = eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g"
+        proof(etcs_rule one_separator)
+          fix x
+          assume x_type[type_rule]: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<one>"
+          then obtain w i where  x_def: "(w \<in>\<^sub>c \<Omega>) \<and> (i \<in>\<^sub>c \<one>) \<and> (x = \<langle>w,i\<rangle>)"
+            using cart_prod_decomp by blast
+          then have i_def: "i = id(\<one>)"
+            using id1_eq id1_is one_unique_element by auto
+          have w_def: "(w = \<f>) \<or> (w = \<t>)"
+            by (simp add: true_false_only_truth_values x_def)
+          then have x_def2: "(x = \<langle>\<f>,i\<rangle>) \<or> (x = \<langle>\<t>,i\<rangle>)"
+            using x_def by auto
+          show "(eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c x = (eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c x"
+          proof(cases "(x = \<langle>\<f>,i\<rangle>)",clarify)
+            assume case1: "x = \<langle>\<f>,i\<rangle>"
+            have "(eval_func A \<Omega> \<circ>\<^sub>c (id\<^sub>c \<Omega> \<times>\<^sub>f f)) \<circ>\<^sub>c \<langle>\<f>,i\<rangle> = eval_func A \<Omega> \<circ>\<^sub>c ((id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>\<f>,i\<rangle>)"
+              using case1 comp_associative2 x_type by (typecheck_cfuncs, auto)
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>id\<^sub>c \<Omega> \<circ>\<^sub>c  \<f>,f \<circ>\<^sub>c i\<rangle>"
+              using cfunc_cross_prod_comp_cfunc_prod i_def id1_eq id1_is by (typecheck_cfuncs, auto)
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f \<rangle>"
+              using f_type false_func_type i_def id_left_unit2 id_right_unit2 by auto
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>"
+              using equation3 by blast
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>id\<^sub>c \<Omega> \<circ>\<^sub>c  \<f>,g \<circ>\<^sub>c i\<rangle>"
+              by (typecheck_cfuncs, simp add: i_def id_left_unit2 id_right_unit2)
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c ((id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>\<f>,i\<rangle>)"
+              using cfunc_cross_prod_comp_cfunc_prod i_def id1_eq id1_is by (typecheck_cfuncs, auto)
+            also have "... = (eval_func A \<Omega> \<circ>\<^sub>c (id\<^sub>c \<Omega> \<times>\<^sub>f g)) \<circ>\<^sub>c \<langle>\<f>,i\<rangle>"
+              using case1 comp_associative2 x_type by (typecheck_cfuncs, auto)
+            then show "(eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>\<f>,i\<rangle> = (eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>\<f>,i\<rangle>"
+              by (simp add: calculation)
+          next
+            assume case2: "x \<noteq> \<langle>\<f>,i\<rangle>"
+            then have x_eq: "x = \<langle>\<t>,i\<rangle>"
+              using x_def2 by blast
+            have "(eval_func A \<Omega> \<circ>\<^sub>c (id\<^sub>c \<Omega> \<times>\<^sub>f f)) \<circ>\<^sub>c \<langle>\<t>,i\<rangle> = eval_func A \<Omega> \<circ>\<^sub>c ((id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>\<t>,i\<rangle>)"
+                using case2 x_eq comp_associative2 x_type by (typecheck_cfuncs, auto)
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>id\<^sub>c \<Omega> \<circ>\<^sub>c  \<t>,f \<circ>\<^sub>c i\<rangle>"
+                using cfunc_cross_prod_comp_cfunc_prod i_def id1_eq id1_is by (typecheck_cfuncs, auto)
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f \<rangle>"
+              using f_type i_def id_left_unit2 id_right_unit2 true_func_type by auto
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>"
+              using equation3 by blast
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>id\<^sub>c \<Omega> \<circ>\<^sub>c  \<t>,g \<circ>\<^sub>c i\<rangle>"
+                by (typecheck_cfuncs, simp add: i_def id_left_unit2 id_right_unit2)
+            also have "... = eval_func A \<Omega> \<circ>\<^sub>c ((id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>\<t>,i\<rangle>)"
+                using cfunc_cross_prod_comp_cfunc_prod i_def id1_eq id1_is by (typecheck_cfuncs, auto)
+            also have "... = (eval_func A \<Omega> \<circ>\<^sub>c (id\<^sub>c \<Omega> \<times>\<^sub>f g)) \<circ>\<^sub>c \<langle>\<t>,i\<rangle>"
+              using comp_associative2 x_eq x_type by (typecheck_cfuncs, blast)
+            then show "(eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c x = (eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c x"
+              by (simp add: calculation x_eq)
           qed
-          have equation2: "\<langle>a1,a2\<rangle> =  \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>,
-                                      eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>\<rangle>"
-          proof - 
-              have "\<langle>a1,a2\<rangle> = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle>,
-                              eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle>\<rangle> \<circ>\<^sub>c g"
-                using \<phi>_def eqs phi_f_def by auto
-              also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle> \<circ>\<^sub>c g ,
-                                eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub>, id(A\<^bsup>\<Omega>\<^esup>)\<rangle> \<circ>\<^sub>c g\<rangle>"
-                by (typecheck_cfuncs,smt cfunc_prod_comp comp_associative2)
-              also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub> \<circ>\<^sub>c g, id(A\<^bsup>\<Omega>\<^esup>) \<circ>\<^sub>c g\<rangle>,
-                                eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^bsup>\<Omega>\<^esup>\<^esub> \<circ>\<^sub>c g, id(A\<^bsup>\<Omega>\<^esup>)\<circ>\<^sub>c g \<rangle>\<rangle>"
-                by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
-              also have "... = \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>,
-                                eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>\<rangle>"    
-                by (typecheck_cfuncs, metis id1_eq id1_is id_left_unit2 id_right_unit2 terminal_func_unique)
-              then show ?thesis using calculation by auto
-         qed
-            have "\<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f\<rangle>, eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f\<rangle>\<rangle> = 
-                  \<langle>eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>, eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>\<rangle>"
-              using equation1 equation2 by auto
-            then have equation3: "(eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f\<rangle> = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>) \<and> 
-                                  (eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f\<rangle> = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>)"
-              using  cart_prod_eq2 by (typecheck_cfuncs, auto)
-            have "eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f  = eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g"
-            proof(rule one_separator[where X = "\<Omega> \<times>\<^sub>c \<one>", where Y = A])
-              show "eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f : \<Omega> \<times>\<^sub>c \<one> \<rightarrow> A"
-                by typecheck_cfuncs
-              show "eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g : \<Omega> \<times>\<^sub>c \<one> \<rightarrow> A"
-                by typecheck_cfuncs
-              show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<one> \<Longrightarrow>
-         (eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c x = (eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c x"
-              proof - 
-                fix x
-                assume x_type[type_rule]: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<one>"
-                then obtain w i where  x_def: "(w \<in>\<^sub>c \<Omega>) \<and> (i \<in>\<^sub>c \<one>) \<and> (x = \<langle>w,i\<rangle>)"
-                  using cart_prod_decomp by blast
-                then have i_def: "i = id(\<one>)"
-                  using id1_eq id1_is one_unique_element by auto
-                have w_def: "(w = \<f>) \<or> (w = \<t>)"
-                  by (simp add: true_false_only_truth_values x_def)
-                then have x_def2: "(x = \<langle>\<f>,i\<rangle>) \<or> (x = \<langle>\<t>,i\<rangle>)"
-                  using x_def by auto
-                show "(eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c x = (eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c x"
-                proof(cases "(x = \<langle>\<f>,i\<rangle>)",clarify)
-                  assume case1: "x = \<langle>\<f>,i\<rangle>"
-                  have "(eval_func A \<Omega> \<circ>\<^sub>c (id\<^sub>c \<Omega> \<times>\<^sub>f f)) \<circ>\<^sub>c \<langle>\<f>,i\<rangle> = eval_func A \<Omega> \<circ>\<^sub>c ((id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>\<f>,i\<rangle>)"
-                    using case1 comp_associative2 x_type by (typecheck_cfuncs, auto)
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>id\<^sub>c \<Omega> \<circ>\<^sub>c  \<f>,f \<circ>\<^sub>c i\<rangle>"
-                    using cfunc_cross_prod_comp_cfunc_prod i_def id1_eq id1_is by (typecheck_cfuncs, auto)
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, f \<rangle>"
-                    using f_type false_func_type i_def id_left_unit2 id_right_unit2 by auto
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<f>, g\<rangle>"
-                    using equation3 by blast
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>id\<^sub>c \<Omega> \<circ>\<^sub>c  \<f>,g \<circ>\<^sub>c i\<rangle>"
-                    by (typecheck_cfuncs, simp add: i_def id_left_unit2 id_right_unit2)
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c ((id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>\<f>,i\<rangle>)"
-                    using cfunc_cross_prod_comp_cfunc_prod i_def id1_eq id1_is by (typecheck_cfuncs, auto)
-                  also have "... = (eval_func A \<Omega> \<circ>\<^sub>c (id\<^sub>c \<Omega> \<times>\<^sub>f g)) \<circ>\<^sub>c \<langle>\<f>,i\<rangle>"
-                    using case1 comp_associative2 x_type by (typecheck_cfuncs, auto)
-                  then show "(eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>\<f>,i\<rangle> = (eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>\<f>,i\<rangle>"
-                    by (simp add: calculation)
-              next
-                  assume case2: "x \<noteq> \<langle>\<f>,i\<rangle>"
-                  then have x_eq: "x = \<langle>\<t>,i\<rangle>"
-                    using x_def2 by blast
-                  have "(eval_func A \<Omega> \<circ>\<^sub>c (id\<^sub>c \<Omega> \<times>\<^sub>f f)) \<circ>\<^sub>c \<langle>\<t>,i\<rangle> = eval_func A \<Omega> \<circ>\<^sub>c ((id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>\<t>,i\<rangle>)"
-                      using case2 x_eq comp_associative2 x_type by (typecheck_cfuncs, auto)
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>id\<^sub>c \<Omega> \<circ>\<^sub>c  \<t>,f \<circ>\<^sub>c i\<rangle>"
-                      using cfunc_cross_prod_comp_cfunc_prod i_def id1_eq id1_is by (typecheck_cfuncs, auto)
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, f \<rangle>"
-                    using f_type i_def id_left_unit2 id_right_unit2 true_func_type by auto
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>\<t>, g\<rangle>"
-                    using equation3 by blast
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c \<langle>id\<^sub>c \<Omega> \<circ>\<^sub>c  \<t>,g \<circ>\<^sub>c i\<rangle>"
-                      by (typecheck_cfuncs, simp add: i_def id_left_unit2 id_right_unit2)
-                  also have "... = eval_func A \<Omega> \<circ>\<^sub>c ((id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>\<t>,i\<rangle>)"
-                      using cfunc_cross_prod_comp_cfunc_prod i_def id1_eq id1_is by (typecheck_cfuncs, auto)
-                  also have "... = (eval_func A \<Omega> \<circ>\<^sub>c (id\<^sub>c \<Omega> \<times>\<^sub>f g)) \<circ>\<^sub>c \<langle>\<t>,i\<rangle>"
-                    using comp_associative2 x_eq x_type by (typecheck_cfuncs, blast)
-                  then show "(eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f) \<circ>\<^sub>c x = (eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g) \<circ>\<^sub>c x"
-                    by (simp add: calculation x_eq)
-                qed
-              qed
-            qed
-            then show "eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f \<circ>\<^sub>c id_1 = eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g \<circ>\<^sub>c id_1"
-              using  f_type g_type same_evals_equal by blast
-          qed
+        qed
+        then show "eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f f \<circ>\<^sub>c id_1 = eval_func A \<Omega> \<circ>\<^sub>c id\<^sub>c \<Omega> \<times>\<^sub>f g \<circ>\<^sub>c id_1"
+          using  f_type g_type same_evals_equal by blast
         qed
       qed
     qed

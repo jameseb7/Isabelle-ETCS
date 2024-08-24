@@ -744,7 +744,6 @@ proof -
     qed
     show "fibered_product_right_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_right_proj X f f X"
     proof -
-      thm b_eq fibered_product_right_proj_def
       have "fibered_product_right_proj E h h E \<circ>\<^sub>c b
           = right_cart_proj E E \<circ>\<^sub>c fibered_product_morphism E h h E \<circ>\<^sub>c b"
         unfolding fibered_product_right_proj_def by (typecheck_cfuncs, simp add: comp_associative2)

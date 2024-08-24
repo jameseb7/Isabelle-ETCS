@@ -94,9 +94,12 @@ proof -
         using calculation by auto
     qed
     show "epimorphism (g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m)"
-      by (rule surjective_is_epimorphism, typecheck_cfuncs, unfold surjective_def2, clarify,
-             rule_tac x="f \<circ>\<^sub>c y" in exI, safe, typecheck_cfuncs, simp add: func_f_elem_eq,
-             simp add: cfunc_type_def codomain_comp domain_comp, smt func_f_elem_eq)
+    proof (rule surjective_is_epimorphism, etcs_subst surjective_def2, clarify)
+      fix y
+      assume y_type[type_rule]: "y \<in>\<^sub>c X"
+      show "\<exists>xa. xa \<in>\<^sub>c Y \<and> (g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c xa = y"
+        by (rule exI[where x="f \<circ>\<^sub>c y"], typecheck_cfuncs, smt func_f_elem_eq)
+    qed
     show "(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c f = id\<^sub>c X"
       by (insert comp_associative2 func_f_elem_eq id_left_unit2, typecheck_cfuncs, rule one_separator, auto)
   qed

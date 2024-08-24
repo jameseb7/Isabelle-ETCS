@@ -674,6 +674,13 @@ definition is_pullback :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarr
     (\<forall> Z k h. (k : Z \<rightarrow> B \<and> h : Z \<rightarrow> C \<and> bd \<circ>\<^sub>c k = cd \<circ>\<^sub>c h)  \<longrightarrow>
       (\<exists>! j. j : Z \<rightarrow> A \<and> ab \<circ>\<^sub>c j = k \<and> ac \<circ>\<^sub>c j = h)))"
 
+lemma pullback_unique:
+  assumes "ab : A \<rightarrow> B" "bd : B \<rightarrow> D" "ac : A \<rightarrow> C" "cd : C \<rightarrow> D"
+  assumes "k : Z \<rightarrow> B" "h : Z \<rightarrow> C"
+  assumes "is_pullback A B C D ab bd ac cd"
+  shows "bd \<circ>\<^sub>c k = cd \<circ>\<^sub>c h \<Longrightarrow> (\<exists>! j. j : Z \<rightarrow> A \<and> ab \<circ>\<^sub>c j = k \<and> ac \<circ>\<^sub>c j = h)"
+  using assms unfolding is_pullback_def by simp
+
 lemma pullback_iff_product:
   assumes "terminal_object(T)"
   assumes f_type[type_rule]: "f : Y \<rightarrow> T" 

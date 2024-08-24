@@ -283,11 +283,8 @@ lemma inverse_image_is_equalizer:
 proof -
   obtain A k where "equalizer A k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
     by (meson assms(1,2) comp_type equalizer_exists left_cart_proj_type right_cart_proj_type)
-  then have "\<exists> X Y k. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
-    equalizer (inverse_image f B m) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
-    unfolding inverse_image_def by (rule_tac someI_ex, auto, rule_tac x="A" in exI, rule_tac x="X" in exI, rule_tac x="Y" in exI, auto simp add: assms)
   then show "\<exists>k. equalizer (inverse_image f B m) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
-    using assms(2) cfunc_type_def by auto
+    unfolding inverse_image_def using assms cfunc_type_def by (rule_tac someI2_ex, auto)
 qed
 
 definition inverse_image_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc"  where
@@ -416,18 +413,24 @@ next
   then show "\<exists>j. j : Z \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>) \<and>
          (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = k \<and>
          (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h"
-  proof (insert k_type h_type assms, typecheck_cfuncs, safe, rule_tac x=u in exI, safe)
+  proof (insert k_type h_type assms, safe)
     fix u
-    assume u_type: "u : Z \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>)"
+    assume u_type[type_rule]: "u : Z \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>)"
     assume u_eq: "inverse_image_mapping f B m \<circ>\<^sub>c u = \<langle>h,k\<rangle>"
 
-    show "(right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c u = k"
-      using assms u_type h_type k_type u_eq
-      by (typecheck_cfuncs, metis (full_types) comp_associative2 right_cart_proj_cfunc_prod)
+    show "\<exists>j. j : Z \<rightarrow> f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub> \<and>
+             (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = k \<and>
+             (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h"
+    proof (rule exI[where x=u], typecheck_cfuncs, safe)
 
-    show "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c u = h"
-      using assms u_type h_type k_type u_eq
-      by (typecheck_cfuncs, metis (full_types) comp_associative2 left_cart_proj_cfunc_prod)
+      show "(right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c u = k"
+        using assms u_type h_type k_type u_eq
+        by (typecheck_cfuncs, metis (full_types) comp_associative2 right_cart_proj_cfunc_prod)
+  
+      show "(left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c u = h"
+        using assms u_type h_type k_type u_eq
+        by (typecheck_cfuncs, metis (full_types) comp_associative2 left_cart_proj_cfunc_prod)
+    qed
   qed
 next
   fix Z j y

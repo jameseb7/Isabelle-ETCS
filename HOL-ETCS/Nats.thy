@@ -472,14 +472,9 @@ lemma ITER_type[type_rule]:
   unfolding ITER_def by typecheck_cfuncs
 
 lemma ITER_zero: 
-  assumes "f : Z \<rightarrow> (U\<^bsup>U\<^esup>)"
+  assumes f_type[type_rule]: "f : Z \<rightarrow> (U\<^bsup>U\<^esup>)"
   shows "ITER U \<circ>\<^sub>c \<langle>f, zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle> = metafunc (id U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>"
-proof(rule one_separator[where X = Z, where Y = "U\<^bsup>U\<^esup>"])
-  show "ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle> : Z \<rightarrow> U\<^bsup>U\<^esup>"
-    using assms by typecheck_cfuncs
-  show "metafunc (id\<^sub>c U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub> : Z \<rightarrow> U\<^bsup>U\<^esup>"
-    using assms by typecheck_cfuncs
-next
+proof(etcs_rule one_separator)
   fix z 
   assume z_type[type_rule]: "z \<in>\<^sub>c Z"
   have "(ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle>) \<circ>\<^sub>c z = ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle> \<circ>\<^sub>c z"
@@ -514,15 +509,9 @@ lemma ITER_zero':
   by (typecheck_cfuncs, metis ITER_zero assms id_right_unit2 id_type one_unique_element terminal_func_type)
 
 lemma ITER_succ:
- assumes "f : Z \<rightarrow> (U\<^bsup>U\<^esup>)"
- assumes "n : Z \<rightarrow> \<nat>\<^sub>c"
+ assumes f_type[type_rule]: "f : Z \<rightarrow> (U\<^bsup>U\<^esup>)" and n_type[type_rule]: "n : Z \<rightarrow> \<nat>\<^sub>c"
  shows "ITER U \<circ>\<^sub>c \<langle>f, successor \<circ>\<^sub>c n\<rangle> = f \<box> (ITER U \<circ>\<^sub>c \<langle>f, n \<rangle>)"
-proof(rule one_separator[where X = Z, where Y = "U\<^bsup>U\<^esup>"])
-  show "ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle> : Z \<rightarrow> U\<^bsup>U\<^esup>"
-    using assms by typecheck_cfuncs
-  show "f \<box> ITER U \<circ>\<^sub>c \<langle>f,n\<rangle> : Z \<rightarrow> U\<^bsup>U\<^esup>"
-    using assms by typecheck_cfuncs
-next
+proof(etcs_rule one_separator)
   fix z 
   assume z_type[type_rule]: "z \<in>\<^sub>c Z"
   have "(ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle>) \<circ>\<^sub>c z  = ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle> \<circ>\<^sub>c z"
@@ -589,14 +578,9 @@ lemma iter_comp_def3:
   using assms cfunc_type_def iter_comp_def2 by auto
 
 lemma zero_iters:
-  assumes "g : X \<rightarrow> X"
+  assumes g_type[type_rule]: "g : X \<rightarrow> X"
   shows "g\<^bsup>\<circ>zero\<^esup> = id\<^sub>c X"
-proof(rule one_separator[where X=X, where Y=X])
-  show "g\<^bsup>\<circ>zero\<^esup> : X \<rightarrow> X"
-    using assms by typecheck_cfuncs
-  show "id\<^sub>c X : X \<rightarrow> X"
-    by typecheck_cfuncs
-next 
+proof(etcs_rule one_separator)
   fix x 
   assume x_type[type_rule]: "x \<in>\<^sub>c X"
   have "(g\<^bsup>\<circ>zero\<^esup>) \<circ>\<^sub>c x = (cnufatem (ITER X \<circ>\<^sub>c \<langle>metafunc g,zero\<rangle>)) \<circ>\<^sub>c x"
@@ -663,12 +647,7 @@ next
     using calculation by auto
   show "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor =
     successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>"
-  proof(rule one_separator[where X ="\<nat>\<^sub>c", where Y = "\<nat>\<^sub>c"])
-    show "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-      by typecheck_cfuncs
-    show "successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-      by typecheck_cfuncs
-  next    
+  proof(etcs_rule one_separator)
     fix m
     assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
     have "(successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c m = 

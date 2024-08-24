@@ -160,11 +160,11 @@ proof -
     have true_iso_one: "\<chi> = \<t> \<Longrightarrow> X \<cong> \<one>"
     proof -
       assume \<chi>_true: "\<chi> = \<t>"
-      then have "\<exists>! x. x \<in>\<^sub>c X"
-        using \<chi>_pullback unfolding is_pullback_def         
-        by (clarsimp, (erule_tac x=\<one> in allE, erule_tac x="id \<one>" in allE, erule_tac x="id \<one>" in allE), metis comp_type id_type terminal_func_unique)
+      then have "\<exists>!j. j \<in>\<^sub>c X \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c j = id\<^sub>c \<one> \<and> m \<circ>\<^sub>c j = id\<^sub>c \<one>"
+        using \<chi>_pullback \<chi>_true is_pullback_def by (typecheck_cfuncs, auto)
       then show "X \<cong> \<one>"
-        using single_elem_iso_one by auto
+        using single_elem_iso_one
+        by (metis X_m_subobject subobject_of_def2 terminal_func_comp_elem terminal_func_unique) 
     qed
 
     have false_iso_one: "\<chi> = \<f> \<Longrightarrow> X \<cong> \<emptyset>"

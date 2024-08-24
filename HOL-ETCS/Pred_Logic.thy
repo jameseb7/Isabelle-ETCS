@@ -452,36 +452,29 @@ lemma OR_true_implies_one_is_true:
 
 lemma NOT_NOR_is_OR:
  "OR = NOT \<circ>\<^sub>c NOR"
-proof(rule one_separator[where X = "\<Omega> \<times>\<^sub>c \<Omega>", where Y = \<Omega>])
-  show "OR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "NOT \<circ>\<^sub>c NOR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega> \<Longrightarrow> OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
-  proof-
-    fix x 
-    assume x_type[type_rule]: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
-    then obtain p q where p_type[type_rule]: "p \<in>\<^sub>c \<Omega>" and q_type[type_rule]:  "q \<in>\<^sub>c \<Omega>" and x_def: "x = \<langle>p,q\<rangle>"
-      by (meson cart_prod_decomp)
+proof(etcs_rule one_separator)
+  fix x 
+  assume x_type[type_rule]: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
+  then obtain p q where p_type[type_rule]: "p \<in>\<^sub>c \<Omega>" and q_type[type_rule]:  "q \<in>\<^sub>c \<Omega>" and x_def: "x = \<langle>p,q\<rangle>"
+    by (meson cart_prod_decomp)
+  show "OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
+  proof(cases "p = \<t>")
+    show "p = \<t> \<Longrightarrow> OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
+      by (typecheck_cfuncs, metis NOR_left_true_is_false NOT_false_is_true OR_true_left_is_true comp_associative2 q_type x_def)
+  next
+    assume "p \<noteq> \<t>"
+    then have "p = \<f>"
+      using p_type true_false_only_truth_values by blast
     show "OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
-    proof(cases "p = \<t>")
-      show "p = \<t> \<Longrightarrow> OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
-        by (typecheck_cfuncs, metis NOR_left_true_is_false NOT_false_is_true OR_true_left_is_true comp_associative2 q_type x_def)
+    proof(cases "q = \<t>")
+      show "q = \<t> \<Longrightarrow> OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
+        by (typecheck_cfuncs, metis NOR_right_true_is_false NOT_false_is_true OR_true_right_is_true 
+            cfunc_type_def comp_associative p_type x_def)
     next
-      assume "p \<noteq> \<t>"
-      then have "p = \<f>"
-        using p_type true_false_only_truth_values by blast
-      show "OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
-      proof(cases "q = \<t>")
-        show "q = \<t> \<Longrightarrow> OR \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c NOR) \<circ>\<^sub>c x"
-          by (typecheck_cfuncs, metis NOR_right_true_is_false NOT_false_is_true OR_true_right_is_true 
-              cfunc_type_def comp_associative p_type x_def)
-      next
-        assume "q \<noteq> \<t>"
-        then show ?thesis
-          by (typecheck_cfuncs,metis NOR_false_false_is_true NOT_is_true_implies_false OR_false_false_is_false
-              \<open>p = \<f>\<close>  comp_associative2 q_type true_false_only_truth_values x_def)
-      qed
+      assume "q \<noteq> \<t>"
+      then show ?thesis
+        by (typecheck_cfuncs,metis NOR_false_false_is_true NOT_is_true_implies_false OR_false_false_is_false
+            \<open>p = \<f>\<close>  comp_associative2 q_type true_false_only_truth_values x_def)
     qed
   qed
 qed
@@ -876,20 +869,13 @@ lemma NAND_true_implies_one_is_false:
 
 lemma NOT_AND_is_NAND:
  "NAND = NOT \<circ>\<^sub>c AND"
-proof(rule one_separator[where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y = "\<Omega>"])
-  show "NAND : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "NOT \<circ>\<^sub>c AND : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega> \<Longrightarrow> NAND \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c AND) \<circ>\<^sub>c x"
-  proof-
-    fix x 
-    assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
-    then obtain p q where x_def: "p \<in>\<^sub>c \<Omega> \<and> q \<in>\<^sub>c \<Omega> \<and> x = \<langle>p,q\<rangle>"
-      by (meson cart_prod_decomp)
-    show "NAND \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c AND) \<circ>\<^sub>c x"
-      by (typecheck_cfuncs, metis AND_false_left_is_false AND_false_right_is_false AND_true_true_is_true NAND_left_false_is_true NAND_right_false_is_true NAND_true_implies_one_is_false NOT_false_is_true NOT_true_is_false comp_associative2 true_false_only_truth_values x_def x_type)
-  qed
+proof(etcs_rule one_separator)
+  fix x 
+  assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
+  then obtain p q where x_def: "p \<in>\<^sub>c \<Omega> \<and> q \<in>\<^sub>c \<Omega> \<and> x = \<langle>p,q\<rangle>"
+    by (meson cart_prod_decomp)
+  show "NAND \<circ>\<^sub>c x = (NOT \<circ>\<^sub>c AND) \<circ>\<^sub>c x"
+    by (typecheck_cfuncs, metis AND_false_left_is_false AND_false_right_is_false AND_true_true_is_true NAND_left_false_is_true NAND_right_false_is_true NAND_true_implies_one_is_false NOT_false_is_true NOT_true_is_false comp_associative2 true_false_only_truth_values x_def x_type)
 qed
 
 lemma NAND_not_idempotent:
@@ -1086,45 +1072,38 @@ qed
 
 lemma NOT_IFF_is_XOR: 
   "NOT \<circ>\<^sub>c IFF = XOR"
-proof(rule one_separator[where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y = "\<Omega>"])
-  show "NOT \<circ>\<^sub>c IFF : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "XOR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega> \<Longrightarrow> (NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
-  proof - 
-    fix x   
-    assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
-    then obtain u w where x_def: "u \<in>\<^sub>c \<Omega> \<and> w \<in>\<^sub>c \<Omega> \<and> x = \<langle>u,w\<rangle>"
-      using cart_prod_decomp by blast
+proof(etcs_rule one_separator)
+  fix x   
+  assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
+  then obtain u w where x_def: "u \<in>\<^sub>c \<Omega> \<and> w \<in>\<^sub>c \<Omega> \<and> x = \<langle>u,w\<rangle>"
+    using cart_prod_decomp by blast
+  show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
+  proof(cases "u = \<t>")
     show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
-    proof(cases "u = \<t>")
+    proof(cases "w = \<t>")
       show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
-      proof(cases "w = \<t>")
-        show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
-          by (metis IFF_false_false_is_true IFF_false_true_is_false IFF_true_false_is_false IFF_true_true_is_true IFF_type NOT_false_is_true NOT_true_is_false NOT_type XOR_false_false_is_false XOR_only_true_left_is_true XOR_only_true_right_is_true XOR_true_true_is_false cfunc_type_def comp_associative true_false_only_truth_values x_def x_type)
-      next 
-        assume "w \<noteq> \<t>"
-        then have "w = \<f>"
-          by (metis true_false_only_truth_values x_def)
-        then show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
-          by (metis IFF_false_false_is_true IFF_true_false_is_false IFF_type NOT_false_is_true NOT_true_is_false NOT_type XOR_false_false_is_false XOR_only_true_left_is_true comp_associative2 true_false_only_truth_values x_def x_type)
-      qed
+        by (metis IFF_false_false_is_true IFF_false_true_is_false IFF_true_false_is_false IFF_true_true_is_true IFF_type NOT_false_is_true NOT_true_is_false NOT_type XOR_false_false_is_false XOR_only_true_left_is_true XOR_only_true_right_is_true XOR_true_true_is_false cfunc_type_def comp_associative true_false_only_truth_values x_def x_type)
     next 
-      assume "u \<noteq> \<t>"
-      then have "u = \<f>"
+      assume "w \<noteq> \<t>"
+      then have "w = \<f>"
         by (metis true_false_only_truth_values x_def)
+      then show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
+        by (metis IFF_false_false_is_true IFF_true_false_is_false IFF_type NOT_false_is_true NOT_true_is_false NOT_type XOR_false_false_is_false XOR_only_true_left_is_true comp_associative2 true_false_only_truth_values x_def x_type)
+    qed
+  next 
+    assume "u \<noteq> \<t>"
+    then have "u = \<f>"
+      by (metis true_false_only_truth_values x_def)
+    show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
+    proof(cases "w = \<t>")
       show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
-      proof(cases "w = \<t>")
-        show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
-          by (metis IFF_false_false_is_true IFF_false_true_is_false IFF_type NOT_false_is_true NOT_true_is_false NOT_type XOR_false_false_is_false XOR_only_true_right_is_true \<open>u = \<f>\<close> comp_associative2 true_false_only_truth_values x_def x_type)
-      next
-        assume "w \<noteq> \<t>"
-        then have "w = \<f>"
-          by (metis true_false_only_truth_values x_def)
-        then show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
-          by (metis IFF_false_false_is_true IFF_type NOT_true_is_false NOT_type XOR_false_false_is_false \<open>u = \<f>\<close> cfunc_type_def comp_associative x_def x_type)
-      qed
+        by (metis IFF_false_false_is_true IFF_false_true_is_false IFF_type NOT_false_is_true NOT_true_is_false NOT_type XOR_false_false_is_false XOR_only_true_right_is_true \<open>u = \<f>\<close> comp_associative2 true_false_only_truth_values x_def x_type)
+    next
+      assume "w \<noteq> \<t>"
+      then have "w = \<f>"
+        by (metis true_false_only_truth_values x_def)
+      then show "(NOT \<circ>\<^sub>c IFF) \<circ>\<^sub>c x = XOR \<circ>\<^sub>c x"
+        by (metis IFF_false_false_is_true IFF_type NOT_true_is_false NOT_type XOR_false_false_is_false \<open>u = \<f>\<close> cfunc_type_def comp_associative x_def x_type)
     qed
   qed
 qed
@@ -1318,111 +1297,104 @@ lemma IMPLIES_false_is_true_false:
 text \<open>ETCS analog to $(A \iff B) = (A \implies B) \land (B \implies A)$\<close>
 lemma iff_is_and_implies_implies_swap:
 "IFF = AND \<circ>\<^sub>c  \<langle>IMPLIES, IMPLIES \<circ>\<^sub>c  swap \<Omega> \<Omega>\<rangle>"
-proof(rule one_separator[ where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y = "\<Omega>"])
-  show "IFF : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle> : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega> \<Longrightarrow> IFF \<circ>\<^sub>c x = (AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x"
-  proof-
-    fix x 
-    assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
-    then obtain p q where x_def: "p \<in>\<^sub>c \<Omega> \<and> q \<in>\<^sub>c \<Omega> \<and> x = \<langle>p,q\<rangle>"
-      by (meson cart_prod_decomp)
-    show "IFF \<circ>\<^sub>c x = (AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x"
-    proof(cases "p = \<t>")
-      assume "p = \<t>"
+proof(etcs_rule one_separator)
+  fix x 
+  assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
+  then obtain p q where x_def: "p \<in>\<^sub>c \<Omega> \<and> q \<in>\<^sub>c \<Omega> \<and> x = \<langle>p,q\<rangle>"
+    by (meson cart_prod_decomp)
+  show "IFF \<circ>\<^sub>c x = (AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x"
+  proof(cases "p = \<t>")
+    assume "p = \<t>"
+    show ?thesis
+    proof(cases "q = \<t>")
+      assume "q = \<t>"
       show ?thesis
-      proof(cases "q = \<t>")
-        assume "q = \<t>"
-        show ?thesis
-        proof - 
-          have "(AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x =    
-                 AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>  \<circ>\<^sub>c x"
-            using comp_associative2 x_type by (typecheck_cfuncs, force)
-          also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c x,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega> \<circ>\<^sub>c x\<rangle>"
-            using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, force)
-          also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle>, IMPLIES \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle>\<rangle>"
-            using \<open>p = \<t>\<close> \<open>q = \<t>\<close> swap_ap x_def by (typecheck_cfuncs, presburger)
-          also have "... = AND \<circ>\<^sub>c \<langle>\<t>, \<t>\<rangle>"
-            using IMPLIES_true_true_is_true by presburger
-          also have "... = \<t>"
-            by (simp add: AND_true_true_is_true)
-          also have "... = IFF \<circ>\<^sub>c x"
-            by (simp add: IFF_true_true_is_true \<open>p = \<t>\<close> \<open>q = \<t>\<close> x_def)
-          then show ?thesis
-            by (simp add: calculation)
-        qed
-      next
-        assume "q \<noteq> \<t>"
-        then have "q = \<f>"
-          by (meson true_false_only_truth_values x_def)
-        show ?thesis
-        proof - 
-          have "(AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x =    
-                 AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>  \<circ>\<^sub>c x"
-            using comp_associative2 x_type by (typecheck_cfuncs, force)
-          also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c x,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega> \<circ>\<^sub>c x\<rangle>"
-            using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, force)
-          also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c \<langle>\<t>,\<f>\<rangle>, IMPLIES \<circ>\<^sub>c \<langle>\<f>,\<t>\<rangle>\<rangle>"
-            using \<open>p = \<t>\<close> \<open>q = \<f>\<close> swap_ap x_def by (typecheck_cfuncs, presburger)
-          also have "... = AND \<circ>\<^sub>c \<langle>\<f>, \<t>\<rangle>"
-            using IMPLIES_false_true_is_true IMPLIES_true_false_is_false by presburger
-          also have "... = \<f>"
-            by (simp add: AND_false_left_is_false true_func_type)
-          also have "... = IFF \<circ>\<^sub>c x"
-            by (simp add: IFF_true_false_is_false \<open>p = \<t>\<close> \<open>q = \<f>\<close> x_def)
-          then show ?thesis
-            by (simp add: calculation)
-        qed
+      proof - 
+        have "(AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x =    
+               AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>  \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c x,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega> \<circ>\<^sub>c x\<rangle>"
+          using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle>, IMPLIES \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle>\<rangle>"
+          using \<open>p = \<t>\<close> \<open>q = \<t>\<close> swap_ap x_def by (typecheck_cfuncs, presburger)
+        also have "... = AND \<circ>\<^sub>c \<langle>\<t>, \<t>\<rangle>"
+          using IMPLIES_true_true_is_true by presburger
+        also have "... = \<t>"
+          by (simp add: AND_true_true_is_true)
+        also have "... = IFF \<circ>\<^sub>c x"
+          by (simp add: IFF_true_true_is_true \<open>p = \<t>\<close> \<open>q = \<t>\<close> x_def)
+        then show ?thesis
+          by (simp add: calculation)
       qed
     next
-      assume "p \<noteq> \<t>"
-      then have "p = \<f>"
-        using true_false_only_truth_values x_def by blast
+      assume "q \<noteq> \<t>"
+      then have "q = \<f>"
+        by (meson true_false_only_truth_values x_def)
       show ?thesis
-      proof(cases "q = \<t>")
-        assume "q = \<t>"
-        show ?thesis
-        proof - 
-          have "(AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x =    
-                 AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>  \<circ>\<^sub>c x"
-            using comp_associative2 x_type by (typecheck_cfuncs, force)
-          also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c x,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega> \<circ>\<^sub>c x\<rangle>"
-            using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, force)
-          also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c \<langle>\<f>,\<t>\<rangle>, IMPLIES \<circ>\<^sub>c \<langle>\<t>,\<f>\<rangle>\<rangle>"
-            using \<open>p = \<f>\<close> \<open>q = \<t>\<close> swap_ap x_def by (typecheck_cfuncs, presburger)
-          also have "... = AND \<circ>\<^sub>c \<langle>\<t>, \<f>\<rangle>"
-            by (simp add: IMPLIES_false_true_is_true IMPLIES_true_false_is_false)
-          also have "... = \<f>"
-            by (simp add: AND_false_right_is_false true_func_type)
-          also have "... = IFF \<circ>\<^sub>c x"
-            by (simp add: IFF_false_true_is_false \<open>p = \<f>\<close> \<open>q = \<t>\<close> x_def)
-          then show ?thesis
-            by (simp add: calculation)
-        qed
-      next
-        assume "q \<noteq> \<t>"
-        then have "q = \<f>"
-          by (meson true_false_only_truth_values x_def)
-        show ?thesis
-        proof - 
-          have "(AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x =    
-                 AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>  \<circ>\<^sub>c x"
-            using comp_associative2 x_type by (typecheck_cfuncs, force)
-          also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c x,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega> \<circ>\<^sub>c x\<rangle>"
-            using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, force)
-          also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle>, IMPLIES \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle>\<rangle>"
-            using \<open>p = \<f>\<close> \<open>q = \<f>\<close> swap_ap x_def by (typecheck_cfuncs, presburger)
-          also have "... = AND \<circ>\<^sub>c \<langle>\<t>, \<t>\<rangle>"
-            by (simp add: IMPLIES_false_false_is_true)
-          also have "... = \<t>"
-            by (simp add: AND_true_true_is_true)
-          also have "... = IFF \<circ>\<^sub>c x"
-            by (simp add: IFF_false_false_is_true \<open>p = \<f>\<close> \<open>q = \<f>\<close> x_def)
-          then show ?thesis
-            by (simp add: calculation)
-        qed
+      proof - 
+        have "(AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x =    
+               AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>  \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c x,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega> \<circ>\<^sub>c x\<rangle>"
+          using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c \<langle>\<t>,\<f>\<rangle>, IMPLIES \<circ>\<^sub>c \<langle>\<f>,\<t>\<rangle>\<rangle>"
+          using \<open>p = \<t>\<close> \<open>q = \<f>\<close> swap_ap x_def by (typecheck_cfuncs, presburger)
+        also have "... = AND \<circ>\<^sub>c \<langle>\<f>, \<t>\<rangle>"
+          using IMPLIES_false_true_is_true IMPLIES_true_false_is_false by presburger
+        also have "... = \<f>"
+          by (simp add: AND_false_left_is_false true_func_type)
+        also have "... = IFF \<circ>\<^sub>c x"
+          by (simp add: IFF_true_false_is_false \<open>p = \<t>\<close> \<open>q = \<f>\<close> x_def)
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+    qed
+  next
+    assume "p \<noteq> \<t>"
+    then have "p = \<f>"
+      using true_false_only_truth_values x_def by blast
+    show ?thesis
+    proof(cases "q = \<t>")
+      assume "q = \<t>"
+      show ?thesis
+      proof - 
+        have "(AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x =    
+               AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>  \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c x,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega> \<circ>\<^sub>c x\<rangle>"
+          using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c \<langle>\<f>,\<t>\<rangle>, IMPLIES \<circ>\<^sub>c \<langle>\<t>,\<f>\<rangle>\<rangle>"
+          using \<open>p = \<f>\<close> \<open>q = \<t>\<close> swap_ap x_def by (typecheck_cfuncs, presburger)
+        also have "... = AND \<circ>\<^sub>c \<langle>\<t>, \<f>\<rangle>"
+          by (simp add: IMPLIES_false_true_is_true IMPLIES_true_false_is_false)
+        also have "... = \<f>"
+          by (simp add: AND_false_right_is_false true_func_type)
+        also have "... = IFF \<circ>\<^sub>c x"
+          by (simp add: IFF_false_true_is_false \<open>p = \<f>\<close> \<open>q = \<t>\<close> x_def)
+        then show ?thesis
+          by (simp add: calculation)
+      qed
+    next
+      assume "q \<noteq> \<t>"
+      then have "q = \<f>"
+        by (meson true_false_only_truth_values x_def)
+      show ?thesis
+      proof - 
+        have "(AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>) \<circ>\<^sub>c x =    
+               AND \<circ>\<^sub>c \<langle>IMPLIES,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega>\<rangle>  \<circ>\<^sub>c x"
+          using comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c x,IMPLIES \<circ>\<^sub>c swap \<Omega> \<Omega> \<circ>\<^sub>c x\<rangle>"
+          using cfunc_prod_comp comp_associative2 x_type by (typecheck_cfuncs, force)
+        also have "... = AND \<circ>\<^sub>c \<langle>IMPLIES \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle>, IMPLIES \<circ>\<^sub>c \<langle>\<f>,\<f>\<rangle>\<rangle>"
+          using \<open>p = \<f>\<close> \<open>q = \<f>\<close> swap_ap x_def by (typecheck_cfuncs, presburger)
+        also have "... = AND \<circ>\<^sub>c \<langle>\<t>, \<t>\<rangle>"
+          by (simp add: IMPLIES_false_false_is_true)
+        also have "... = \<t>"
+          by (simp add: AND_true_true_is_true)
+        also have "... = IFF \<circ>\<^sub>c x"
+          by (simp add: IFF_false_false_is_true \<open>p = \<f>\<close> \<open>q = \<f>\<close> x_def)
+        then show ?thesis
+          by (simp add: calculation)
       qed
     qed
   qed
@@ -1430,88 +1402,81 @@ qed
 
 lemma IMPLIES_is_OR_NOT_id:
   "IMPLIES = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id(\<Omega>))"
-proof(rule one_separator[ where X = "\<Omega>\<times>\<^sub>c\<Omega>", where Y = "\<Omega>"])
-  show "IMPLIES : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega> : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "\<And>x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega> \<Longrightarrow> IMPLIES \<circ>\<^sub>c x = (OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
-  proof - 
-    fix x 
-    assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
-    then obtain u v where x_form: "u \<in>\<^sub>c \<Omega> \<and> v \<in>\<^sub>c \<Omega> \<and> x = \<langle>u, v\<rangle>"
-      using cart_prod_decomp by blast
-    show "IMPLIES \<circ>\<^sub>c x = (OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
-    proof(cases "u = \<t>")
-      assume "u = \<t>"
-      show ?thesis
-      proof(cases "v = \<t>")
-        assume "v = \<t>"
-        have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
-          using comp_associative2 x_type by (typecheck_cfuncs, force)
-        also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<t>\<rangle>"
-          by (typecheck_cfuncs, simp add: \<open>u = \<t>\<close> \<open>v = \<t>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
-        also have "... = OR \<circ>\<^sub>c \<langle>\<f>, \<t>\<rangle>"
-          by (typecheck_cfuncs, simp add: NOT_true_is_false id_left_unit2)
-        also have "... = \<t>"
-          by (simp add: OR_true_right_is_true false_func_type)
-        also have "... = IMPLIES \<circ>\<^sub>c x"
-          by (simp add: IMPLIES_true_true_is_true \<open>u = \<t>\<close> \<open>v = \<t>\<close> x_form)
-        then show ?thesis
-          by (simp add: calculation)
-      next
-        assume "v \<noteq> \<t>"
-        then have "v = \<f>"
-          by (metis true_false_only_truth_values x_form)
-        have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
-          using comp_associative2 x_type by (typecheck_cfuncs, force)
-        also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<f>\<rangle>"
-          by (typecheck_cfuncs, simp add: \<open>u = \<t>\<close> \<open>v = \<f>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
-        also have "... = OR \<circ>\<^sub>c \<langle>\<f>, \<f>\<rangle>"
-          by (typecheck_cfuncs, simp add: NOT_true_is_false id_left_unit2)
-        also have "... = \<f>"
-          by (simp add: OR_false_false_is_false false_func_type)
-        also have "... = IMPLIES \<circ>\<^sub>c x"
-          by (simp add: IMPLIES_true_false_is_false \<open>u = \<t>\<close> \<open>v = \<f>\<close> x_form)
-        then show ?thesis
-          by (simp add: calculation)
-      qed
+proof(etcs_rule one_separator)
+  fix x 
+  assume x_type: "x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>"
+  then obtain u v where x_form: "u \<in>\<^sub>c \<Omega> \<and> v \<in>\<^sub>c \<Omega> \<and> x = \<langle>u, v\<rangle>"
+    using cart_prod_decomp by blast
+  show "IMPLIES \<circ>\<^sub>c x = (OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+  proof(cases "u = \<t>")
+    assume "u = \<t>"
+    show ?thesis
+    proof(cases "v = \<t>")
+      assume "v = \<t>"
+      have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+        using comp_associative2 x_type by (typecheck_cfuncs, force)
+      also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<t>\<rangle>"
+        by (typecheck_cfuncs, simp add: \<open>u = \<t>\<close> \<open>v = \<t>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
+      also have "... = OR \<circ>\<^sub>c \<langle>\<f>, \<t>\<rangle>"
+        by (typecheck_cfuncs, simp add: NOT_true_is_false id_left_unit2)
+      also have "... = \<t>"
+        by (simp add: OR_true_right_is_true false_func_type)
+      also have "... = IMPLIES \<circ>\<^sub>c x"
+        by (simp add: IMPLIES_true_true_is_true \<open>u = \<t>\<close> \<open>v = \<t>\<close> x_form)
+      then show ?thesis
+        by (simp add: calculation)
     next
-      assume "u \<noteq> \<t>"
-      then have "u = \<f>"
-          by (metis true_false_only_truth_values x_form)
-      show ?thesis 
-      proof(cases "v = \<t>")
-        assume "v = \<t>"
-        have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
-          using comp_associative2 x_type by (typecheck_cfuncs, force)
-        also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<f>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<t>\<rangle>"
-          by (typecheck_cfuncs, simp add: \<open>u = \<f>\<close> \<open>v = \<t>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
-        also have "... = OR \<circ>\<^sub>c \<langle>\<t>, \<t>\<rangle>"
-          using NOT_false_is_true id_left_unit2 true_func_type by smt
-        also have "... = \<t>"
-          by (simp add: OR_true_right_is_true true_func_type)
-        also have "... = IMPLIES \<circ>\<^sub>c x"
-          by (simp add: IMPLIES_false_true_is_true \<open>u = \<f>\<close> \<open>v = \<t>\<close> x_form)
-        then show ?thesis
-          by (simp add: calculation)
-      next
-        assume "v \<noteq> \<t>"
-        then have "v = \<f>"
-          by (metis true_false_only_truth_values x_form)
-        have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
-          using comp_associative2 x_type by (typecheck_cfuncs, force)
-        also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<f>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<f>\<rangle>"
-          by (typecheck_cfuncs, simp add: \<open>u = \<f>\<close> \<open>v = \<f>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
-        also have "... = OR \<circ>\<^sub>c \<langle>\<t>, \<f>\<rangle>"
-          using NOT_false_is_true false_func_type id_left_unit2 by presburger
-        also have "... = \<t>"
-          by (simp add: OR_true_left_is_true false_func_type)
-        also have "... = IMPLIES \<circ>\<^sub>c x"
-          by (simp add: IMPLIES_false_false_is_true \<open>u = \<f>\<close> \<open>v = \<f>\<close> x_form)
-        then show ?thesis
-          by (simp add: calculation)
-      qed
+      assume "v \<noteq> \<t>"
+      then have "v = \<f>"
+        by (metis true_false_only_truth_values x_form)
+      have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+        using comp_associative2 x_type by (typecheck_cfuncs, force)
+      also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<t>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<f>\<rangle>"
+        by (typecheck_cfuncs, simp add: \<open>u = \<t>\<close> \<open>v = \<f>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
+      also have "... = OR \<circ>\<^sub>c \<langle>\<f>, \<f>\<rangle>"
+        by (typecheck_cfuncs, simp add: NOT_true_is_false id_left_unit2)
+      also have "... = \<f>"
+        by (simp add: OR_false_false_is_false false_func_type)
+      also have "... = IMPLIES \<circ>\<^sub>c x"
+        by (simp add: IMPLIES_true_false_is_false \<open>u = \<t>\<close> \<open>v = \<f>\<close> x_form)
+      then show ?thesis
+        by (simp add: calculation)
+    qed
+  next
+    assume "u \<noteq> \<t>"
+    then have "u = \<f>"
+        by (metis true_false_only_truth_values x_form)
+    show ?thesis 
+    proof(cases "v = \<t>")
+      assume "v = \<t>"
+      have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+        using comp_associative2 x_type by (typecheck_cfuncs, force)
+      also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<f>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<t>\<rangle>"
+        by (typecheck_cfuncs, simp add: \<open>u = \<f>\<close> \<open>v = \<t>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
+      also have "... = OR \<circ>\<^sub>c \<langle>\<t>, \<t>\<rangle>"
+        using NOT_false_is_true id_left_unit2 true_func_type by smt
+      also have "... = \<t>"
+        by (simp add: OR_true_right_is_true true_func_type)
+      also have "... = IMPLIES \<circ>\<^sub>c x"
+        by (simp add: IMPLIES_false_true_is_true \<open>u = \<f>\<close> \<open>v = \<t>\<close> x_form)
+      then show ?thesis
+        by (simp add: calculation)
+    next
+      assume "v \<noteq> \<t>"
+      then have "v = \<f>"
+        by (metis true_false_only_truth_values x_form)
+      have "(OR \<circ>\<^sub>c NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x = OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id\<^sub>c \<Omega>) \<circ>\<^sub>c x"
+        using comp_associative2 x_type by (typecheck_cfuncs, force)
+      also have "... = OR \<circ>\<^sub>c \<langle>NOT \<circ>\<^sub>c \<f>, id\<^sub>c \<Omega> \<circ>\<^sub>c \<f>\<rangle>"
+        by (typecheck_cfuncs, simp add: \<open>u = \<f>\<close> \<open>v = \<f>\<close> cfunc_cross_prod_comp_cfunc_prod x_form)
+      also have "... = OR \<circ>\<^sub>c \<langle>\<t>, \<f>\<rangle>"
+        using NOT_false_is_true false_func_type id_left_unit2 by presburger
+      also have "... = \<t>"
+        by (simp add: OR_true_left_is_true false_func_type)
+      also have "... = IMPLIES \<circ>\<^sub>c x"
+        by (simp add: IMPLIES_false_false_is_true \<open>u = \<f>\<close> \<open>v = \<f>\<close> x_form)
+      then show ?thesis
+        by (simp add: calculation)
     qed
   qed
 qed
@@ -1539,7 +1504,7 @@ proof -
     by (typecheck_cfuncs_prems, smt left_cart_proj_cfunc_prod)
 
   show "Q = \<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
-  proof (typecheck_cfuncs, rule one_separator[where X=Y, where Y=\<Omega>], auto)
+  proof (etcs_rule one_separator)
     fix y
     assume y_in_Y[type_rule]: "y \<in>\<^sub>c Y"
     obtain x where x_in_X[type_rule]: "x \<in>\<^sub>c X"

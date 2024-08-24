@@ -545,7 +545,6 @@ proof -
 
     show m_mono: "monomorphism m"
     proof -
-      thm kernel_pair_connection[where E=E,where X=X, where h=m, where f=f, where g=q, where Y=Y]
       have q_eq: "q \<circ>\<^sub>c fibered_product_left_proj X f f X = q \<circ>\<^sub>c fibered_product_right_proj X f f X"
         using canonical_quotient_map_is_coequalizer coequalizer_def f_type fibered_product_left_proj_def fibered_product_right_proj_def kernel_pair_equiv_rel q_def by fastforce
       then have "\<exists>!b. b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E \<and>
