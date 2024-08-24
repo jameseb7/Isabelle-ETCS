@@ -2,22 +2,6 @@
 \begin{isabellebody}%
 \setisabellecontext{Axiom{\isacharunderscore}{\kern0pt}Of{\isacharunderscore}{\kern0pt}Choice}%
 %
-\isadelimtheory
-%
-\endisadelimtheory
-%
-\isatagtheory
-\isacommand{theory}\isamarkupfalse%
-\ Axiom{\isacharunderscore}{\kern0pt}Of{\isacharunderscore}{\kern0pt}Choice\isanewline
-\ \ \isakeyword{imports}\ Coproduct\isanewline
-\isakeyword{begin}%
-\endisatagtheory
-{\isafoldtheory}%
-%
-\isadelimtheory
-%
-\endisadelimtheory
-%
 \isadelimdocument
 %
 \endisadelimdocument
@@ -34,6 +18,22 @@
 \isadelimdocument
 %
 \endisadelimdocument
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Axiom{\isacharunderscore}{\kern0pt}Of{\isacharunderscore}{\kern0pt}Choice\isanewline
+\ \ \isakeyword{imports}\ Coproduct\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
 %
 \begin{isamarkuptext}%
 The two definitions below correspond to Definition 2.7.1 in Halvorson.%
@@ -146,7 +146,7 @@ The lemma below corresponds to Proposition 2.6.8 in Halvorson.%
 \end{isamarkuptext}\isamarkuptrue%
 \isacommand{lemma}\isamarkupfalse%
 \ monos{\isacharunderscore}{\kern0pt}give{\isacharunderscore}{\kern0pt}epis{\isacharcolon}{\kern0pt}\isanewline
-\ \ \isakeyword{assumes}\ f{\isacharunderscore}{\kern0pt}type{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}f\ {\isacharcolon}{\kern0pt}\ X\ {\isasymrightarrow}\ Y{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ f{\isacharunderscore}{\kern0pt}type{\isacharbrackleft}{\kern0pt}type{\isacharunderscore}{\kern0pt}rule{\isacharbrackright}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}f\ {\isacharcolon}{\kern0pt}\ X\ {\isasymrightarrow}\ Y{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{assumes}\ f{\isacharunderscore}{\kern0pt}mono{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}monomorphism\ f{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{assumes}\ X{\isacharunderscore}{\kern0pt}nonempty{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}nonempty\ X{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isasymexists}g{\isachardot}{\kern0pt}\ g{\isacharcolon}{\kern0pt}\ Y\ {\isasymrightarrow}\ X\ {\isasymand}\ epimorphism\ g\ {\isasymand}\ g\ {\isasymcirc}\isactrlsub c\ f\ {\isacharequal}{\kern0pt}\ id\ X{\isachardoublequoteclose}\isanewline
@@ -168,7 +168,7 @@ The lemma below corresponds to Proposition 2.6.8 in Halvorson.%
 \ \ \isacommand{have}\isamarkupfalse%
 \ g{\isacharunderscore}{\kern0pt}mono{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}monomorphism\ g{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{proof}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ unfold\ monomorphism{\isacharunderscore}{\kern0pt}def{\isadigit{3}}{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ unfold\ monomorphism{\isacharunderscore}{\kern0pt}def{\isadigit{3}}{\isacharcomma}{\kern0pt}\ clarify{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \isacommand{fix}\isamarkupfalse%
 \ x\ y\ A\isanewline
 \ \ \ \ \isacommand{assume}\isamarkupfalse%
@@ -216,12 +216,7 @@ The lemma below corresponds to Proposition 2.6.8 in Halvorson.%
 \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymexists}g{\isachardot}{\kern0pt}\ g{\isacharcolon}{\kern0pt}\ Y\ {\isasymrightarrow}\ X\ {\isasymand}\ epimorphism\ g\ {\isasymand}\ g\ {\isasymcirc}\isactrlsub c\ f\ {\isacharequal}{\kern0pt}\ id\isactrlsub c\ X{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{proof}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{show}\isamarkupfalse%
-\ {\isachardoublequoteopen}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m\ {\isacharcolon}{\kern0pt}\ Y\ {\isasymrightarrow}\ X{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ typecheck{\isacharunderscore}{\kern0pt}cfuncs\isanewline
-\isanewline
+\ {\isacharparenleft}{\kern0pt}rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ safe{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \isacommand{have}\isamarkupfalse%
 \ func{\isacharunderscore}{\kern0pt}f{\isacharunderscore}{\kern0pt}elem{\isacharunderscore}{\kern0pt}eq{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymAnd}\ y{\isachardot}{\kern0pt}\ y\ {\isasymin}\isactrlsub c\ X\ {\isasymLongrightarrow}\ {\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ f\ {\isasymcirc}\isactrlsub c\ y\ {\isacharequal}{\kern0pt}\ y{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{proof}\isamarkupfalse%
@@ -260,40 +255,24 @@ The lemma below corresponds to Proposition 2.6.8 in Halvorson.%
 \ auto\isanewline
 \ \ \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\isanewline
 \ \ \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}epimorphism\ {\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{proof}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}rule\ surjective{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}epimorphism{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ unfold\ surjective{\isacharunderscore}{\kern0pt}def{\isadigit{2}}{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}rule\ surjective{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}epimorphism{\isacharcomma}{\kern0pt}\ etcs{\isacharunderscore}{\kern0pt}subst\ surjective{\isacharunderscore}{\kern0pt}def{\isadigit{2}}{\isacharcomma}{\kern0pt}\ clarify{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \ \ \isacommand{fix}\isamarkupfalse%
 \ y\isanewline
 \ \ \ \ \ \ \isacommand{assume}\isamarkupfalse%
 \ y{\isacharunderscore}{\kern0pt}type{\isacharbrackleft}{\kern0pt}type{\isacharunderscore}{\kern0pt}rule{\isacharbrackright}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}y\ {\isasymin}\isactrlsub c\ X{\isachardoublequoteclose}\isanewline
-\isanewline
 \ \ \ \ \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymexists}xa{\isachardot}{\kern0pt}\ xa\ {\isasymin}\isactrlsub c\ Y\ {\isasymand}\ {\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ xa\ {\isacharequal}{\kern0pt}\ y{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{proof}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}f\ {\isasymcirc}\isactrlsub c\ y{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\isanewline
-\isanewline
-\ \ \ \ \ \ \ \ \isacommand{show}\isamarkupfalse%
-\ {\isachardoublequoteopen}f\ {\isasymcirc}\isactrlsub c\ y\ {\isasymin}\isactrlsub c\ Y{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ f{\isacharunderscore}{\kern0pt}type\ \isacommand{by}\isamarkupfalse%
-\ typecheck{\isacharunderscore}{\kern0pt}cfuncs\isanewline
-\isanewline
-\ \ \ \ \ \ \ \ \isacommand{show}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ f\ {\isasymcirc}\isactrlsub c\ y\ {\isacharequal}{\kern0pt}\ y{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ func{\isacharunderscore}{\kern0pt}f{\isacharunderscore}{\kern0pt}elem{\isacharunderscore}{\kern0pt}eq\ y{\isacharunderscore}{\kern0pt}type{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}rule\ exI{\isacharbrackleft}{\kern0pt}\isakeyword{where}\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}f\ {\isasymcirc}\isactrlsub c\ y{\isachardoublequoteclose}{\isacharbrackright}{\kern0pt}{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ smt\ func{\isacharunderscore}{\kern0pt}f{\isacharunderscore}{\kern0pt}elem{\isacharunderscore}{\kern0pt}eq{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
 \isanewline
 \ \ \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ f\ {\isacharequal}{\kern0pt}\ id\isactrlsub c\ X{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}insert\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ func{\isacharunderscore}{\kern0pt}f{\isacharunderscore}{\kern0pt}elem{\isacharunderscore}{\kern0pt}eq\ id{\isacharunderscore}{\kern0pt}left{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}\ f{\isacharunderscore}{\kern0pt}type{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule\ one{\isacharunderscore}{\kern0pt}separator{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}insert\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ func{\isacharunderscore}{\kern0pt}f{\isacharunderscore}{\kern0pt}elem{\isacharunderscore}{\kern0pt}eq\ id{\isacharunderscore}{\kern0pt}left{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule\ one{\isacharunderscore}{\kern0pt}separator{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isacommand{qed}\isamarkupfalse%
@@ -404,11 +383,11 @@ The lemma below corresponds to Exercise 2.7.2(ii) in Halvorson.%
 \end{isabellebody}%
 \endinput
 %:%file=~/ETCS/HOL-ETCS/Axiom_Of_Choice.thy%:%
-%:%10=1%:%
 %:%11=1%:%
-%:%12=2%:%
-%:%13=3%:%
-%:%27=5%:%
+%:%27=3%:%
+%:%28=3%:%
+%:%29=4%:%
+%:%30=5%:%
 %:%39=7%:%
 %:%41=8%:%
 %:%42=8%:%
@@ -538,129 +517,108 @@ The lemma below corresponds to Exercise 2.7.2(ii) in Halvorson.%
 %:%222=80%:%
 %:%223=80%:%
 %:%224=81%:%
-%:%225=82%:%
+%:%225=81%:%
 %:%226=82%:%
-%:%227=83%:%
+%:%227=82%:%
 %:%228=83%:%
 %:%229=84%:%
 %:%230=84%:%
 %:%231=85%:%
-%:%232=85%:%
+%:%232=86%:%
 %:%233=86%:%
-%:%234=87%:%
+%:%234=86%:%
 %:%235=87%:%
-%:%236=88%:%
-%:%237=89%:%
-%:%238=89%:%
-%:%239=89%:%
-%:%240=90%:%
-%:%241=90%:%
-%:%242=90%:%
-%:%243=91%:%
-%:%244=91%:%
-%:%245=92%:%
-%:%246=92%:%
-%:%247=92%:%
-%:%248=93%:%
-%:%249=93%:%
-%:%250=94%:%
-%:%251=94%:%
-%:%252=94%:%
-%:%253=95%:%
-%:%254=95%:%
-%:%255=96%:%
-%:%256=96%:%
-%:%257=96%:%
-%:%258=97%:%
-%:%259=97%:%
+%:%236=87%:%
+%:%237=87%:%
+%:%238=88%:%
+%:%239=88%:%
+%:%240=89%:%
+%:%241=89%:%
+%:%242=89%:%
+%:%243=90%:%
+%:%244=90%:%
+%:%245=91%:%
+%:%246=91%:%
+%:%247=91%:%
+%:%248=92%:%
+%:%249=92%:%
+%:%250=93%:%
+%:%251=93%:%
+%:%252=93%:%
+%:%253=94%:%
+%:%254=94%:%
+%:%255=94%:%
+%:%256=95%:%
+%:%257=95%:%
+%:%258=96%:%
+%:%259=96%:%
 %:%260=97%:%
-%:%261=98%:%
+%:%261=97%:%
 %:%262=98%:%
-%:%263=99%:%
-%:%264=100%:%
-%:%265=100%:%
-%:%266=101%:%
-%:%267=101%:%
-%:%268=102%:%
-%:%269=102%:%
-%:%270=103%:%
-%:%271=103%:%
-%:%272=104%:%
-%:%273=105%:%
-%:%274=105%:%
-%:%275=106%:%
-%:%276=106%:%
-%:%277=107%:%
-%:%278=108%:%
-%:%279=108%:%
-%:%280=109%:%
-%:%281=109%:%
-%:%282=109%:%
-%:%283=110%:%
-%:%284=111%:%
-%:%285=111%:%
-%:%286=112%:%
-%:%287=112%:%
-%:%288=113%:%
-%:%289=113%:%
-%:%290=114%:%
-%:%291=114%:%
-%:%292=115%:%
-%:%293=116%:%
-%:%294=116%:%
-%:%295=117%:%
-%:%296=117%:%
-%:%297=118%:%
-%:%298=118%:%
-%:%299=119%:%
-%:%309=121%:%
-%:%311=122%:%
-%:%312=122%:%
-%:%313=123%:%
-%:%314=124%:%
-%:%315=125%:%
-%:%322=126%:%
-%:%323=126%:%
-%:%324=127%:%
-%:%325=127%:%
-%:%326=128%:%
-%:%327=128%:%
-%:%328=129%:%
-%:%329=129%:%
-%:%330=129%:%
-%:%331=130%:%
-%:%332=130%:%
-%:%333=131%:%
-%:%334=131%:%
-%:%335=132%:%
-%:%336=133%:%
-%:%337=133%:%
-%:%338=133%:%
-%:%339=134%:%
-%:%340=134%:%
-%:%341=134%:%
-%:%342=135%:%
-%:%352=137%:%
-%:%354=138%:%
-%:%355=138%:%
-%:%356=139%:%
-%:%357=140%:%
-%:%358=141%:%
-%:%365=142%:%
-%:%366=142%:%
-%:%367=143%:%
-%:%368=143%:%
-%:%369=144%:%
-%:%370=144%:%
-%:%371=145%:%
-%:%372=145%:%
-%:%373=146%:%
-%:%374=147%:%
-%:%375=147%:%
-%:%376=147%:%
-%:%377=148%:%
-%:%378=148%:%
-%:%379=149%:%
-%:%385=149%:%
-%:%390=150%:%
-%:%395=151%:%
+%:%263=98%:%
+%:%264=99%:%
+%:%265=99%:%
+%:%266=100%:%
+%:%267=100%:%
+%:%268=101%:%
+%:%269=101%:%
+%:%270=102%:%
+%:%271=102%:%
+%:%272=103%:%
+%:%273=103%:%
+%:%274=104%:%
+%:%275=104%:%
+%:%276=105%:%
+%:%277=105%:%
+%:%278=106%:%
+%:%288=108%:%
+%:%290=109%:%
+%:%291=109%:%
+%:%292=110%:%
+%:%293=111%:%
+%:%294=112%:%
+%:%301=113%:%
+%:%302=113%:%
+%:%303=114%:%
+%:%304=114%:%
+%:%305=115%:%
+%:%306=115%:%
+%:%307=116%:%
+%:%308=116%:%
+%:%309=116%:%
+%:%310=117%:%
+%:%311=117%:%
+%:%312=118%:%
+%:%313=118%:%
+%:%314=119%:%
+%:%315=120%:%
+%:%316=120%:%
+%:%317=120%:%
+%:%318=121%:%
+%:%319=121%:%
+%:%320=121%:%
+%:%321=122%:%
+%:%331=124%:%
+%:%333=125%:%
+%:%334=125%:%
+%:%335=126%:%
+%:%336=127%:%
+%:%337=128%:%
+%:%344=129%:%
+%:%345=129%:%
+%:%346=130%:%
+%:%347=130%:%
+%:%348=131%:%
+%:%349=131%:%
+%:%350=132%:%
+%:%351=132%:%
+%:%352=133%:%
+%:%353=134%:%
+%:%354=134%:%
+%:%355=134%:%
+%:%356=135%:%
+%:%357=135%:%
+%:%358=136%:%
+%:%364=136%:%
+%:%369=137%:%
+%:%374=138%:%
