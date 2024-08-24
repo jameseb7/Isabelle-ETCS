@@ -376,7 +376,7 @@ next
   then have case2: "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,left_coproj X Y \<circ>\<^sub>c x\<rangle> = \<f>"
     using true_false_only_truth_values by (typecheck_cfuncs, blast)
   then have u_not_left_coproj_x: "u  \<noteq> left_coproj X Y \<circ>\<^sub>c x"
-    using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, presburger)
+    using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, blast)
   show "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,left_coproj X Y \<circ>\<^sub>c x\<rangle> = (eq_pred X \<circ>\<^sub>c \<langle>id\<^sub>c X,x \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c u"
   proof (cases "\<exists> g. g : one \<rightarrow> X \<and> u = left_coproj X Y \<circ>\<^sub>c g")  
     assume "\<exists>g. g \<in>\<^sub>c X \<and> u = left_coproj X Y \<circ>\<^sub>c g"
@@ -442,7 +442,7 @@ next
   then have eq_pred_false: "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c y\<rangle> = \<f>"
     using true_false_only_truth_values by (typecheck_cfuncs, blast)
   then have u_not_right_coproj_y: "u  \<noteq> right_coproj X Y \<circ>\<^sub>c y"
-    using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, presburger)
+    using eq_pred_iff_eq_conv by (typecheck_cfuncs_prems, blast)
 
   show "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c y\<rangle> = (\<f> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<amalg> (eq_pred Y \<circ>\<^sub>c \<langle>id\<^sub>c Y,y \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>\<rangle>) \<circ>\<^sub>c u"
   proof (cases "\<exists> g. g : one \<rightarrow> Y \<and> u = right_coproj X Y \<circ>\<^sub>c g")

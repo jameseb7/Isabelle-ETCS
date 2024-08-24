@@ -211,7 +211,7 @@ fun typecheck_cfuncs_prems_subproof ctxt assms _ n (focus : Subgoal.focus) =
   in the right format to be passed to the SUBGOAL combinator *)
 fun typecheck_cfuncs_prems_subtac ctxt type_rules (subgoal, n) = 
           Subgoal.FOCUS (typecheck_cfuncs_prems_subproof ctxt type_rules subgoal n) ctxt n
-          THEN asm_full_simp_tac ctxt n
+          THEN TRY (clarify_tac ctxt n)
 
 (* typecheck_cfuncs_prems_tac lifts typecheck_cfuncs_subproof to a tactic
   that generates cfunc type facts as assumptions of a specified goal *)
