@@ -58,7 +58,7 @@ lemma prod_with_empty_is_empty2:
   shows "is_empty (A \<times>\<^sub>c B)"
   using assms cart_prod_decomp is_empty_def by blast
 
-subsection \<open>Terminal Objects (sets with \<one> element)\<close>
+subsection \<open>Terminal Objects (sets with one element)\<close>
 
 definition terminal_object :: "cset \<Rightarrow> bool" where
   "terminal_object X \<longleftrightarrow> (\<forall> Y. \<exists>! f. f : Y \<rightarrow> X)"
