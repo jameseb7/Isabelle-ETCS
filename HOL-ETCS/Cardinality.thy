@@ -161,14 +161,15 @@ qed
 
 lemma size_2plus_sets:
   "(\<Omega> \<le>\<^sub>c X) = (\<exists> x1. \<exists> x2. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2)"
-proof(auto)
-  show "\<Omega> \<le>\<^sub>c X \<Longrightarrow> \<exists>x1. x1 \<in>\<^sub>c X \<and> (\<exists>x2. x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2)"
+proof standard
+  show "\<Omega> \<le>\<^sub>c X \<Longrightarrow> \<exists>x1 x2. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2"
     by (meson comp_type false_func_type is_smaller_than_def monomorphism_def3 true_false_distinct true_func_type)
 next
-  fix x1 x2 
-  assume x1_type[type_rule]: "x1 \<in>\<^sub>c X"
-  assume x2_type[type_rule]: "x2 \<in>\<^sub>c X"
-  assume distinct: "x1 \<noteq> x2"  
+  assume "\<exists>x1 x2. x1 \<in>\<^sub>c X \<and> x2 \<in>\<^sub>c X \<and> x1 \<noteq> x2"
+  then obtain x1 x2 where x1_type[type_rule]: "x1 \<in>\<^sub>c X" and
+                     x2_type[type_rule]: "x2 \<in>\<^sub>c X" and
+                               distinct: "x1 \<noteq> x2"
+    by blast  
   have mono_type: "((x1 \<amalg> x2) \<circ>\<^sub>c case_bool) : \<Omega> \<rightarrow> X"
     by typecheck_cfuncs
   have inj: "injective ((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
@@ -793,7 +794,7 @@ next
          proof(cases "y = y2")
            assume "y = y2"
            show "\<langle>x,y\<rangle> = \<langle>s,t\<rangle>"
-           proof(cases "t = y2",auto)
+           proof(cases "t = y2", clarify)
              show "t = y2 \<Longrightarrow> \<langle>x,y\<rangle> = \<langle>s,y2\<rangle>"
                by (typecheck_cfuncs, metis \<open>y = y2\<close> \<open>y \<noteq> y1\<close> equals f1 f2 st_def xy_def)
            next
