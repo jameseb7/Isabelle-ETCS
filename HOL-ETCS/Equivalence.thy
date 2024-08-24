@@ -1152,7 +1152,7 @@ next
 
   show "\<langle>t,s\<rangle> \<in>\<^bsub>(X \<times>\<^sub>c Z) \<times>\<^sub>c (X \<times>\<^sub>c Z)\<^esub> (Y \<times>\<^sub>c Z, distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z))" 
     using s_def t_def m_def
-  proof (simp, typecheck_cfuncs, clarify, unfold relative_member_def2, safe)
+  proof (typecheck_cfuncs, clarify, unfold relative_member_def2, safe)
     show "monomorphism (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
       using relative_member_def2 st_relation by blast
 
@@ -1233,7 +1233,7 @@ next
 
   show "\<langle>t,s\<rangle> \<in>\<^bsub>(Z \<times>\<^sub>c X) \<times>\<^sub>c (Z \<times>\<^sub>c X)\<^esub> (Z \<times>\<^sub>c Y, distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))" 
     using s_def t_def m_def
-  proof (simp, typecheck_cfuncs, clarify, unfold relative_member_def2, safe)
+  proof (typecheck_cfuncs, clarify, unfold relative_member_def2, safe)
     show "monomorphism (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
       using relative_member_def2 st_relation by blast
 
