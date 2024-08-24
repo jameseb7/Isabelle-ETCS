@@ -29,6 +29,14 @@ definition is_coprod :: "cset \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarr
       (\<exists> h. h :  W \<rightarrow> Z \<and> h \<circ>\<^sub>c i\<^sub>0 = f \<and> h \<circ>\<^sub>c i\<^sub>1 = g \<and>
         (\<forall> h2. (h2 : W \<rightarrow> Z \<and> h2 \<circ>\<^sub>c i\<^sub>0 = f \<and> h2 \<circ>\<^sub>c i\<^sub>1 = g) \<longrightarrow> h2 = h))))"
 
+lemma is_coprod_def2:
+  assumes "i\<^sub>0 : X \<rightarrow> W" "i\<^sub>1 : Y \<rightarrow> W"
+  shows "is_coprod W i\<^sub>0 i\<^sub>1 X Y \<longleftrightarrow> 
+    (\<forall> f g Z. (f : X \<rightarrow> Z \<and> g : Y \<rightarrow> Z) \<longrightarrow> 
+      (\<exists> h. h :  W \<rightarrow> Z \<and> h \<circ>\<^sub>c i\<^sub>0 = f \<and> h \<circ>\<^sub>c i\<^sub>1 = g \<and>
+        (\<forall> h2. (h2 : W \<rightarrow> Z \<and> h2 \<circ>\<^sub>c i\<^sub>0 = f \<and> h2 \<circ>\<^sub>c i\<^sub>1 = g) \<longrightarrow> h2 = h)))"
+  unfolding is_coprod_def using assms by auto
+
 abbreviation is_coprod_triple :: "cset \<times> cfunc \<times> cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" where
   "is_coprod_triple Wi X Y \<equiv> is_coprod (fst Wi) (fst (snd Wi)) (snd (snd Wi)) X Y"
 
