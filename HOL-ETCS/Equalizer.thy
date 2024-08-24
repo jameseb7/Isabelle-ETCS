@@ -163,32 +163,32 @@ qed
 text \<open>The definition below corresponds to Definition 2.1.35 in Halvorson.\<close>
 definition regular_monomorphism :: "cfunc \<Rightarrow> bool"
   where "regular_monomorphism f  \<longleftrightarrow>  
-          (\<exists> g h. domain(g) = codomain(f) \<and> domain(h) = codomain(f) \<and> equalizer (domain f) f g h)"
+          (\<exists> g h. domain g = codomain f \<and> domain h = codomain f \<and> equalizer (domain f) f g h)"
 
 text \<open>The lemma below corresponds to Exercise 2.1.36 in Halvorson.\<close>
 lemma epi_regmon_is_iso:
-  assumes "epimorphism(f)" "regular_monomorphism(f)"
-  shows "isomorphism(f)"
+  assumes "epimorphism f" "regular_monomorphism f"
+  shows "isomorphism f"
 proof -
-  obtain g h where g_type: "domain(g) = codomain(f)" and
-                   h_type: "domain(h) = codomain(f)" and
+  obtain g h where g_type: "domain g = codomain f" and
+                   h_type: "domain h = codomain f" and
                    f_equalizer: "equalizer (domain f) f g h"
     using assms(2) regular_monomorphism_def by auto
   then have "g \<circ>\<^sub>c f = h \<circ>\<^sub>c f"
     using equalizer_def by blast
   then have "g = h"
     using assms(1) cfunc_type_def epimorphism_def equalizer_def f_equalizer by auto
-  then have "g \<circ>\<^sub>c id(codomain(f)) = h \<circ>\<^sub>c id(codomain(f))"
+  then have "g \<circ>\<^sub>c id(codomain f) = h \<circ>\<^sub>c id(codomain f)"
     by simp
   then obtain k where k_type: "f \<circ>\<^sub>c k = id(codomain(f)) \<and> codomain k = domain f"
     by (metis cfunc_type_def equalizer_def f_equalizer id_type)
   then have "f \<circ>\<^sub>c id(domain(f)) = f \<circ>\<^sub>c (k \<circ>\<^sub>c f)"
     by (metis comp_associative domain_comp id_domain id_left_unit id_right_unit)
-  then have "monomorphism f \<Longrightarrow> k \<circ>\<^sub>c f = id(domain(f))"
+  then have "monomorphism f \<Longrightarrow> k \<circ>\<^sub>c f = id(domain f)"
     by (metis (mono_tags) codomain_comp domain_comp id_codomain id_domain k_type monomorphism_def)
-  then have "k \<circ>\<^sub>c f = id(domain(f))"
+  then have "k \<circ>\<^sub>c f = id(domain f)"
     using equalizer_is_monomorphism f_equalizer by blast
-  then show "isomorphism(f)"
+  then show "isomorphism f"
     by (metis domain_comp id_domain isomorphism_def k_type)  
 qed
 
