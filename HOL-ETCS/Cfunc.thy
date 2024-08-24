@@ -30,7 +30,7 @@ where
 
 text \<open>We define a neater way of stating types and lift the type axioms into lemmas using it.\<close>
 definition cfunc_type :: "cfunc \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> bool" ("_ : _ \<rightarrow> _" [50, 50, 50]50) where
-  "(f : X \<rightarrow> Y) \<longleftrightarrow> (domain(f) = X \<and> codomain(f) = Y)"
+  "(f : X \<rightarrow> Y) \<longleftrightarrow> (domain f = X \<and> codomain f = Y)"
 
 lemma comp_type:
   "f : X \<rightarrow> Y \<Longrightarrow> g : Y \<rightarrow> Z \<Longrightarrow> g \<circ>\<^sub>c f : X \<rightarrow> Z"
@@ -122,8 +122,8 @@ subsection \<open>Monomorphisms, Epimorphisms and Isomorphisms\<close>
 subsubsection \<open>Monomorphisms\<close>
 
 definition monomorphism :: "cfunc \<Rightarrow> bool" where
-  "monomorphism(f) \<longleftrightarrow> (\<forall> g h. 
-    (codomain(g) = domain(f) \<and> codomain(h) = domain(f)) \<longrightarrow> (f \<circ>\<^sub>c g = f \<circ>\<^sub>c h \<longrightarrow> g = h))"
+  "monomorphism f \<longleftrightarrow> (\<forall> g h. 
+    (codomain g = domain f \<and> codomain h = domain f) \<longrightarrow> (f \<circ>\<^sub>c g = f \<circ>\<^sub>c h \<longrightarrow> g = h))"
 
 lemma monomorphism_def2:
   "monomorphism f \<longleftrightarrow> (\<forall> g h A X Y. g : A \<rightarrow> X \<and> h : A \<rightarrow> X \<and> f : X \<rightarrow> Y \<longrightarrow> (f \<circ>\<^sub>c g = f \<circ>\<^sub>c h \<longrightarrow> g = h))"
@@ -190,7 +190,7 @@ subsubsection \<open>Epimorphisms\<close>
 
 definition epimorphism :: "cfunc \<Rightarrow> bool" where
   "epimorphism f \<longleftrightarrow> (\<forall> g h. 
-    (domain(g) = codomain(f) \<and> domain(h) = codomain(f)) \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
+    (domain g = codomain f \<and> domain h = codomain f) \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
 
 lemma epimorphism_def2:
   "epimorphism f \<longleftrightarrow> (\<forall> g h A X Y. f : X \<rightarrow> Y \<and> g : Y \<rightarrow> A \<and> h : Y \<rightarrow> A \<longrightarrow> (g \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> g = h))"
@@ -229,9 +229,9 @@ assumes "codomain f = domain g"
 proof clarify
   fix h k
   assume f_epi :"\<forall> s h.
-    (domain(s) = codomain(f) \<and> domain(h) = codomain(f)) \<longrightarrow> (s \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> s = h)"
+    (domain s = codomain f \<and> domain h = codomain f) \<longrightarrow> (s \<circ>\<^sub>c f = h \<circ>\<^sub>c f \<longrightarrow> s = h)"
   assume g_epi :"\<forall> s h.
-    (domain(s) = codomain(g) \<and> domain(h) = codomain(g)) \<longrightarrow> (s \<circ>\<^sub>c g = h \<circ>\<^sub>c g \<longrightarrow> s = h)"
+    (domain s = codomain g \<and> domain h = codomain g) \<longrightarrow> (s \<circ>\<^sub>c g = h \<circ>\<^sub>c g \<longrightarrow> s = h)"
   assume domain_k: "domain k = codomain (g \<circ>\<^sub>c f)"
   assume domain_h: "domain h = codomain (g \<circ>\<^sub>c f)"
   assume hgf_eq_kgf: "h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = k \<circ>\<^sub>c (g \<circ>\<^sub>c f)"
@@ -252,24 +252,24 @@ qed
 subsubsection \<open>Isomorphisms\<close>
 
 definition isomorphism :: "cfunc \<Rightarrow> bool" where
-  "isomorphism(f) \<longleftrightarrow> (\<exists> g. domain(g) = codomain(f) \<and> codomain(g) = domain(f) \<and> 
-    (g \<circ>\<^sub>c f = id(domain(f))) \<and> (f \<circ>\<^sub>c g = id(domain(g))))"
+  "isomorphism f \<longleftrightarrow> (\<exists> g. domain g = codomain f \<and> codomain g = domain f \<and> 
+    g \<circ>\<^sub>c f = id(domain f) \<and> f \<circ>\<^sub>c g = id(domain g))"
 
 lemma isomorphism_def2:
-  "isomorphism(f) \<longleftrightarrow> (\<exists> g X Y. f : X \<rightarrow> Y \<and> g : Y \<rightarrow> X \<and> g \<circ>\<^sub>c f = id X \<and> f \<circ>\<^sub>c g = id Y)"
+  "isomorphism f \<longleftrightarrow> (\<exists> g X Y. f : X \<rightarrow> Y \<and> g : Y \<rightarrow> X \<and> g \<circ>\<^sub>c f = id X \<and> f \<circ>\<^sub>c g = id Y)"
   unfolding isomorphism_def cfunc_type_def by auto
 
 lemma isomorphism_def3:
   assumes "f : X \<rightarrow> Y"
-  shows "isomorphism(f) \<longleftrightarrow> (\<exists> g. g : Y \<rightarrow> X \<and> g \<circ>\<^sub>c f = id X \<and> f \<circ>\<^sub>c g = id Y)"
+  shows "isomorphism f \<longleftrightarrow> (\<exists> g. g : Y \<rightarrow> X \<and> g \<circ>\<^sub>c f = id X \<and> f \<circ>\<^sub>c g = id Y)"
   using assms unfolding isomorphism_def2 cfunc_type_def by auto
 
 definition inverse :: "cfunc \<Rightarrow> cfunc" ("_\<^bold>\<inverse>" [1000] 999) where
-  "inverse(f) = (THE g. g : codomain(f) \<rightarrow> domain(f) \<and> g \<circ>\<^sub>c f = id(domain(f)) \<and> f \<circ>\<^sub>c g = id(codomain(f)))"
+  "inverse f = (THE g. g : codomain f \<rightarrow> domain f \<and> g \<circ>\<^sub>c f = id(domain f) \<and> f \<circ>\<^sub>c g = id(codomain f))"
 
 lemma inverse_def2:
-  assumes "isomorphism(f)"
-  shows "f\<^bold>\<inverse> : codomain(f) \<rightarrow> domain(f) \<and> f\<^bold>\<inverse> \<circ>\<^sub>c f = id(domain(f)) \<and> f \<circ>\<^sub>c f\<^bold>\<inverse> = id(codomain(f))"
+  assumes "isomorphism f"
+  shows "f\<^bold>\<inverse> : codomain f \<rightarrow> domain f \<and> f\<^bold>\<inverse> \<circ>\<^sub>c f = id(domain f) \<and> f \<circ>\<^sub>c f\<^bold>\<inverse> = id(codomain f)"
 proof (unfold inverse_def, rule theI', safe)
   show "\<exists>g. g : codomain f \<rightarrow> domain f \<and> g \<circ>\<^sub>c f = id\<^sub>c (domain f) \<and> f \<circ>\<^sub>c g = id\<^sub>c (codomain f)"
     using assms unfolding isomorphism_def cfunc_type_def by auto
@@ -278,39 +278,39 @@ next
   assume g1_f: "g1 \<circ>\<^sub>c f = id\<^sub>c (domain f)" and f_g1: "f \<circ>\<^sub>c g1 = id\<^sub>c (codomain f)"
   assume g2_f: "g2 \<circ>\<^sub>c f = id\<^sub>c (domain f)" and f_g2: "f \<circ>\<^sub>c g2 = id\<^sub>c (codomain f)"
   assume "g1 : codomain f \<rightarrow> domain f" "g2 : codomain f \<rightarrow> domain f"
-  then have "codomain(g1) = domain(f)" "domain(g2) = codomain(f)"
+  then have "codomain g1 = domain f" "domain g2 = codomain f"
     unfolding cfunc_type_def by auto
   then show "g1 = g2"
     by (metis comp_associative f_g1 g2_f id_left_unit id_right_unit)
 qed
 
 lemma inverse_type[type_rule]:
-  assumes "isomorphism(f)" "f : X \<rightarrow> Y"
+  assumes "isomorphism f" "f : X \<rightarrow> Y"
   shows "f\<^bold>\<inverse> : Y \<rightarrow> X"
   using assms inverse_def2 unfolding cfunc_type_def by auto
 
 lemma inv_left:
-  assumes "isomorphism(f)" "f : X \<rightarrow> Y"
+  assumes "isomorphism f" "f : X \<rightarrow> Y"
   shows "f\<^bold>\<inverse> \<circ>\<^sub>c f = id X"
   using assms inverse_def2 unfolding cfunc_type_def by auto
 
 lemma inv_right:
-  assumes "isomorphism(f)" "f : X \<rightarrow> Y"
+  assumes "isomorphism f" "f : X \<rightarrow> Y"
   shows "f \<circ>\<^sub>c f\<^bold>\<inverse> = id Y"
   using assms inverse_def2 unfolding cfunc_type_def by auto
 
 lemma inv_iso:
-  assumes "isomorphism(f)"
+  assumes "isomorphism f"
   shows "isomorphism(f\<^bold>\<inverse>)"
   using assms inverse_def2 unfolding isomorphism_def cfunc_type_def by (rule_tac x=f in exI, auto)
 
 lemma inv_idempotent:
-  assumes "isomorphism(f)"
+  assumes "isomorphism f"
   shows "(f\<^bold>\<inverse>)\<^bold>\<inverse> = f"
   by (smt assms cfunc_type_def comp_associative id_left_unit inv_iso inverse_def2)
 
 definition is_isomorphic :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix "\<cong>" 50)  where
-  "X \<cong> Y \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> Y \<and> isomorphism(f))"
+  "X \<cong> Y \<longleftrightarrow> (\<exists> f. f : X \<rightarrow> Y \<and> isomorphism f)"
 
 lemma id_isomorphism: "isomorphism (id X)"
   unfolding isomorphism_def
@@ -322,7 +322,7 @@ lemma isomorphic_is_reflexive: "X \<cong> X"
 
 lemma isomorphic_is_symmetric: "X \<cong> Y \<longrightarrow> Y \<cong> X"
   unfolding is_isomorphic_def isomorphism_def 
-  by (auto, rule_tac x="g" in exI, auto, metis cfunc_type_def)
+  by (auto, metis cfunc_type_def)
 
 lemma isomorphism_comp: 
   "domain f = codomain g \<Longrightarrow> isomorphism f \<Longrightarrow> isomorphism g \<Longrightarrow> isomorphism (f \<circ>\<^sub>c g)"
@@ -354,12 +354,12 @@ text \<open>The lemma below corresponds to Exercise 2.1.7e in Halvorson.\<close>
 lemma iso_imp_epi_and_monic:
   "isomorphism f \<Longrightarrow> epimorphism f \<and> monomorphism f"
   unfolding isomorphism_def epimorphism_def monomorphism_def
-proof auto
+proof safe
   fix g s t
   assume domain_g: "domain g = codomain f"
   assume codomain_g: "codomain g = domain f"
   assume gf_id: "g \<circ>\<^sub>c f = id (domain f)"
-  assume fg_id: "f \<circ>\<^sub>c g = id (codomain f)"
+  assume fg_id: "f \<circ>\<^sub>c g = id (domain g)"
   assume domain_s: "domain s = codomain f"
   assume domain_t: "domain t = codomain f"
   assume sf_eq_tf: "s \<circ>\<^sub>c f = t \<circ>\<^sub>c f"
@@ -367,18 +367,17 @@ proof auto
   have "s = s \<circ>\<^sub>c id(codomain(f))"
     by (metis domain_s id_right_unit)
   also have "... = s \<circ>\<^sub>c (f \<circ>\<^sub>c g)"
-    by (metis fg_id)
+    by (simp add: domain_g fg_id)
   also have "... = (s \<circ>\<^sub>c f) \<circ>\<^sub>c g"
     by (simp add: codomain_g comp_associative domain_s)
   also have "... = (t \<circ>\<^sub>c f) \<circ>\<^sub>c g"
     by (simp add: sf_eq_tf)
   also have "... = t \<circ>\<^sub>c (f \<circ>\<^sub>c g)"
     by (simp add: codomain_g comp_associative domain_t)
-  also have "... = t \<circ>\<^sub>c id(codomain(f))"
-    by (metis fg_id)
+  also have "... = t \<circ>\<^sub>c id(codomain f)"
+    by (simp add: domain_g fg_id)
   also have "... = t"
-    by (metis domain_t id_right_unit)
-    
+    by (metis domain_t id_right_unit)    
   then show "s = t"
     using calculation by auto
 next
@@ -386,12 +385,12 @@ next
   assume domain_g: "domain g = codomain f"
   assume codomain_g: "codomain g = domain f"
   assume gf_id: "g \<circ>\<^sub>c f = id (domain f)"
-  assume fg_id: "f \<circ>\<^sub>c g = id (codomain f)"
-  assume codomain_k: "codomain k = domain f"
+  assume fg_id: "f \<circ>\<^sub>c g = id (domain g)"
   assume codomain_h: "codomain h = domain f"
+  assume codomain_k: "codomain k = domain f"
   assume fk_eq_fh: "f \<circ>\<^sub>c k = f \<circ>\<^sub>c h"
 
-  have "h = id(domain(f)) \<circ>\<^sub>c h"
+  have "h = id(domain f) \<circ>\<^sub>c h"
     by (metis codomain_h id_left_unit)
   also have "... = (g \<circ>\<^sub>c f) \<circ>\<^sub>c h"
     using gf_id by auto
@@ -401,7 +400,7 @@ next
     by (simp add: fk_eq_fh)
   also have "... = (g \<circ>\<^sub>c f) \<circ>\<^sub>c k"
     by (simp add: codomain_k comp_associative domain_g)
-  also have "... = id(domain(f)) \<circ>\<^sub>c k"
+  also have "... = id(domain f) \<circ>\<^sub>c k"
     by (simp add: gf_id)
   also have "... = k"
     by (metis codomain_k id_left_unit)
@@ -418,7 +417,7 @@ lemma isomorphism_sandwich:
 proof -
   have "isomorphism(h\<^bold>\<inverse> \<circ>\<^sub>c (h \<circ>\<^sub>c g \<circ>\<^sub>c f) \<circ>\<^sub>c f\<^bold>\<inverse>)"
     using assms by (typecheck_cfuncs, simp add: f_iso h_iso hgf_iso inv_iso isomorphism_comp')
-  then show "isomorphism(g)"
+  then show "isomorphism g"
     using assms by (typecheck_cfuncs_prems, smt comp_associative2 id_left_unit2 id_right_unit2 inv_left inv_right)
 qed
 
