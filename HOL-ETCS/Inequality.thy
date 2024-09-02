@@ -183,7 +183,7 @@ lemma fewer_is_less:
 lemma lqe_connexity:
   assumes m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(leq \<circ>\<^sub>c \<langle>n, m\<rangle> = \<t>) \<or> (leq \<circ>\<^sub>c \<langle>m, n\<rangle> = \<t>)"
-proof-
+proof - 
   have main_result: "(OR \<circ>\<^sub>c \<langle>
 leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>,
 leq \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>
@@ -688,7 +688,7 @@ qed
 lemma nat_strict_total_order:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "(n \<le>\<^sub>\<nat> m) = (\<not>(successor \<circ>\<^sub>c m \<le>\<^sub>\<nat> n))"
+  shows "(n \<le>\<^sub>\<nat> m) = (\<not> successor \<circ>\<^sub>c m \<le>\<^sub>\<nat> n)"
 proof(safe)
   show "n \<le>\<^sub>\<nat> m \<Longrightarrow> successor \<circ>\<^sub>c m \<le>\<^sub>\<nat> n \<Longrightarrow> False"
     by (metis add_respects_succ2 add_respects_zero_on_left exists_implies_leq_true leq_infix_def
@@ -752,9 +752,9 @@ proof -
     fix n 
     assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
     assume "Q \<circ>\<^sub>c n = \<t>"
-    then have "(FORALL \<nat>\<^sub>c ) \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n = \<t>"
+    then have "FORALL \<nat>\<^sub>c  \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n = \<t>"
       unfolding Q_def by (etcs_assocl, blast)
-    then have "(FORALL \<nat>\<^sub>c ) \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id  \<nat>\<^sub>c \<times>\<^sub>f n))\<^sup>\<sharp> = \<t>"
+    then have "FORALL \<nat>\<^sub>c  \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id  \<nat>\<^sub>c \<times>\<^sub>f n))\<^sup>\<sharp> = \<t>"
       using  sharp_comp by (typecheck_cfuncs, force) 
     then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> (IMPLIES \<circ>\<^sub>c \<langle>leq , P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c( (id  \<nat>\<^sub>c \<times>\<^sub>f n) \<circ>\<^sub>c \<langle>k, id \<one>\<rangle>) = \<t>"
       by(etcs_assocl, typecheck_cfuncs, smt FORALL_elim)
@@ -782,9 +782,9 @@ proof -
       by (etcs_assocr, typecheck_cfuncs, smt (verit, best) cfunc_prod_comp cfunc_prod_type)
     then have "\<And>k.  k \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> ((IMPLIES \<circ>\<^sub>c \<langle>leq, P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id  \<nat>\<^sub>c \<times>\<^sub>f n)) \<circ>\<^sub>c \<langle>k   ,id \<one>  \<rangle> = \<t>"
       by (typecheck_cfuncs, smt (verit, best)  cfunc_cross_prod_comp_cfunc_prod cfunc_prod_type comp_associative2 id_left_unit2 id_right_unit2)
-    then have "(FORALL \<nat>\<^sub>c ) \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c \<langle>leq, P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id  \<nat>\<^sub>c \<times>\<^sub>f n))\<^sup>\<sharp> = \<t>"
+    then have "FORALL \<nat>\<^sub>c  \<circ>\<^sub>c ((IMPLIES \<circ>\<^sub>c \<langle>leq, P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c (id  \<nat>\<^sub>c \<times>\<^sub>f n))\<^sup>\<sharp> = \<t>"
       using all_true_implies_FORALL_true3 by (typecheck_cfuncs, blast)
-    then have "(FORALL \<nat>\<^sub>c ) \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq, P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n = \<t>"
+    then have "FORALL \<nat>\<^sub>c  \<circ>\<^sub>c (IMPLIES \<circ>\<^sub>c \<langle>leq, P \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c n = \<t>"
       by (typecheck_cfuncs, simp add: sharp_comp)
     then show "Q \<circ>\<^sub>c n = \<t>"
       unfolding Q_def by (etcs_assocr, blast)
@@ -797,8 +797,8 @@ proof -
     fix n 
     assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
     assume Qn_true:  "Q \<circ>\<^sub>c n = \<t>"
-    then show " Q \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
-       by (typecheck_cfuncs, metis Qn_true Qn_true_eqs induction_case leq_infix_def lqe_antisymmetry nat_strict_total_order)
+    then show "Q \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+       by (typecheck_cfuncs, metis Qn_true_eqs induction_case leq_infix_def lqe_antisymmetry nat_strict_total_order)
   qed
   then show "P \<circ>\<^sub>c n = \<t>"
     using Qn_true_eqs leq_infix_def lqe_connexity by (typecheck_cfuncs, blast)
@@ -850,7 +850,7 @@ proof(rule ccontr)
       qed
     qed
   qed
-  have "\<not>nonempty S"
+  have "\<not> nonempty S"
   proof(rule ccontr, clarify, unfold nonempty_def)
     assume "\<exists>s. s \<in>\<^sub>c S"
     then obtain s where s_type[type_rule]: "s \<in>\<^sub>c S"

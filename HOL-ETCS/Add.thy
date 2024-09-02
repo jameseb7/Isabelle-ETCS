@@ -5,13 +5,13 @@ begin
 definition add1 :: "cfunc" where
    "add1 = (THE u. u: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and>
     u \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp> \<and>
-    successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c u = u\<circ>\<^sub>csuccessor)"
+    u \<circ>\<^sub>c successor = successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c u)"
 
 lemma add1_property: "(add1: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and>
     add1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp> \<and>
-    successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add1 = add1 \<circ>\<^sub>c successor)"
+    add1 \<circ>\<^sub>c successor = successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add1)"
   unfolding add1_def
-  by (rule theI', typecheck_cfuncs, smt (verit, best) natural_number_object_property)
+  by (rule theI', typecheck_cfuncs, smt (verit, best) natural_number_object_property2)
 
 lemma add1_type[type_rule]: "add1:  \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   by (simp add: add1_property)
@@ -1503,4 +1503,5 @@ proof(unfold add_def meta_add_def)
              add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>"
     by (typecheck_cfuncs, smt assms cnufatem_metafunc)
 qed
+
 end
