@@ -2,11 +2,6 @@ theory Mult
   imports Inequality
 begin
 
-(*Defining multiplication on N*)
-  
-
-
-
 definition mult1 :: "cfunc" where
   "mult1 = (THE v. v: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and>
     v \<circ>\<^sub>c zero = ((zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c \<one>))\<^sup>\<sharp>) \<and>
@@ -25,13 +20,9 @@ lemma mult1_type[type_rule]: "mult1:  \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub
 lemma mult1_0_eq: "mult1 \<circ>\<^sub>c zero = ((zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c \<one>))\<^sup>\<sharp>)"
   by (simp add: mult1_property)
 
-
-
-
 lemma mult1_comp_succ_eq: "mult1 \<circ>\<^sub>c successor =
   ((add2  \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)),(eval_func  \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c mult1"
   by (simp add: mult1_property)
-
 
 definition mult2 :: "cfunc"
   where "mult2 = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f mult1)"
@@ -39,8 +30,6 @@ definition mult2 :: "cfunc"
 lemma mult2_type[type_rule]: "mult2:  \<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c"
   unfolding mult2_def
   by typecheck_cfuncs
-
-
 
 definition mult :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixl "\<cdot>\<^sub>\<nat>" 70)
   where "m \<cdot>\<^sub>\<nat> n = mult2\<circ>\<^sub>c\<langle>m, n\<rangle>"
@@ -56,7 +45,6 @@ lemma mult_def2:
   unfolding mult_def mult2_def
   using assms 
   by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2)
-
 
 lemma mult_apply1right:
   assumes "m\<in>\<^sub>c  \<nat>\<^sub>c" "n\<in>\<^sub>c  \<nat>\<^sub>c"
@@ -117,7 +105,6 @@ proof -
 then show ?thesis using calculation by auto
 qed
 
-
 lemma mult_respects_succ_right:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "m \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n) = m +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> n)"
@@ -166,20 +153,11 @@ proof (etcs_rule one_separator[where X="\<nat>\<^sub>c", where Y="\<nat>\<^sub>c
     using assms x_type by (typecheck_cfuncs, smt cfunc_prod_comp comp_associative2)
 qed
 
-
 lemma s0_is_right_id:
   assumes "m\<in>\<^sub>c  \<nat>\<^sub>c" 
   shows "m \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m"
   by (simp add: add_respects_zero_on_right assms mult_respects_succ_right mult_respects_zero_right zero_type)
 (*Proof: m \<cdot>\<^sub>\<nat> S(0) = m +\<^sub>\<nat> (m \<cdot>\<^sub>\<nat> 0) = m +\<^sub>\<nat> 0 =m*)
-
-
-
-
-
-
-
-
 
 lemma mult_respects_zero_left:
   assumes m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c" 
@@ -189,7 +167,6 @@ proof -
     using mult_apply1_left mult_respects_zero_right by (typecheck_cfuncs, presburger)
   have triangle2: "mult2 \<circ>\<^sub>c \<langle>zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id\<^sub>c \<nat>\<^sub>c \<rangle>  \<circ>\<^sub>c zero = zero"
     by (typecheck_cfuncs, metis (no_types) cart_prod_extract_left cart_prod_extract_right triangle1)
-
   have square1: "mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c, zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c successor
                = mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c, zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
   proof (etcs_rule one_separator[where X="\<nat>\<^sub>c", where Y="\<nat>\<^sub>c"])
@@ -222,9 +199,6 @@ proof -
   then show ?thesis
     by (simp add: assms mult_respects_zero_right)
 qed
-
-
-
 
 lemma s0_is_left_id:
   assumes "m \<in>\<^sub>c  \<nat>\<^sub>c"
@@ -282,9 +256,7 @@ proof -
       by (typecheck_cfuncs, simp add: add2_commutes_succ add2_respects_zero_on_left)
     then show ?thesis
       by (simp add: calculation)
-  qed
-
-  
+  qed  
   have id3: "mult2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c zero  \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id\<^sub>c \<nat>\<^sub>c\<rangle> = id\<^sub>c \<nat>\<^sub>c"
     by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2 natural_number_object_func_unique square triangle)
   have "m = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c m"
@@ -296,9 +268,6 @@ proof -
   then show ?thesis
     unfolding mult_def using calculation by auto
 qed
-
-
-
 
 lemma mult_Left_Distributivity:
   assumes a_type[type_rule]: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type[type_rule]: "b \<in>\<^sub>c \<nat>\<^sub>c" and c_type[type_rule]: "c \<in>\<^sub>c \<nat>\<^sub>c"
@@ -322,9 +291,7 @@ proof -
       assume x_type[type_rule]: "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<one>"
      
       obtain p q where p_type[type_rule]: "p \<in>\<^sub>c \<nat>\<^sub>c" and q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and x_def:  "x = \<langle>\<langle>p,q\<rangle>, id \<one>\<rangle>"
-        using x_type by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)
-     
-       
+        using x_type by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)            
       have "(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f
           (mult2 \<circ>\<^sub>c add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero) \<circ>\<^sub>c \<langle>\<langle>p,q\<rangle>, id \<one>\<rangle> =
          (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f
@@ -411,8 +378,6 @@ proof -
           using   x_def by blast
       qed
     qed
-
-
     have main_result: "(mult2 \<circ>\<^sub>c (add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> = 
                         (add2 \<circ>\<^sub>c\<langle>mult2 \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c), 
              (right_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle>, mult2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<circ>\<^sub>c
@@ -432,9 +397,7 @@ proof -
             fix x 
             assume x_type[type_rule]: "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c"
             obtain p q r where p_type[type_rule]: "p\<in>\<^sub>c \<nat>\<^sub>c" and q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and r_type[type_rule]: "r \<in>\<^sub>c \<nat>\<^sub>c" and x_def: "x = \<langle>\<langle>p,q\<rangle>,r\<rangle>"
-              using cart_prod_decomp x_type by blast
-           
-  
+              using cart_prod_decomp x_type by blast            
             have fact5: "(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
             ((eval_func \<nat>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c))\<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f(mult2 \<circ>\<^sub>c (add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp> \<circ>\<^sub>c successor)) \<circ>\<^sub>c   \<langle>\<langle>p,q\<rangle>,r\<rangle>"
               using x_def by blast
@@ -493,8 +456,7 @@ proof -
          using calculation x_def by blast
        qed
      qed
-    qed
-
+   qed
   show "(add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>,mult2 \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor = 
         (add2 \<circ>\<^sub>c (add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>),eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c (add2 \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>,mult2 \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp>"
   proof(etcs_rule same_evals_equal[where Z = "\<nat>\<^sub>c", where X = "\<nat>\<^sub>c", where A = "\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c"])
@@ -590,7 +552,6 @@ proof -
       qed
     qed
   qed
-
   then have flat_main_result: "mult2 \<circ>\<^sub>c (add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) = add2 \<circ>\<^sub>c\<langle>mult2 \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c), (right_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle>, mult2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<circ>\<^sub>c  (left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c),(right_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c)\<rangle>\<rangle>"
     by (typecheck_cfuncs, metis flat_cancels_sharp main_result)
   then have main_equation: "(a +\<^sub>\<nat> b)\<cdot>\<^sub>\<nat> c = mult2 \<circ>\<^sub>c (add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,c\<rangle>"
@@ -603,14 +564,9 @@ proof -
     by (simp add: calculation) 
 qed
 
-
-
-
-
 lemma mult_commutative:
   assumes a_type[type_rule]: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type[type_rule]: "b \<in>\<^sub>c \<nat>\<^sub>c"
   shows "a \<cdot>\<^sub>\<nat> b = b \<cdot>\<^sub>\<nat> a"
-
 proof - 
   have main_result: "(mult2 \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> = (mult2)\<^sup>\<sharp>"
   proof(etcs_rule natural_number_object_func_unique[where X = "\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>", where f = "(add2 \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>), eval_func \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>"])  
@@ -677,9 +633,7 @@ proof -
           fix x 
           assume x_type[type_rule]: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
           obtain p q where p_type[type_rule]: "p \<in>\<^sub>c \<nat>\<^sub>c" and q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and x_def: "x = \<langle>p,q\<rangle>"
-            using cart_prod_decomp x_type by blast
-         
-
+            using cart_prod_decomp x_type by blast        
           have "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
                 ((eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (mult2 \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c,left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<^sup>\<sharp>) \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)) \<circ>\<^sub>c x"
             by (typecheck_cfuncs , simp add: sharp_comp transpose_func_def)
@@ -736,9 +690,7 @@ proof -
           fix x 
           assume x_type[type_rule]: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
           obtain p q where p_type[type_rule]: "p \<in>\<^sub>c \<nat>\<^sub>c" and q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and x_def: "x = \<langle>p,q\<rangle>"
-            using cart_prod_decomp x_type by blast
-          
-
+            using cart_prod_decomp x_type by blast          
           have "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x =
                 ((eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2\<^sup>\<sharp>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor)) \<circ>\<^sub>c x"
             by (typecheck_cfuncs, metis inv_transpose_func_def3 inv_transpose_of_composition)
@@ -797,9 +749,6 @@ proof -
     by (simp add: mult_def)
   then show ?thesis using calculation by auto
 qed
-
-
-
 
 lemma mult_associative:
   assumes a_type[type_rule]: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type[type_rule]: "b \<in>\<^sub>c \<nat>\<^sub>c" and c_type[type_rule]: "c \<in>\<^sub>c \<nat>\<^sub>c"
@@ -961,7 +910,6 @@ proof -
           obtain p q where p_type[type_rule]: "p \<in>\<^sub>c \<nat>\<^sub>c" and q_type[type_rule]: "q \<in>\<^sub>c \<nat>\<^sub>c" and y_def:  "y = \<langle>p,q\<rangle>"
             using cart_prod_decomp y_type by blast
 
-
           have trip_shft: 
              "\<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj  (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c, 
              \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj  (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c, 
@@ -981,9 +929,6 @@ proof -
                                 \<rangle>)\<^sup>\<sharp>"
           and g_type[type_rule]: "g: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
             by (typecheck_cfuncs, blast)
-
-          
-
 
           have "(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,\<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor) \<circ>\<^sub>c x 
               = (eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (mult2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,\<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>)\<^sup>\<sharp> )\<circ>\<^sub>c( (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f successor) \<circ>\<^sub>c x) "
@@ -1055,7 +1000,6 @@ proof -
   have main_result_flat: "mult2 \<circ>\<^sub>c mult2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c =
        mult2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f mult2) \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,\<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c,right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<nat>\<^sub>c\<rangle>\<rangle>"
     by (typecheck_cfuncs, metis flat_cancels_sharp main_result)
-
   have "(a \<cdot>\<^sub>\<nat>  b) \<cdot>\<^sub>\<nat> c = mult2 \<circ>\<^sub>c \<langle>a \<cdot>\<^sub>\<nat> b, c\<rangle>"
     by (simp add: mult_def)
   also have "... = mult2 \<circ>\<^sub>c \<langle> mult2 \<circ>\<^sub>c \<langle>a,b\<rangle>, id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c c\<rangle>"
@@ -1079,17 +1023,10 @@ proof -
   then show ?thesis using calculation by auto
 qed
 
-
-
-
 lemma mult_right_distributivity:
   assumes "a \<in>\<^sub>c  \<nat>\<^sub>c"  "b\<in>\<^sub>c  \<nat>\<^sub>c"  "c\<in>\<^sub>c  \<nat>\<^sub>c"
   shows "a \<cdot>\<^sub>\<nat> ( b +\<^sub>\<nat> c)   = (a \<cdot>\<^sub>\<nat> b) +\<^sub>\<nat>  (a \<cdot>\<^sub>\<nat> c)"
   using add_type assms mult_Left_Distributivity mult_commutative by auto
-
-
-
-
 
 lemma mult_cancellative_contrapositve:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c"
@@ -1101,7 +1038,7 @@ proof(cases "leq \<circ>\<^sub>c \<langle>a, b\<rangle> = \<t>")
     using add_commutes assms(1,3) mult_closure mult_respects_succ_right by fastforce  
   obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "k +\<^sub>\<nat> a = b"
     using assms ab leq_true_implies_exists by auto
-  have f2: "((k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k)+\<^sub>\<nat> ((a  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  a ) = b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c)"
+  have f2: "((k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k)+\<^sub>\<nat> ((a  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  a) = b \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c c)"
     using add_commutes assms(1,3) k_def mult_Left_Distributivity mult_respects_succ_right by (typecheck_cfuncs, fastforce)
   have "(k  \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat>  k \<noteq> zero"
     by (typecheck_cfuncs, metis add_monotonic add_respects_zero_on_left assms exists_implies_leq_true k_def lqe_antisymmetry)
@@ -1132,9 +1069,6 @@ lemma l_mult_cancellative:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "c \<noteq> zero"
   shows  "(c \<cdot>\<^sub>\<nat> a = c \<cdot>\<^sub>\<nat> b) = (a = b)"
   by (metis assms mult_cancellative_contrapositve mult_commutative nonzero_is_succ)
-
-
-
 
 lemma mult_monotonic:
   assumes m_type: "m \<in>\<^sub>c \<nat>\<^sub>c" and n_type: "n \<in>\<^sub>c \<nat>\<^sub>c" and u_type: "u \<in>\<^sub>c \<nat>\<^sub>c" and v_type: "v \<in>\<^sub>c \<nat>\<^sub>c"
@@ -1240,8 +1174,6 @@ lemma FOIL_2:
   assumes "a \<in>\<^sub>c \<nat>\<^sub>c" "b \<in>\<^sub>c \<nat>\<^sub>c" "c \<in>\<^sub>c \<nat>\<^sub>c" "d \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(a +\<^sub>\<nat> b) \<cdot>\<^sub>\<nat> (c +\<^sub>\<nat> d)  = (a \<cdot>\<^sub>\<nat> c) +\<^sub>\<nat> (a \<cdot>\<^sub>\<nat> d) +\<^sub>\<nat> (c \<cdot>\<^sub>\<nat> b) +\<^sub>\<nat> (b \<cdot>\<^sub>\<nat> d)"
   using assms by (typecheck_cfuncs, simp add: FOIL mult_commutative)
-
-
 
 (*Parity results:*)
 
@@ -1387,7 +1319,6 @@ proof -
     by (simp add: m_pls_n)
 qed
 
-
 lemma add_odds_is_even:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
   assumes "j \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m"
@@ -1410,16 +1341,12 @@ proof -
     by (simp add: calculation)
 qed
 
-
 lemma add_mixed_is_odd: 
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
   assumes "j \<in>\<^sub>c \<nat>\<^sub>c \<and> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> j = m"
   assumes "k \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n"
   shows   "((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (j +\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero)) = m +\<^sub>\<nat> n"
   using add_associates assms(3,4) mult_closure mult_right_distributivity succ_n_type zero_type by force
-
-
-
 
 lemma mult_even_is_even:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -1468,16 +1395,11 @@ lemma even_or_odd2:
          (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n =              (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)"
   by (typecheck_cfuncs, metis nth_even_is_times_twoB nth_even_or_nth_odd nth_odd_is_succ_times_twoB)
 
-
-
-
-
 lemma not_even_and_odd2:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "\<not>((\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n = successor \<circ>\<^sub>c((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m)) \<and> 
            (\<exists> m. m \<in>\<^sub>c \<nat>\<^sub>c \<and>  n =              (successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> m))"
   by (smt (z3) assms comp_associative2 halve_nth_even halve_nth_odd halve_type id_left_unit2 n_neq_succ_n nth_even_is_times_twoB nth_even_type nth_odd_def2 nth_odd_is_succ_times_twoB)
-
 
 lemma add_evens_is_even2:
   assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
@@ -1600,7 +1522,7 @@ proof -
     using add_respects_succ1 add_respects_zero_on_right n_def n_def2 by (typecheck_cfuncs, auto)
   then have n_def4: "\<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> k) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n"
     using n_def by blast
-  
+
   have "\<exists>l. l \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m \<cdot>\<^sub>\<nat> n"
     by (rule mult_odds_is_odd, simp_all add: assms m_def4 n_def4)
   then obtain l where mn_def: "l \<in>\<^sub>c \<nat>\<^sub>c \<and> ((successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> l) +\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = m \<cdot>\<^sub>\<nat> n"
@@ -1623,15 +1545,9 @@ proof -
     by (simp add: calculation)
 qed
 
-
 lemma prod_of_consecutive_nats_is_even:
   assumes "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "is_even \<circ>\<^sub>c (n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)) = \<t>"
   by (metis add_odds_is_even2 assms even_or_odd mult_evens_is_even2 mult_odds_is_odd2 mult_respects_succ_right mult_type succ_n_type)       
-
-
-
-
-
 
 end

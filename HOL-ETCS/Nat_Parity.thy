@@ -60,13 +60,7 @@ lemma nth_odd_successor2:
 
 lemma nth_odd_is_succ_nth_even:
   "nth_odd = successor \<circ>\<^sub>c nth_even"
-proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f="successor \<circ>\<^sub>c successor"])
-  show "nth_odd : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-  show "successor \<circ>\<^sub>c nth_even : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-  show "successor \<circ>\<^sub>c successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-    by typecheck_cfuncs
+proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f="successor \<circ>\<^sub>c successor"])
   show "nth_odd \<circ>\<^sub>c zero = (successor \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero"
   proof -
     have "nth_odd \<circ>\<^sub>c zero = successor \<circ>\<^sub>c zero"
@@ -96,7 +90,6 @@ qed
 lemma succ_nth_odd_is_nth_even_succ:
   "successor \<circ>\<^sub>c nth_odd = nth_even \<circ>\<^sub>c successor"
 proof (etcs_rule natural_number_object_func_unique[where f="successor \<circ>\<^sub>c successor"])
-
   show "(successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = (nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c zero"
   proof -
     have "(successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero"
@@ -193,14 +186,7 @@ lemma even_or_odd:
 
 lemma is_even_nth_even_true:
   "is_even \<circ>\<^sub>c nth_even = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
-proof (rule natural_number_object_func_unique[where f="id \<Omega>", where X=\<Omega>])
-  show "is_even \<circ>\<^sub>c nth_even : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-
+proof (etcs_rule natural_number_object_func_unique[where f="id \<Omega>", where X=\<Omega>])
   show "(is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
   proof -
     have "(is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero = is_even \<circ>\<^sub>c nth_even \<circ>\<^sub>c zero"
@@ -235,14 +221,7 @@ qed
 
 lemma is_odd_nth_odd_true:
   "is_odd \<circ>\<^sub>c nth_odd = \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
-proof (rule natural_number_object_func_unique[where f="id \<Omega>", where X=\<Omega>])
-  show "is_odd \<circ>\<^sub>c nth_odd : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "id\<^sub>c \<Omega> : \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-
+proof (etcs_rule natural_number_object_func_unique[where f="id \<Omega>", where X=\<Omega>])
   show "(is_odd \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
   proof -
     have "(is_odd \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = is_odd \<circ>\<^sub>c nth_odd \<circ>\<^sub>c zero"
@@ -391,14 +370,7 @@ lemma halve_with_parity_successor:
 
 lemma halve_with_parity_nth_even:
   "halve_with_parity \<circ>\<^sub>c nth_even = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c"
-proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c", where f="(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)"])
-  show "halve_with_parity \<circ>\<^sub>c nth_even : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-  show "left_coproj \<nat>\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-  show "(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) : \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-
+proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c", where f="(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)"])
   show "(halve_with_parity \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
   proof -
     have "(halve_with_parity \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero = halve_with_parity \<circ>\<^sub>c nth_even \<circ>\<^sub>c zero"
@@ -446,14 +418,7 @@ qed
 
 lemma halve_with_parity_nth_odd:
   "halve_with_parity \<circ>\<^sub>c nth_odd = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c"
-proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c", where f="(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)"])
-  show "halve_with_parity \<circ>\<^sub>c nth_odd : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-  show "right_coproj \<nat>\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-  show "(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) : \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-
+proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c", where f="(left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)"])
   show "(halve_with_parity \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
   proof -
     have "(halve_with_parity \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = halve_with_parity \<circ>\<^sub>c nth_odd \<circ>\<^sub>c zero"
@@ -510,14 +475,7 @@ qed
 
 lemma nth_even_nth_odd_halve_with_parity:
   "(nth_even \<amalg> nth_odd) \<circ>\<^sub>c halve_with_parity = id \<nat>\<^sub>c"
-proof (rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f="successor"])
-  show "nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-  show "id\<^sub>c \<nat>\<^sub>c : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-  show "successor : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
-    by typecheck_cfuncs
-
+proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", where f="successor"])
   show "(nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
   proof -
     have "(nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero = nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c zero"
@@ -608,14 +566,7 @@ lemma halve_nth_odd:
 
 lemma is_even_def3:
   "is_even = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)) \<circ>\<^sub>c halve_with_parity"
-proof (rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT])
-  show "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "NOT : \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-
+proof (etcs_rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT])
   show "is_even \<circ>\<^sub>c zero = ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero"
   proof -
     have "((\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero
@@ -659,14 +610,7 @@ qed
 
 lemma is_odd_def3:
   "is_odd = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>)) \<circ>\<^sub>c halve_with_parity"
-proof (rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT])
-  show "is_odd : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "(\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-  show "NOT : \<Omega> \<rightarrow> \<Omega>"
-    by typecheck_cfuncs
-
+proof (etcs_rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT])
   show "is_odd \<circ>\<^sub>c zero = ((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero"
   proof -
     have "((\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c zero
