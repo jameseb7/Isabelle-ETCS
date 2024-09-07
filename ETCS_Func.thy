@@ -1876,5 +1876,4 @@ lemma larger_than_infinite_is_infinite:
     iso_imp_epi_and_monic smaller_than_finite_is_finite by blast
 
 
-
 end

@@ -124,7 +124,7 @@ lemma transpose_factors:
   shows "(g \<circ>\<^sub>c f)\<^bsup>A\<^esup>\<^sub>f = (g\<^bsup>A\<^esup>\<^sub>f) \<circ>\<^sub>c (f\<^bsup>A\<^esup>\<^sub>f)"
   using assms by (typecheck_cfuncs, smt comp_associative2 comp_type eval_func_type exp_func_def2 transpose_of_comp)
 
-subsection "Inverse Transpose Function (flat)"
+subsection \<open>Inverse Transpose Function (flat)\<close>
 
 text \<open>The definition below corresponds to Definition 2.5.3 in Halvorson.\<close>
 definition inv_transpose_func :: "cfunc \<Rightarrow> cfunc" ("_\<^sup>\<flat>" [100]100) where
