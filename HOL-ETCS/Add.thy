@@ -33,7 +33,7 @@ lemma add2_apply:
   assumes "m : X \<rightarrow> \<nat>\<^sub>c" "n : X \<rightarrow> \<nat>\<^sub>c"
   shows "add2 \<circ>\<^sub>c \<langle>m, n\<rangle> = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add1 \<circ>\<^sub>c n\<rangle>"
   unfolding add2_def using assms 
-  by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2)
+  by (etcs_assocr, typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
 
 definition add :: "cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" (infixl "+\<^sub>\<nat>" 65)
   where "m +\<^sub>\<nat> n = add2 \<circ>\<^sub>c \<langle>m, n\<rangle>"
@@ -44,7 +44,7 @@ lemma add_type[type_rule]:
   unfolding add_def using assms by typecheck_cfuncs
 
 lemma add_def2:
-  assumes "m \<in>\<^sub>c  \<nat>\<^sub>c" "n\<in>\<^sub>c  \<nat>\<^sub>c"
+  assumes "m \<in>\<^sub>c \<nat>\<^sub>c" "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "m +\<^sub>\<nat> n = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add1 \<circ>\<^sub>c n\<rangle>"
   unfolding add_def using assms by (typecheck_cfuncs, simp add: add2_apply)
 
@@ -54,13 +54,13 @@ lemma add_respects_zero_on_right:
 proof -
   have "m +\<^sub>\<nat> zero =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add1 \<circ>\<^sub>c zero\<rangle>"
     by (simp add: add_def2 assms zero_type)
-  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> \<rangle>"
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp> \<rangle>"
     by (simp add: add1_0_eq)
-  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> \<circ>\<^sub>c id \<one> \<rangle>"
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp> \<circ>\<^sub>c id \<one> \<rangle>"
     using assms by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2)
-  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c ((id \<nat>\<^sub>c \<times>\<^sub>f  (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp>) \<circ>\<^sub>c  \<langle>m, id \<one> \<rangle>)"
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f  left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp>) \<circ>\<^sub>c  \<langle>m, id \<one> \<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-  also have "... =  (left_cart_proj \<nat>\<^sub>c \<one>) \<circ>\<^sub>c \<langle>m,id \<one>\<rangle>"
+  also have "... =  left_cart_proj \<nat>\<^sub>c \<one> \<circ>\<^sub>c \<langle>m,id \<one>\<rangle>"
     using assms by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
   also have "... = m"
     using assms id_type left_cart_proj_cfunc_prod by blast
