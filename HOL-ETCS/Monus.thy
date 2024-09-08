@@ -1,5 +1,5 @@
 theory Monus
-  imports Add Inequality
+  imports Inequality
 begin
 
 definition monus1 :: "cfunc" 
@@ -221,8 +221,6 @@ proof -
     by (metis calculation eq_pred_iff_eq m_type monus_def monus_type n_type succ_n_type)
 qed
 
-
-
 lemma monus_self:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
   shows "n \<midarrow>\<^sub>\<nat> n = zero"
@@ -244,11 +242,11 @@ proof -
         then show ?thesis
           by (metis calculation eq_pred_iff_eq_conv2 m_type monus_def monus_type zero_type)
       qed
-      have induction_conclusion: "monus2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m, successor \<circ>\<^sub>c m\<rangle> = zero" 
-        using induction_hypothesis monus_def monus_of_succs by (typecheck_cfuncs, presburger)
+      then have induction_conclusion: "monus2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c m, successor \<circ>\<^sub>c m\<rangle> = zero" 
+        using  monus_def monus_of_succs by (typecheck_cfuncs, presburger)
       then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,id\<^sub>c \<nat>\<^sub>c\<rangle>,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c m = \<t>"
         by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 
-            eq_pred_true_extract_right id_left_unit2 id_right_unit2 induction_conclusion terminal_func_comp_elem)
+            eq_pred_true_extract_right id_left_unit2 id_right_unit2 terminal_func_comp_elem)
   qed
   then have "\<t> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c, id \<nat>\<^sub>c\<rangle>, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c n"
     by (typecheck_cfuncs, simp add: comp_associative2)
@@ -257,9 +255,76 @@ proof -
   then show ?thesis
     by (metis calculation eq_pred_iff_eq monus_def monus_type n_type zero_type)
 qed
-      
-        
 
+lemma smaller_monus_bigger:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes n_leq_m: "n \<le>\<^sub>\<nat> m"
+  shows "n \<midarrow>\<^sub>\<nat> m = zero"
+proof - 
+  obtain c where c_type[type_rule]: "c \<in>\<^sub>c \<nat>\<^sub>c" and c_def: "n +\<^sub>\<nat> c = m"
+    by (typecheck_cfuncs, metis add_commutes leq_infix_def leq_true_implies_exists n_leq_m)
+  have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c \<rangle>\<rangle>, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c c = \<t>"
+  proof(etcs_rule nat_induction)
+    show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = \<t>"
+    proof - 
+      have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = 
+             eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>  \<circ>\<^sub>c zero, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero\<rangle>"
+        by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp cfunc_type_def comp_associative)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n, add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c zero\<rangle>, zero\<rangle>"
+        by (typecheck_cfuncs, smt (verit, ccfv_SIG) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n, add2 \<circ>\<^sub>c \<langle>n, zero\<rangle>\<rangle>, zero\<rangle>"
+        by (typecheck_cfuncs, metis add_apply1 add_def)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n, n\<rangle>, zero\<rangle>"
+        using add_def add_respects_zero_on_right by (typecheck_cfuncs, presburger)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+        using monus_def monus_self n_type by force
+      also have "... = \<t>"
+        using eq_pred_iff_eq by (typecheck_cfuncs, blast)
+      then show ?thesis
+        using calculation by auto
+    qed
+  next
+    fix k
+    assume k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c"
+    assume eq_pred_ind_hyp: "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c k = \<t>"
+    have induction_hypothesis: "n \<midarrow>\<^sub>\<nat> (n +\<^sub>\<nat> k) = zero"
+    proof - 
+      have "\<t> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c k"
+        using comp_associative2 eq_pred_ind_hyp by (typecheck_cfuncs, force)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c k, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c k\<rangle>"
+        by (typecheck_cfuncs, smt (verit, ccfv_SIG) cfunc_prod_comp comp_associative2)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n, add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c k\<rangle>, zero\<rangle>"
+        by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n, add2 \<circ>\<^sub>c \<langle>n, k\<rangle>\<rangle>, zero\<rangle>"
+        by (typecheck_cfuncs, metis cart_prod_extract_right)
+      then show ?thesis
+        by (typecheck_cfuncs, simp add: add_def calculation eq_pred_iff_eq monus_def)
+    qed
+    then have induction_conclusion: "n \<midarrow>\<^sub>\<nat> (n +\<^sub>\<nat> (successor \<circ>\<^sub>c k)) = zero"
+      by (typecheck_cfuncs, metis NAME_ME_PLEASE' add_respects_succ1 add_type zero_monus)
+    then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c k = \<t>"
+      by (typecheck_cfuncs, smt (verit, best) add_apply1_left beta_N_succ_nEqs_Id1 cart_prod_extract_left cfunc_prod_comp
+          comp_associative2 eq_pred_iff_eq_conv2 id_right_unit2 left_param_def2 left_param_on_el monus_def)
+  qed
+  then have "\<t> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle> monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c \<rangle>\<rangle>, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c c"
+    by (typecheck_cfuncs, simp add:  comp_associative2)
+  also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c c, zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c c\<rangle>"
+    by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2)
+  also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n, add2 \<circ>\<^sub>c \<langle>n, c\<rangle>\<rangle>, zero\<rangle>"
+    by (typecheck_cfuncs, smt (z3) cart_prod_extract_right cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)    
+  then show ?thesis
+    by (typecheck_cfuncs, smt c_def calculation add_def eq_pred_iff_eq monus_def)
+qed
+
+lemma RENAME_Part1:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "n +\<^sub>\<nat> (m \<midarrow>\<^sub>\<nat> n) = m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m)"
+  sorry
+
+lemma RENAME_Part2:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c" and k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(n \<midarrow>\<^sub>\<nat> m) \<midarrow>\<^sub>\<nat> k = n \<midarrow>\<^sub>\<nat> (m +\<^sub>\<nat> k)"
+  sorry
 
 
 end
