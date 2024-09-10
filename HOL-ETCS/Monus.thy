@@ -388,4 +388,48 @@ next
         add_respects_zero_on_right add_type bigger_monus_smaller smaller_monus_bigger)
 qed
 
+lemma monus:
+    assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+    shows "n \<le>\<^sub>\<nat> m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m)" and "\<And> j. j \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> n \<le>\<^sub>\<nat> m +\<^sub>\<nat> j \<Longrightarrow> (n \<midarrow>\<^sub>\<nat> m) \<le>\<^sub>\<nat> j"
+proof -
+  show "n \<le>\<^sub>\<nat> m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m)"
+  proof(cases "n \<le>\<^sub>\<nat> m")
+    show "n \<le>\<^sub>\<nat> m \<Longrightarrow> n \<le>\<^sub>\<nat> m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m)"
+      by (typecheck_cfuncs, simp add: add_respects_zero_on_right smaller_monus_bigger)
+  next
+    show "\<not> n \<le>\<^sub>\<nat> m \<Longrightarrow> n \<le>\<^sub>\<nat> m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m)"
+      by (typecheck_cfuncs, metis RENAME_Part1 add_commutes exists_implies_leq_true leq_infix_def monus_type)
+  qed
+next
+  fix j 
+  assume j_type[type_rule]: "j \<in>\<^sub>c \<nat>\<^sub>c"
+  assume j_prop: "n \<le>\<^sub>\<nat> m +\<^sub>\<nat> j"
+  show "n \<midarrow>\<^sub>\<nat> m \<le>\<^sub>\<nat> j"
+  proof(cases "n \<le>\<^sub>\<nat> m")
+    show "n \<le>\<^sub>\<nat> m \<Longrightarrow> n \<midarrow>\<^sub>\<nat> m \<le>\<^sub>\<nat> j"
+      by (typecheck_cfuncs, simp add: leq_infix_def smaller_monus_bigger zero_is_smallest)
+  next
+    assume "\<not> n \<le>\<^sub>\<nat> m"
+    then obtain k where k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c" and k_def: "m +\<^sub>\<nat> k = n"
+      by (typecheck_cfuncs, metis add_commutes leq_infix_def leq_true_implies_exists lqe_connexity)
+    have "m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m) \<le>\<^sub>\<nat> m +\<^sub>\<nat> j"
+    proof -   
+      have "m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m) = m +\<^sub>\<nat> ((m +\<^sub>\<nat> k) \<midarrow>\<^sub>\<nat> m)"
+        using k_def by blast
+      also have "... = m +\<^sub>\<nat> k"
+        by (typecheck_cfuncs, simp add: bigger_monus_smaller)
+      also have "... = n"
+        by (simp add: k_def)
+      also have "... \<le>\<^sub>\<nat> m +\<^sub>\<nat> j"
+        by (simp add: j_prop)
+      then show ?thesis 
+        using calculation by auto
+    qed
+    then have "(m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m)) \<midarrow>\<^sub>\<nat> m \<le>\<^sub>\<nat> (m +\<^sub>\<nat> j) \<midarrow>\<^sub>\<nat> m"
+      by (typecheck_cfuncs, metis leq_infix_def lqe_connexity monus_monotonic)
+    then show "n \<midarrow>\<^sub>\<nat> m \<le>\<^sub>\<nat> j"
+      using bigger_monus_smaller by (typecheck_cfuncs, auto)
+  qed
+qed
+    
 end

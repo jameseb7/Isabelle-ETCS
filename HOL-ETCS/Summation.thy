@@ -1,5 +1,5 @@
 theory Summation
-  imports Mult 
+  imports Mult Monus
 begin
 
 definition indexed_sum1 :: cfunc where
@@ -636,5 +636,20 @@ proof -
   then show ?thesis
     by (-, typecheck_cfuncs, smt (verit, ccfv_SIG) cfunc_prod_comp comp_associative2 eq_pred_iff_eq id_left_unit2 id_right_unit2 terminal_func_comp_elem)
 qed
+
+definition summation :: cfunc where
+  "summation  = indexed_sum \<circ>\<^sub>c \<langle>\<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)),  
+                                right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)\<rangle>, 
+                                monus2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)), 
+                                           (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<rangle>\<rangle>"
+
+lemma summation_type[type_rule]: 
+  "summation : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<rightarrow> \<nat>\<^sub>c"
+  unfolding summation_def by typecheck_cfuncs
+
+
+
+
+
 
 end
