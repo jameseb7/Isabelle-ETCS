@@ -648,6 +648,28 @@ lemma summation_type[type_rule]:
   unfolding summation_def by typecheck_cfuncs
 
 
+lemma empty_sum:
+  assumes l_type[type_rule]: "lower \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes u_type[type_rule]: "upper \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "successor \<circ>\<^sub>c upper \<le>\<^sub>\<nat> lower"
+  assumes f_type[type_rule]: "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  shows "summation \<circ>\<^sub>c \<langle>\<langle>lower, upper\<rangle>, f\<rangle> = zero"
+  unfolding summation_def
+proof - 
+  have "(indexed_sum \<circ>\<^sub>c \<langle>\<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>),
+                         right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)\<rangle>,
+           monus2 \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>),
+                       left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)\<rangle>\<rangle>) \<circ>\<^sub>c  \<langle>\<langle>lower,upper\<rangle>,f\<rangle> =
+        indexed_sum \<circ>\<^sub>c \<langle>\<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c  \<langle>\<langle>lower,upper\<rangle>,f\<rangle>,
+                         right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c  \<langle>\<langle>lower,upper\<rangle>,f\<rangle>\<rangle> ,
+           monus2 \<circ>\<^sub>c \<langle>right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c  \<langle>\<langle>lower,upper\<rangle>,f\<rangle>,
+                       left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c  \<langle>\<langle>lower,upper\<rangle>,f\<rangle>\<rangle>\<rangle>"
+    by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2)
+  also have "... = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, (upper \<midarrow>\<^sub>\<nat> lower)\<rangle>"
+    by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod monus_def right_cart_proj_cfunc_prod)
+
+
+
 
 
 
