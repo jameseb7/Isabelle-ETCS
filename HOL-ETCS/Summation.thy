@@ -638,16 +638,42 @@ proof -
 qed
 
 definition summation :: cfunc where
-  "summation  = indexed_sum \<circ>\<^sub>c \<langle>\<langle>(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)),  
+  "summation  = (zero \<amalg> (indexed_sum \<circ>\<^sub>c \<langle>\<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)),  
                                 right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)\<rangle>, 
                                 monus2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)), 
-                                           (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<rangle>\<rangle>"
+                                           (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<rangle>\<rangle>))
+                 \<circ>\<^sub>c (case_bool \<circ>\<^sub>c leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> \<times>\<^sub>f id (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))"
 
+lemma something_easier:
+  "case_bool \<circ>\<^sub>c leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle> : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<one> \<Coprod> \<one>)"
+  by typecheck_cfuncs
+
+lemma something_easy:
+  "\<langle>id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c), (case_bool \<circ>\<^sub>c leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<rangle> \<times>\<^sub>f id (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) :
+                           (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<rightarrow> ((\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<one> \<Coprod> \<one>)) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)"
+  by typecheck_cfuncs
+
+lemma something_easy_on_elements:
+  assumes l_type[type_rule]: "l \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes u_type[type_rule]: "u \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes "l \<le>\<^sub>\<nat> u"
+  assumes f_type[type_rule]: "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  shows "(\<langle>id (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c), (case_bool \<circ>\<^sub>c leq \<circ>\<^sub>c \<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c, right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c\<rangle>)\<rangle> \<times>\<^sub>f id (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)) \<circ>\<^sub>c \<langle>\<langle>l,u\<rangle>,f\<rangle>=
+          \<langle>\<langle>\<langle>l,u\<rangle>, left_coproj \<one> \<one>\<rangle>, f\<rangle>"
+  using assms apply typecheck_cfuncs
+  by (smt (verit, ccfv_SIG) assms(3) case_bool_true cfunc_cross_prod_comp_cfunc_prod cfunc_prod_comp cfunc_prod_unique comp_associative2 id_left_unit2 id_right_unit2 leq_infix_def)
+        
+
+
+
+(*
 lemma summation_type[type_rule]: 
-  "summation : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<rightarrow> \<nat>\<^sub>c"
+  "summation : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<rightarrow> \<nat>\<^sub>c \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)"
   unfolding summation_def by typecheck_cfuncs
+*)
 
 
+(*
 lemma empty_sum:
   assumes l_type[type_rule]: "lower \<in>\<^sub>c \<nat>\<^sub>c"
   assumes u_type[type_rule]: "upper \<in>\<^sub>c \<nat>\<^sub>c"
@@ -667,7 +693,7 @@ proof -
     by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2)
   also have "... = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, (upper \<midarrow>\<^sub>\<nat> lower)\<rangle>"
     by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod monus_def right_cart_proj_cfunc_prod)
-
+*)
 
 
 

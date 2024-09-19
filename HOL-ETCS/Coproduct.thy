@@ -1884,6 +1884,85 @@ lemma try_cast_mono:
   shows "monomorphism(try_cast m)"
   by (smt cfunc_type_def comp_monic_imp_monic' id_isomorphism into_super_type iso_imp_epi_and_monic try_cast_def2 assms)  
 
+
+subsection \<open>Cases\<close>
+
+definition cases :: "cfunc \<Rightarrow> cfunc" where
+"cases(f) = ((right_cart_proj \<one> (domain f)) \<bowtie>\<^sub>f (right_cart_proj \<one> (domain f))) \<circ>\<^sub>c (dist_prod_coprod_right \<one> \<one> (domain f)) \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f, id(domain(f))\<rangle>"
+
+lemma cases_def2: 
+  assumes "f : X \<rightarrow> \<Omega>"
+  shows "cases(f) = ((right_cart_proj \<one> X) \<bowtie>\<^sub>f (right_cart_proj \<one> X)) \<circ>\<^sub>c (dist_prod_coprod_right \<one> \<one> X) \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f, id X\<rangle>"
+  unfolding cases_def
+  using assms cfunc_type_def by auto 
+
+lemma cases_type[type_rule]:
+  assumes "f : X \<rightarrow> \<Omega>"
+  shows "cases(f) : X  \<rightarrow> X \<Coprod> X"
+  unfolding cases_def dist_prod_coprod_right_def 
+  using assms case_bool_type cfunc_bowtie_prod_type cfunc_prod_type cfunc_type_def 
+  comp_type dist_prod_coprod_left_def2 id_type right_cart_proj_type swap_type by fastforce
+
+lemma true_case:
+  assumes x_type[type_rule]: "x \<in>\<^sub>c X"
+  assumes f_type[type_rule]: "f : X \<rightarrow> \<Omega>"
+  assumes true_case: "f \<circ>\<^sub>c x = \<t>"
+  shows "cases f \<circ>\<^sub>c x = left_coproj X X \<circ>\<^sub>c x"
+  unfolding cases_def
+proof - 
+  have "domain f = X"
+    using assms(2) cfunc_type_def by blast    
+  have "((right_cart_proj \<one> (domain f) \<bowtie>\<^sub>f right_cart_proj \<one> (domain f)) \<circ>\<^sub>c
+     dist_prod_coprod_right \<one> \<one> (domain f) \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c (domain f)\<rangle>) \<circ>\<^sub>c x = 
+        ((right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c
+     dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c X\<rangle>) \<circ>\<^sub>c x"
+    by (simp add: \<open>domain f = X\<close>)
+  also have "... = (right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c  dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f \<circ>\<^sub>c x, x\<rangle>"
+    by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 id_left_unit2)
+  also have "... = (right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>left_coproj \<one> \<one>, x\<rangle>"
+    using true_case case_bool_true by argo
+  also have "... = (right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c left_coproj (\<one> \<times>\<^sub>c X) (\<one> \<times>\<^sub>c X) \<circ>\<^sub>c \<langle>id \<one> , x\<rangle>"
+    by (typecheck_cfuncs, metis dist_prod_coprod_right_ap_left id_right_unit2)
+  also have "... = left_coproj X X \<circ>\<^sub>c right_cart_proj \<one> X  \<circ>\<^sub>c \<langle>id \<one>, x\<rangle>"
+    by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_bowtie_prod)
+  also have "... = left_coproj X X \<circ>\<^sub>c x"
+    using right_cart_proj_cfunc_prod by (typecheck_cfuncs, presburger)
+  then show "((right_cart_proj \<one> (domain f) \<bowtie>\<^sub>f right_cart_proj \<one> (domain f)) \<circ>\<^sub>c
+              dist_prod_coprod_right \<one> \<one> (domain f) \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c (domain f)\<rangle>) \<circ>\<^sub>c x =
+              left_coproj X X \<circ>\<^sub>c x"
+    using calculation by argo
+qed
+
+lemma false_case:
+  assumes x_type[type_rule]: "x \<in>\<^sub>c X"
+  assumes f_type[type_rule]: "f : X \<rightarrow> \<Omega>"
+  assumes false_case: "f \<circ>\<^sub>c x = \<f>"
+  shows "cases f \<circ>\<^sub>c x = right_coproj X X \<circ>\<^sub>c x"
+  unfolding cases_def
+proof - 
+  have "domain f = X"
+    using assms(2) cfunc_type_def by blast    
+  have "((right_cart_proj \<one> (domain f) \<bowtie>\<^sub>f right_cart_proj \<one> (domain f)) \<circ>\<^sub>c
+     dist_prod_coprod_right \<one> \<one> (domain f) \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c (domain f)\<rangle>) \<circ>\<^sub>c x = 
+        ((right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c
+     dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c X\<rangle>) \<circ>\<^sub>c x"
+    by (simp add: \<open>domain f = X\<close>)
+  also have "... = (right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c  dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f \<circ>\<^sub>c x, x\<rangle>"
+    by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 id_left_unit2)
+  also have "... = (right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>right_coproj \<one> \<one>, x\<rangle>"
+    using case_bool_false false_case by fastforce
+  also have "... = (right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c right_coproj (\<one> \<times>\<^sub>c X) (\<one> \<times>\<^sub>c X) \<circ>\<^sub>c \<langle>id \<one> , x\<rangle>"
+    by (typecheck_cfuncs, metis dist_prod_coprod_right_ap_right id_right_unit2)
+  also have "... = right_coproj X X \<circ>\<^sub>c right_cart_proj \<one> X  \<circ>\<^sub>c \<langle>id \<one>, x\<rangle>"
+    by (typecheck_cfuncs, simp add: comp_associative2 right_coproj_cfunc_bowtie_prod)
+  also have "... = right_coproj X X \<circ>\<^sub>c x"
+    using right_cart_proj_cfunc_prod by (typecheck_cfuncs, presburger)
+  then show "((right_cart_proj \<one> (domain f) \<bowtie>\<^sub>f right_cart_proj \<one> (domain f)) \<circ>\<^sub>c
+              dist_prod_coprod_right \<one> \<one> (domain f) \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c (domain f)\<rangle>) \<circ>\<^sub>c x =
+              right_coproj X X \<circ>\<^sub>c x"
+    using calculation by argo
+qed
+
 subsection  \<open>Coproduct Set Properities\<close>
 
 lemma coproduct_commutes:
@@ -2353,8 +2432,8 @@ proof -
 qed
 
 lemma oneUone_iso_\<Omega>:
-  "\<one> \<Coprod> \<one> \<cong> \<Omega>"
-  by (meson truth_value_set_iso_1u1 cfunc_coprod_type false_func_type is_isomorphic_def true_func_type)
+  "\<Omega> \<cong> \<one> \<Coprod> \<one>"
+  using case_bool_def2 case_bool_iso is_isomorphic_def by auto
 
 text \<open>The lemma below is dual to Proposition 2.2.2 in Halvorson.\<close>
 lemma "card {x. x \<in>\<^sub>c \<Omega> \<Coprod> \<Omega>} = 4"

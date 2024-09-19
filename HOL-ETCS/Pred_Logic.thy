@@ -146,10 +146,10 @@ lemma AND_complementary:
 subsection \<open>NOR\<close>
 
 definition NOR :: "cfunc" where
-  "NOR = (THE \<chi>. is_pullback  \<one> \<one> (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> \<langle>\<f>, \<f>\<rangle> \<chi>)"
+  "NOR = (THE \<chi>. is_pullback  \<one> \<one> (\<Omega> \<times>\<^sub>c \<Omega>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> \<langle>\<f>, \<f>\<rangle> \<chi>)"
 
 lemma NOR_is_pullback:
-  "is_pullback  \<one> \<one> (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> \<langle>\<f>, \<f>\<rangle> NOR"
+  "is_pullback  \<one> \<one> (\<Omega> \<times>\<^sub>c \<Omega>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> \<langle>\<f>, \<f>\<rangle> NOR"
   unfolding NOR_def
   using characteristic_function_exists element_monomorphism
   by (typecheck_cfuncs, rule_tac the1I2, simp)

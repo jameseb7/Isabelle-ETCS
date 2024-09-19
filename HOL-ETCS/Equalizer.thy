@@ -413,7 +413,7 @@ next
   then show "\<exists>j. j : Z \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>) \<and>
          (right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = k \<and>
          (left_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m) \<circ>\<^sub>c j = h"
-  proof (insert k_type h_type assms, safe)
+  proof (clarify)
     fix u
     assume u_type[type_rule]: "u : Z \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>)"
     assume u_eq: "inverse_image_mapping f B m \<circ>\<^sub>c u = \<langle>h,k\<rangle>"
