@@ -551,7 +551,7 @@ proof -
         fibered_product_left_proj E m m E \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
         fibered_product_right_proj E m m E \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
         epimorphism b"
-        by (typecheck_cfuncs, rule_tac kernel_pair_connection,
+        by (typecheck_cfuncs, intro kernel_pair_connection,
             simp_all add: q_epi, metis f_const kernel_pair_equiv_rel m_def q_def quotient_func_eq)
       then obtain b where b_type[type_rule]: "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E" and
         b_left_eq: "fibered_product_left_proj E m m E \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X" and
@@ -614,7 +614,7 @@ proof -
     coequalizer (f\<lparr>A\<rparr>\<^bsub>n\<^esub>) g (fibered_product_left_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) (fibered_product_right_proj A (f \<circ>\<^sub>c n) (f \<circ>\<^sub>c n) A) \<and>
     monomorphism m \<and> f \<circ>\<^sub>c n = m \<circ>\<^sub>c g \<and> (\<forall>x. x : f\<lparr>A\<rparr>\<^bsub>n\<^esub> \<rightarrow> codomain f \<longrightarrow> f \<circ>\<^sub>c n = x \<circ>\<^sub>c g \<longrightarrow> x = m)"
     using assms cfunc_type_def comp_type epi_monic_factorization[where f="f \<circ>\<^sub>c n", where X=A, where Y="codomain f"] 
-    by (unfold image_of_def, rule_tac someI_ex, auto)
+    by (unfold image_of_def, subst someI_ex, auto)
   then show ?thesis
     using assms(1) cfunc_type_def by auto
 qed

@@ -444,9 +444,9 @@ proof -
   have p'_u_is_id: "p' \<circ>\<^sub>c u = id \<nat>\<^sub>c"
   proof (etcs_rule natural_number_object_func_unique[where f=successor])
     show "(p' \<circ>\<^sub>c u) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
-      by (etcs_subst id_left_unit2, etcs_assocr, etcs_subst u_zero z'_def, simp)
+      by (etcs_subst id_left_unit2, etcs_assocr, simp add: u_zero sym[OF z'_def])
     show "(p' \<circ>\<^sub>c u) \<circ>\<^sub>c successor = successor \<circ>\<^sub>c p' \<circ>\<^sub>c u"
-      by (etcs_assocr, etcs_subst u_succ, etcs_assocl, etcs_subst s'_def, simp)
+      by (etcs_assocr, subst u_succ, etcs_assocl, simp add: s'_def)
     show "id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
       by (etcs_subst id_right_unit2 id_left_unit2, simp)
   qed

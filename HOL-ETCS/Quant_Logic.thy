@@ -13,7 +13,7 @@ lemma FORALL_is_pullback:
   "is_pullback \<one> \<one> (\<Omega>\<^bsup>X\<^esup>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>)\<^sup>\<sharp>) (FORALL X)"
   unfolding FORALL_def
   using characteristic_function_exists element_monomorphism
-  by (typecheck_cfuncs, rule_tac the1I2, auto)
+  by (typecheck_cfuncs, simp add: the1I2)
 
 lemma FORALL_type[type_rule]:
   "FORALL X : \<Omega>\<^bsup>X\<^esup> \<rightarrow> \<Omega>"

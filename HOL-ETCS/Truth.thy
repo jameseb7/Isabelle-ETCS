@@ -269,9 +269,10 @@ lemma regmono_is_mono: "regular_monomorphism m \<Longrightarrow> monomorphism m"
 text \<open>The lemma below corresponds to Proposition 2.2.4 in Halvorson.\<close>
 lemma mono_is_regmono:
   shows "monomorphism m \<Longrightarrow> regular_monomorphism m"
-  unfolding monomorphism_def regular_monomorphism_def
-  using cfunc_type_def characteristic_func_type monomorphism_def domain_comp terminal_func_type true_func_type monomorphism_equalizes_char_func
-  by (rule_tac x="characteristic_func m" in exI, intro exI[where x="\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub>"], auto)
+  unfolding regular_monomorphism_def
+  by (rule exI[where x="characteristic_func m"], 
+      rule exI[where x="\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub>"], 
+      typecheck_cfuncs, auto simp add: cfunc_type_def monomorphism_equalizes_char_func)
 
 text \<open>The lemma below corresponds to Proposition 2.2.5 in Halvorson.\<close>
 lemma epi_mon_is_iso:
@@ -786,7 +787,7 @@ proof -
   have "\<exists> E m'. equalizer E m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
     using assms equalizer_exists by (typecheck_cfuncs, auto)
   then have "\<exists> m'.  equalizer (Y \<setminus> (X,m)) m' (characteristic_func (snd (X,m))) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
-    by (unfold set_subtraction_def, rule_tac someI_ex, auto)
+    by (unfold set_subtraction_def, subst someI_ex, auto)
   then show "\<exists> m'.  equalizer (Y \<setminus> (X,m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
     by auto
 qed
@@ -801,7 +802,7 @@ proof -
   have "\<exists> m'. equalizer (codomain m \<setminus> (domain m, m)) m' (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>)"
     by (simp add: assms cfunc_type_def set_subtraction_equalizer)
   then have "equalizer (codomain m \<setminus> (domain m, m)) m\<^sup>c (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>codomain m\<^esub>)"
-    by (unfold complement_morphism_def, rule_tac someI_ex, auto)
+    by (unfold complement_morphism_def, subst someI_ex, auto)
   then show "equalizer (Y \<setminus> (X, m)) m\<^sup>c (characteristic_func m) (\<f> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>)"
     using assms unfolding cfunc_type_def by auto
 qed
@@ -1032,7 +1033,7 @@ definition graph_morph :: "cfunc \<Rightarrow> cfunc" where
 
 lemma graph_equalizer3:
   "equalizer (graph f) (graph_morph f) (f \<circ>\<^sub>c left_cart_proj (domain f) (codomain f)) (right_cart_proj (domain f) (codomain f))"
-   using graph_equalizer unfolding graph_morph_def by (typecheck_cfuncs, rule_tac someI_ex, blast)
+  unfolding graph_morph_def by (rule someI_ex, simp add: graph_equalizer)
 
 lemma graph_equalizer4:
   assumes "f : X \<rightarrow> Y"

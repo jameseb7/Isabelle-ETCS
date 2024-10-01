@@ -13,7 +13,7 @@ lemma NOT_is_pullback:
   "is_pullback \<one> \<one> \<Omega> \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> \<f> NOT"
   unfolding NOT_def
   using characteristic_function_exists false_func_type element_monomorphism
-  by (rule_tac the1I2, auto)
+  by (subst the1I2, auto)
 
 lemma NOT_type[type_rule]:
   "NOT : \<Omega> \<rightarrow> \<Omega>"
@@ -67,7 +67,7 @@ lemma AND_is_pullback:
   "is_pullback \<one> \<one> (\<Omega> \<times>\<^sub>c \<Omega>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> \<langle>\<t>,\<t>\<rangle> AND"
   unfolding AND_def
   using element_monomorphism characteristic_function_exists
-  by (typecheck_cfuncs, rule_tac the1I2, auto)
+  by (typecheck_cfuncs, subst the1I2, auto)
 
 lemma AND_type[type_rule]:
   "AND : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
@@ -152,7 +152,7 @@ lemma NOR_is_pullback:
   "is_pullback  \<one> \<one> (\<Omega> \<times>\<^sub>c \<Omega>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> \<langle>\<f>, \<f>\<rangle> NOR"
   unfolding NOR_def
   using characteristic_function_exists element_monomorphism
-  by (typecheck_cfuncs, rule_tac the1I2, simp)
+  by (typecheck_cfuncs, simp add: the1I2)
 
 lemma NOR_type[type_rule]:
   "NOR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
@@ -352,7 +352,7 @@ lemma OR_is_pullback:
   "is_pullback (\<one>\<Coprod>(\<one>\<Coprod>\<one>)) \<one> (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>(\<one>\<Coprod>(\<one>\<Coprod>\<one>))\<^esub>) \<t> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) OR"
   unfolding OR_def
   using element_monomorphism characteristic_function_exists
-  by (typecheck_cfuncs, rule_tac the1I2, metis injective_imp_monomorphism pre_OR_injective)
+  by (typecheck_cfuncs, simp add: the1I2 injective_imp_monomorphism pre_OR_injective)
       
 lemma OR_type[type_rule]:
   "OR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
@@ -596,7 +596,7 @@ lemma XOR_is_pullback:
   "is_pullback (\<one>\<Coprod>\<one>) \<one> (\<Omega> \<times>\<^sub>c \<Omega>) \<Omega> (\<beta>\<^bsub>(\<one>\<Coprod>\<one>)\<^esub>) \<t> (\<langle>\<t>, \<f>\<rangle> \<amalg> \<langle>\<f>, \<t>\<rangle>) XOR"
   unfolding XOR_def
   using element_monomorphism characteristic_function_exists
-  by (typecheck_cfuncs, rule_tac the1I2, metis injective_imp_monomorphism pre_XOR_injective)
+  by (typecheck_cfuncs, simp add: the1I2 injective_imp_monomorphism pre_XOR_injective)
       
 lemma XOR_type[type_rule]:
   "XOR : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
@@ -773,7 +773,7 @@ lemma NAND_is_pullback:
   "is_pullback (\<one>\<Coprod>(\<one>\<Coprod>\<one>)) \<one> (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>(\<one>\<Coprod>(\<one>\<Coprod>\<one>))\<^esub>) \<t> (\<langle>\<f>, \<f>\<rangle>\<amalg> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) NAND"
   unfolding NAND_def
   using element_monomorphism characteristic_function_exists
-  by (typecheck_cfuncs, rule_tac the1I2, metis injective_imp_monomorphism pre_NAND_injective)
+  by (typecheck_cfuncs, simp add: the1I2 injective_imp_monomorphism pre_NAND_injective)
       
 lemma NAND_type[type_rule]:
   "NAND : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
@@ -977,7 +977,7 @@ lemma IFF_is_pullback:
   "is_pullback (\<one>\<Coprod>\<one>) \<one> (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>(\<one>\<Coprod>\<one>)\<^esub>) \<t> (\<langle>\<t>, \<t>\<rangle> \<amalg>\<langle>\<f>, \<f>\<rangle>) IFF"
   unfolding IFF_def
   using element_monomorphism characteristic_function_exists
-  by (typecheck_cfuncs, rule_tac the1I2, metis injective_imp_monomorphism pre_IFF_injective)
+  by (typecheck_cfuncs, simp add: the1I2 injective_imp_monomorphism pre_IFF_injective)
 
 lemma IFF_type[type_rule]:
   "IFF : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"
@@ -1193,7 +1193,7 @@ lemma IMPLIES_is_pullback:
   "is_pullback (\<one>\<Coprod>(\<one>\<Coprod>\<one>)) \<one> (\<Omega>\<times>\<^sub>c\<Omega>) \<Omega> (\<beta>\<^bsub>(\<one>\<Coprod>(\<one>\<Coprod>\<one>))\<^esub>) \<t> (\<langle>\<t>, \<t>\<rangle>\<amalg> (\<langle>\<f>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>)) IMPLIES"
   unfolding IMPLIES_def
   using element_monomorphism characteristic_function_exists
-  by (typecheck_cfuncs, rule_tac the1I2, metis injective_imp_monomorphism pre_IMPLIES_injective)
+  by (typecheck_cfuncs, simp add: the1I2 injective_imp_monomorphism pre_IMPLIES_injective)
       
 lemma IMPLIES_type[type_rule]:
   "IMPLIES : \<Omega> \<times>\<^sub>c \<Omega> \<rightarrow> \<Omega>"

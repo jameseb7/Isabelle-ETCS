@@ -283,7 +283,7 @@ proof -
   obtain A k where "equalizer A k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
     by (meson assms(1,2) comp_type equalizer_exists left_cart_proj_type right_cart_proj_type)
   then show "\<exists>k. equalizer (inverse_image f B m) k (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
-    unfolding inverse_image_def using assms cfunc_type_def by (rule_tac someI2_ex, auto)
+    unfolding inverse_image_def using assms cfunc_type_def by (subst someI2_ex, auto)
 qed
 
 definition inverse_image_mapping :: "cfunc \<Rightarrow> cset \<Rightarrow> cfunc \<Rightarrow> cfunc"  where
@@ -298,7 +298,7 @@ proof -
     using assms inverse_image_is_equalizer by blast
   then have "\<exists> X Y. f : X \<rightarrow> Y \<and> m : B \<rightarrow> Y \<and> monomorphism m \<and>
     equalizer (inverse_image f B m) (inverse_image_mapping f B m) (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
-    unfolding inverse_image_mapping_def using assms by (rule_tac someI_ex, auto)
+    unfolding inverse_image_mapping_def using assms by (subst someI_ex, auto)
   then show "equalizer (inverse_image f B m) (inverse_image_mapping f B m) (f \<circ>\<^sub>c left_cart_proj X B) (m \<circ>\<^sub>c right_cart_proj X B)"
     using assms(2) cfunc_type_def by auto
 qed
