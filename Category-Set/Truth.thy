@@ -664,7 +664,7 @@ proof -
   have "is_pullback (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) (X \<times>\<^sub>c X) (E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E) (E \<times>\<^sub>c E)
       (fibered_product_morphism X f f X) (g \<times>\<^sub>f g) b (fibered_product_morphism E h h E)"
     unfolding is_pullback_def
-  proof (typecheck_cfuncs, safe)
+  proof (typecheck_cfuncs, safe, metis b_eq)
     fix Z k j
     assume k_type[type_rule]: "k : Z \<rightarrow> X \<times>\<^sub>c X" and h_type[type_rule]: "j : Z \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E"
     assume k_h_eq: "(g \<times>\<^sub>f g) \<circ>\<^sub>c k = fibered_product_morphism E h h E \<circ>\<^sub>c j"
