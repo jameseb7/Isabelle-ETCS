@@ -690,7 +690,8 @@ proof(safe)
   have g_type[type_rule]: "g : X \<rightarrow> T"
     using is_pullback_def pullback by force
   show "is_cart_prod P pX pY X Y"
-  proof(unfold is_cart_prod_def, safe)
+    unfolding is_cart_prod_def
+  proof(safe)
     show pX_type[type_rule]: "pX : P \<rightarrow> X"
       using pullback is_pullback_def by force
     show pY_type[type_rule]: "pY : P \<rightarrow> Y"
@@ -717,7 +718,8 @@ proof(safe)
 next
   assume prod: "is_cart_prod P pX pY X Y"
   then show "is_pullback P Y X T pY f pX g"
-  proof(unfold is_cart_prod_def is_pullback_def, typecheck_cfuncs, safe)
+    unfolding is_cart_prod_def is_pullback_def
+  proof(typecheck_cfuncs, safe)
     assume pX_type[type_rule]: "pX : P \<rightarrow> X"
     assume pY_type[type_rule]: "pY : P \<rightarrow> Y"
     show "f \<circ>\<^sub>c pY = g \<circ>\<^sub>c pX"

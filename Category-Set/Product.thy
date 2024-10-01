@@ -407,7 +407,7 @@ lemma associate_right_crossprod_ap:
 proof-
   have "associate_right X Y Z \<circ>\<^sub>c ((x \<times>\<^sub>f y) \<times>\<^sub>f z) =
         associate_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x  \<circ>\<^sub>c left_cart_proj A B, y \<circ>\<^sub>c right_cart_proj A B\<rangle> \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C, z \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) C\<rangle>"
-    using assms by(unfold cfunc_cross_prod_def2, typecheck_cfuncs, unfold cfunc_cross_prod_def2, auto) 
+    using assms unfolding cfunc_cross_prod_def2 by(typecheck_cfuncs, unfold cfunc_cross_prod_def2, auto) 
   also have "... = associate_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x  \<circ>\<^sub>c left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C, y  \<circ>\<^sub>c right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C\<rangle>, z \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) C\<rangle>"
     using assms  cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, auto)
   also have "... = \<langle>x  \<circ>\<^sub>c left_cart_proj A B \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C, \<langle>y \<circ>\<^sub>c right_cart_proj A B \<circ>\<^sub>c left_cart_proj (A\<times>\<^sub>cB) C, z \<circ>\<^sub>c right_cart_proj (A \<times>\<^sub>c B) C\<rangle>\<rangle>"
@@ -475,7 +475,7 @@ lemma associate_left_crossprod_ap:
 proof-
   have "associate_left X Y Z \<circ>\<^sub>c (x \<times>\<^sub>f (y\<times>\<^sub>f z)) =
         associate_left X Y Z \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c left_cart_proj A (B\<times>\<^sub>cC), \<langle>y \<circ>\<^sub>c left_cart_proj B C, z \<circ>\<^sub>c right_cart_proj B C\<rangle> \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC)\<rangle>"
-    using assms by(unfold cfunc_cross_prod_def2, typecheck_cfuncs, unfold cfunc_cross_prod_def2, auto) 
+    using assms unfolding cfunc_cross_prod_def2 by(typecheck_cfuncs, unfold cfunc_cross_prod_def2, auto) 
   also have "... = associate_left X Y Z \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c left_cart_proj A (B\<times>\<^sub>cC), \<langle>y \<circ>\<^sub>c left_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC), z \<circ>\<^sub>c right_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC)\<rangle>\<rangle>"
     using assms  cfunc_prod_comp comp_associative2 by (typecheck_cfuncs, auto)
   also have "... = \<langle>\<langle>x \<circ>\<^sub>c left_cart_proj A (B\<times>\<^sub>cC), y \<circ>\<^sub>c left_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC)\<rangle>,z \<circ>\<^sub>c right_cart_proj B C \<circ>\<^sub>c right_cart_proj A (B\<times>\<^sub>cC)\<rangle>"

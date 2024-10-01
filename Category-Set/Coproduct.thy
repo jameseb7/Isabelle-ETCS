@@ -1043,7 +1043,8 @@ definition case_bool :: "cfunc" where
 lemma case_bool_def2:
   "case_bool : \<Omega> \<rightarrow> (\<one> \<Coprod> \<one>) \<and>  
     (\<t> \<amalg> \<f>) \<circ>\<^sub>c case_bool = id \<Omega> \<and> case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (\<one> \<Coprod> \<one>)"
-proof (unfold case_bool_def, rule theI', safe)
+  unfolding case_bool_def
+proof (rule theI', safe)
   show "\<exists>x. x : \<Omega> \<rightarrow> \<one> \<Coprod> \<one> \<and> \<t> \<amalg> \<f> \<circ>\<^sub>c x = id\<^sub>c \<Omega> \<and> x \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (\<one> \<Coprod> \<one>)"
     unfolding isomorphism_def
     using isomorphism_def3 truth_value_set_iso_1u1 by (typecheck_cfuncs, blast)
@@ -1746,7 +1747,7 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, clarify)
     then have "y \<in>\<^bsub>Y\<^esub> (X, m)"
       by (simp add: assms characteristic_func_true_relative_member y_type)
     then obtain x where x_type: "x \<in>\<^sub>c X" and x_def: "y = m \<circ>\<^sub>c x"
-      by (unfold relative_member_def2, auto, unfold factors_through_def2, auto)
+      unfolding relative_member_def2 by (auto, unfold factors_through_def2, auto)
     then show "\<exists>x. x \<in>\<^sub>c domain (into_super m) \<and> into_super m \<circ>\<^sub>c x = y"
       unfolding into_super_def using assms cfunc_type_def comp_associative left_coproj_cfunc_coprod
       by (intro exI[where x="left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x"], typecheck_cfuncs, metis)
@@ -1757,7 +1758,7 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, clarify)
     then have "y \<in>\<^bsub>Y\<^esub> (Y \<setminus> (X, m), m\<^sup>c)"
       by (simp add: assms not_in_subset_in_complement y_type)
     then obtain x' where x'_type: "x' \<in>\<^sub>c Y \<setminus> (X, m)" and x'_def: "y = m\<^sup>c \<circ>\<^sub>c x'"
-      by (unfold relative_member_def2, auto, unfold factors_through_def2, auto)
+      unfolding relative_member_def2 by (auto, unfold factors_through_def2, auto)
     then show "\<exists>x. x \<in>\<^sub>c domain (into_super m) \<and> into_super m \<circ>\<^sub>c x = y"
       unfolding into_super_def using assms cfunc_type_def comp_associative right_coproj_cfunc_coprod
       by (intro exI[where x="right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'"], typecheck_cfuncs, metis)

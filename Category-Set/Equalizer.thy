@@ -360,7 +360,7 @@ lemma inverse_image_subobject_mapping_def2:
 lemma inverse_image_subobject_mapping_type[type_rule]:
   assumes "f : X \<rightarrow> Y" "m : B \<rightarrow> Y" "monomorphism m"
   shows "[f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>]map : f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub> \<rightarrow> X"
-  using assms by (unfold inverse_image_subobject_mapping_def2, typecheck_cfuncs)
+  by (smt (verit, best) assms comp_type inverse_image_mapping_type inverse_image_subobject_mapping_def2 left_cart_proj_type)
 
 lemma inverse_image_subobject_mapping_mono:
   assumes "f : X \<rightarrow> Y" "m : B \<rightarrow> Y" "monomorphism m"

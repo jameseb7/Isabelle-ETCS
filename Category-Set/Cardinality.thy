@@ -287,7 +287,8 @@ proof -
 
 
   have "injective(m)"
-  proof(unfold injective_def, clarify)
+    unfolding injective_def
+  proof(clarify)
     fix a b 
     assume "a \<in>\<^sub>c domain m" "b \<in>\<^sub>c domain m"
     then have a_type[type_rule]: "a \<in>\<^sub>c X  \<Coprod> Y" and b_type[type_rule]: "b \<in>\<^sub>c X  \<Coprod> Y"
@@ -748,7 +749,8 @@ next
         qed
   
      have \<Theta>_injective: "injective(\<Theta>)"
-     proof(unfold injective_def, clarify)
+       unfolding injective_def
+     proof(clarify)
        fix xy st
        assume xy_type[type_rule]: "xy \<in>\<^sub>c domain \<Theta>"
        assume st_type[type_rule]: "st \<in>\<^sub>c domain \<Theta>"
@@ -893,7 +895,8 @@ proof -
   then have map_type: "(x1 \<amalg> x2) \<circ>\<^sub>c case_bool   : \<Omega> \<rightarrow> X"
     by typecheck_cfuncs
   have injective: "injective((x1 \<amalg> x2) \<circ>\<^sub>c case_bool)"
-  proof(unfold injective_def, clarify)
+    unfolding injective_def
+  proof(clarify)
     fix \<omega>1 \<omega>2 
     assume "\<omega>1 \<in>\<^sub>c domain (x1 \<amalg> x2 \<circ>\<^sub>c case_bool)"
     then have \<omega>1_type[type_rule]: "\<omega>1 \<in>\<^sub>c \<Omega>"
@@ -948,7 +951,8 @@ lemma exp_preserves_card1:
   assumes "A \<le>\<^sub>c B"
   assumes "nonempty X"   
   shows "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
-proof (unfold is_smaller_than_def)
+  unfolding is_smaller_than_def
+proof -
   obtain x where x_type[type_rule]: "x \<in>\<^sub>c X"
     using assms(2) unfolding nonempty_def by auto
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
@@ -1099,7 +1103,8 @@ qed
 lemma exp_preserves_card2:
   assumes "A \<le>\<^sub>c B"
   shows "A\<^bsup>X\<^esup> \<le>\<^sub>c B\<^bsup>X\<^esup>"
-proof (unfold is_smaller_than_def)
+  unfolding is_smaller_than_def
+proof -
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
         using assms unfolding is_smaller_than_def by auto
   show "\<exists>m. m : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup> \<and> monomorphism m"

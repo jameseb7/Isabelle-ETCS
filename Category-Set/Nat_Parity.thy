@@ -13,7 +13,7 @@ definition nth_even :: "cfunc" where
 
 lemma nth_even_def2:
   "nth_even: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<and> nth_even \<circ>\<^sub>c zero = zero \<and> (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even = nth_even \<circ>\<^sub>c successor"
-  by (unfold nth_even_def, rule theI', etcs_rule natural_number_object_property2)
+  unfolding nth_even_def by (rule theI', etcs_rule natural_number_object_property2)
 
 lemma nth_even_type[type_rule]:
   "nth_even: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
@@ -40,7 +40,7 @@ definition nth_odd :: "cfunc" where
 
 lemma nth_odd_def2:
   "nth_odd: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<and> nth_odd \<circ>\<^sub>c zero = successor \<circ>\<^sub>c zero \<and> (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_odd = nth_odd \<circ>\<^sub>c successor"
-  by (unfold nth_odd_def, rule theI', etcs_rule natural_number_object_property2)
+  unfolding nth_odd_def by (rule theI', etcs_rule natural_number_object_property2)
 
 lemma nth_odd_type[type_rule]:
   "nth_odd: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
@@ -113,7 +113,7 @@ definition is_even :: "cfunc" where
 
 lemma is_even_def2:
   "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> is_even \<circ>\<^sub>c zero = \<t> \<and> NOT \<circ>\<^sub>c is_even = is_even \<circ>\<^sub>c successor"
-  by (unfold is_even_def, rule theI', etcs_rule natural_number_object_property2)
+  unfolding is_even_def by (rule theI', etcs_rule natural_number_object_property2)
 
 lemma is_even_type[type_rule]:
   "is_even : \<nat>\<^sub>c \<rightarrow> \<Omega>"
@@ -134,7 +134,7 @@ definition is_odd :: "cfunc" where
 
 lemma is_odd_def2:
   "is_odd : \<nat>\<^sub>c \<rightarrow> \<Omega> \<and> is_odd \<circ>\<^sub>c zero = \<f> \<and> NOT \<circ>\<^sub>c is_odd = is_odd \<circ>\<^sub>c successor"
-  by (unfold is_odd_def, rule theI', etcs_rule natural_number_object_property2)
+  unfolding is_odd_def by (rule theI', etcs_rule natural_number_object_property2)
 
 lemma is_odd_type[type_rule]:
   "is_odd : \<nat>\<^sub>c \<rightarrow> \<Omega>"
@@ -354,7 +354,7 @@ lemma halve_with_parity_def2:
   "halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c \<and> 
     halve_with_parity \<circ>\<^sub>c zero = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero \<and>
     (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<amalg> (left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity = halve_with_parity \<circ>\<^sub>c successor"
-  by (unfold halve_with_parity_def, rule theI', etcs_rule natural_number_object_property2)
+  unfolding halve_with_parity_def by (rule theI', etcs_rule natural_number_object_property2)
 
 lemma halve_with_parity_type[type_rule]:
   "halve_with_parity : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c \<Coprod> \<nat>\<^sub>c"
@@ -525,7 +525,8 @@ lemma halve_with_parity_nth_even_nth_odd:
 
 lemma even_odd_iso:
   "isomorphism (nth_even \<amalg> nth_odd)"
-proof (unfold isomorphism_def, intro exI[where x=halve_with_parity], safe)
+  unfolding isomorphism_def
+proof (intro exI[where x=halve_with_parity], safe)
   show "domain halve_with_parity = codomain (nth_even \<amalg> nth_odd)"
     by (typecheck_cfuncs, unfold cfunc_type_def, auto)
   show "codomain halve_with_parity = domain (nth_even \<amalg> nth_odd)"
@@ -538,7 +539,8 @@ qed
 
 lemma halve_with_parity_iso:
   "isomorphism halve_with_parity"
-proof (unfold isomorphism_def, intro exI[where x="nth_even \<amalg> nth_odd"], safe)
+   unfolding isomorphism_def
+proof (intro exI[where x="nth_even \<amalg> nth_odd"], safe)
   show "domain (nth_even \<amalg> nth_odd) = codomain halve_with_parity"
     by (typecheck_cfuncs, unfold cfunc_type_def, auto)
   show "codomain (nth_even \<amalg> nth_odd) = domain halve_with_parity"

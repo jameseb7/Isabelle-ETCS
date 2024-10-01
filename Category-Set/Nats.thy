@@ -99,7 +99,8 @@ proof -
   obtain s where s_type[type_rule]: "s: N \<rightarrow> N" and s_def: "s = (i \<circ>\<^sub>c successor) \<circ>\<^sub>c i\<^bold>\<inverse>"
     using i_iso by (typecheck_cfuncs, simp)
   have "is_NNO N z s"
-  proof(unfold is_NNO_def, typecheck_cfuncs)
+    unfolding is_NNO_def
+  proof(typecheck_cfuncs)
     fix X q f 
     assume q_type[type_rule]: "q: \<one> \<rightarrow> X"
     assume f_type[type_rule]: "f:   X \<rightarrow> X"
@@ -292,7 +293,8 @@ definition predecessor' :: "cfunc" where
 lemma predecessor'_def2:
   "predecessor' : \<nat>\<^sub>c \<rightarrow> \<one> \<Coprod> \<nat>\<^sub>c \<and> predecessor' \<circ>\<^sub>c (zero \<amalg> successor) = id (\<one> \<Coprod> \<nat>\<^sub>c)
     \<and> (zero \<amalg> successor) \<circ>\<^sub>c predecessor' = id \<nat>\<^sub>c"
-proof (unfold predecessor'_def, rule theI', safe)
+  unfolding predecessor'_def
+proof (rule theI', safe)
   show "\<exists>x. x : \<nat>\<^sub>c \<rightarrow> \<one> \<Coprod> \<nat>\<^sub>c \<and>
         x \<circ>\<^sub>c zero \<amalg> successor = id\<^sub>c (\<one> \<Coprod> \<nat>\<^sub>c) \<and> zero \<amalg> successor \<circ>\<^sub>c x = id\<^sub>c \<nat>\<^sub>c"
     using oneUN_iso_N_isomorphism by (typecheck_cfuncs, unfold isomorphism_def cfunc_type_def, auto)

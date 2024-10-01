@@ -199,10 +199,10 @@ proof -
   have "{(X, m). (X, m) \<subseteq>\<^sub>c \<one>} // {((X1, m1), (X2, m2)). X1 \<cong> X2} = {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> \<one>}}"
   proof
     show "{(X, m). (X, m) \<subseteq>\<^sub>c \<one>} // {((X1, m1), (X2, m2)). X1 \<cong> X2} \<subseteq> {{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> \<one>}}"
-      by (unfold quotient_def, auto, insert isomorphic_is_symmetric isomorphic_is_transitive subobject_one_or_empty, blast+)
+      unfolding quotient_def by (auto, insert isomorphic_is_symmetric isomorphic_is_transitive subobject_one_or_empty, blast+)
   next
     show "{{(X, m). X \<cong> \<emptyset>}, {(X, m). X \<cong> \<one>}} \<subseteq> {(X, m). (X, m) \<subseteq>\<^sub>c \<one>} // {((X1, m1), X2, m2). X1 \<cong> X2}"
-      by (unfold quotient_def, insert empty_subobject one_subobject, auto simp add: isomorphic_is_symmetric)
+      unfolding quotient_def by (insert empty_subobject one_subobject, auto simp add: isomorphic_is_symmetric)
   qed
   then show "card ({(X, m). (X, m) \<subseteq>\<^sub>c \<one>} // {((X, m1), (Y, m2)). X \<cong> Y}) = 2"
     by (simp add: classes_distinct)

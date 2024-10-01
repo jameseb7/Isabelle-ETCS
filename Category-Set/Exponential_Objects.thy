@@ -1341,7 +1341,8 @@ proof -
                  \<phi>_type[type_rule]: "\<phi> : A\<^bsup>\<Omega>\<^esup> \<rightarrow> A \<times>\<^sub>c A"
                   by (typecheck_cfuncs, simp)
   have "injective \<phi>"
-  proof(unfold injective_def, clarify)
+    unfolding injective_def
+  proof(clarify)
     fix f g 
     assume "f \<in>\<^sub>c domain \<phi>" then have f_type[type_rule]: "f \<in>\<^sub>c A\<^bsup>\<Omega>\<^esup>" 
       using \<phi>_type cfunc_type_def by (typecheck_cfuncs, auto)

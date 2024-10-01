@@ -270,7 +270,8 @@ definition inverse :: "cfunc \<Rightarrow> cfunc" ("_\<^bold>\<inverse>" [1000] 
 lemma inverse_def2:
   assumes "isomorphism f"
   shows "f\<^bold>\<inverse> : codomain f \<rightarrow> domain f \<and> f\<^bold>\<inverse> \<circ>\<^sub>c f = id(domain f) \<and> f \<circ>\<^sub>c f\<^bold>\<inverse> = id(codomain f)"
-proof (unfold inverse_def, rule theI', safe)
+  unfolding inverse_def
+proof (rule theI', safe)
   show "\<exists>g. g : codomain f \<rightarrow> domain f \<and> g \<circ>\<^sub>c f = id\<^sub>c (domain f) \<and> f \<circ>\<^sub>c g = id\<^sub>c (codomain f)"
     using assms unfolding isomorphism_def cfunc_type_def by auto
 next
