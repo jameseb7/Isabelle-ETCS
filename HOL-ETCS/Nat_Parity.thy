@@ -285,7 +285,7 @@ proof -
     show "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> : \<nat>\<^sub>c \<rightarrow> \<Omega>"
       by typecheck_cfuncs
     show "\<exists>x. x \<in>\<^sub>c \<nat>\<^sub>c \<and> (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c x = \<t>"
-    proof (typecheck_cfuncs, rule_tac x="zero" in exI, clarify)
+    proof (typecheck_cfuncs, intro exI[where x="zero"], clarify)
       have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero
         = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle> \<circ>\<^sub>c zero"
         by (typecheck_cfuncs, simp add: comp_associative2)
@@ -525,7 +525,7 @@ lemma halve_with_parity_nth_even_nth_odd:
 
 lemma even_odd_iso:
   "isomorphism (nth_even \<amalg> nth_odd)"
-proof (unfold isomorphism_def, rule_tac x=halve_with_parity in exI, safe)
+proof (unfold isomorphism_def, intro exI[where x=halve_with_parity], safe)
   show "domain halve_with_parity = codomain (nth_even \<amalg> nth_odd)"
     by (typecheck_cfuncs, unfold cfunc_type_def, auto)
   show "codomain halve_with_parity = domain (nth_even \<amalg> nth_odd)"
@@ -538,7 +538,7 @@ qed
 
 lemma halve_with_parity_iso:
   "isomorphism halve_with_parity"
-proof (unfold isomorphism_def, rule_tac x="nth_even \<amalg> nth_odd" in exI, safe)
+proof (unfold isomorphism_def, intro exI[where x="nth_even \<amalg> nth_odd"], safe)
   show "domain (nth_even \<amalg> nth_odd) = codomain halve_with_parity"
     by (typecheck_cfuncs, unfold cfunc_type_def, auto)
   show "codomain (nth_even \<amalg> nth_odd) = domain halve_with_parity"

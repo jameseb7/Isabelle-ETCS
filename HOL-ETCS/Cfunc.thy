@@ -302,7 +302,7 @@ lemma inv_right:
 lemma inv_iso:
   assumes "isomorphism f"
   shows "isomorphism(f\<^bold>\<inverse>)"
-  using assms inverse_def2 unfolding isomorphism_def cfunc_type_def by (rule_tac x=f in exI, auto)
+  using assms inverse_def2 unfolding isomorphism_def cfunc_type_def by (intro exI[where x=f], auto)
 
 lemma inv_idempotent:
   assumes "isomorphism f"
@@ -314,11 +314,11 @@ definition is_isomorphic :: "cset \<Rightarrow> cset \<Rightarrow> bool" (infix 
 
 lemma id_isomorphism: "isomorphism (id X)"
   unfolding isomorphism_def
-  by (rule_tac x="id X" in exI, auto simp add: id_codomain id_domain, metis id_domain id_right_unit)
+  by (intro exI[where x= "id X"], auto simp add: id_codomain id_domain, metis id_domain id_right_unit)
 
 lemma isomorphic_is_reflexive: "X \<cong> X"
   unfolding is_isomorphic_def
-  by (rule_tac x="id X" in exI, auto simp add: id_domain id_codomain id_isomorphism id_type)
+  by (intro exI[where x= "id X"], auto simp add: id_domain id_codomain id_isomorphism id_type)
 
 lemma isomorphic_is_symmetric: "X \<cong> Y \<longrightarrow> Y \<cong> X"
   unfolding is_isomorphic_def isomorphism_def 

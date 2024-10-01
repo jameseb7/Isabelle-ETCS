@@ -75,7 +75,7 @@ proof -
     using X_nonempty nonempty_def by blast
 
   show "\<exists>g. g: Y \<rightarrow> X \<and> epimorphism g \<and> g \<circ>\<^sub>c f = id\<^sub>c X"
-  proof (rule_tac x="(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>)) \<circ>\<^sub>c try_cast m" in exI, safe, typecheck_cfuncs)
+  proof (intro exI[where x="(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>)) \<circ>\<^sub>c try_cast m"], safe, typecheck_cfuncs)
     have func_f_elem_eq: "\<And> y. y \<in>\<^sub>c X \<Longrightarrow> (g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c f \<circ>\<^sub>c y = y"
     proof -
       fix y
@@ -115,8 +115,7 @@ proof -
     by (meson assms(2) f_type split_epimorphism_def2)
   then have "coequalizer Y f (s \<circ>\<^sub>c f) (id X)"
     unfolding coequalizer_def 
-    by (rule_tac x="X" in exI, rule_tac x="X" in exI, typecheck_cfuncs,
-        smt (verit, ccfv_threshold) cfunc_type_def comp_associative comp_type id_left_unit2 id_right_unit2)
+    by (typecheck_cfuncs, smt (verit, del_insts) comp_associative2 comp_type id_left_unit2 id_right_unit2 s_splits)
   then show ?thesis
     using assms coequalizer_is_epimorphism epimorphisms_are_regular by blast
 qed
@@ -129,7 +128,7 @@ lemma sections_are_regular_monos:
 proof -   
   have "coequalizer Y f (s \<circ>\<^sub>c f) (id X)"
     unfolding coequalizer_def 
-    by (rule_tac x="X" in exI, rule_tac x="X" in exI, typecheck_cfuncs,
+    by (rule exI[where x="X"], intro exI[where x="X"], typecheck_cfuncs,
         smt (z3) assms cfunc_type_def comp_associative2 comp_type id_left_unit id_right_unit2 section_of_def)
   then show ?thesis
     by (metis assms(2) cfunc_type_def comp_monic_imp_monic' id_isomorphism iso_imp_epi_and_monic mono_is_regmono section_of_def)

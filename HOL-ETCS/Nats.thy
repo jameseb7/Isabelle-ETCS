@@ -117,7 +117,7 @@ proof -
     show "\<exists>!u. u : N \<rightarrow> X \<and> q = u \<circ>\<^sub>c z \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c s"
     proof safe
       show "\<exists>u. u : N \<rightarrow> X \<and> q = u \<circ>\<^sub>c z \<and> f \<circ>\<^sub>c u = u \<circ>\<^sub>c s"
-        by (rule_tac x=v in exI, auto simp add: bottom_triangle bottom_square v_type)
+        by (intro exI[where x=v], auto simp add: bottom_triangle bottom_square v_type)
     next
       fix w y
       assume w_type[type_rule]: "w : N \<rightarrow> X"

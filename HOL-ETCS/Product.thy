@@ -51,7 +51,7 @@ proof (typecheck_cfuncs)
                  left_cart_proj X Y \<circ>\<^sub>c h2 = f \<and> right_cart_proj X Y \<circ>\<^sub>c h2 = g \<longrightarrow>
                  h2 = h)"
        using f_type g_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod cfunc_prod_unique
-    by (rule_tac x="\<langle>f,g\<rangle>" in exI, simp add: cfunc_prod_type)
+       by (intro exI[where x="\<langle>f,g\<rangle>"], simp add: cfunc_prod_type)
 qed
 
 text \<open>The lemma below corresponds to Proposition 2.1.8 in Halvorson.\<close>
@@ -95,9 +95,9 @@ proof -
   proof clarify
     assume idW_unique: "\<forall>h2. h2 : W \<rightarrow> W \<and> \<pi>\<^sub>0 \<circ>\<^sub>c h2 = \<pi>\<^sub>0 \<and> \<pi>\<^sub>1 \<circ>\<^sub>c h2 = \<pi>\<^sub>1 \<longrightarrow> h2 = idW"
     have 1: "g \<circ>\<^sub>c f = idW"
-      using idW_unique cfunc_type_def codomain_comp domain_comp f_def gf0 gf1 g_def by (erule_tac x="g \<circ>\<^sub>c f" in allE, auto)
+      using idW_unique cfunc_type_def codomain_comp domain_comp f_def gf0 gf1 g_def by auto
     have 2: "id W = idW"
-      using idW_unique W_cart_prod id_right_unit2 id_type is_cart_prod_def by (erule_tac x="id W" in allE, auto)
+      using idW_unique W_cart_prod id_right_unit2 id_type is_cart_prod_def by auto
     from 1 2 show "g \<circ>\<^sub>c f = id W"
       by auto
   qed
@@ -141,7 +141,7 @@ lemma cart_prod_eq2:
 lemma cart_prod_decomp:
   assumes "a : A \<rightarrow> X \<times>\<^sub>c Y"
   shows "\<exists> x y. a = \<langle>x, y\<rangle> \<and> x : A \<rightarrow> X \<and> y : A \<rightarrow> Y"
-proof (rule_tac x="left_cart_proj X Y \<circ>\<^sub>c a" in exI, rule_tac x="right_cart_proj X Y \<circ>\<^sub>c a" in exI, safe)
+proof (rule exI[where x="left_cart_proj X Y \<circ>\<^sub>c a"], intro exI [where x="right_cart_proj X Y \<circ>\<^sub>c a"], safe)
   show "a = \<langle>left_cart_proj X Y \<circ>\<^sub>c a,right_cart_proj X Y \<circ>\<^sub>c a\<rangle>"
     using assms by (typecheck_cfuncs, simp add: cfunc_prod_unique)
   show "left_cart_proj X Y \<circ>\<^sub>c a : A \<rightarrow>  X"
@@ -242,8 +242,7 @@ proof -
     using a_type b_type right_cart_proj_cfunc_prod by auto
 
   show "(f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>a,b\<rangle> = \<langle>f \<circ>\<^sub>c a,g \<circ>\<^sub>c b\<rangle>"
-    using uniqueness left_eq right_eq assms by (erule_tac x="f \<times>\<^sub>f g \<circ>\<^sub>c \<langle>a,b\<rangle>" in allE,
-                      meson cfunc_cross_prod_type cfunc_prod_type comp_type uniqueness)
+    using uniqueness left_eq right_eq assms by (meson cfunc_cross_prod_type cfunc_prod_type comp_type uniqueness)
 qed
 
 lemma cfunc_prod_comp:

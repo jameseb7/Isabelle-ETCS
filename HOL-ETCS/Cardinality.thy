@@ -954,9 +954,9 @@ proof (unfold is_smaller_than_def)
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
     using assms(1) unfolding is_smaller_than_def by auto
   show "\<exists>m. m : X\<^bsup>A\<^esup> \<rightarrow> X\<^bsup>B\<^esup> \<and> monomorphism m"
-  proof (rule_tac x="(((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>))
+  proof (intro exI[where x="(((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>))
     \<circ>\<^sub>c dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) 
-    \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id (X\<^bsup>A\<^esup>)))\<^sup>\<sharp>" in exI, safe)
+    \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id (X\<^bsup>A\<^esup>)))\<^sup>\<sharp>"], safe)
 
     show "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> : X\<^bsup>A\<^esup> \<rightarrow> X\<^bsup>B\<^esup>"
       by  typecheck_cfuncs
@@ -977,7 +977,7 @@ proof (unfold is_smaller_than_def)
           swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h"
 
       show "g = h"
-      proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=A, where X=X], clarify)
+      proof (typecheck_cfuncs, rule same_evals_equal[where Z=Z, where A=A, where X=X], clarify)
         show "eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f g = eval_func X A \<circ>\<^sub>c id\<^sub>c A \<times>\<^sub>f h"
         proof (typecheck_cfuncs, rule one_separator[where X="A \<times>\<^sub>c Z", where Y="X"], clarify)
           fix az
@@ -1103,7 +1103,7 @@ proof (unfold is_smaller_than_def)
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
         using assms unfolding is_smaller_than_def by auto
   show "\<exists>m. m : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup> \<and> monomorphism m"
-  proof (rule_tac x="(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>" in exI, safe)
+  proof (intro exI[where x="(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>"], safe)
     show "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup>"
       by typecheck_cfuncs
     then show "monomorphism((m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)"
@@ -1114,7 +1114,7 @@ proof (unfold is_smaller_than_def)
 
       assume eq: "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c g = (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c h"
       show "g = h"
-      proof (typecheck_cfuncs, rule_tac same_evals_equal[where Z=Z, where A=X, where X=A], clarify)
+      proof (typecheck_cfuncs, rule same_evals_equal[where Z=Z, where A=X, where X=A], clarify)
           have "((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f g)  = 
                 ((eval_func B X) \<circ>\<^sub>c (id X \<times>\<^sub>f (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)) \<circ>\<^sub>c (id X \<times>\<^sub>f h)"
             by (typecheck_cfuncs, smt comp_associative2 eq inv_transpose_func_def3 inv_transpose_of_composition)

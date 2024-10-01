@@ -29,7 +29,8 @@ proof -
     using assms characteristic_function_exists by blast
 
   have "monomorphism m \<longrightarrow> is_pullback (domain m) \<one> (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m (characteristic_func m)"
-  proof (unfold characteristic_func_def, rule theI', rule_tac a=\<chi> in ex1I, clarify)
+    unfolding characteristic_func_def
+  proof (rule theI', rule ex1I[where a= \<chi>], clarify)
     show "is_pullback (domain m) \<one> (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m \<chi>"
       using assms(1) cfunc_type_def chi_is_pullback by auto
     show "\<And>x. monomorphism m \<longrightarrow> is_pullback (domain m) \<one> (codomain m) \<Omega> (\<beta>\<^bsub>domain m\<^esub>) \<t> m x \<Longrightarrow> x = \<chi>"
@@ -58,7 +59,13 @@ lemma monomorphism_equalizes_char_func:
   assumes m_type[type_rule]: "m : B \<rightarrow> X" and m_mono[type_rule]: "monomorphism m"
   shows "equalizer B m (characteristic_func m) (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>)"
   unfolding equalizer_def
-proof (typecheck_cfuncs, rule_tac x="X" in exI, rule_tac x="\<Omega>" in exI, safe)
+proof (rule exI[where x=X], rule exI[where x=\<Omega>], safe)
+  show "characteristic_func m : X \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub> : X \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "m : B \<rightarrow> X"
+    by typecheck_cfuncs
   have comm: "\<t> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub> = characteristic_func m \<circ>\<^sub>c m"
     using characteristic_func_eq m_mono m_type by auto
   then have "\<beta>\<^bsub>B\<^esub> = \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c m"
@@ -264,7 +271,7 @@ lemma mono_is_regmono:
   shows "monomorphism m \<Longrightarrow> regular_monomorphism m"
   unfolding monomorphism_def regular_monomorphism_def
   using cfunc_type_def characteristic_func_type monomorphism_def domain_comp terminal_func_type true_func_type monomorphism_equalizes_char_func
-  by (rule_tac x="characteristic_func m" in exI, rule_tac x="\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub>" in exI, auto)
+  by (rule_tac x="characteristic_func m" in exI, intro exI[where x="\<t> \<circ>\<^sub>c \<beta>\<^bsub>codomain(m)\<^esub>"], auto)
 
 text \<open>The lemma below corresponds to Proposition 2.2.5 in Halvorson.\<close>
 lemma epi_mon_is_iso:
@@ -700,16 +707,17 @@ proof -
       unfolding fibered_product_right_proj_def fibered_product_left_proj_def
       by (typecheck_cfuncs_prems, smt cfunc_prod_comp cfunc_prod_unique)
 
-    show "\<exists>l. l : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c l = k \<and> b \<circ>\<^sub>c l = j"
-    proof (rule_tac x=z in exI, typecheck_cfuncs, insert k_eq, safe)
+    then show "\<exists>l. l : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c l = k \<and> b \<circ>\<^sub>c l = j"
+    proof (intro exI[where x=z], clarify)
+      assume k_def: "k = fibered_product_morphism X f f X \<circ>\<^sub>c z"
       have "fibered_product_morphism E h h E \<circ>\<^sub>c j = (g \<times>\<^sub>f g) \<circ>\<^sub>c k"
         by (simp add: k_h_eq)
       also have "... = (g \<times>\<^sub>f g) \<circ>\<^sub>c fibered_product_morphism X f f X \<circ>\<^sub>c z"
         by (simp add: k_eq)
       also have "... = fibered_product_morphism E h h E \<circ>\<^sub>c b \<circ>\<^sub>c z"
         by (typecheck_cfuncs, simp add: b_eq comp_associative2)
-      then show "b \<circ>\<^sub>c z = j"
-        using calculation fibered_product_morphism_monomorphism monomorphism_def2 by (typecheck_cfuncs_prems, metis)
+      then show "z : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<and> fibered_product_morphism X f f X \<circ>\<^sub>c z = fibered_product_morphism X f f X \<circ>\<^sub>c z \<and> b \<circ>\<^sub>c z = j"
+        by (typecheck_cfuncs, metis assms(6) fibered_product_morphism_monomorphism fibered_product_morphism_type k_def k_h_eq monomorphism_def3)
     qed
 
     show "\<And> j y. j : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<Longrightarrow> y : Z \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<Longrightarrow>
@@ -725,7 +733,7 @@ proof -
         fibered_product_left_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
         fibered_product_right_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
         epimorphism b"
-  proof (rule_tac x=b in exI, safe)
+  proof (intro exI[where x=b], safe)
     show "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E"
       by typecheck_cfuncs
     show "fibered_product_left_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_left_proj X f f X"
@@ -947,7 +955,7 @@ proof -
     then obtain j where j_type[type_rule]: "j : Z \<rightarrow> C" and j_def: "i \<circ>\<^sub>c h = (i \<circ>\<^sub>c m) \<circ>\<^sub>c j"
       using \<chi>im_pullback unfolding is_pullback_def by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 k_type)
     then show "\<exists>j. j : Z \<rightarrow> C \<and> \<beta>\<^bsub>C\<^esub> \<circ>\<^sub>c j = k \<and> m \<circ>\<^sub>c j = h"
-      by (rule_tac x="j" in exI, typecheck_cfuncs, smt comp_associative2 i_iso iso_imp_epi_and_monic monomorphism_def2 terminal_func_unique)
+      by (intro exI[where x=j], typecheck_cfuncs, smt comp_associative2 i_iso iso_imp_epi_and_monic monomorphism_def2 terminal_func_unique)
   next
     fix Z j y
     assume j_type[type_rule]: "j : Z \<rightarrow> C" and y_type[type_rule]: "y : Z \<rightarrow> C"
@@ -960,7 +968,7 @@ proof -
   then have "\<chi>im \<circ>\<^sub>c (i \<circ>\<^sub>c m\<^sup>c) = \<f> \<circ>\<^sub>c \<beta>\<^bsub>B\<^esub> \<circ>\<^sub>c (i \<circ>\<^sub>c m\<^sup>c)"
     by (etcs_assocl, typecheck_cfuncs, smt (verit, best) \<chi>m_def comp_associative2 complement_morphism_eq m_mono terminal_func_comp)
   then obtain i' where i'_type[type_rule]: "i' : A \<setminus> (C, m) \<rightarrow> B \<setminus> (C, i \<circ>\<^sub>c m)" and i'_def: "i \<circ>\<^sub>c m\<^sup>c = (i \<circ>\<^sub>c m)\<^sup>c \<circ>\<^sub>c i'"
-    using complement_morphism_equalizer[where m="i \<circ>\<^sub>c m", where X=C, where Y=B] unfolding equalizer_def
+    using complement_morphism_equalizer unfolding equalizer_def
     by (-, typecheck_cfuncs, smt \<chi>im_def cfunc_type_def comp_associative2 im_mono)
 
   have "\<chi>m \<circ>\<^sub>c (i\<^bold>\<inverse> \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c) = \<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub> \<circ>\<^sub>c (i\<^bold>\<inverse> \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c)"
@@ -981,7 +989,9 @@ proof -
     by (-, typecheck_cfuncs, smt (z3) \<chi>m_def cfunc_type_def comp_associative2 i_iso id_left_unit2 inv_right m_mono)
 
   have "isomorphism i'"
-  proof (etcs_subst isomorphism_def3, rule_tac x="i'_inv" in exI, typecheck_cfuncs, safe)
+  proof (etcs_subst isomorphism_def3, intro exI[where x = "i'_inv"], safe)
+    show "i'_inv : B \<setminus> (C, i \<circ>\<^sub>c m) \<rightarrow> A \<setminus> (C, m)"
+      by typecheck_cfuncs
     have "i \<circ>\<^sub>c m\<^sup>c = (i \<circ>\<^sub>c m\<^sup>c) \<circ>\<^sub>c i'_inv \<circ>\<^sub>c i'"
       using i'_inv_def by (etcs_subst i'_def, etcs_assocl, auto)
     then show "i'_inv \<circ>\<^sub>c i' = id\<^sub>c (A \<setminus> (C, m))"
@@ -1009,7 +1019,8 @@ definition graph :: "cfunc \<Rightarrow> cset" where
 
 lemma graph_equalizer:
   "\<exists> m. equalizer (graph f) m (f \<circ>\<^sub>c left_cart_proj (domain f) (codomain f)) (right_cart_proj (domain f) (codomain f))"
-  by (unfold graph_def, typecheck_cfuncs, rule_tac someI_ex, simp add: cfunc_type_def equalizer_exists)
+  unfolding graph_def
+  by (typecheck_cfuncs, rule someI_ex, simp add: cfunc_type_def equalizer_exists)
   
 lemma graph_equalizer2:
   assumes "f : X \<rightarrow> Y"
@@ -1021,7 +1032,7 @@ definition graph_morph :: "cfunc \<Rightarrow> cfunc" where
 
 lemma graph_equalizer3:
   "equalizer (graph f) (graph_morph f) (f \<circ>\<^sub>c left_cart_proj (domain f) (codomain f)) (right_cart_proj (domain f) (codomain f))"
-   using graph_equalizer by (unfold graph_morph_def, typecheck_cfuncs, rule_tac someI_ex, blast)
+   using graph_equalizer unfolding graph_morph_def by (typecheck_cfuncs, rule_tac someI_ex, blast)
 
 lemma graph_equalizer4:
   assumes "f : X \<rightarrow> Y"
@@ -1169,7 +1180,7 @@ proof safe
     unfolding f_def h_def by (typecheck_cfuncs, smt comp_associative2 id_right_unit2 inv_left isomorphism)
 
   show "\<exists>f. f : X \<rightarrow> Y \<and> (\<exists>i. i : R \<rightarrow> graph f \<and> isomorphism i \<and> m = graph_morph f \<circ>\<^sub>c i)"
-  proof (rule_tac x=f in exI, safe, typecheck_cfuncs)
+  proof (intro exI[where x=f], safe, typecheck_cfuncs)
     have graph_equalizer: "equalizer (graph f) (graph_morph f) (f \<circ>\<^sub>c left_cart_proj X Y) (right_cart_proj X Y)"
       by (simp add: f_type graph_equalizer4)
     then have "\<forall>h F. h : F \<rightarrow> X \<times>\<^sub>c Y \<and> (f \<circ>\<^sub>c left_cart_proj X Y) \<circ>\<^sub>c h = right_cart_proj X Y \<circ>\<^sub>c h \<longrightarrow>
@@ -1220,12 +1231,12 @@ proof safe
       then have "i \<circ>\<^sub>c x' = y'"
         using equalizer_is_monomorphism graph_equalizer monomorphism_def2 by (typecheck_cfuncs_prems, blast)
       then show "\<exists>x'. x' \<in>\<^sub>c R \<and> i \<circ>\<^sub>c x' = y'"
-        by (rule_tac x=x' in exI, simp add: x'_type)
+        by (intro exI[where x=x'], simp add: x'_type)
     qed
     then have "isomorphism i"
       by (metis comp_monic_imp_monic' epi_mon_is_iso f_type graph_morph_type i_eq i_type m_mono surjective_is_epimorphism)
     then show "\<exists>i. i : R \<rightarrow> graph f \<and> isomorphism i \<and> m = graph_morph f \<circ>\<^sub>c i"
-      by (rule_tac x=i in exI, simp add: i_type i_eq)
+      by (intro exI[where x=i], simp add: i_type i_eq)
   qed
 next
   fix f1 f2 i1 i2

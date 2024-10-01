@@ -592,7 +592,7 @@ lemma const_mult_index_sum:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
   assumes f_type[type_rule]: "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   assumes c_type[type_rule]: "c \<in>\<^sub>c \<nat>\<^sub>c"
-  shows "mult2 \<circ>\<^sub>c \<langle>c, indexed_sum \<circ>\<^sub>c \<langle>\<langle>a, f\<rangle>, n\<rangle>\<rangle> = indexed_sum \<circ>\<^sub>c \<langle>\<langle>a, metafunc (mult2 \<circ>\<^sub>c \<langle>c \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, cnufatem f\<rangle>) \<rangle>, n\<rangle>"
+  shows "mult2 \<circ>\<^sub>c \<langle>c, indexed_sum \<circ>\<^sub>c \<langle>\<langle>a, f\<rangle>, n\<rangle>\<rangle> = indexed_sum \<circ>\<^sub>c \<langle>\<langle>a, metafunc (mult2 \<circ>\<^sub>c \<langle>c \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, cnufatem f\<rangle>)\<rangle>, n\<rangle>"
 proof - 
   have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>c \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, indexed_sum \<circ>\<^sub>c \<langle>\<langle>a, f\<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>,
                         indexed_sum \<circ>\<^sub>c \<langle>\<langle>a, metafunc (mult2 \<circ>\<^sub>c \<langle>c \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, cnufatem f\<rangle>) \<rangle> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c n = \<t>"
@@ -640,11 +640,9 @@ qed
 definition summation :: cfunc where
 "summation  = ((indexed_sum \<circ>\<^sub>c \<langle>\<langle>left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)),  
                                 right_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)\<rangle>, 
-                                monus2 \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)
-\<rangle>)
+                                monus2 \<circ>\<^sub>c swap \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)\<rangle>)
               \<amalg>
               (zero \<circ>\<^sub>c \<beta>\<^bsub>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)\<^esub>)) \<circ>\<^sub>c cases  (leq \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))"
-
 
 lemma type_1[type_rule]: 
   "cases  (leq \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)) : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<rightarrow> ((\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>)) \<Coprod> ((\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))"
@@ -729,17 +727,42 @@ proof -
 qed
 
 
-lemma sum_uppr_eq_lwr:
-  assumes "lower \<in>\<^sub>c \<nat>\<^sub>c"  
-  assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+lemma sum_one_term:
+  assumes l_type: "lower \<in>\<^sub>c \<nat>\<^sub>c"  
+  assumes f_type: "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   shows "summation \<circ>\<^sub>c \<langle>\<langle>lower, lower\<rangle>, f\<rangle> = cnufatem f \<circ>\<^sub>c lower"
-  shows "indexed_sum \<circ>\<^sub>c \<langle>\<langle>n, f\<rangle>, zero\<rangle> =  cnufatem f \<circ>\<^sub>c n"
+proof - 
+  have "summation \<circ>\<^sub>c \<langle>\<langle>lower, lower\<rangle>, f\<rangle> = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, lower \<midarrow>\<^sub>\<nat> lower\<rangle>"
+    using f_type l_type leq_infix_def lqe_connexity nonempty_sum by blast
+  also have "... = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, zero\<rangle>"
+    by (simp add: l_type monus_self)
+  also have "... = cnufatem f \<circ>\<^sub>c lower"
+    by (simp add: f_type indexed_sum_uppr_eq_lwr l_type)
+  then show ?thesis
+    using calculation by auto
+qed
 
+(*
+lemma summation_tail:
+  assumes l_type[type_rule]: "lower \<in>\<^sub>c \<nat>\<^sub>c"  
+  assumes u_type[type_rule]: "upper \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes lt: "lower \<le>\<^sub>\<nat> upper"
+  assumes f_type[type_rule]: "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+  shows "summation \<circ>\<^sub>c \<langle>\<langle>lower, successor \<circ>\<^sub>c upper\<rangle>, f\<rangle> = (summation \<circ>\<^sub>c \<langle>\<langle>lower, upper\<rangle>, f\<rangle>) +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c successor \<circ>\<^sub>c upper)"
+proof - 
+  have "summation \<circ>\<^sub>c \<langle>\<langle>lower, successor \<circ>\<^sub>c upper\<rangle>, f\<rangle> = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, (successor \<circ>\<^sub>c upper) \<midarrow>\<^sub>\<nat> lower\<rangle>"
+    by (metis assms leq_infix_def lqe_connexity nat_strict_total_order nonempty_sum succ_n_type)
+  also have "... = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>,  successor \<circ>\<^sub>c (upper \<midarrow>\<^sub>\<nat> lower)\<rangle>"
+    by (typecheck_cfuncs, smt (verit, ccfv_SIG) RENAME_Part1 add_commutes add_respects_succ3 
+        add_respects_zero_on_right bigger_monus_smaller lt smaller_monus_bigger)
+  also have "... = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>,  upper \<midarrow>\<^sub>\<nat> lower\<rangle> +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c (lower +\<^sub>\<nat> (successor \<circ>\<^sub>c (upper \<midarrow>\<^sub>\<nat> lower))))"
+    using indexed_sum_tail_term apply (-, typecheck_cfuncs)
+    oops
 
-
-
-
-
+(* indexed_sum_tail_term
+indexed_sum \<circ>\<^sub>c \<langle>\<langle>n, f\<rangle>, successor \<circ>\<^sub>c m\<rangle> = (indexed_sum \<circ>\<^sub>c \<langle>\<langle>n, f\<rangle>, m\<rangle>) +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c (n +\<^sub>\<nat> (successor \<circ>\<^sub>c m)))
+*)
+*)
 
 
 

@@ -51,7 +51,7 @@ proof (typecheck_cfuncs)
            h \<circ>\<^sub>c left_coproj X Y = f \<and>
            h \<circ>\<^sub>c right_coproj X Y = g \<and> (\<forall>h2. h2 : X \<Coprod> Y \<rightarrow> Z \<and> h2 \<circ>\<^sub>c left_coproj X Y = f \<and> h2 \<circ>\<^sub>c right_coproj X Y = g \<longrightarrow> h2 = h)"
     using cfunc_coprod_type cfunc_coprod_unique f_type g_type left_coproj_cfunc_coprod right_coproj_cfunc_coprod 
-    by(rule_tac x="f\<amalg>g" in exI, auto)
+    by(intro exI[where x="f\<amalg>g"], auto)
 qed
 
 text \<open>The lemma below is dual to Proposition 2.1.8 in Halvorson.\<close>
@@ -326,7 +326,7 @@ lemma coprod_eq2:
 lemma coprod_decomp:
   assumes "a : X \<Coprod> Y \<rightarrow> A"
   shows "\<exists> x y. a = (x \<amalg> y) \<and> x : X \<rightarrow> A \<and> y : Y \<rightarrow> A"
-proof (rule_tac x="a \<circ>\<^sub>c left_coproj X Y" in exI, rule_tac x="a \<circ>\<^sub>c right_coproj X Y" in exI, safe)
+proof (rule exI[where x="a \<circ>\<^sub>c left_coproj X Y"], intro exI[where x="a \<circ>\<^sub>c right_coproj X Y"], safe)
   show "a = (a \<circ>\<^sub>c left_coproj X Y) \<amalg> (a \<circ>\<^sub>c right_coproj X Y)"
     using assms cfunc_coprod_unique cfunc_type_def codomain_comp domain_comp left_proj_type right_proj_type by auto
   show "a \<circ>\<^sub>c left_coproj X Y : X \<rightarrow> A"
@@ -574,7 +574,7 @@ proof -
 
   show "(a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
     using uniqueness left_eq right_eq assms
-    by (typecheck_cfuncs, erule_tac x="(a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g)" in allE, auto)
+    by (typecheck_cfuncs, auto)
 qed
 
 lemma id_bowtie_prod: "id(X) \<bowtie>\<^sub>f id(Y) = id(X \<Coprod> Y)"
@@ -1045,8 +1045,8 @@ lemma case_bool_def2:
     (\<t> \<amalg> \<f>) \<circ>\<^sub>c case_bool = id \<Omega> \<and> case_bool \<circ>\<^sub>c (\<t> \<amalg> \<f>) = id (\<one> \<Coprod> \<one>)"
 proof (unfold case_bool_def, rule theI', safe)
   show "\<exists>x. x : \<Omega> \<rightarrow> \<one> \<Coprod> \<one> \<and> \<t> \<amalg> \<f> \<circ>\<^sub>c x = id\<^sub>c \<Omega> \<and> x \<circ>\<^sub>c \<t> \<amalg> \<f> = id\<^sub>c (\<one> \<Coprod> \<one>)"
-    using truth_value_set_iso_1u1 unfolding isomorphism_def
-    by (auto, rule_tac x=g in exI, typecheck_cfuncs, simp add: cfunc_type_def)
+    unfolding isomorphism_def
+    using isomorphism_def3 truth_value_set_iso_1u1 by (typecheck_cfuncs, blast)
 next
   fix x y
   assume x_type[type_rule]: "x : \<Omega> \<rightarrow> \<one> \<Coprod> \<one>" and y_type[type_rule]: "y : \<Omega> \<rightarrow> \<one> \<Coprod> \<one>"
@@ -1075,7 +1075,7 @@ lemma true_coprod_false_case_bool:
 lemma case_bool_iso:
   "isomorphism case_bool"
   using case_bool_def2 unfolding isomorphism_def
-  by (rule_tac x="\<t> \<amalg> \<f>" in exI, typecheck_cfuncs, auto simp add: cfunc_type_def)
+  by (intro exI[where x="\<t> \<amalg> \<f>"], typecheck_cfuncs, auto simp add: cfunc_type_def)
 
 lemma case_bool_true_and_false:
   "(case_bool \<circ>\<^sub>c \<t> = left_coproj \<one> \<one>) \<and> (case_bool \<circ>\<^sub>c \<f> = right_coproj \<one> \<one>)"
@@ -1749,7 +1749,7 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, clarify)
       by (unfold relative_member_def2, auto, unfold factors_through_def2, auto)
     then show "\<exists>x. x \<in>\<^sub>c domain (into_super m) \<and> into_super m \<circ>\<^sub>c x = y"
       unfolding into_super_def using assms cfunc_type_def comp_associative left_coproj_cfunc_coprod
-      by (rule_tac x="left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x" in exI, typecheck_cfuncs, metis)
+      by (intro exI[where x="left_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x"], typecheck_cfuncs, metis)
   next
     assume "characteristic_func m \<circ>\<^sub>c y = \<f>"
     then have "\<not> y \<in>\<^bsub>Y\<^esub> (X, m)"
@@ -1760,7 +1760,7 @@ proof (rule surjective_is_epimorphism, unfold surjective_def, clarify)
       by (unfold relative_member_def2, auto, unfold factors_through_def2, auto)
     then show "\<exists>x. x \<in>\<^sub>c domain (into_super m) \<and> into_super m \<circ>\<^sub>c x = y"
       unfolding into_super_def using assms cfunc_type_def comp_associative right_coproj_cfunc_coprod
-      by (rule_tac x="right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'" in exI, typecheck_cfuncs, metis)
+      by (intro exI[where x="right_coproj X (Y \<setminus> (X, m)) \<circ>\<^sub>c x'"], typecheck_cfuncs, metis)
   qed
 qed
 

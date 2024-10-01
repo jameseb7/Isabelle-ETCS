@@ -61,7 +61,7 @@ proof -
     using cfunc_coprod_unique id_left_unit2 by (typecheck_cfuncs, auto)
   then have "isomorphism(id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)"
     unfolding isomorphism_def 
-    by (rule_tac x="left_coproj X \<emptyset>" in exI, typecheck_cfuncs, simp add: cfunc_type_def concl left_coproj_cfunc_coprod)
+    by (intro exI[where x="left_coproj X \<emptyset>"], typecheck_cfuncs, simp add: cfunc_type_def concl left_coproj_cfunc_coprod)
   then show "X\<Coprod>\<emptyset> \<cong> X"
     using cfunc_coprod_type id_type initial_func_type is_isomorphic_def by blast
 qed

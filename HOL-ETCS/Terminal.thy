@@ -95,7 +95,7 @@ proof -
   have f_isomorphism: "isomorphism f"
     unfolding isomorphism_def
     using cfunc_type_def f_type g_type g_f_is_id f_g_is_id
-    by (rule_tac x=g in exI, auto)
+    by (intro exI[where x=g], auto)
 
   show "\<exists>f. f : X \<rightarrow> Y \<and> isomorphism f"
     using f_isomorphism f_type by auto
@@ -111,10 +111,7 @@ proof
   obtain x where x_type[type_rule]: "x : \<one> \<rightarrow> X" and x_unique: "\<forall> y. y : \<one> \<rightarrow> X \<longrightarrow> x = y"
     by (smt assms is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric monomorphism_def2 terminal_func_comp terminal_func_unique)
   show  "\<exists>!f. f : Y \<rightarrow> X"
-  proof (rule_tac a="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" in ex1I)
-    show "x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> : Y \<rightarrow> X"
-      by typecheck_cfuncs
-  next
+  proof (rule ex1I[where a="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"], typecheck_cfuncs)
     fix xa
     assume xa_type: "xa : Y \<rightarrow> X"
     show "xa = x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"
@@ -169,7 +166,7 @@ next
   proof 
     fix Y
     show "\<exists>!f. f : Y \<rightarrow> X"
-    proof (rule_tac a="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>" in ex1I)
+    proof (rule ex1I [where a="x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>"])
       show "x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub> : Y \<rightarrow> X"
         using comp_type terminal_func_type x_type by blast
     next
@@ -485,7 +482,7 @@ lemma diag_on_elements:
 
 lemma one_cross_one_unique_element:
   "\<exists>! x. x \<in>\<^sub>c \<one> \<times>\<^sub>c \<one>"
-proof (rule_tac a="diagonal \<one>" in ex1I)
+proof (rule ex1I[where a="diagonal \<one>"])
   show "diagonal \<one> \<in>\<^sub>c \<one> \<times>\<^sub>c \<one>"
     by (simp add: cfunc_prod_type diagonal_def id_type)
 next
@@ -516,7 +513,7 @@ next
   assume f_type: "f : Y \<rightarrow> X" and g_type: "g : Y \<rightarrow> \<one>"
   then show "\<exists>h. h : Y \<rightarrow> X \<and>
            id\<^sub>c X \<circ>\<^sub>c h = f \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h = g \<and> (\<forall>h2. h2 : Y \<rightarrow> X \<and> id\<^sub>c X \<circ>\<^sub>c h2 = f \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h2 = g \<longrightarrow> h2 = h)"
-  proof (rule_tac x=f in exI, safe)
+  proof (intro exI[where x=f], safe)
     show "id X \<circ>\<^sub>c f = f"
       using cfunc_type_def f_type id_left_unit by auto
     show "\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c f = g"
@@ -540,7 +537,7 @@ next
   assume f_type: "f : Z \<rightarrow> \<one>" and g_type: "g : Z \<rightarrow> X"
   then show "\<exists>h. h : Z \<rightarrow> X \<and>
            \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h = f \<and> id\<^sub>c X \<circ>\<^sub>c h = g \<and> (\<forall>h2. h2 : Z \<rightarrow> X \<and> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c h2 = f \<and> id\<^sub>c X \<circ>\<^sub>c h2 = g \<longrightarrow> h2 = h)"
-  proof (rule_tac x=g in exI, safe)
+  proof (intro exI[where x=g], safe)
     show "id\<^sub>c X \<circ>\<^sub>c g = g"
       using cfunc_type_def g_type id_left_unit by auto
     show "\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c g = f"

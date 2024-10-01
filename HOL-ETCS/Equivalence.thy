@@ -193,8 +193,7 @@ proof clarify
 
   then obtain z where "z: E \<rightarrow> codomain(k) \<and> z \<circ>\<^sub>c m  = k \<circ>\<^sub>c m \<and>
     (\<forall> j. j:E \<rightarrow> codomain(k) \<and>  j \<circ>\<^sub>c m = k \<circ>\<^sub>c m \<longrightarrow> j = z)"
-    using uniqueness by (erule_tac x="k \<circ>\<^sub>c m" in allE, erule_tac x="codomain(k)" in allE,
-    smt cfunc_type_def codomain_comp comp_associative domain_comp f_type g_type m_k_mh m_type relation_k relation_h)
+    using uniqueness by (smt cfunc_type_def codomain_comp comp_associative domain_comp f_type g_type m_k_mh m_type relation_k relation_h)
 
   then show "k = h"
     by (metis cfunc_type_def codomain_comp m_k_mh m_type relation_k relation_h)
@@ -205,7 +204,7 @@ lemma canonical_quotient_map_is_coequalizer:
   shows "coequalizer (X \<sslash> (R,m)) (equiv_class (R,m))
                      (left_cart_proj X X \<circ>\<^sub>c m) (right_cart_proj X X \<circ>\<^sub>c m)"
   unfolding coequalizer_def 
-proof(rule_tac x=X in exI, rule_tac x= R in exI, safe)
+proof(rule exI[where x=X], intro exI[where x= R], safe)
   have m_type: "m: R \<rightarrow> X \<times>\<^sub>c X"
     using assms equiv_rel_on_def subobject_of_def2 transitive_on_def by blast
   show "left_cart_proj X X \<circ>\<^sub>c m : R \<rightarrow> X"
@@ -215,7 +214,7 @@ proof(rule_tac x=X in exI, rule_tac x= R in exI, safe)
   show "equiv_class (R, m) : X \<rightarrow> X \<sslash> (R, m)"
     by (simp add: assms equiv_class_type)
   show "[left_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub> = [right_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub>"
-  proof(rule one_separator[where X="R", where Y = "X \<sslash> (R,m)"])
+  proof(rule one_separator[where X="R", where Y = "X \<sslash> (R,m)"], typecheck_cfuncs)
     show "[left_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub> : R \<rightarrow> X \<sslash> (R, m)"
       using m_type assms by typecheck_cfuncs
     show "[right_cart_proj X X \<circ>\<^sub>c m]\<^bsub>(R, m)\<^esub> : R \<rightarrow> X \<sslash> (R, m)"
@@ -262,7 +261,7 @@ next
   qed
   then show "\<exists>k. k : X \<sslash> (R, m) \<rightarrow> F \<and> k \<circ>\<^sub>c equiv_class (R, m) = h"
     using assms h_type quotient_func_type quotient_func_eq
-    by (rule_tac x="quotient_func h (R, m)" in exI, safe)
+    by (intro exI[where x="quotient_func h (R, m)"], safe)
 next
   fix F k y
   assume k_type[type_rule]: "k : X \<sslash> (R, m) \<rightarrow> F"
@@ -358,7 +357,8 @@ text \<open>The two lemmas below correspond to Proposition 2.3.6 in Halvorson.\<
 lemma epimorphism_coequalizer_kernel_pair:
   assumes "f : X \<rightarrow> Y" "epimorphism f"
   shows "coequalizer Y f (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)"
-proof (unfold coequalizer_def, rule_tac x=X in exI, rule_tac x="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X" in exI, safe)
+  unfolding coequalizer_def
+proof (rule exI[where x = X], rule exI[where x="X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X"], safe)
   show "fibered_product_left_proj X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X"
     using assms by typecheck_cfuncs
   show "fibered_product_right_proj X f f X : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> X"
@@ -528,7 +528,7 @@ proof -
     \<and> coequalizer E g (fibered_product_left_proj X f f X) (fibered_product_right_proj X f f X)
     \<and> monomorphism m \<and> f = m \<circ>\<^sub>c g
     \<and> (\<forall>x. x : E \<rightarrow> Y \<longrightarrow> f = x \<circ>\<^sub>c g \<longrightarrow> x = m)"
-  proof (rule_tac x="q" in exI, rule_tac x="m" in exI, rule_tac x="E" in exI, safe)
+  proof (rule exI[where x=q], rule exI [where x=m], rule exI[where x=E], safe)
     show q_type[type_rule]: "q : X \<rightarrow> E"
       unfolding q_def E_def using kernel_pair_equiv_rel by (typecheck_cfuncs, blast)
     
@@ -551,7 +551,7 @@ proof -
         fibered_product_left_proj E m m E \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X \<and>
         fibered_product_right_proj E m m E \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_right_proj X f f X \<and>
         epimorphism b"
-        by (typecheck_cfuncs, rule_tac kernel_pair_connection[where Y=Y],
+        by (typecheck_cfuncs, rule_tac kernel_pair_connection,
             simp_all add: q_epi, metis f_const kernel_pair_equiv_rel m_def q_def quotient_func_eq)
       then obtain b where b_type[type_rule]: "b : X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X \<rightarrow> E \<^bsub>m\<^esub>\<times>\<^sub>c\<^bsub>m\<^esub> E" and
         b_left_eq: "fibered_product_left_proj E m m E \<circ>\<^sub>c b = q \<circ>\<^sub>c fibered_product_left_proj X f f X" and
@@ -712,7 +712,7 @@ proof -
   then have "isomorphism (f\<restriction>\<^bsub>(A, a)\<^esub>)"
     using assms epi_mon_is_iso image_rest_map_epi by blast
   then have "A \<cong> f\<lparr>A\<rparr>\<^bsub>a\<^esub>"
-    using assms unfolding is_isomorphic_def by (rule_tac x="f\<restriction>\<^bsub>(A, a)\<^esub>" in exI, typecheck_cfuncs)
+    using assms unfolding is_isomorphic_def by (intro exI[where x="f\<restriction>\<^bsub>(A, a)\<^esub>"], typecheck_cfuncs)
   then show ?thesis
     by (simp add: isomorphic_is_symmetric)
 qed
@@ -758,8 +758,8 @@ proof -
   then have "n \<circ>\<^sub>c k = [f\<lparr>A\<rparr>\<^bsub>a\<^esub>]map"
     by (typecheck_cfuncs, smt (z3) comp_associative2 f_eq_ng g_type image_rest_map_type image_subobj_map_unique k_e_eq_g)
   then show "(f\<lparr>A\<rparr>\<^bsub>a\<^esub>, [f\<lparr>A\<rparr>\<^bsub>a\<^esub>]map) \<subseteq>\<^bsub>Y\<^esub> (B, n)"
-    unfolding relative_subset_def2 using n_mono image_subobj_map_mono
-    by (typecheck_cfuncs, auto, rule_tac x=k in exI, typecheck_cfuncs)
+    unfolding relative_subset_def2
+    using image_subobj_map_mono k_type n_mono by (typecheck_cfuncs, blast)
 qed
 
 lemma images_iso:
@@ -803,7 +803,7 @@ proof -
     by (meson is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric)
   then show "\<exists>j. (f\<lparr>A\<rparr>\<^bsub>m \<circ>\<^sub>c n\<^esub>, j) \<subseteq>\<^sub>c B"
     unfolding subobject_of_def using composition_of_monic_pair_is_monic i_mono
-    by (rule_tac x="i \<circ>\<^sub>c k" in exI, typecheck_cfuncs, simp add: cfunc_type_def)
+    by (intro exI[where x="i \<circ>\<^sub>c k"], typecheck_cfuncs, simp add: cfunc_type_def)
 qed
 
 lemma image_rel_subset_conv:
@@ -855,7 +855,7 @@ proof (typecheck_cfuncs, safe)
     by (smt (verit, ccfv_SIG) cfunc_type_def comp_monic_imp_monic comp_type f_type image_subobject_mapping_def2 k'_maps_eq k'_type m_type n_type)
 
   show "\<exists>k. k : f\<lparr>A\<rparr>\<^bsub>m \<circ>\<^sub>c n\<^esub> \<rightarrow> B \<and> b \<circ>\<^sub>c k = [f\<lparr>A\<rparr>\<^bsub>m \<circ>\<^sub>c n\<^esub>]map"
-    by (rule_tac x="k \<circ>\<^sub>c k'" in exI, typecheck_cfuncs, simp add: b_k_eq_map comp_associative2 k'_maps_eq)
+    by (intro exI[where x="k \<circ>\<^sub>c k'"], typecheck_cfuncs, simp add: b_k_eq_map comp_associative2 k'_maps_eq)
 qed
 
 text \<open>The lemma below corresponds to Proposition 2.3.9 in Halvorson.\<close>
@@ -908,7 +908,7 @@ proof safe
       unfolding middle_arrow_def using b_mono by (typecheck_cfuncs)
 
     show "\<exists>h. h : A \<rightarrow> B \<and> m \<circ>\<^sub>c h = f \<circ>\<^sub>c m' \<circ>\<^sub>c k"
-      by (rule_tac x="middle_arrow \<circ>\<^sub>c k" in exI, typecheck_cfuncs, 
+      by (intro exI[where x="middle_arrow \<circ>\<^sub>c k"], typecheck_cfuncs, 
           simp add: b_mono cfunc_type_def comp_associative2 inverse_image_mapping_eq inverse_image_subobject_mapping_def m'_def middle_arrow_def)
   qed
 
@@ -961,7 +961,7 @@ next
     assume "monomorphism k"
     then show "\<exists>k. k : A \<rightarrow> f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub> \<and> [f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>]map \<circ>\<^sub>c k = a"
       using assms(3) inverse_image_subobject_mapping_def2 k_left_eq k_type 
-      by (rule_tac x=k in exI, force)
+      by (intro exI[where x=k], force)
   qed
 qed
 
@@ -1204,7 +1204,7 @@ next
         using calculation by auto
     qed
     then show "\<langle>\<langle>tx,tz\<rangle>,\<langle>sx,sz\<rangle>\<rangle> factorsthru (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
-      by (typecheck_cfuncs, unfold factors_through_def2, rule_tac x="\<langle>y',z\<rangle>" in exI, typecheck_cfuncs)
+      by (typecheck_cfuncs, metis cfunc_prod_type eqs factors_through_def2 y'_type)
   qed
 qed
 
@@ -1285,7 +1285,7 @@ next
         using calculation by auto
     qed
     then show "\<langle>\<langle>xt,zt\<rangle>,\<langle>xs,zs\<rangle>\<rangle> factorsthru (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
-      by (typecheck_cfuncs, unfold factors_through_def2, rule_tac x="\<langle>z,y'\<rangle>" in exI, typecheck_cfuncs)
+      by (typecheck_cfuncs, metis cfunc_prod_type eqs factors_through_def2 y'_type)
   qed
 qed
 
@@ -1379,7 +1379,7 @@ next
 
     show "\<exists>h. h \<in>\<^sub>c Y \<times>\<^sub>c Z \<and> (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c h = \<langle>s,u\<rangle>"
       unfolding s_def u_def gy_eq_gz
-    proof (rule_tac x="\<langle>y,gz\<rangle>" in exI, safe, typecheck_cfuncs)
+    proof (intro exI[where x="\<langle>y,gz\<rangle>"], safe, typecheck_cfuncs)
       have "(distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,gz\<rangle> = distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,gz\<rangle>"
         by (typecheck_cfuncs, auto simp add: comp_associative2)
       also have "... = distribute_right X X Z \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c y, gz\<rangle>"
@@ -1477,7 +1477,7 @@ next
       using relative_member_def2 st_relation by blast
     show "\<exists>h. h \<in>\<^sub>c Z \<times>\<^sub>c Y \<and> (distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c h = \<langle>s,u\<rangle>"
       unfolding s_def u_def gy_eq_gz
-    proof (rule_tac x="\<langle>gz,y\<rangle>" in exI, safe, typecheck_cfuncs)
+    proof (intro exI[where x="\<langle>gz,y\<rangle>"], safe, typecheck_cfuncs)
       have "(distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c \<langle>gz,y\<rangle> = distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>gz,y\<rangle>"
         by (typecheck_cfuncs, auto simp add: comp_associative2)
       also have "... = distribute_left Z X X  \<circ>\<^sub>c \<langle>gz, m \<circ>\<^sub>c y\<rangle>"

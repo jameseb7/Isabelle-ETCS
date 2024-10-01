@@ -822,7 +822,7 @@ proof -
       using comp_type e_defn i_type transpose_func_def y_type by blast
     then show "\<exists>x. x \<in>\<^sub>c domain e \<and> e \<circ>\<^sub>c x = y" 
       unfolding cfunc_type_def using y_type i_type i_inv_type e_type 
-      by (rule_tac x="(id(\<one>) \<times>\<^sub>f (y \<circ>\<^sub>c i)\<^sup>\<sharp>) \<circ>\<^sub>c i_inv" in exI, typecheck_cfuncs, metis cfunc_type_def comp_associative i_iso id_right_unit2)
+      by (intro exI[where x="(id(\<one>) \<times>\<^sub>f (y \<circ>\<^sub>c i)\<^sup>\<sharp>) \<circ>\<^sub>c i_inv"], typecheck_cfuncs, metis cfunc_type_def comp_associative i_iso id_right_unit2)
   qed
 
   have "isomorphism e"
@@ -852,7 +852,7 @@ proof -
       using  fsharp_type same_evals_equal z_type by force
   qed
   then have "\<exists>! x. x \<in>\<^sub>c X\<^bsup>\<emptyset>\<^esup>"
-    by (rule_tac a="f\<^sup>\<sharp>" in ex1I, simp_all add: fsharp_type)
+    by (intro ex1I[where a="f\<^sup>\<sharp>"], simp_all add: fsharp_type)
   then show "X\<^bsup>\<emptyset>\<^esup> \<cong> \<one>"
     using single_elem_iso_one by auto
 qed
@@ -889,7 +889,7 @@ proof -
            right_cart_proj X Y\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c h = g \<and>
            (\<forall>h2. h2 : Z \<rightarrow> (X \<times>\<^sub>c Y)\<^bsup>A\<^esup> \<and> left_cart_proj X Y\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c h2 = f \<and> right_cart_proj X Y\<^bsup>A\<^esup>\<^sub>f \<circ>\<^sub>c h2 = g \<longrightarrow>
                  h2 = h)"
-    proof (rule_tac x="\<langle>f\<^sup>\<flat> ,g\<^sup>\<flat>\<rangle>\<^sup>\<sharp>" in exI, safe, typecheck_cfuncs)
+    proof (intro exI[where x="\<langle>f\<^sup>\<flat> ,g\<^sup>\<flat>\<rangle>\<^sup>\<sharp>"], safe, typecheck_cfuncs)
       have "((left_cart_proj X Y)\<^bsup>A\<^esup>\<^sub>f) \<circ>\<^sub>c \<langle>f\<^sup>\<flat> ,g\<^sup>\<flat>\<rangle>\<^sup>\<sharp> = ((left_cart_proj X Y) \<circ>\<^sub>c \<langle>f\<^sup>\<flat> ,g\<^sup>\<flat>\<rangle>)\<^sup>\<sharp>"
         by (typecheck_cfuncs, metis transpose_of_comp)
       also have "... = f\<^sup>\<flat>\<^sup>\<sharp>"
@@ -954,7 +954,7 @@ proof -
                  (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h2 = f \<and>
                  (eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c right_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h2 = g \<longrightarrow>
                  h2 = h)"
-    proof (rule_tac x="(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_right X Y H)\<^sup>\<sharp>" in exI, safe, typecheck_cfuncs)
+    proof (intro exI[where x="(f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_right X Y H)\<^sup>\<sharp>"], safe, typecheck_cfuncs)
       have "(eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_right X Y H)\<^sup>\<sharp> = 
             ((eval_func Z (X \<Coprod> Y) \<circ>\<^sub>c left_coproj X Y \<times>\<^sub>f id\<^sub>c (Z\<^bsup>(X \<Coprod> Y)\<^esup>)) \<circ>\<^sub>c (id X \<times>\<^sub>f (f\<^sup>\<flat> \<amalg> g\<^sup>\<flat> \<circ>\<^sub>c dist_prod_coprod_right X Y H)\<^sup>\<sharp>))\<^sup>\<sharp>"
         using sharp_comp by (typecheck_cfuncs, blast)

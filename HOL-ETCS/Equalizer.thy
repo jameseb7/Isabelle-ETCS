@@ -42,7 +42,7 @@ proof -
     using assms equalizer_exists by blast
   then show ?thesis
     unfolding equalizer_def
-  proof (rule_tac x="E" in exI, rule_tac x="m" in exI, safe)
+  proof (intro exI[where x=E], intro exI[where x=m], safe)
     fix X' Y'
     assume f_type2: "f : X' \<rightarrow> Y'"
     assume g_type2: "g : X' \<rightarrow> Y'"
@@ -94,7 +94,7 @@ proof -
     using assms(2) equalizer_def id_right_unit2 id_type by blast
 
   show "\<exists>k. k : E \<rightarrow> E' \<and> isomorphism k \<and> m = m' \<circ>\<^sub>c k"
-    using cfunc_type_def isomorphism_def k'_type k'k_eq_id k_type kk'_eq_id m'k_eq_m by (rule_tac x="k'" in exI, auto)
+    using cfunc_type_def isomorphism_def k'_type k'k_eq_id k_type kk'_eq_id m'k_eq_m by (intro exI[where x=k'], auto)
 qed
 
 lemma isomorphic_to_equalizer_is_equalizer:
@@ -154,8 +154,7 @@ proof clarify
     using cfunc_type_def comp_associative f_type fm_gm g_type m_ga_mh m_type relation_h by auto
   then obtain z where "z: domain(h1) \<rightarrow> E \<and> m \<circ>\<^sub>c z = m \<circ>\<^sub>c h1 \<and> 
     (\<forall> j. j:domain(h1) \<rightarrow> E \<and>  m \<circ>\<^sub>c j = m \<circ>\<^sub>c h1 \<longrightarrow> j = z)"
-    using uniqueness by (erule_tac x="m \<circ>\<^sub>c h1" in allE, erule_tac x="domain(h1)" in allE,
-                         smt cfunc_type_def codomain_comp domain_comp m_ga_mh m_type relation_ga)
+    using uniqueness by (smt cfunc_type_def codomain_comp domain_comp m_ga_mh m_type relation_ga)
   then show "h1 = h2"
     by (metis cfunc_type_def domain_comp m_ga_mh m_type relation_ga relation_h)
 qed
@@ -267,7 +266,7 @@ proof clarify
   then show "x factorsthru m "
     unfolding factors_through_def 
     using cfunc_type_def comp_type k_type m_type comp_associative
-    by (rule_tac x="k \<circ>\<^sub>c a" in exI, auto)
+    by (intro exI[where x="k \<circ>\<^sub>c a"], auto)
 qed
 
 subsection \<open>Inverse Image\<close>
@@ -405,7 +404,7 @@ next
   then have "\<langle>h,k\<rangle> : Z \<rightarrow> X \<times>\<^sub>c B  \<Longrightarrow>
       (f \<circ>\<^sub>c left_cart_proj X B) \<circ>\<^sub>c \<langle>h,k\<rangle> = (m \<circ>\<^sub>c right_cart_proj X B) \<circ>\<^sub>c \<langle>h,k\<rangle> \<Longrightarrow>
       (\<exists>!u. u : Z \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>) \<and> inverse_image_mapping f B m \<circ>\<^sub>c u = \<langle>h,k\<rangle>)"
-    by (erule_tac x="\<langle>h,k\<rangle>" in allE, erule_tac x=Z in allE, auto)
+    by auto
   then have "\<exists>!u. u : Z \<rightarrow> (f\<^sup>-\<^sup>1\<lparr>B\<rparr>\<^bsub>m\<^esub>) \<and> inverse_image_mapping f B m \<circ>\<^sub>c u = \<langle>h,k\<rangle>"
     using k_type h_type assms
     by (typecheck_cfuncs, smt comp_associative2 left_cart_proj_cfunc_prod left_cart_proj_type
@@ -465,7 +464,7 @@ proof
     using assms m_type h_type by (typecheck_cfuncs, smt cfunc_type_def comp_associative domain_comp)
   then have "(f \<circ>\<^sub>c x) factorsthru m"
     unfolding factors_through_def using assms h_type m_type
-    by (rule_tac x="right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m \<circ>\<^sub>c h" in exI,
+    by (intro exI[where x="right_cart_proj X B \<circ>\<^sub>c inverse_image_mapping f B m \<circ>\<^sub>c h"],
         typecheck_cfuncs, auto simp add: cfunc_type_def)
   then show "f \<circ>\<^sub>c x \<in>\<^bsub>Y\<^esub> (B, m)"
     unfolding relative_member_def2 using assms m_type by (typecheck_cfuncs, auto)
@@ -576,14 +575,14 @@ proof -
 qed
 
 lemma fibered_product_is_pullback:
-  assumes "f : X \<rightarrow> Z" "g : Y \<rightarrow> Z"
+  assumes f_type[type_rule]: "f : X \<rightarrow> Z" and g_type[type_rule]: "g : Y \<rightarrow> Z"
   shows "is_pullback (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y) Y X Z  (fibered_product_right_proj X f g Y) g (fibered_product_left_proj X f g Y) f"
   unfolding is_pullback_def
   using assms fibered_product_left_proj_type fibered_product_right_proj_type
 proof safe
   show "g \<circ>\<^sub>c fibered_product_right_proj X f g Y = f \<circ>\<^sub>c fibered_product_left_proj X f g Y"
     unfolding fibered_product_right_proj_def fibered_product_left_proj_def
-    using assms cfunc_type_def comp_associative2 equalizer_def fibered_product_morphism_equalizer
+    using cfunc_type_def comp_associative2 equalizer_def fibered_product_morphism_equalizer
     by (typecheck_cfuncs, auto)
 next
   fix A k h
@@ -592,24 +591,18 @@ next
 
   have "\<langle>h,k\<rangle> factorsthru fibered_product_morphism X f g Y"
     using assms h_type k_h_commutes k_type pair_factorsthru_fibered_product_morphism by auto
-  then have "\<exists>j. j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and> fibered_product_morphism X f g Y \<circ>\<^sub>c j = \<langle>h,k\<rangle>"
+  then have f1: "\<exists>j. j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and> fibered_product_morphism X f g Y \<circ>\<^sub>c j = \<langle>h,k\<rangle>"
     by (meson assms cfunc_prod_type factors_through_def2 fibered_product_morphism_type h_type k_type)
   then show "\<exists>j. j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
            fibered_product_right_proj X f g Y \<circ>\<^sub>c j = k \<and> fibered_product_left_proj X f g Y \<circ>\<^sub>c j = h"
     unfolding fibered_product_right_proj_def fibered_product_left_proj_def 
-  proof (clarify, rule_tac x=j in exI, safe)
+  proof (clarify, safe)
     fix j
     assume j_type: "j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y"
 
-    show "fibered_product_morphism X f g Y \<circ>\<^sub>c j = \<langle>h,k\<rangle> \<Longrightarrow>
-        (right_cart_proj X Y \<circ>\<^sub>c fibered_product_morphism X f g Y) \<circ>\<^sub>c j = k"
-      using assms h_type k_type j_type
-      by (typecheck_cfuncs, metis cfunc_type_def comp_associative right_cart_proj_cfunc_prod)
-
-    show "fibered_product_morphism X f g Y \<circ>\<^sub>c j = \<langle>h,k\<rangle> \<Longrightarrow>
-        (left_cart_proj X Y \<circ>\<^sub>c fibered_product_morphism X f g Y) \<circ>\<^sub>c j = h"
-      using assms h_type k_type j_type
-      by (typecheck_cfuncs, metis cfunc_type_def comp_associative left_cart_proj_cfunc_prod)
+    show "\<exists>j. j : A \<rightarrow> X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y \<and>
+           (right_cart_proj X Y \<circ>\<^sub>c fibered_product_morphism X f g Y) \<circ>\<^sub>c j = k \<and> (left_cart_proj X Y \<circ>\<^sub>c fibered_product_morphism X f g Y) \<circ>\<^sub>c j = h"
+      by (typecheck_cfuncs, smt (verit, best) f1 comp_associative2 h_type k_type left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   qed
 next
   fix A j y
@@ -689,7 +682,7 @@ next
       using j_exists[where Z=\<one>, where k=y, where h=x] assms f_g_eq by auto
     show "\<exists>h. h : domain \<langle>x,y\<rangle> \<rightarrow> domain (snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y)) \<and>
            snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y) \<circ>\<^sub>c h = \<langle>x,y\<rangle>"
-    proof (rule_tac x=j in exI, safe)
+    proof (intro exI[where x=j], safe)
       show "j : domain \<langle>x,y\<rangle> \<rightarrow> domain (snd (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>g\<^esub> Y, fibered_product_morphism X f g Y))"
         using assms j_type cfunc_type_def by (typecheck_cfuncs, auto)
 
