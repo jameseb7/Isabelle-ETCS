@@ -11,7 +11,7 @@ chapter AFP
 *)
 
 (* Session name, list base session: *)
-session "Category-Set" = "HOL-Eisbach" +
+session "Category_Set" = "HOL-Eisbach" +
 
 (* Timeout (in sec) in case of non-termination problems *)
   options [timeout = 600]
