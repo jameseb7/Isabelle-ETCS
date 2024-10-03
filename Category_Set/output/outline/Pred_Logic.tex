@@ -69,7 +69,7 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ characteristic{\isacharunderscore}{\kern0pt}function{\isacharunderscore}{\kern0pt}exists\ false{\isacharunderscore}{\kern0pt}func{\isacharunderscore}{\kern0pt}type\ element{\isacharunderscore}{\kern0pt}monomorphism\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}rule{\isacharunderscore}{\kern0pt}tac\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}subst\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -277,7 +277,7 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ element{\isacharunderscore}{\kern0pt}monomorphism\ characteristic{\isacharunderscore}{\kern0pt}function{\isacharunderscore}{\kern0pt}exists\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ subst\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -562,11 +562,11 @@
 \endisadelimdocument
 \isacommand{definition}\isamarkupfalse%
 \ NOR\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}cfunc{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
-\ \ {\isachardoublequoteopen}NOR\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}THE\ {\isasymchi}{\isachardot}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}pullback\ \ {\isasymone}\ {\isasymone}\ {\isacharparenleft}{\kern0pt}{\isasymOmega}{\isasymtimes}\isactrlsub c{\isasymOmega}{\isacharparenright}{\kern0pt}\ {\isasymOmega}\ {\isacharparenleft}{\kern0pt}{\isasymbeta}\isactrlbsub {\isasymone}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymt}\ {\isasymlangle}{\isasymf}{\isacharcomma}{\kern0pt}\ {\isasymf}{\isasymrangle}\ {\isasymchi}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ {\isachardoublequoteopen}NOR\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}THE\ {\isasymchi}{\isachardot}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}pullback\ \ {\isasymone}\ {\isasymone}\ {\isacharparenleft}{\kern0pt}{\isasymOmega}\ {\isasymtimes}\isactrlsub c\ {\isasymOmega}{\isacharparenright}{\kern0pt}\ {\isasymOmega}\ {\isacharparenleft}{\kern0pt}{\isasymbeta}\isactrlbsub {\isasymone}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymt}\ {\isasymlangle}{\isasymf}{\isacharcomma}{\kern0pt}\ {\isasymf}{\isasymrangle}\ {\isasymchi}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ NOR{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}pullback{\isacharcolon}{\kern0pt}\isanewline
-\ \ {\isachardoublequoteopen}is{\isacharunderscore}{\kern0pt}pullback\ \ {\isasymone}\ {\isasymone}\ {\isacharparenleft}{\kern0pt}{\isasymOmega}{\isasymtimes}\isactrlsub c{\isasymOmega}{\isacharparenright}{\kern0pt}\ {\isasymOmega}\ {\isacharparenleft}{\kern0pt}{\isasymbeta}\isactrlbsub {\isasymone}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymt}\ {\isasymlangle}{\isasymf}{\isacharcomma}{\kern0pt}\ {\isasymf}{\isasymrangle}\ NOR{\isachardoublequoteclose}\isanewline
+\ \ {\isachardoublequoteopen}is{\isacharunderscore}{\kern0pt}pullback\ \ {\isasymone}\ {\isasymone}\ {\isacharparenleft}{\kern0pt}{\isasymOmega}\ {\isasymtimes}\isactrlsub c\ {\isasymOmega}{\isacharparenright}{\kern0pt}\ {\isasymOmega}\ {\isacharparenleft}{\kern0pt}{\isasymbeta}\isactrlbsub {\isasymone}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymt}\ {\isasymlangle}{\isasymf}{\isacharcomma}{\kern0pt}\ {\isasymf}{\isasymrangle}\ NOR{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -578,7 +578,7 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ characteristic{\isacharunderscore}{\kern0pt}function{\isacharunderscore}{\kern0pt}exists\ element{\isacharunderscore}{\kern0pt}monomorphism\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ simp{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ the{\isadigit{1}}I{\isadigit{2}}{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -1154,7 +1154,7 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ element{\isacharunderscore}{\kern0pt}monomorphism\ characteristic{\isacharunderscore}{\kern0pt}function{\isacharunderscore}{\kern0pt}exists\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ metis\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}OR{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ the{\isadigit{1}}I{\isadigit{2}}\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}OR{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -1842,7 +1842,7 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ element{\isacharunderscore}{\kern0pt}monomorphism\ characteristic{\isacharunderscore}{\kern0pt}function{\isacharunderscore}{\kern0pt}exists\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ metis\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}XOR{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ the{\isadigit{1}}I{\isadigit{2}}\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}XOR{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -2349,7 +2349,7 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ element{\isacharunderscore}{\kern0pt}monomorphism\ characteristic{\isacharunderscore}{\kern0pt}function{\isacharunderscore}{\kern0pt}exists\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ metis\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}NAND{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ the{\isadigit{1}}I{\isadigit{2}}\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}NAND{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -2933,7 +2933,7 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ element{\isacharunderscore}{\kern0pt}monomorphism\ characteristic{\isacharunderscore}{\kern0pt}function{\isacharunderscore}{\kern0pt}exists\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ metis\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}IFF{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ the{\isadigit{1}}I{\isadigit{2}}\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}IFF{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -3538,7 +3538,7 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ element{\isacharunderscore}{\kern0pt}monomorphism\ characteristic{\isacharunderscore}{\kern0pt}function{\isacharunderscore}{\kern0pt}exists\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ the{\isadigit{1}}I{\isadigit{2}}{\isacharcomma}{\kern0pt}\ metis\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}IMPLIES{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ the{\isadigit{1}}I{\isadigit{2}}\ injective{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}monomorphism\ pre{\isacharunderscore}{\kern0pt}IMPLIES{\isacharunderscore}{\kern0pt}injective{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -4745,7 +4745,7 @@ ETCS analog to $(A \iff B) = (A \implies B) \land (B \implies A)$%
 %
 \end{isabellebody}%
 \endinput
-%:%file=~/ETCS/HOL-ETCS/Pred_Logic.thy%:%
+%:%file=~/ETCS/Category_Set/Pred_Logic.thy%:%
 %:%11=1%:%
 %:%27=3%:%
 %:%28=3%:%

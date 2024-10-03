@@ -186,7 +186,7 @@ The lemma below corresponds to Exercise 2.4.6 in Halvorson.%
 \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ isomorphism{\isacharunderscore}{\kern0pt}def\ \isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}left{\isacharunderscore}{\kern0pt}coproj\ X\ {\isasymemptyset}{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ cfunc{\isacharunderscore}{\kern0pt}type{\isacharunderscore}{\kern0pt}def\ concl\ left{\isacharunderscore}{\kern0pt}coproj{\isacharunderscore}{\kern0pt}cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharparenright}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}intro\ exI{\isacharbrackleft}{\kern0pt}\isakeyword{where}\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}left{\isacharunderscore}{\kern0pt}coproj\ X\ {\isasymemptyset}{\isachardoublequoteclose}{\isacharbrackright}{\kern0pt}{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ cfunc{\isacharunderscore}{\kern0pt}type{\isacharunderscore}{\kern0pt}def\ concl\ left{\isacharunderscore}{\kern0pt}coproj{\isacharunderscore}{\kern0pt}cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}X{\isasymCoprod}{\isasymemptyset}\ {\isasymcong}\ X{\isachardoublequoteclose}\isanewline
@@ -594,14 +594,16 @@ The lemma below corresponds to Proposition 2.2.1 in Halvorson.%
 \isanewline
 \ \ \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}X{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharparenleft}{\kern0pt}X{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\ {\isasymsubseteq}\isactrlsub c\ {\isasymone}{\isacharbraceright}{\kern0pt}\ {\isacharslash}{\kern0pt}{\isacharslash}{\kern0pt}\ {\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}X{\isadigit{1}}{\isacharcomma}{\kern0pt}\ m{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharcomma}{\kern0pt}\ {\isacharparenleft}{\kern0pt}X{\isadigit{2}}{\isacharcomma}{\kern0pt}\ m{\isadigit{2}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ X{\isadigit{1}}\ {\isasymcong}\ X{\isadigit{2}}{\isacharbraceright}{\kern0pt}\ {\isasymsubseteq}\ {\isacharbraceleft}{\kern0pt}{\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}X{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ X\ {\isasymcong}\ {\isasymemptyset}{\isacharbraceright}{\kern0pt}{\isacharcomma}{\kern0pt}\ {\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}X{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ X\ {\isasymcong}\ {\isasymone}{\isacharbraceright}{\kern0pt}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}unfold\ quotient{\isacharunderscore}{\kern0pt}def{\isacharcomma}{\kern0pt}\ auto{\isacharcomma}{\kern0pt}\ insert\ isomorphic{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}symmetric\ isomorphic{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}transitive\ subobject{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}or{\isacharunderscore}{\kern0pt}empty{\isacharcomma}{\kern0pt}\ blast{\isacharplus}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
+\ quotient{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto{\isacharcomma}{\kern0pt}\ insert\ isomorphic{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}symmetric\ isomorphic{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}transitive\ subobject{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}or{\isacharunderscore}{\kern0pt}empty{\isacharcomma}{\kern0pt}\ blast{\isacharplus}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
 \ \ \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharbraceleft}{\kern0pt}{\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}X{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ X\ {\isasymcong}\ {\isasymemptyset}{\isacharbraceright}{\kern0pt}{\isacharcomma}{\kern0pt}\ {\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}X{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ X\ {\isasymcong}\ {\isasymone}{\isacharbraceright}{\kern0pt}{\isacharbraceright}{\kern0pt}\ {\isasymsubseteq}\ {\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}X{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharparenleft}{\kern0pt}X{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\ {\isasymsubseteq}\isactrlsub c\ {\isasymone}{\isacharbraceright}{\kern0pt}\ {\isacharslash}{\kern0pt}{\isacharslash}{\kern0pt}\ {\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}X{\isadigit{1}}{\isacharcomma}{\kern0pt}\ m{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharcomma}{\kern0pt}\ X{\isadigit{2}}{\isacharcomma}{\kern0pt}\ m{\isadigit{2}}{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ X{\isadigit{1}}\ {\isasymcong}\ X{\isadigit{2}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}unfold\ quotient{\isacharunderscore}{\kern0pt}def{\isacharcomma}{\kern0pt}\ insert\ empty{\isacharunderscore}{\kern0pt}subobject\ one{\isacharunderscore}{\kern0pt}subobject{\isacharcomma}{\kern0pt}\ auto\ simp\ add{\isacharcolon}{\kern0pt}\ isomorphic{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}symmetric{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
+\ quotient{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}insert\ empty{\isacharunderscore}{\kern0pt}subobject\ one{\isacharunderscore}{\kern0pt}subobject{\isacharcomma}{\kern0pt}\ auto\ simp\ add{\isacharcolon}{\kern0pt}\ isomorphic{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}symmetric{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \ \ \isacommand{then}\isamarkupfalse%
@@ -717,7 +719,7 @@ The lemma below corresponds to Proposition 2.2.1 in Halvorson.%
 %
 \end{isabellebody}%
 \endinput
-%:%file=~/ETCS/HOL-ETCS/Initial.thy%:%
+%:%file=~/ETCS/Category_Set/Initial.thy%:%
 %:%11=1%:%
 %:%27=3%:%
 %:%28=3%:%
@@ -1117,57 +1119,59 @@ The lemma below corresponds to Proposition 2.2.1 in Halvorson.%
 %:%596=201%:%
 %:%597=202%:%
 %:%598=202%:%
-%:%599=203%:%
+%:%599=202%:%
 %:%600=203%:%
-%:%601=204%:%
+%:%601=203%:%
 %:%602=204%:%
-%:%603=205%:%
+%:%603=204%:%
 %:%604=205%:%
-%:%605=206%:%
-%:%606=206%:%
-%:%607=207%:%
-%:%608=207%:%
+%:%605=205%:%
+%:%606=205%:%
+%:%607=206%:%
+%:%608=206%:%
 %:%609=207%:%
-%:%610=208%:%
-%:%611=208%:%
-%:%612=209%:%
-%:%618=209%:%
-%:%621=210%:%
-%:%622=211%:%
-%:%623=211%:%
-%:%624=212%:%
-%:%625=213%:%
-%:%628=214%:%
-%:%632=214%:%
-%:%633=214%:%
-%:%638=214%:%
-%:%641=215%:%
-%:%642=216%:%
-%:%643=216%:%
-%:%644=217%:%
-%:%645=218%:%
-%:%648=219%:%
-%:%652=219%:%
-%:%653=219%:%
+%:%610=207%:%
+%:%611=207%:%
+%:%612=208%:%
+%:%613=208%:%
+%:%614=209%:%
+%:%620=209%:%
+%:%623=210%:%
+%:%624=211%:%
+%:%625=211%:%
+%:%626=212%:%
+%:%627=213%:%
+%:%630=214%:%
+%:%634=214%:%
+%:%635=214%:%
+%:%640=214%:%
+%:%643=215%:%
+%:%644=216%:%
+%:%645=216%:%
+%:%646=217%:%
+%:%647=218%:%
+%:%650=219%:%
 %:%654=219%:%
-%:%659=219%:%
-%:%662=220%:%
-%:%663=221%:%
-%:%664=221%:%
-%:%665=222%:%
-%:%666=223%:%
-%:%669=224%:%
-%:%673=224%:%
-%:%674=224%:%
-%:%679=224%:%
-%:%682=225%:%
-%:%683=226%:%
-%:%684=226%:%
-%:%685=227%:%
-%:%686=228%:%
-%:%689=229%:%
-%:%693=229%:%
-%:%694=229%:%
-%:%699=229%:%
-%:%704=230%:%
-%:%709=231%:%
+%:%655=219%:%
+%:%656=219%:%
+%:%661=219%:%
+%:%664=220%:%
+%:%665=221%:%
+%:%666=221%:%
+%:%667=222%:%
+%:%668=223%:%
+%:%671=224%:%
+%:%675=224%:%
+%:%676=224%:%
+%:%681=224%:%
+%:%684=225%:%
+%:%685=226%:%
+%:%686=226%:%
+%:%687=227%:%
+%:%688=228%:%
+%:%691=229%:%
+%:%695=229%:%
+%:%696=229%:%
+%:%701=229%:%
+%:%706=230%:%
+%:%711=231%:%

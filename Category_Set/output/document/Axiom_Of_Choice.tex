@@ -216,7 +216,7 @@ The lemma below corresponds to Proposition 2.6.8 in Halvorson.%
 \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymexists}g{\isachardot}{\kern0pt}\ g{\isacharcolon}{\kern0pt}\ Y\ {\isasymrightarrow}\ X\ {\isasymand}\ epimorphism\ g\ {\isasymand}\ g\ {\isasymcirc}\isactrlsub c\ f\ {\isacharequal}{\kern0pt}\ id\isactrlsub c\ X{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{proof}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ safe{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharparenright}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}intro\ exI{\isacharbrackleft}{\kern0pt}\isakeyword{where}\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isachardoublequoteclose}{\isacharbrackright}{\kern0pt}{\isacharcomma}{\kern0pt}\ safe{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \isacommand{have}\isamarkupfalse%
 \ func{\isacharunderscore}{\kern0pt}f{\isacharunderscore}{\kern0pt}elem{\isacharunderscore}{\kern0pt}eq{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymAnd}\ y{\isachardot}{\kern0pt}\ y\ {\isasymin}\isactrlsub c\ X\ {\isasymLongrightarrow}\ {\isacharparenleft}{\kern0pt}g{\isacharunderscore}{\kern0pt}inv\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}x\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub Y\ {\isasymsetminus}\ {\isacharparenleft}{\kern0pt}E{\isacharcomma}{\kern0pt}\ m{\isacharparenright}{\kern0pt}\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ try{\isacharunderscore}{\kern0pt}cast\ m{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ f\ {\isasymcirc}\isactrlsub c\ y\ {\isacharequal}{\kern0pt}\ y{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{proof}\isamarkupfalse%
@@ -310,8 +310,7 @@ The lemma below corresponds to Exercise 2.7.2(i) in Halvorson.%
 \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ coequalizer{\isacharunderscore}{\kern0pt}def\ \isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}X{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}X{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ smt\ {\isacharparenleft}{\kern0pt}verit{\isacharcomma}{\kern0pt}\ ccfv{\isacharunderscore}{\kern0pt}threshold{\isacharparenright}{\kern0pt}\ cfunc{\isacharunderscore}{\kern0pt}type{\isacharunderscore}{\kern0pt}def\ comp{\isacharunderscore}{\kern0pt}associative\ comp{\isacharunderscore}{\kern0pt}type\ id{\isacharunderscore}{\kern0pt}left{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}\ id{\isacharunderscore}{\kern0pt}right{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ smt\ {\isacharparenleft}{\kern0pt}verit{\isacharcomma}{\kern0pt}\ del{\isacharunderscore}{\kern0pt}insts{\isacharparenright}{\kern0pt}\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ comp{\isacharunderscore}{\kern0pt}type\ id{\isacharunderscore}{\kern0pt}left{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}\ id{\isacharunderscore}{\kern0pt}right{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}\ s{\isacharunderscore}{\kern0pt}splits{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\isanewline
@@ -348,7 +347,7 @@ The lemma below corresponds to Exercise 2.7.2(ii) in Halvorson.%
 \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ coequalizer{\isacharunderscore}{\kern0pt}def\ \isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}X{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ rule{\isacharunderscore}{\kern0pt}tac\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}X{\isachardoublequoteclose}\ \isakeyword{in}\ exI{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}rule\ exI{\isacharbrackleft}{\kern0pt}\isakeyword{where}\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}X{\isachardoublequoteclose}{\isacharbrackright}{\kern0pt}{\isacharcomma}{\kern0pt}\ intro\ exI{\isacharbrackleft}{\kern0pt}\isakeyword{where}\ x{\isacharequal}{\kern0pt}{\isachardoublequoteopen}X{\isachardoublequoteclose}{\isacharbrackright}{\kern0pt}{\isacharcomma}{\kern0pt}\ typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\isanewline
 \ \ \ \ \ \ \ \ smt\ {\isacharparenleft}{\kern0pt}z{\isadigit{3}}{\isacharparenright}{\kern0pt}\ assms\ cfunc{\isacharunderscore}{\kern0pt}type{\isacharunderscore}{\kern0pt}def\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ comp{\isacharunderscore}{\kern0pt}type\ id{\isacharunderscore}{\kern0pt}left{\isacharunderscore}{\kern0pt}unit\ id{\isacharunderscore}{\kern0pt}right{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}\ section{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -382,7 +381,7 @@ The lemma below corresponds to Exercise 2.7.2(ii) in Halvorson.%
 %
 \end{isabellebody}%
 \endinput
-%:%file=~/ETCS/HOL-ETCS/Axiom_Of_Choice.thy%:%
+%:%file=~/ETCS/Category_Set/Axiom_Of_Choice.thy%:%
 %:%11=1%:%
 %:%27=3%:%
 %:%28=3%:%
@@ -591,34 +590,33 @@ The lemma below corresponds to Exercise 2.7.2(ii) in Halvorson.%
 %:%312=118%:%
 %:%313=118%:%
 %:%314=119%:%
-%:%315=120%:%
-%:%316=120%:%
+%:%315=119%:%
+%:%316=119%:%
 %:%317=120%:%
-%:%318=121%:%
-%:%319=121%:%
+%:%318=120%:%
+%:%319=120%:%
 %:%320=121%:%
-%:%321=122%:%
-%:%331=124%:%
-%:%333=125%:%
+%:%330=123%:%
+%:%332=124%:%
+%:%333=124%:%
 %:%334=125%:%
 %:%335=126%:%
 %:%336=127%:%
-%:%337=128%:%
-%:%344=129%:%
+%:%343=128%:%
+%:%344=128%:%
 %:%345=129%:%
-%:%346=130%:%
+%:%346=129%:%
 %:%347=130%:%
-%:%348=131%:%
+%:%348=130%:%
 %:%349=131%:%
-%:%350=132%:%
+%:%350=131%:%
 %:%351=132%:%
 %:%352=133%:%
-%:%353=134%:%
-%:%354=134%:%
+%:%353=133%:%
+%:%354=133%:%
 %:%355=134%:%
-%:%356=135%:%
+%:%356=134%:%
 %:%357=135%:%
-%:%358=136%:%
-%:%364=136%:%
-%:%369=137%:%
-%:%374=138%:%
+%:%363=135%:%
+%:%368=136%:%
+%:%373=137%:%
