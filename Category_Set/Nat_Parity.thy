@@ -67,8 +67,7 @@ proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", whe
       by (simp add: nth_odd_zero)
     also have "... = (successor \<circ>\<^sub>c nth_even) \<circ>\<^sub>c zero"
       using comp_associative2 nth_even_def2 successor_type zero_type by fastforce
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 
   show "nth_odd \<circ>\<^sub>c successor = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_odd"
@@ -82,8 +81,7 @@ proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", whe
       by (simp add: nth_even_successor2)
     also have "... = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c successor \<circ>\<^sub>c nth_even"
       by (typecheck_cfuncs, simp add: comp_associative2)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 qed
 
@@ -91,15 +89,7 @@ lemma succ_nth_odd_is_nth_even_succ:
   "successor \<circ>\<^sub>c nth_odd = nth_even \<circ>\<^sub>c successor"
 proof (etcs_rule natural_number_object_func_unique[where f="successor \<circ>\<^sub>c successor"])
   show "(successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = (nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c zero"
-  proof -
-    have "(successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c zero = successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero"
-      using comp_associative2 nth_odd_def2 successor_type zero_type by fastforce
-    also have "... = (nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c zero"
-      using calculation nth_even_successor2 nth_odd_is_succ_nth_even by auto
-    then show ?thesis
-      using calculation by auto
-  qed
-
+    by (simp add: nth_even_successor2 nth_odd_is_succ_nth_even)
   show "(successor \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c successor = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c successor \<circ>\<^sub>c nth_odd"
     by (metis cfunc_type_def codomain_comp comp_associative nth_odd_def2 successor_type)
   then show "(nth_even \<circ>\<^sub>c successor) \<circ>\<^sub>c successor = (successor \<circ>\<^sub>c successor) \<circ>\<^sub>c nth_even \<circ>\<^sub>c successor"
@@ -195,8 +185,7 @@ proof (etcs_rule natural_number_object_func_unique[where f="id \<Omega>", where 
       by (simp add: is_even_zero nth_even_zero)
     also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
       by (typecheck_cfuncs, metis comp_associative2 id_right_unit2 terminal_func_comp_elem)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 
   show "(is_even \<circ>\<^sub>c nth_even) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c is_even \<circ>\<^sub>c nth_even"
@@ -211,8 +200,7 @@ proof (etcs_rule natural_number_object_func_unique[where f="id \<Omega>", where 
       using is_even_def2 is_even_not_is_odd is_odd_def2 is_odd_not_is_even by (typecheck_cfuncs, auto)
     also have "... = id \<Omega> \<circ>\<^sub>c is_even \<circ>\<^sub>c nth_even"
       by (typecheck_cfuncs, simp add: id_left_unit2)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 
   show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
@@ -230,8 +218,7 @@ proof (etcs_rule natural_number_object_func_unique[where f="id \<Omega>", where 
       using comp_associative2 is_even_not_is_odd is_even_zero is_odd_def2 nth_odd_def2 successor_type zero_type by auto
     also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero"
       by (typecheck_cfuncs, metis comp_associative2 is_even_nth_even_true is_even_type is_even_zero nth_even_def2)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 
   show "(is_odd \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c nth_odd"
@@ -246,10 +233,8 @@ proof (etcs_rule natural_number_object_func_unique[where f="id \<Omega>", where 
       using is_even_def2 is_even_not_is_odd is_odd_def2 is_odd_not_is_even by (typecheck_cfuncs, auto)
     also have "... = id \<Omega> \<circ>\<^sub>c is_odd \<circ>\<^sub>c nth_odd"
       by (typecheck_cfuncs, simp add: id_left_unit2)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
-
   show "(\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor = id\<^sub>c \<Omega> \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>"
     by (typecheck_cfuncs, smt comp_associative2 id_left_unit2 terminal_func_comp)
 qed
@@ -293,12 +278,10 @@ proof -
         by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2 id_right_unit2 terminal_func_comp_elem)
       also have "... = \<t>"
         using eq_pred_iff_eq nth_even_zero by (typecheck_cfuncs, blast)
-      then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = \<t>"
-        using calculation by auto
+      finally show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_even,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c zero = \<t>".
     qed
   qed
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma not_EXISTS_zero_nth_odd:
@@ -339,8 +322,7 @@ proof -
     then show "EXISTS \<nat>\<^sub>c \<circ>\<^sub>c ((eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>nth_odd,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> = \<f>"
       using true_false_only_truth_values by (typecheck_cfuncs, blast)
   qed
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 subsection \<open>Natural Number Halving\<close>
@@ -379,8 +361,7 @@ proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Cop
       by (simp add: nth_even_zero)
     also have "... = left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
       by (simp add: halve_with_parity_zero)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 
   show "(halve_with_parity \<circ>\<^sub>c nth_even) \<circ>\<^sub>c successor =
@@ -407,8 +388,7 @@ proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Cop
     also have "... = ((left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor))
         \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_even"
       by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 
   show "left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor =
@@ -437,8 +417,7 @@ proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Cop
       by (typecheck_cfuncs, simp add: comp_associative2)
     also have "... = right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
       by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
-    then show ?thesis
-      using calculation by auto
+    finally  show ?thesis.
   qed
 
   show "(halve_with_parity \<circ>\<^sub>c nth_odd) \<circ>\<^sub>c successor =
@@ -464,8 +443,7 @@ proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c \<Cop
       by (typecheck_cfuncs, simp add: comp_associative2)
     also have "... = ((left_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor) \<amalg> (right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor)) \<circ>\<^sub>c halve_with_parity \<circ>\<^sub>c nth_odd"
       by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 left_coproj_cfunc_coprod right_coproj_cfunc_coprod)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 
   show "right_coproj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor =
@@ -488,8 +466,7 @@ proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", whe
       by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
     also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
       using id_left_unit2 nth_even_def2 zero_type by auto
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 
   show "(nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity) \<circ>\<^sub>c successor =
@@ -511,10 +488,8 @@ proof (etcs_rule natural_number_object_func_unique[where X="\<nat>\<^sub>c", whe
       by (simp add: nth_odd_is_succ_nth_even)
     also have "... = successor \<circ>\<^sub>c nth_even \<amalg> nth_odd \<circ>\<^sub>c halve_with_parity"
       by (typecheck_cfuncs, simp add: cfunc_coprod_comp comp_associative2)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
-
   show "id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
     using id_left_unit2 id_right_unit2 successor_type by auto
 qed
@@ -580,8 +555,8 @@ proof (etcs_rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT
       using comp_associative2 is_even_def2 is_even_nth_even_true nth_even_def2 by (typecheck_cfuncs, force)
     also have "... = is_even \<circ>\<^sub>c zero"
       by (simp add: is_even_zero)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis
+      by simp
   qed
 
   show "is_even \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_even"
@@ -605,8 +580,7 @@ proof (etcs_rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT
       by (typecheck_cfuncs, simp add: NOT_false_is_true NOT_true_is_false comp_associative2)
     also have "... = NOT \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity"
       by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 terminal_func_unique)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 qed
 
@@ -624,8 +598,8 @@ proof (etcs_rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT
       using comp_associative2 is_odd_nth_even_false is_odd_type is_odd_zero nth_even_def2 by (typecheck_cfuncs, force)
     also have "... = is_odd \<circ>\<^sub>c zero"
       by (simp add: is_odd_def2)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis
+      by simp
   qed
 
   show "is_odd \<circ>\<^sub>c successor = NOT \<circ>\<^sub>c is_odd"
@@ -649,8 +623,7 @@ proof (etcs_rule natural_number_object_func_unique[where X=\<Omega>, where f=NOT
       by (typecheck_cfuncs, simp add: NOT_false_is_true NOT_true_is_false comp_associative2)
     also have "... = NOT \<circ>\<^sub>c (\<f> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<amalg> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c halve_with_parity"
       by (typecheck_cfuncs, smt cfunc_coprod_comp comp_associative2 terminal_func_unique)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
 qed
 

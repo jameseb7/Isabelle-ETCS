@@ -347,8 +347,8 @@ proof -
     using assms(1) id_left_unit2 id_right_unit2 by auto
   also have "... = (f \<circ>\<^sub>c j) \<circ>\<^sub>c f"
      using assms(1) comp_associative2 j_def by fastforce
-  then have "id(Y) = f \<circ>\<^sub>c j"
-    by (typecheck_cfuncs, metis W_def assms(1) calculation coequalizer_is_epimorphism epimorphism_def3 j_def)
+  ultimately have "id(Y) = f \<circ>\<^sub>c j"
+    by (typecheck_cfuncs, metis W_def assms(1) coequalizer_is_epimorphism epimorphism_def3 j_def)
   then show "isomorphism f"
     using  assms(1) cfunc_type_def isomorphism_def j_def by fastforce  
 qed
@@ -439,8 +439,7 @@ next
       using assms(1) canonical_quotient_map_is_coequalizer coequalizer_def fibered_product_left_proj_def fibered_product_right_proj_def kernel_pair_equiv_rel q_def by fastforce
     also have "... = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b"
       by (simp add: right_b_eqs)
-    then have "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b"
-      by (simp add: calculation)
+    finally have "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b".
     then show ?thesis
       using b_type epi_b epimorphism_def2 fibr_proj_left_type fibr_proj_right_type by blast
   qed
@@ -462,8 +461,7 @@ next
       using assms(1) canonical_quotient_map_is_coequalizer coequalizer_def fibered_product_left_proj_def fibered_product_right_proj_def kernel_pair_equiv_rel q_def by fastforce
     also have "... = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b"
       by (simp add: right_b_eqs)
-    then have "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b"
-      by (simp add: calculation)
+    finally have "fibered_product_left_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b = fibered_product_right_proj F (f_bar) (f_bar) F \<circ>\<^sub>c b".
     then show ?thesis
       using b_type epi_b epimorphism_def2 fibr_proj_left_type fibr_proj_right_type by blast
   qed
@@ -1062,7 +1060,6 @@ next
       by (simp add: cfunc_cross_prod_type id_type m_type)
     have dist_mid_type:"distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z : Y \<times>\<^sub>c Z \<rightarrow> (X \<times>\<^sub>c Z) \<times>\<^sub>c X \<times>\<^sub>c Z"
       using comp_type distribute_right_type mid_type by force
-
     have yz_type: "\<langle>y,z\<rangle> \<in>\<^sub>c Y \<times>\<^sub>c Z"
       by (typecheck_cfuncs, simp add: \<open>z \<in>\<^sub>c Z\<close> y_def)
     have "(distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,z\<rangle>  = distribute_right X X Z \<circ>\<^sub>c (m \<times>\<^sub>f id(Z)) \<circ>\<^sub>c \<langle>y,z\<rangle>"
@@ -1073,10 +1070,8 @@ next
       using z_type id_left_unit2 y_def by auto
     also have "... = \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle>"
       by (meson z_type distribute_right_ap x_type)
-    then have "\<exists>h. \<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> = (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c h"
-      by (metis  calculation)
-    then show "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> factorsthru (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
-      using  xzxz_type z_type distribute_right_ap x_type dist_mid_type calculation factors_through_def2 yz_type by auto
+    ultimately show "\<langle>\<langle>x,z\<rangle>,\<langle>x,z\<rangle>\<rangle> factorsthru (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
+      using dist_mid_type distxxz factors_through_def2 xzxz_type yz_type by (typecheck_cfuncs, auto)
   qed
 qed
 
@@ -1121,10 +1116,8 @@ proof (unfold reflexive_on_def, safe)
       using z_type id_left_unit2 y_def by auto
     also have "... = \<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle>"
       by (meson z_type distribute_left_ap x_type)
-    then have "\<exists>h. \<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle> = (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m)) \<circ>\<^sub>c h"
-      by (metis  calculation)
-    then show "\<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle> factorsthru (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
-      using z_type distribute_left_ap x_type calculation dist_mid_type factors_through_def2 yz_type zxzx_type by auto
+    ultimately show "\<langle>\<langle>z,x\<rangle>,\<langle>z,x\<rangle>\<rangle> factorsthru (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
+      using z_type distribute_left_ap x_type dist_mid_type factors_through_def2 yz_type zxzx_type by auto
   qed
 qed
 
@@ -1178,8 +1171,7 @@ next
         unfolding my_def by (typecheck_cfuncs, simp add: id_left_unit2)
       also have "... = \<langle>\<langle>my1,z\<rangle>, \<langle>my2,z\<rangle>\<rangle>"
         using distribute_right_ap by (typecheck_cfuncs, auto)
-      then show ?thesis
-        using calculation by auto
+      finally show ?thesis.
     qed   
     then have "\<langle>\<langle>sx,sz\<rangle>,\<langle>tx,tz\<rangle>\<rangle> = \<langle>\<langle>my1,z\<rangle>,\<langle>my2,z\<rangle>\<rangle>"
       using yz_def by auto
@@ -1200,8 +1192,7 @@ next
         using distribute_right_ap by (typecheck_cfuncs, auto)
       also have "... = \<langle>\<langle>tx,tz\<rangle>, \<langle>sx,sz\<rangle>\<rangle>"
         using eqs by auto
-      then show ?thesis
-        using calculation by auto
+      finally show ?thesis.
     qed
     then show "\<langle>\<langle>tx,tz\<rangle>,\<langle>sx,sz\<rangle>\<rangle> factorsthru (distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z)"
       by (typecheck_cfuncs, metis cfunc_prod_type eqs factors_through_def2 y'_type)
@@ -1259,8 +1250,7 @@ next
         unfolding my_def by (typecheck_cfuncs, simp add: id_left_unit2)
       also have "... = \<langle>\<langle>z,my2\<rangle>, \<langle>z,my1\<rangle>\<rangle>"
         using distribute_left_ap by (typecheck_cfuncs, auto)
-      then show ?thesis
-        using calculation by auto
+      finally show ?thesis.
     qed   
     then have "\<langle>\<langle>xs,zs\<rangle>,\<langle>xt,zt\<rangle>\<rangle> = \<langle>\<langle>z,my2\<rangle>,\<langle>z,my1\<rangle>\<rangle>"
       using zy_def by auto
@@ -1281,8 +1271,7 @@ next
         using distribute_left_ap by (typecheck_cfuncs, auto)
       also have "... = \<langle>\<langle>xt,zt\<rangle>, \<langle>xs,zs\<rangle>\<rangle>"
         using eqs by auto
-      then show ?thesis
-        using calculation by auto
+      finally show ?thesis.
     qed
     then show "\<langle>\<langle>xt,zt\<rangle>,\<langle>xs,zs\<rangle>\<rangle> factorsthru (distribute_left Z X X  \<circ>\<^sub>c (id\<^sub>c Z \<times>\<^sub>f m))"
       by (typecheck_cfuncs, metis cfunc_prod_type eqs factors_through_def2 y'_type)
@@ -1324,8 +1313,7 @@ next
       by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
     also have "... = \<langle>\<langle>mhy1, hz\<rangle>, \<langle>mhy2, hz\<rangle>\<rangle>"
       unfolding mhy_decomp by (typecheck_cfuncs, simp add: distribute_right_ap)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
   then have s_def: "s = \<langle>mhy1, hz\<rangle>" and t_def: "t = \<langle>mhy2, hz\<rangle>"
     using cart_prod_eq2 by (typecheck_cfuncs, auto, presburger)
@@ -1348,8 +1336,7 @@ next
       by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
     also have "... = \<langle>\<langle>mgy1, gz\<rangle>, \<langle>mgy2, gz\<rangle>\<rangle>"
       unfolding mgy_decomp by (typecheck_cfuncs, simp add: distribute_right_ap)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
   then have t_def2: "t = \<langle>mgy1, gz\<rangle>" and u_def: "u = \<langle>mgy2, gz\<rangle>"
     using cart_prod_eq2 by (typecheck_cfuncs, auto, presburger)
@@ -1386,8 +1373,7 @@ next
         by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
       also have "... = \<langle>\<langle>mhy1,gz\<rangle>,\<langle>mgy2,gz\<rangle>\<rangle>"
         unfolding y_def by (typecheck_cfuncs, simp add: distribute_right_ap)
-      then show "(distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,gz\<rangle> = \<langle>\<langle>mhy1,gz\<rangle>,\<langle>mgy2,gz\<rangle>\<rangle>"
-        using calculation by auto
+      finally show "(distribute_right X X Z \<circ>\<^sub>c m \<times>\<^sub>f id\<^sub>c Z) \<circ>\<^sub>c \<langle>y,gz\<rangle> = \<langle>\<langle>mhy1,gz\<rangle>,\<langle>mgy2,gz\<rangle>\<rangle>".
     qed
   qed
 qed
@@ -1426,8 +1412,7 @@ next
       by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
     also have "... = \<langle>\<langle>hz, mhy1\<rangle>, \<langle>hz, mhy2\<rangle>\<rangle>"
       unfolding mhy_decomp by (typecheck_cfuncs, simp add: distribute_left_ap)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
   then have s_def: "s = \<langle>hz, mhy1\<rangle>" and t_def: "t = \<langle>hz, mhy2\<rangle>"
     using cart_prod_eq2 by (typecheck_cfuncs, auto, presburger)
@@ -1451,8 +1436,7 @@ next
       by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
     also have "... = \<langle>\<langle>gz, mgy2\<rangle>, \<langle>gz, mgy1\<rangle>\<rangle>"
       unfolding mgy_decomp by (typecheck_cfuncs, simp add: distribute_left_ap)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
   then have t_def2: "t = \<langle>gz, mgy2\<rangle>" and u_def: "u = \<langle>gz, mgy1\<rangle>"
     using cart_prod_eq2 by (typecheck_cfuncs, auto, presburger)
@@ -1484,8 +1468,7 @@ next
         by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
       also have "... = \<langle>\<langle>gz,mhy1\<rangle>,\<langle>gz,mgy1\<rangle>\<rangle>"
         by (typecheck_cfuncs, simp add: distribute_left_ap y_def)
-      then show "(distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>gz,y\<rangle> = \<langle>\<langle>gz,mhy1\<rangle>,\<langle>gz,mgy1\<rangle>\<rangle>"
-        using calculation by auto
+      finally show "(distribute_left Z X X \<circ>\<^sub>c id\<^sub>c Z \<times>\<^sub>f m) \<circ>\<^sub>c \<langle>gz,y\<rangle> = \<langle>\<langle>gz,mhy1\<rangle>,\<langle>gz,mgy1\<rangle>\<rangle>".
     qed
   qed
 qed

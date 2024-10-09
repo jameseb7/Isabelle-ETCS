@@ -90,8 +90,7 @@ proof -
         by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod)
       also have "... = y"
         by (typecheck_cfuncs, simp add: g_inv_g id_left_unit2)
-      then show "(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c f \<circ>\<^sub>c y = y"
-        using calculation by auto
+      finally show "(g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m) \<circ>\<^sub>c f \<circ>\<^sub>c y = y".
     qed
     show "epimorphism (g_inv \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y \<setminus> (E, m)\<^esub>) \<circ>\<^sub>c try_cast m)"
     proof (rule surjective_is_epimorphism, etcs_subst surjective_def2, clarify)

@@ -429,8 +429,7 @@ proof(clarify)
       by (simp add: equals)
     also have "... = f \<circ>\<^sub>c (q1 \<circ>\<^sub>c v)"
       using assms(3) cfunc_type_def comp_associative is_pullback_def by (typecheck_cfuncs, force)
-    then show ?thesis
-      by (simp add: calculation)
+    finally show ?thesis.
   qed 
 
   have eqn2: "q1 \<circ>\<^sub>c u =  q1  \<circ>\<^sub>c v"
@@ -480,8 +479,7 @@ proof(clarify)
       by (simp add: equals)
     also have "... = g \<circ>\<^sub>c (q0 \<circ>\<^sub>c v)"
       using assms(3) cfunc_type_def comp_associative is_pullback_def  by (typecheck_cfuncs, force)
-    then show ?thesis
-      by (simp add: calculation)
+    finally show ?thesis.
   qed 
 
   have eqn2: "q0 \<circ>\<^sub>c u =  q0  \<circ>\<^sub>c v"
@@ -541,8 +539,7 @@ proof -
     using assms by (typecheck_cfuncs, metis element_monomorphism terminal_func_unique)
   also have "... = y \<circ>\<^sub>c \<beta>\<^bsub>f\<^sup>-\<^sup>1{y}\<^esub>"
     unfolding fiber_def by auto
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 text \<open>The lemma below corresponds to Proposition 2.2.7 in Halvorson.\<close>
@@ -646,8 +643,7 @@ proof -
       by (typecheck_cfuncs, simp add: comp_associative2 right_cart_proj_cfunc_cross_prod)
     also have "... = (h \<circ>\<^sub>c right_cart_proj E E) \<circ>\<^sub>c (g \<times>\<^sub>f g) \<circ>\<^sub>c fibered_product_morphism X f f X"
       by (typecheck_cfuncs, smt comp_associative2)
-    then show ?thesis
-      using calculation by auto
+    finally show ?thesis.
   qed
   have h_equalizer: "equalizer (E \<^bsub>h\<^esub>\<times>\<^sub>c\<^bsub>h\<^esub> E) (fibered_product_morphism E h h E) (h \<circ>\<^sub>c left_cart_proj E E) (h \<circ>\<^sub>c right_cart_proj E E)"
     using fibered_product_morphism_equalizer h_type by auto
@@ -689,8 +685,7 @@ proof -
         by (typecheck_cfuncs, simp add: comp_associative2 right_cart_proj_cfunc_cross_prod)
       also have "... = f \<circ>\<^sub>c right_cart_proj X X \<circ>\<^sub>c k"
         using assms(6) comp_associative2 comp_type g_type h_g_eq_f k_type right_cart_proj_type by blast
-      then show ?thesis
-        using calculation by auto
+      finally show ?thesis.
     qed
 
     have "is_pullback (X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X) X X Y
@@ -754,8 +749,7 @@ proof -
         by (typecheck_cfuncs, simp add: comp_associative2 left_cart_proj_cfunc_cross_prod)
       also have "... = g \<circ>\<^sub>c fibered_product_left_proj X f f X"
         unfolding fibered_product_left_proj_def by (typecheck_cfuncs)
-      then show ?thesis
-        using calculation by auto
+      finally show ?thesis.
     qed
     show "fibered_product_right_proj E h h E \<circ>\<^sub>c b = g \<circ>\<^sub>c fibered_product_right_proj X f f X"
     proof -
@@ -768,8 +762,7 @@ proof -
         by (typecheck_cfuncs, simp add: comp_associative2 right_cart_proj_cfunc_cross_prod)
       also have "... = g \<circ>\<^sub>c fibered_product_right_proj X f f X"
         unfolding fibered_product_right_proj_def by (typecheck_cfuncs)
-      then show ?thesis
-        using calculation by auto
+      finally show ?thesis.
     qed
     show "epimorphism b"
       by (simp add: b_epi)
@@ -929,8 +922,7 @@ proof -
       by (typecheck_cfuncs, auto)
     also have "... = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
       by (typecheck_cfuncs, metis \<chi>mi_def mi_mono not_rel_mem_char_func_false rel_mem_char_func_true true_false_distinct)
-    then show "(\<chi>m \<circ>\<^sub>c c = \<t>) = (\<chi>mi \<circ>\<^sub>c c = \<t>)"
-      using calculation by auto
+    finally show "(\<chi>m \<circ>\<^sub>c c = \<t>) = (\<chi>mi \<circ>\<^sub>c c = \<t>)".
   qed
   then have "\<chi>m = \<chi>mi"
     by (typecheck_cfuncs, smt (verit, best) comp_type one_separator true_false_only_truth_values) 
@@ -989,7 +981,7 @@ proof -
       by (typecheck_cfuncs, simp add: \<chi>im_def comp_associative2 complement_morphism_eq im_mono)
     also have "... = \<f> \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub> \<circ>\<^sub>c (i\<^bold>\<inverse> \<circ>\<^sub>c (i \<circ>\<^sub>c m)\<^sup>c)"
       by (typecheck_cfuncs, metis i_iso terminal_func_unique)
-    then show ?thesis using calculation by auto
+    finally show ?thesis.
   qed
   then obtain i'_inv where i'_inv_type[type_rule]: "i'_inv : B \<setminus> (C, i \<circ>\<^sub>c m) \<rightarrow> A \<setminus> (C, m)"
     and i'_inv_def: "(i \<circ>\<^sub>c m)\<^sup>c = (i \<circ>\<^sub>c m\<^sup>c) \<circ>\<^sub>c i'_inv"
@@ -1223,7 +1215,7 @@ proof safe
             unfolding x'_eq using left_cart_proj_cfunc_prod by (typecheck_cfuncs, blast)
           also have "... = left_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
             unfolding x_def by auto
-          then show ?thesis using calculation by auto
+          finally show ?thesis.
         qed
 
         show "right_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c i \<circ>\<^sub>c x' = right_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
@@ -1234,7 +1226,7 @@ proof safe
             by (subst left, simp)
           also have "... = right_cart_proj X Y \<circ>\<^sub>c graph_morph f \<circ>\<^sub>c y'"
             by (etcs_assocl, typecheck_cfuncs, metis graph_equalizer equalizer_eq)
-          then show ?thesis using calculation by auto
+          finally show ?thesis.
         qed
       qed
       then have "i \<circ>\<^sub>c x' = y'"
@@ -1276,7 +1268,7 @@ next
       by (typecheck_cfuncs, smt comp_associative2 equalizer_eq graph_equalizer4)
     also have "... = f2 \<circ>\<^sub>c left_cart_proj X Y \<circ>\<^sub>c m"
       by (typecheck_cfuncs, metis comp_associative2 eq1 eq2)
-    then show ?thesis using calculation by auto
+    finally show ?thesis.
   qed
   then show "f1 = f2"
     by (typecheck_cfuncs, metis cfunc_type_def comp_associative h_def h_type id_right_unit2 inverse_def2 isomorphism)

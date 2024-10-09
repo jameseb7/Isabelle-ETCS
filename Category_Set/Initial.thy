@@ -38,7 +38,7 @@ proof -
       by (typecheck_cfuncs, metis left_coproj_cfunc_coprod)
     also have "... = left_coproj X \<emptyset>"
       by (typecheck_cfuncs, metis id_right_unit2)
-    then show ?thesis using calculation by auto
+    finally show ?thesis.
   qed
   have comp2: "(left_coproj X \<emptyset> \<circ>\<^sub>c (id(X) \<amalg> \<alpha>\<^bsub>X\<^esub>)) \<circ>\<^sub>c right_coproj X \<emptyset> = right_coproj X \<emptyset>"
   proof -
@@ -49,7 +49,7 @@ proof -
       by (typecheck_cfuncs, metis right_coproj_cfunc_coprod)
     also have "... = right_coproj X \<emptyset>"
       by (typecheck_cfuncs, metis initial_func_unique)
-    then show ?thesis using calculation by auto
+    finally show ?thesis.
   qed
   then have fact1: "(left_coproj X \<emptyset>)\<amalg>(right_coproj X \<emptyset>) \<circ>\<^sub>c left_coproj X \<emptyset> = left_coproj X \<emptyset>"
     using left_coproj_cfunc_coprod by (typecheck_cfuncs, blast)

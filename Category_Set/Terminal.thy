@@ -275,8 +275,8 @@ proof safe
       by (simp add: equals)
     also have "... = (f \<times>\<^sub>f g) \<circ>\<^sub>c \<langle>y,b\<rangle>"
       using b_def cfunc_cross_prod_comp_cfunc_prod type_assms y_type2 by auto
-    then have "\<langle>x,b\<rangle> = \<langle>y,b\<rangle>"
-      by (metis calculation cfunc_type_def fg_inject fg_type injective_def xb_type yb_type)
+    ultimately have "\<langle>x,b\<rangle> = \<langle>y,b\<rangle>"
+      by (metis cfunc_type_def fg_inject fg_type injective_def xb_type yb_type)
     then show "x = y"
       using b_def cart_prod_eq2 x_type2 y_type2 by auto
   qed
@@ -646,8 +646,7 @@ proof -
     using assms by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 id_type one_unique_element)
   also have "... = \<langle>id X, g \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c f"
     using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma cart_prod_extract_right:
@@ -658,8 +657,7 @@ proof -
     using assms by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 id_type one_unique_element)
   also have "... = \<langle>f \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>, id Y\<rangle> \<circ>\<^sub>c g"
     using assms by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 subsubsection \<open>Cartesian Products as Pullbacks\<close>

@@ -311,8 +311,7 @@ proof -
           using l_type comp_associative2 id_left_unit2 by (typecheck_cfuncs, auto)
         also have "... = \<langle>l , y1\<rangle>"
           using l_type by (typecheck_cfuncs,metis id_right_unit2 id_type one_unique_element)
-        then show "m \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c l = \<langle>l,y1\<rangle>"
-          by (simp add: calculation)
+        finally show "m \<circ>\<^sub>c left_coproj X Y \<circ>\<^sub>c l = \<langle>l,y1\<rangle>".
       qed
 
       have m_rightproj_y1_equals: "m \<circ>\<^sub>c right_coproj X Y \<circ>\<^sub>c y1 = \<langle>x2, y2\<rangle>"
@@ -327,7 +326,7 @@ proof -
           using  try_cast_m_m y1_mono y1y2_def(1) by auto
         also have "... =  \<langle>x2, y2\<rangle>"
           using left_coproj_cfunc_coprod type4 type5 by blast
-        then show ?thesis using calculation by auto
+        finally show ?thesis.
       qed
 
       have m_rightproj_not_y1_equals: "\<And> r. r  \<in>\<^sub>c Y \<and> r \<noteq> y1 \<Longrightarrow>
@@ -358,7 +357,7 @@ proof -
             using cfunc_prod_comp comp_associative2 k_def by (typecheck_cfuncs, auto)
           also have "... =  \<langle>x1, y1\<^sup>c \<circ>\<^sub>c k\<rangle>"
             by (metis id_right_unit2 id_type k_def one_unique_element terminal_func_comp terminal_func_type x1x2_def(1))
-          then show ?thesis using calculation by auto
+          finally show ?thesis.
         qed
         then show "\<exists>k. k \<in>\<^sub>c Y \<setminus> (\<one>, y1) \<and>
           try_cast y1 \<circ>\<^sub>c r = right_coproj \<one> (Y \<setminus> (\<one>, y1)) \<circ>\<^sub>c k \<and> 
@@ -619,8 +618,7 @@ next
               using swap_ap by (typecheck_cfuncs, presburger)
             also have "... = into \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
               using associate_right_ap by (typecheck_cfuncs, presburger)
-            then show ?thesis
-              using calculation by presburger
+            finally show ?thesis.
           qed
         qed
   
@@ -656,8 +654,7 @@ next
             using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
           also have "... = y"
             by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
-          then show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = y"
-            by (simp add: calculation into_def)
+          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = y".
         qed
   
         have f2: "\<And>x y z. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y  \<Longrightarrow>  z \<in>\<^sub>c X \<Longrightarrow> z \<noteq> x \<Longrightarrow> y \<noteq> y1 \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1"
@@ -701,8 +698,7 @@ next
             by (typecheck_cfuncs, metis \<open>y \<noteq> y1\<close> eq_pred_iff_eq_conv)
           also have "... = y1"
             using case_bool_false right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
-          then show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1"
-            by (simp add: calculation)
+          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1".
         qed
         
         have f3: "\<And>x z. x \<in>\<^sub>c X \<Longrightarrow>  z \<in>\<^sub>c X \<Longrightarrow> z \<noteq> x \<Longrightarrow>  (\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2"
@@ -744,8 +740,7 @@ next
             by (typecheck_cfuncs, metis eq_pred_iff_eq)
           also have "... = y2"
             using case_bool_true left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
-          then show "(\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2"
-            by (simp add: calculation)
+          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2".
         qed
   
      have \<Theta>_injective: "injective(\<Theta>)"
@@ -876,8 +871,8 @@ proof -
       by (typecheck_cfuncs, simp add: f_def transpose_func_def)
     also have "... = y \<circ>\<^sub>c (right_cart_proj Y \<one>)"
       using right_cart_proj_cfunc_cross_prod y_type2 by (typecheck_cfuncs, auto)
-    then show "x = y"
-      using  assms calculation epimorphism_def3 nonempty_left_imp_right_proj_epimorphism right_cart_proj_type x_type2 y_type2 by fastforce
+    ultimately show "x = y"
+      using assms epimorphism_def3 nonempty_left_imp_right_proj_epimorphism right_cart_proj_type x_type2 y_type2 by fastforce
   qed
   then show "X \<le>\<^sub>c X\<^bsup>Y\<^esup>"
     using f_type injective_imp_monomorphism is_smaller_than_def by blast

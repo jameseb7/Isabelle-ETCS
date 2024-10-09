@@ -308,8 +308,7 @@ proof(clarify)
       using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
     also have "... = \<langle>\<t>,\<f>\<rangle>"
       by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
-    then show ?thesis
-      by (simp add: calculation)
+    finally show ?thesis.
   qed
   have f3: "\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj \<one> (\<one>\<Coprod>\<one>)\<circ>\<^sub>c right_coproj \<one> \<one>) = \<langle>\<f>,\<t>\<rangle>"
   proof- 
@@ -320,8 +319,7 @@ proof(clarify)
       using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
     also have "... = \<langle>\<f>,\<t>\<rangle>"
       by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
-    then show ?thesis
-      by (simp add: calculation)
+    finally show ?thesis.
   qed
   show "x = y"
   proof(cases "x = left_coproj \<one> (\<one> \<Coprod> \<one>)")
@@ -413,8 +411,8 @@ proof(rule ccontr)
           using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
         also have "... = \<langle>\<t>, \<f>\<rangle>"
           by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
-        then show ?thesis
-          using calculation j_def by presburger
+        finally show ?thesis
+          using j_def by simp
       qed
       then show ?thesis
         by blast
@@ -430,8 +428,8 @@ proof(rule ccontr)
           using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
         also have "... = \<langle>\<f>, \<t>\<rangle>"
           by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
-        then show ?thesis
-          using calculation j_def by presburger
+        finally show ?thesis
+          using j_def by simp
       qed
       then show ?thesis
         by blast
@@ -729,8 +727,7 @@ proof(clarify)
       using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
     also have "... = \<langle>\<t>,\<f>\<rangle>"
       by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
-    then show ?thesis
-      by (simp add: calculation)
+    finally show ?thesis.
   qed
   have f3: "\<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<t>,\<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj \<one> (\<one>\<Coprod>\<one>)\<circ>\<^sub>c right_coproj \<one> \<one>) = \<langle>\<f>,\<t>\<rangle>"
   proof- 
@@ -741,8 +738,7 @@ proof(clarify)
       using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
     also have "... = \<langle>\<f>,\<t>\<rangle>"
       by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
-    then show ?thesis
-      by (simp add: calculation)
+    finally show ?thesis.
   qed
   show "x = y"
   proof(cases "x = left_coproj \<one> (\<one> \<Coprod> \<one>)")
@@ -830,8 +826,8 @@ proof(rule ccontr)
           using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
         also have "... = \<langle>\<t>, \<f>\<rangle>"
           by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
-        then show ?thesis
-          using calculation j_def by presburger
+        finally show ?thesis
+          using j_def by simp
       qed
       then show ?thesis
         by blast
@@ -847,8 +843,8 @@ proof(rule ccontr)
           using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
         also have "... = \<langle>\<f>, \<t>\<rangle>"
           by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
-        then show ?thesis
-          using calculation j_def by presburger
+        finally show ?thesis
+          using j_def by simp
       qed
       then show ?thesis
         by blast
@@ -1149,8 +1145,7 @@ proof(clarify)
       using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
     also have "... = \<langle>\<f>, \<f>\<rangle>"
       by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
-    then show ?thesis
-      by (simp add: calculation)
+    finally show ?thesis.      
   qed
   have f3: "\<langle>\<t>,\<t>\<rangle> \<amalg> \<langle>\<f>, \<f>\<rangle> \<amalg> \<langle>\<f>,\<t>\<rangle> \<circ>\<^sub>c (right_coproj \<one> (\<one>\<Coprod>\<one>)\<circ>\<^sub>c right_coproj \<one> \<one>) = \<langle>\<f>,\<t>\<rangle>"
   proof- 
@@ -1161,8 +1156,7 @@ proof(clarify)
       using right_coproj_cfunc_coprod by (typecheck_cfuncs, smt)
     also have "... = \<langle>\<f>,\<t>\<rangle>"
       by (typecheck_cfuncs, simp add: right_coproj_cfunc_coprod)
-    then show ?thesis
-      by (simp add: calculation)
+    finally show ?thesis.
   qed
   show "x = y"
   proof(cases "x = left_coproj \<one> (\<one> \<Coprod> \<one>)")
@@ -1323,8 +1317,8 @@ proof(etcs_rule one_separator)
           by (simp add: AND_true_true_is_true)
         also have "... = IFF \<circ>\<^sub>c x"
           by (simp add: IFF_true_true_is_true \<open>p = \<t>\<close> \<open>q = \<t>\<close> x_def)
-        then show ?thesis
-          by (simp add: calculation)
+        finally show ?thesis
+          by simp
       qed
     next
       assume "q \<noteq> \<t>"
@@ -1345,8 +1339,8 @@ proof(etcs_rule one_separator)
           by (simp add: AND_false_left_is_false true_func_type)
         also have "... = IFF \<circ>\<^sub>c x"
           by (simp add: IFF_true_false_is_false \<open>p = \<t>\<close> \<open>q = \<f>\<close> x_def)
-        then show ?thesis
-          by (simp add: calculation)
+        finally show ?thesis
+          by simp
       qed
     qed
   next
@@ -1371,8 +1365,8 @@ proof(etcs_rule one_separator)
           by (simp add: AND_false_right_is_false true_func_type)
         also have "... = IFF \<circ>\<^sub>c x"
           by (simp add: IFF_false_true_is_false \<open>p = \<f>\<close> \<open>q = \<t>\<close> x_def)
-        then show ?thesis
-          by (simp add: calculation)
+        finally show ?thesis
+          by simp
       qed
     next
       assume "q \<noteq> \<t>"
@@ -1393,8 +1387,8 @@ proof(etcs_rule one_separator)
           by (simp add: AND_true_true_is_true)
         also have "... = IFF \<circ>\<^sub>c x"
           by (simp add: IFF_false_false_is_true \<open>p = \<f>\<close> \<open>q = \<f>\<close> x_def)
-        then show ?thesis
-          by (simp add: calculation)
+        finally show ?thesis
+          by simp
       qed
     qed
   qed
@@ -1423,8 +1417,8 @@ proof(etcs_rule one_separator)
         by (simp add: OR_true_right_is_true false_func_type)
       also have "... = IMPLIES \<circ>\<^sub>c x"
         by (simp add: IMPLIES_true_true_is_true \<open>u = \<t>\<close> \<open>v = \<t>\<close> x_form)
-      then show ?thesis
-        by (simp add: calculation)
+      finally show ?thesis
+        by simp
     next
       assume "v \<noteq> \<t>"
       then have "v = \<f>"
@@ -1439,9 +1433,9 @@ proof(etcs_rule one_separator)
         by (simp add: OR_false_false_is_false false_func_type)
       also have "... = IMPLIES \<circ>\<^sub>c x"
         by (simp add: IMPLIES_true_false_is_false \<open>u = \<t>\<close> \<open>v = \<f>\<close> x_form)
-      then show ?thesis
-        by (simp add: calculation)
-    qed
+      finally show ?thesis
+        by simp
+      qed
   next
     assume "u \<noteq> \<t>"
     then have "u = \<f>"
@@ -1459,8 +1453,8 @@ proof(etcs_rule one_separator)
         by (simp add: OR_true_right_is_true true_func_type)
       also have "... = IMPLIES \<circ>\<^sub>c x"
         by (simp add: IMPLIES_false_true_is_true \<open>u = \<f>\<close> \<open>v = \<t>\<close> x_form)
-      then show ?thesis
-        by (simp add: calculation)
+      finally show ?thesis
+        by simp
     next
       assume "v \<noteq> \<t>"
       then have "v = \<f>"
@@ -1475,9 +1469,9 @@ proof(etcs_rule one_separator)
         by (simp add: OR_true_left_is_true false_func_type)
       also have "... = IMPLIES \<circ>\<^sub>c x"
         by (simp add: IMPLIES_false_false_is_true \<open>u = \<f>\<close> \<open>v = \<f>\<close> x_form)
-      then show ?thesis
-        by (simp add: calculation)
-    qed
+      finally show ?thesis
+        by simp
+      qed
   qed
 qed
 
@@ -1537,8 +1531,8 @@ proof -
         by (typecheck_cfuncs_prems, smt (verit, best) cfunc_cross_prod_comp_cfunc_prod comp_associative2 comp_type id_right_unit2 left_cart_proj_cfunc_prod)
       also have "P \<circ>\<^sub>c x = \<t>"
         using P_true by (typecheck_cfuncs_prems, smt (z3) comp_associative2 id_right_unit2 id_type one_unique_element terminal_func_comp terminal_func_type x_in_X)
-      then have False
-        using calculation true_false_distinct by auto
+      ultimately have False
+        using true_false_distinct by simp
       then show "Q \<circ>\<^sub>c y = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>) \<circ>\<^sub>c y"
         by simp
     next

@@ -158,8 +158,8 @@ proof (rule ccontr, clarify)
     by (smt BWOC comp_associative2 gUh_type left_proj_type right_proj_type x_type y_type) 
   also have "... = \<t>"
     by (simp add: fact1 gUh_def)
-  then show False
-    using calculation true_false_distinct by auto
+  ultimately show False
+    using true_false_distinct by auto
 qed
 
 text \<open>The lemma below corresponds to Proposition 2.4.2 in Halvorson.\<close>
@@ -223,8 +223,7 @@ proof (clarify, rule ccontr)
         using x_type by (typecheck_cfuncs, smt comp_associative2 h_def id_right_unit2 id_type terminal_func_comp terminal_func_type terminal_func_unique)
       also have "... = (h \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x"
              using x_type cfunc_type_def comp_associative comp_type false_func_type h_def terminal_func_type by (typecheck_cfuncs, force)
-      then show "((eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>,id\<^sub>c (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x  = (h \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x"
-             by (simp add: calculation)
+      finally show "((eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>,id\<^sub>c (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x  = (h \<circ>\<^sub>c left_coproj X Y) \<circ>\<^sub>c x".
     qed
   qed
 
@@ -240,8 +239,7 @@ proof (clarify, rule ccontr)
         by (typecheck_cfuncs, smt (verit) assms cfunc_type_def eq_pred_false_extract_right comp_associative comp_type not_in_right_image)
       also have "... = (h \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c x"
         by (etcs_assocr,typecheck_cfuncs, metis cfunc_type_def comp_associative h_def id_right_unit2 terminal_func_comp_elem terminal_func_type)
-      then show "((eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>,id\<^sub>c (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c  x = (h \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c x"
-         by (simp add: calculation)
+      finally show "((eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>,id\<^sub>c (X \<Coprod> Y)\<rangle>) \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c  x = (h \<circ>\<^sub>c right_coproj X Y) \<circ>\<^sub>c x".
     qed
   qed
   have indicator_is_false:"eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>z \<circ>\<^sub>c \<beta>\<^bsub>X \<Coprod> Y\<^esub>, id (X \<Coprod> Y)\<rangle> = h"
@@ -363,8 +361,8 @@ proof (cases "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, left_coproj X 
       by (typecheck_cfuncs, metis cart_prod_extract_left cfunc_type_def comp_associative)
     also have "... = \<t>"
       using eq_pred_iff_eq by (typecheck_cfuncs, blast)
-    then show ?thesis
-      by (simp add: case1 calculation)
+    ultimately show ?thesis
+      by (simp add: case1)
   qed
 next
   assume "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,left_coproj X Y \<circ>\<^sub>c x\<rangle> \<noteq> \<t>"
@@ -388,8 +386,8 @@ next
         by (typecheck_cfuncs, simp add: cart_prod_extract_left comp_associative2)
       also have "... = \<f>"
         using eq_pred_iff_eq_conv x_not_g by (typecheck_cfuncs, blast)
-      then show ?thesis
-        using calculation case2 g_def by argo
+      ultimately show ?thesis
+        using case2 g_def by argo
     qed
   next
     assume "\<nexists>g. g \<in>\<^sub>c X \<and> u = left_coproj X Y \<circ>\<^sub>c g"
@@ -405,8 +403,8 @@ next
         by (typecheck_cfuncs, simp add: comp_associative2 right_coproj_cfunc_coprod)
       also have "... = \<f>"
         by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type terminal_func_comp terminal_func_unique)
-      then show ?thesis
-        using calculation case2 by argo
+      ultimately show ?thesis
+        using case2 by argo
     qed
   qed
 qed
@@ -429,8 +427,8 @@ proof (cases "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u, right_coproj X
       by (typecheck_cfuncs, smt cart_prod_extract_left comp_associative2)
     also have "... = \<t>"
       using eq_pred_iff_eq y_type by auto
-    then show ?thesis
-      using case1 calculation by argo
+    ultimately show ?thesis
+      using case1 by argo
   qed
 next
   assume "eq_pred (X \<Coprod> Y) \<circ>\<^sub>c \<langle>u,right_coproj X Y \<circ>\<^sub>c y\<rangle> \<noteq> \<t>"
@@ -456,8 +454,8 @@ next
         using cart_prod_extract_left comp_associative2 by (typecheck_cfuncs, auto)
       also have "... = \<f>"
         using eq_pred_iff_eq_conv y_not_g y_type g_type by blast
-      then show ?thesis
-        using calculation eq_pred_false g_def by argo
+      ultimately show ?thesis
+        using eq_pred_false g_def by argo
     qed
   next
     assume "\<nexists>g. g \<in>\<^sub>c Y \<and> u = right_coproj X Y \<circ>\<^sub>c g"
@@ -472,8 +470,8 @@ next
         by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_coprod)
       also have "... = \<f>"
         by (typecheck_cfuncs, smt (z3) comp_associative2 id_right_unit2 id_type terminal_func_comp terminal_func_unique)
-      then show ?thesis
-        using calculation eq_pred_false by auto
+      ultimately show ?thesis
+        using eq_pred_false by auto
     qed
   qed
 qed
@@ -554,8 +552,7 @@ proof -
       using a_type assms(2) cfunc_type_def comp_associative f_type by (typecheck_cfuncs, auto)
     also have "... = (a \<circ>\<^sub>c f)"
       using a_type b_type left_coproj_cfunc_coprod by presburger
-    then show  "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)"
-      by (simp add: calculation)
+    finally show  "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V = (a \<circ>\<^sub>c f)".
   qed
 
   have right_eq: "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
@@ -568,8 +565,7 @@ proof -
       using a_type assms(2) cfunc_type_def comp_associative g_type by (typecheck_cfuncs, auto)
     also have "... = (b \<circ>\<^sub>c g)"
       using a_type b_type right_coproj_cfunc_coprod by auto
-    then show "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)"
-      by (simp add: calculation)
+    finally show "(a \<amalg> b \<circ>\<^sub>c f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V = (b \<circ>\<^sub>c g)".
   qed
 
   show "(a \<amalg> b) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) = (a \<circ>\<^sub>c f) \<amalg> (b \<circ>\<^sub>c g)"
@@ -595,15 +591,14 @@ proof-
     using assms by (typecheck_cfuncs, simp add: comp_associative2)
   also have "... = (x \<circ>\<^sub>c f) \<bowtie>\<^sub>f (y \<circ>\<^sub>c g)"
     using assms cfunc_bowtie_prod_def cfunc_type_def codomain_comp by auto
-  then show "(x \<bowtie>\<^sub>f y) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) = (x \<circ>\<^sub>c f) \<bowtie>\<^sub>f (y \<circ>\<^sub>c g)"
-    using assms(1) assms(2) calculation cfunc_bowtie_prod_def2 by auto
+  ultimately show "(x \<bowtie>\<^sub>f y) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) = (x \<circ>\<^sub>c f) \<bowtie>\<^sub>f (y \<circ>\<^sub>c g)"
+    using assms(1,2) cfunc_bowtie_prod_def2 by auto
 qed
 
 lemma cfunc_bowtieprod_epi:
-  assumes type_assms: "f : X \<rightarrow> Y" "g : V \<rightarrow> W"
+  assumes f_type[type_rule]: "f : X \<rightarrow> Y" and g_type[type_rule]: "g : V \<rightarrow> W"
   assumes f_epi: "epimorphism f" and g_epi: "epimorphism g"
   shows "epimorphism (f \<bowtie>\<^sub>f g)"
-  using type_assms
 proof (typecheck_cfuncs, unfold epimorphism_def3, clarify)
   fix x y A
   assume x_type: "x: Y \<Coprod> W \<rightarrow> A"
@@ -622,7 +617,7 @@ proof (typecheck_cfuncs, unfold epimorphism_def3, clarify)
     also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f"
       using assms comp_associative2 x_expand x_type by (typecheck_cfuncs, auto)
     also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V"
-      using left_coproj_cfunc_bowtie_prod type_assms by force
+      using left_coproj_cfunc_bowtie_prod by (typecheck_cfuncs, force)
     also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X V"
       using assms cfunc_type_def comp_associative eqs x_expand x_type y_expand y_type by (typecheck_cfuncs, auto)
     also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c left_coproj Y W \<circ>\<^sub>c f"
@@ -631,15 +626,15 @@ proof (typecheck_cfuncs, unfold epimorphism_def3, clarify)
       using assms comp_associative2 y_expand y_type by (typecheck_cfuncs, blast)
     also have "... = y1 \<circ>\<^sub>c f"
       using y1_y2_type left_coproj_cfunc_coprod by auto 
-    then show "x1 = y1"
-      using calculation epimorphism_def3 f_epi type_assms(1) x1_x2_type(1) y1_y2_type(1) by fastforce
+    ultimately show "x1 = y1"
+      using epimorphism_def3 f_epi f_type x1_x2_type(1) y1_y2_type(1) by fastforce
   next
     have "x2 \<circ>\<^sub>c g = ((x1 \<amalg> x2) \<circ>\<^sub>c right_coproj Y W) \<circ>\<^sub>c g"
       using x1_x2_type right_coproj_cfunc_coprod by auto 
     also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
       using assms comp_associative2 x_expand x_type by (typecheck_cfuncs, auto)
     also have "... = (x1 \<amalg> x2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V"
-      using right_coproj_cfunc_bowtie_prod type_assms by force
+      using right_coproj_cfunc_bowtie_prod by (typecheck_cfuncs, force)
     also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X V"
       using assms cfunc_type_def comp_associative eqs x_expand x_type y_expand y_type by (typecheck_cfuncs, auto)
     also have "... = (y1 \<amalg> y2) \<circ>\<^sub>c right_coproj Y W \<circ>\<^sub>c g"
@@ -648,8 +643,8 @@ proof (typecheck_cfuncs, unfold epimorphism_def3, clarify)
       using assms comp_associative2 y_expand y_type by (typecheck_cfuncs, blast)
     also have "... = y2 \<circ>\<^sub>c g"
       using right_coproj_cfunc_coprod y1_y2_type(1) y1_y2_type(2) by auto
-    then show "x2 = y2"
-      using calculation epimorphism_def3 g_epi type_assms(2) x1_x2_type(2) y1_y2_type(2) by fastforce
+    ultimately show "x2 = y2"
+      using epimorphism_def3 g_epi g_type x1_x2_type(2) y1_y2_type(2) by fastforce
   qed
   then show "x = y"
     by (simp add: x_expand y_expand)
@@ -715,8 +710,8 @@ proof(clarify)
             using cfunc_bowtie_prod_def2 left_coproj_cfunc_bowtie_prod type_assms by auto
           also have "... = left_coproj Y W \<circ>\<^sub>c f  \<circ>\<^sub>c x2"
             by (metis comp_associative2 left_proj_type type_assms(1) x2_def)
-          then have "f  \<circ>\<^sub>c x1 = f  \<circ>\<^sub>c x2"
-            using  calculation cfunc_type_def left_coproj_are_monomorphisms
+          ultimately have "f  \<circ>\<^sub>c x1 = f  \<circ>\<^sub>c x2"
+            using cfunc_type_def left_coproj_are_monomorphisms
             left_proj_type monomorphism_def type_assms(1) x1_def x2_def by (typecheck_cfuncs,auto)
           then show "x1 = x2"
             by (metis cfunc_type_def f_epi injective_def type_assms(1) x1_def x2_def)
@@ -747,8 +742,8 @@ proof(clarify)
         using right_coproj_cfunc_coprod type_assms by (typecheck_cfuncs, fastforce)
       also have "... = right_coproj Y W \<circ>\<^sub>c g  \<circ>\<^sub>c y2"
         using comp_associative2 type_assms(2) y2_def by (typecheck_cfuncs, auto)
-      then have False
-        using calculation comp_type coproducts_disjoint type_assms x1_def y2_def by auto
+      ultimately have False
+        using comp_type coproducts_disjoint type_assms x1_def y2_def by auto
       then show "z1 = z2"
         by simp
     qed
@@ -782,8 +777,8 @@ proof(clarify)
           using right_coproj_cfunc_coprod type_assms  by (typecheck_cfuncs, fastforce)
         also have "... = right_coproj Y W \<circ>\<^sub>c g  \<circ>\<^sub>c y1"
           using comp_associative2 type_assms(2) y1_def by (typecheck_cfuncs, auto)
-        then have False
-          using calculation comp_type coproducts_disjoint type_assms x2_def y1_def by auto
+        ultimately have False
+          using comp_type coproducts_disjoint type_assms x2_def y1_def by auto
         then show "z1 = z2"
           by simp
       qed
@@ -812,8 +807,8 @@ proof(clarify)
             using right_coproj_cfunc_coprod type_assms by (typecheck_cfuncs, fastforce)
           also have "... = right_coproj Y W \<circ>\<^sub>c g  \<circ>\<^sub>c y2"
             using comp_associative2 type_assms(2) y2_def by (typecheck_cfuncs, auto)
-          then have "g  \<circ>\<^sub>c y1 = g  \<circ>\<^sub>c y2"
-            using  calculation cfunc_type_def right_coproj_are_monomorphisms
+          ultimately have "g  \<circ>\<^sub>c y1 = g  \<circ>\<^sub>c y2"
+            using  cfunc_type_def right_coproj_are_monomorphisms
             right_proj_type monomorphism_def type_assms(2) y1_def y2_def by (typecheck_cfuncs,auto)
           then show "y1 = y2"
             by (metis cfunc_type_def g_epi injective_def type_assms(2) y1_def y2_def)
@@ -857,7 +852,7 @@ proof(safe)
       using left_coproj_cfunc_bowtie_prod type_assms(1) type_assms(2) by auto
     also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c left_coproj X Z \<circ>\<^sub>c y"
       using y_type2 comp_associative2 fg_bowtie_tyepe by (typecheck_cfuncs, auto)
-    then show ?thesis using calculation by auto
+    finally show ?thesis.
   qed
   then have "monomorphism (f \<bowtie>\<^sub>f g)"
     using inj_f_bowtie_g injective_imp_monomorphism by auto
@@ -893,7 +888,7 @@ next
       using right_coproj_cfunc_bowtie_prod type_assms(1) type_assms(2) by auto
     also have "... = (f \<bowtie>\<^sub>f g) \<circ>\<^sub>c right_coproj X Z \<circ>\<^sub>c y"
       using y_type2 comp_associative2 fg_bowtie_tyepe by (typecheck_cfuncs, auto)
-    then show ?thesis using calculation by auto
+    finally show ?thesis.
   qed
   then have "monomorphism (f \<bowtie>\<^sub>f g)"
     using inj_f_bowtie_g injective_imp_monomorphism by auto
@@ -945,9 +940,9 @@ proof(safe)
         using left_coproj_cfunc_bowtie_prod type_assms by auto
       also have "... = left_coproj Y W \<circ>\<^sub>c f \<circ>\<^sub>c x"
         using comp_associative2 type_assms(1) x_def by (typecheck_cfuncs, auto)
-      then show "f \<circ>\<^sub>c x = y"
+      ultimately show "f \<circ>\<^sub>c x = y"
         using type_assms(1) x_def y_type2  
-        by (typecheck_cfuncs, metis calculation cfunc_type_def left_coproj_are_monomorphisms left_proj_type monomorphism_def x_def)
+        by (typecheck_cfuncs, metis cfunc_type_def left_coproj_are_monomorphisms left_proj_type monomorphism_def x_def)
     qed
     then show ?thesis
       using cfunc_type_def type_assms(1) x_def by auto
@@ -967,8 +962,8 @@ proof(safe)
         using right_coproj_cfunc_bowtie_prod type_assms by auto
       also have "... = right_coproj Y W \<circ>\<^sub>c g \<circ>\<^sub>c z"
         using comp_associative2 type_assms(2) z_def by (typecheck_cfuncs, auto)
-      then show False
-        using calculation comp_type coproducts_disjoint type_assms(2) y_type2 z_def by auto
+      ultimately show False
+        using comp_type coproducts_disjoint type_assms(2) y_type2 z_def by auto
    qed
    then show ?thesis
      by simp
@@ -1004,8 +999,8 @@ next
         using left_coproj_cfunc_bowtie_prod type_assms by auto
       also have "... = left_coproj Y W \<circ>\<^sub>c f \<circ>\<^sub>c x"
         using comp_associative2 type_assms(1) x_def by (typecheck_cfuncs, auto)
-      then show False
-        by (metis calculation comp_type coproducts_disjoint type_assms(1) x_def y_type2)
+      ultimately show False
+        by (metis comp_type coproducts_disjoint type_assms(1) x_def y_type2)
     qed
     then show ?thesis
       by simp
@@ -1025,8 +1020,8 @@ next
         using right_coproj_cfunc_bowtie_prod type_assms by auto
       also have "... = right_coproj Y W \<circ>\<^sub>c g \<circ>\<^sub>c z"
         using comp_associative2 type_assms(2) z_def by (typecheck_cfuncs, auto)
-      then show ?thesis
-        by (metis calculation cfunc_type_def codomain_comp monomorphism_def 
+      ultimately show ?thesis
+        by (metis cfunc_type_def codomain_comp monomorphism_def 
            right_coproj_are_monomorphisms right_proj_type type_assms(2) y_type2 z_def)
     qed
     then show ?thesis
@@ -1087,8 +1082,8 @@ proof -
     by (simp add: case_bool_def2)
   also have "...  = (case_bool \<circ>\<^sub>c \<t>) \<amalg> (case_bool \<circ>\<^sub>c \<f>)"
     using case_bool_def2 cfunc_coprod_comp false_func_type true_func_type by auto
-  then show ?thesis 
-    using  calculation coprod_eq2 by (typecheck_cfuncs, auto)
+  ultimately show ?thesis 
+    using coprod_eq2 by (typecheck_cfuncs, auto)
 qed
 
 lemma case_bool_true:
@@ -1110,8 +1105,7 @@ proof -
     using assms case_bool_true by presburger
   also have "... = x1"
     using assms left_coproj_cfunc_coprod by force
-  then show ?thesis
-    by (simp add: calculation)
+  finally show ?thesis.
 qed
 
 lemma coprod_case_bool_false:
@@ -1125,8 +1119,7 @@ proof -
     using assms case_bool_false by presburger
   also have "... = x2"
     using assms right_coproj_cfunc_coprod by force
-  then show ?thesis
-    by (simp add: calculation)
+  finally show ?thesis.
 qed
 
 subsection \<open>Distribution of Products over Coproducts\<close>
@@ -1216,8 +1209,7 @@ proof -
             using a'b'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, auto)
           also have "... =  \<langle>a', left_coproj B C \<circ>\<^sub>c b'\<rangle>"
             using a'b'_def id_left_unit2 by force
-          then show "\<langle>a, left_coproj B C \<circ>\<^sub>c b\<rangle> = \<langle>a', left_coproj B C \<circ>\<^sub>c b'\<rangle>"
-            by (simp add: calculation)
+          finally show "\<langle>a, left_coproj B C \<circ>\<^sub>c b\<rangle> = \<langle>a', left_coproj B C \<circ>\<^sub>c b'\<rangle>".
         qed
         then have a_equal: "a = a' \<and> left_coproj B C \<circ>\<^sub>c b = left_coproj B C \<circ>\<^sub>c b'"
           using a'b'_def ab_def cart_prod_eq2 equal_pair by (typecheck_cfuncs, blast)
@@ -1251,8 +1243,7 @@ proof -
           using a'c'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
         also have "... =  \<langle>a', right_coproj B C \<circ>\<^sub>c c'\<rangle>"
           using a'c'_def id_left_unit2 by force
-        then show "\<langle>a, left_coproj B C \<circ>\<^sub>c b\<rangle> = \<langle>a', right_coproj B C \<circ>\<^sub>c c'\<rangle>"
-          by (simp add: calculation)
+        finally show "\<langle>a, left_coproj B C \<circ>\<^sub>c b\<rangle> = \<langle>a', right_coproj B C \<circ>\<^sub>c c'\<rangle>".
       qed        
       then have impossible: "left_coproj B C \<circ>\<^sub>c b = right_coproj B C \<circ>\<^sub>c c'"
         using a'c'_def ab_def element_pair_eq equal_pair by (typecheck_cfuncs, blast)
@@ -1294,8 +1285,7 @@ proof -
           using a'b'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
         also have "... =  \<langle>a', left_coproj B C \<circ>\<^sub>c b'\<rangle>"
           using a'b'_def id_left_unit2 by force
-        then show "\<langle>a, right_coproj B C \<circ>\<^sub>c c\<rangle> = \<langle>a', left_coproj B C \<circ>\<^sub>c b'\<rangle>"
-          by (simp add: calculation)
+        finally show "\<langle>a, right_coproj B C \<circ>\<^sub>c c\<rangle> = \<langle>a', left_coproj B C \<circ>\<^sub>c b'\<rangle>".
       qed        
       then have impossible:  "right_coproj B C \<circ>\<^sub>c c = left_coproj B C \<circ>\<^sub>c b'"
           using a'b'_def ac_def cart_prod_eq2 equal_pair by (typecheck_cfuncs, blast)
@@ -1327,8 +1317,7 @@ proof -
             using a'c'_def cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs,auto)
           also have "... =  \<langle>a', right_coproj B C \<circ>\<^sub>c c'\<rangle>"
             using a'c'_def id_left_unit2 by force
-          then show "\<langle>a, right_coproj B C \<circ>\<^sub>c c\<rangle> = \<langle>a', right_coproj B C \<circ>\<^sub>c c'\<rangle>"
-            by (simp add: calculation)
+          finally show "\<langle>a, right_coproj B C \<circ>\<^sub>c c\<rangle> = \<langle>a', right_coproj B C \<circ>\<^sub>c c'\<rangle>".            
         qed     
         then have a_equal: "a = a' \<and> right_coproj B C \<circ>\<^sub>c c = right_coproj B C \<circ>\<^sub>c c'"
           using a'c'_def ac_def element_pair_eq equal_pair by (typecheck_cfuncs, blast)
@@ -1384,9 +1373,9 @@ proof -
         unfolding \<phi>_def by (typecheck_cfuncs, simp add: left_coproj_cfunc_coprod)
       also have "... = \<phi> \<circ>\<^sub>c x"
         using \<phi>_type x_def ab_type comp_associative2 by (typecheck_cfuncs, auto)
-      then show "\<exists>x. x \<in>\<^sub>c domain ((id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C)) \<and>
+      ultimately show "\<exists>x. x \<in>\<^sub>c domain ((id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C)) \<and>
         (id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C) \<circ>\<^sub>c x = y"
-        using \<phi>_def calculation x_type by auto
+        using \<phi>_def x_type by auto
     next
       assume "\<nexists>b. b \<in>\<^sub>c B \<and> bc = left_coproj B C \<circ>\<^sub>c b"
       then have case2: "\<exists> c. c \<in>\<^sub>c C \<and> bc = (right_coproj B C  \<circ>\<^sub>c c)"
@@ -1407,9 +1396,9 @@ proof -
         unfolding \<phi>_def using right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
       also have "... = \<phi> \<circ>\<^sub>c x"
         using \<phi>_type x_def ac_type comp_associative2 by (typecheck_cfuncs, auto)
-      then show "\<exists>x. x \<in>\<^sub>c domain ((id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C)) \<and>
+      ultimately show "\<exists>x. x \<in>\<^sub>c domain ((id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C)) \<and>
         (id\<^sub>c A \<times>\<^sub>f left_coproj B C) \<amalg> (id\<^sub>c A \<times>\<^sub>f right_coproj B C) \<circ>\<^sub>c x = y"
-        using \<phi>_def calculation x_type by auto
+        using \<phi>_def x_type by auto
     qed
   qed
   then show "epimorphism (factor_prod_coprod_left A B C)"
@@ -1520,8 +1509,7 @@ proof -
     using assms by (typecheck_cfuncs, simp add: factor_prod_coprod_left_ap_left)
   also have "... = \<langle>left_coproj A B \<circ>\<^sub>c a, c\<rangle>"
     using assms swap_ap by (typecheck_cfuncs, auto)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma factor_prod_coprod_right_ap_right:
@@ -1543,8 +1531,7 @@ proof -
     using assms by (typecheck_cfuncs, simp add: factor_prod_coprod_left_ap_right)
   also have "... = \<langle>right_coproj A B \<circ>\<^sub>c b, c\<rangle>"
     using assms swap_ap by (typecheck_cfuncs, auto)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 subsubsection  \<open>Distribute Product over Coproduct on Right\<close>
@@ -1577,8 +1564,7 @@ proof -
     using assms by (typecheck_cfuncs, smt comp_associative2)
   also have "... = left_coproj (A \<times>\<^sub>c C) (B \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>a, c\<rangle>"
     using assms swap_ap by (typecheck_cfuncs, auto)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma dist_prod_coprod_right_ap_right:
@@ -1602,8 +1588,7 @@ proof -
     using assms by (typecheck_cfuncs, auto simp add: comp_associative2)
   also have "... = right_coproj (A \<times>\<^sub>c C) (B \<times>\<^sub>c C) \<circ>\<^sub>c \<langle>b, c\<rangle>"
     using assms swap_ap by (typecheck_cfuncs, auto)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma dist_prod_coprod_right_left_coproj:
@@ -1908,8 +1893,7 @@ proof (etcs_subst cases_def2)
     by (typecheck_cfuncs, simp add: comp_associative2 left_coproj_cfunc_bowtie_prod)
   also have "... = left_coproj X X \<circ>\<^sub>c x"
     using right_cart_proj_cfunc_prod by (typecheck_cfuncs, presburger)
-  then show "((right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c X\<rangle>) \<circ>\<^sub>c x = left_coproj X X \<circ>\<^sub>c x"
-    using calculation by argo
+  finally show "((right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c X\<rangle>) \<circ>\<^sub>c x = left_coproj X X \<circ>\<^sub>c x".
 qed
 
 lemma false_case:
@@ -1930,8 +1914,7 @@ proof (etcs_subst cases_def2)
     using comp_associative2 right_coproj_cfunc_bowtie_prod by (typecheck_cfuncs, force)
   also have "... = right_coproj X X \<circ>\<^sub>c x"
     using right_cart_proj_cfunc_prod by (typecheck_cfuncs, presburger)
-  then show "((right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c X\<rangle>) \<circ>\<^sub>c x = right_coproj X X \<circ>\<^sub>c x"
-    using calculation by argo
+  finally show "((right_cart_proj \<one> X \<bowtie>\<^sub>f right_cart_proj \<one> X) \<circ>\<^sub>c dist_prod_coprod_right \<one> \<one> X \<circ>\<^sub>c \<langle>case_bool \<circ>\<^sub>c f,id\<^sub>c X\<rangle>) \<circ>\<^sub>c x = right_coproj X X \<circ>\<^sub>c x".
 qed
 
 subsection  \<open>Coproduct Set Properities\<close>
@@ -2137,8 +2120,8 @@ proof-
             using \<phi>_type a'_def comp_associative2 by (typecheck_cfuncs, blast)
           also have "... = (left_coproj C D \<circ>\<^sub>c f) \<circ>\<^sub>c a'"
             unfolding \<phi>_def using f_def g_def a'_def left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
-          then show "a = a'"
-            by (smt a'_def a_def calculation cfunc_type_def coproj_f_inject domain_comp f_def injective_def left_proj_type)
+          ultimately show "a = a'"
+            by (smt a'_def a_def cfunc_type_def coproj_f_inject domain_comp f_def injective_def left_proj_type)
         qed
         then show "x=y"
           by (simp add:  a'_def(2) a_def(2))
@@ -2162,42 +2145,42 @@ proof-
             unfolding \<phi>_def using f_def g_def b'_def right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
           also have "... = right_coproj C D \<circ>\<^sub>c (g \<circ>\<^sub>c b')"
               using g_def b'_def by (typecheck_cfuncs, simp add: comp_associative2)
-          then show "x = y"
-             using  a_def(1) b'_def(1) calculation comp_type coproducts_disjoint f_def(1) g_def(1) by auto
+          ultimately show "x = y"
+             using  a_def(1) b'_def(1) comp_type coproducts_disjoint f_def(1) g_def(1) by auto
          qed
        qed
-     next
-         assume "\<nexists>a. a \<in>\<^sub>c A \<and> x = left_coproj A B \<circ>\<^sub>c a"
-         then have "\<exists> b. b \<in>\<^sub>c B \<and> x = right_coproj A B \<circ>\<^sub>c b"
-           using x_form by blast
-         then obtain b where b_def: "b \<in>\<^sub>c B \<and> x = right_coproj A B \<circ>\<^sub>c b"
-           by blast
-              show "x = y"
-              proof(cases "\<exists> a. a \<in>\<^sub>c A  \<and> y = left_coproj A B \<circ>\<^sub>c a")
-                 assume "\<exists> a. a \<in>\<^sub>c A  \<and> y = left_coproj A B \<circ>\<^sub>c a"
-                 then obtain a' where a'_def: "a' \<in>\<^sub>c A" "y = left_coproj A B \<circ>\<^sub>c a'"
-                   by blast
-                 show "x = y"
-                 proof - 
-                  have "right_coproj C D \<circ>\<^sub>c (g \<circ>\<^sub>c b) = (right_coproj C D \<circ>\<^sub>c g) \<circ>\<^sub>c b"
-                    using b_def cfunc_type_def comp_associative g_def right_proj_type by auto
-                  also have "...  = \<phi> \<circ>\<^sub>c x"
-                    by (smt \<phi>_def \<phi>_type b_def comp_associative2 comp_type f_def(1) g_def(1) left_proj_type right_coproj_cfunc_coprod right_proj_type)
-                  also have "... = \<phi> \<circ>\<^sub>c y"
-                    by (meson equals)
-                  also have "... = (\<phi> \<circ>\<^sub>c left_coproj A B) \<circ>\<^sub>c a'"
-                    using \<phi>_type a'_def comp_associative2 by (typecheck_cfuncs, blast)
-                  also have "... = (left_coproj C D \<circ>\<^sub>c f) \<circ>\<^sub>c a' "
-                    unfolding \<phi>_def using f_def g_def a'_def left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
-                  also have "... = left_coproj C D \<circ>\<^sub>c (f \<circ>\<^sub>c a')"
-                      using f_def a'_def by (typecheck_cfuncs, simp add: comp_associative2)
-                  then show "x = y"
-                    by (metis a'_def(1) b_def calculation comp_type coproducts_disjoint f_def(1) g_def(1))
-                qed
-        next
-          assume "\<nexists>a. a \<in>\<^sub>c A \<and> y = left_coproj A B \<circ>\<^sub>c a"
-          then have "\<exists> b. b \<in>\<^sub>c B \<and> y = right_coproj A B \<circ>\<^sub>c b"
-            using y_form by blast
+    next
+      assume "\<nexists>a. a \<in>\<^sub>c A \<and> x = left_coproj A B \<circ>\<^sub>c a"
+      then have "\<exists> b. b \<in>\<^sub>c B \<and> x = right_coproj A B \<circ>\<^sub>c b"
+        using x_form by blast
+      then obtain b where b_def: "b \<in>\<^sub>c B \<and> x = right_coproj A B \<circ>\<^sub>c b"
+        by blast
+      show "x = y"
+      proof(cases "\<exists> a. a \<in>\<^sub>c A  \<and> y = left_coproj A B \<circ>\<^sub>c a")
+        assume "\<exists> a. a \<in>\<^sub>c A  \<and> y = left_coproj A B \<circ>\<^sub>c a"
+        then obtain a' where a'_def: "a' \<in>\<^sub>c A" "y = left_coproj A B \<circ>\<^sub>c a'"
+          by blast
+        show "x = y"
+        proof - 
+          have "right_coproj C D \<circ>\<^sub>c (g \<circ>\<^sub>c b) = (right_coproj C D \<circ>\<^sub>c g) \<circ>\<^sub>c b"
+            using b_def cfunc_type_def comp_associative g_def right_proj_type by auto
+          also have "...  = \<phi> \<circ>\<^sub>c x"
+            by (smt \<phi>_def \<phi>_type b_def comp_associative2 comp_type f_def(1) g_def(1) left_proj_type right_coproj_cfunc_coprod right_proj_type)
+          also have "... = \<phi> \<circ>\<^sub>c y"
+            by (meson equals)
+          also have "... = (\<phi> \<circ>\<^sub>c left_coproj A B) \<circ>\<^sub>c a'"
+            using \<phi>_type a'_def comp_associative2 by (typecheck_cfuncs, blast)
+          also have "... = (left_coproj C D \<circ>\<^sub>c f) \<circ>\<^sub>c a' "
+            unfolding \<phi>_def using f_def g_def a'_def left_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
+          also have "... = left_coproj C D \<circ>\<^sub>c (f \<circ>\<^sub>c a')"
+            using f_def a'_def by (typecheck_cfuncs, simp add: comp_associative2)
+          ultimately show "x = y"
+            by (metis a'_def(1) b_def comp_type coproducts_disjoint f_def(1) g_def(1))
+        qed
+      next
+        assume "\<nexists>a. a \<in>\<^sub>c A \<and> y = left_coproj A B \<circ>\<^sub>c a"
+        then have "\<exists> b. b \<in>\<^sub>c B \<and> y = right_coproj A B \<circ>\<^sub>c b"
+          using y_form by blast
         then obtain b' where b'_def: "b' \<in>\<^sub>c B" "y = right_coproj A B \<circ>\<^sub>c b'"
           by blast
         then have "b = b'"
@@ -2210,23 +2193,23 @@ proof-
             using \<phi>_type b'_def comp_associative2 by (typecheck_cfuncs, blast)
           also have "... = (right_coproj C D \<circ>\<^sub>c g) \<circ>\<^sub>c b'"
             unfolding \<phi>_def using f_def g_def b'_def right_coproj_cfunc_coprod by (typecheck_cfuncs, auto)
-          then show "b = b'"
-            by (smt b'_def b_def calculation cfunc_type_def coproj_g_inject domain_comp g_def injective_def right_proj_type)
+          ultimately show "b = b'"
+            by (smt b'_def b_def cfunc_type_def coproj_g_inject domain_comp g_def injective_def right_proj_type)
         qed
         then show "x = y"
           by (simp add: b'_def(2) b_def)
+        qed
       qed
     qed
-  qed
 
-  have "monomorphism \<phi>"
-    using \<open>injective \<phi>\<close> injective_imp_monomorphism by blast
-  have "epimorphism \<phi>"
-    by (simp add: \<open>surjective \<phi>\<close> surjective_is_epimorphism)
-  have "isomorphism \<phi>"
-    using \<open>epimorphism \<phi>\<close> \<open>monomorphism \<phi>\<close> epi_mon_is_iso by blast
-  then show ?thesis
-    using \<phi>_type is_isomorphic_def by blast
+    have "monomorphism \<phi>"
+      using \<open>injective \<phi>\<close> injective_imp_monomorphism by blast
+    have "epimorphism \<phi>"
+      by (simp add: \<open>surjective \<phi>\<close> surjective_is_epimorphism)
+    have "isomorphism \<phi>"
+      using \<open>epimorphism \<phi>\<close> \<open>monomorphism \<phi>\<close> epi_mon_is_iso by blast
+    then show ?thesis
+      using \<phi>_type is_isomorphic_def by blast
 qed 
 
 lemma product_distribute_over_coproduct_right:
@@ -2260,8 +2243,7 @@ proof -
           unfolding \<rho>_def  using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
         also have "... = \<langle>lx, \<t>\<rangle>"
           by (typecheck_cfuncs, metis cart_prod_extract_left lx_def)
-        then show ?thesis
-          by (simp add: calculation)
+        finally show ?thesis.
       qed
       show "x = y"
       proof(cases "\<exists> ly. y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X")
@@ -2276,8 +2258,7 @@ proof -
             unfolding \<rho>_def  using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
           also have "... = \<langle>ly, \<t>\<rangle>"
             by (typecheck_cfuncs, metis cart_prod_extract_left ly_def)
-          then show ?thesis
-            by (simp add: calculation)
+          finally show ?thesis.
         qed
         then show "x = y"
           using \<rho>x cart_prod_eq2 equals lx_def ly_def true_func_type by auto
@@ -2293,8 +2274,7 @@ proof -
             unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
           also have "... = \<langle>ry, \<f>\<rangle>"
             by (typecheck_cfuncs, metis cart_prod_extract_left)
-          then show ?thesis
-            by (simp add: calculation)
+          finally show ?thesis.
         qed
         then show ?thesis
           using \<rho>x \<rho>y cart_prod_eq2 equals false_func_type lx_def ry_type true_false_distinct true_func_type by force
@@ -2311,8 +2291,7 @@ proof -
           unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
         also have "... = \<langle>rx, \<f>\<rangle>"
           by (typecheck_cfuncs, metis cart_prod_extract_left rx_def)
-        then show ?thesis
-          by (simp add: calculation)
+        finally show ?thesis.
       qed
       show "x = y"
       proof(cases "\<exists> ly. y = left_coproj X X \<circ>\<^sub>c ly \<and> ly \<in>\<^sub>c X")
@@ -2327,8 +2306,7 @@ proof -
             unfolding \<rho>_def  using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
           also have "... = \<langle>ly, \<t>\<rangle>"
             by (typecheck_cfuncs, metis cart_prod_extract_left ly_def)
-          then show ?thesis
-            by (simp add: calculation)
+          finally show ?thesis.
         qed
         then show "x = y"
           using \<rho>x cart_prod_eq2 equals false_func_type ly_def rx_def true_false_distinct true_func_type by force
@@ -2344,8 +2322,7 @@ proof -
             unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
           also have "... = \<langle>ry, \<f>\<rangle>"
             by (typecheck_cfuncs, metis cart_prod_extract_left ry_def)
-          then show ?thesis
-            by (simp add: calculation)
+          finally show ?thesis.
         qed
         show "x = y"
           using \<rho>x \<rho>y cart_prod_eq2 equals false_func_type rx_def ry_def by auto
@@ -2373,8 +2350,7 @@ proof -
           unfolding \<rho>_def  using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)        
         also have "... = y"
           using \<open>w = \<t>\<close> cart_prod_extract_left y_def by auto
-        then show ?thesis
-          by (simp add: calculation)
+        finally show ?thesis.
       qed
       then show ?thesis
         by (metis \<rho>_type cfunc_type_def codomain_comp domain_comp left_proj_type y_def z_def)
@@ -2391,8 +2367,7 @@ proof -
           unfolding \<rho>_def  using right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)        
         also have "... = y"
           using \<open>w = \<f>\<close> cart_prod_extract_left y_def by auto
-        then show ?thesis
-          by (simp add: calculation)
+        finally show ?thesis.
       qed
       then show ?thesis
         by (metis \<rho>_type cfunc_type_def codomain_comp domain_comp right_proj_type y_def z_def)

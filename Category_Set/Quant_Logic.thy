@@ -35,10 +35,8 @@ proof -
     also have "... = \<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub> \<circ>\<^sub>c x "
       using x_type by (typecheck_cfuncs, metis id_right_unit2 id_type one_unique_element)
     also have "... = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>) \<circ>\<^sub>c x"
-      using x_type comp_associative2 by (typecheck_cfuncs, auto)
-    
-    then show "(p \<circ>\<^sub>c left_cart_proj X \<one>) \<circ>\<^sub>c x = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>) \<circ>\<^sub>c x"
-      using calculation by auto
+      using x_type comp_associative2 by (typecheck_cfuncs, auto)    
+    finally show "(p \<circ>\<^sub>c left_cart_proj X \<one>) \<circ>\<^sub>c x = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>) \<circ>\<^sub>c x".
   qed
   then have "(p \<circ>\<^sub>c left_cart_proj X \<one>)\<^sup>\<sharp> = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>)\<^sup>\<sharp>"
     by simp

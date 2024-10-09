@@ -52,8 +52,7 @@ proof(clarify)
       using id_left_unit2 x_f by (typecheck_cfuncs, auto)
     also have "... = f \<circ>\<^sub>c x"
       by (simp add: eval_lemma f_type x_type)
-    then show "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x"
-      by (simp add: calculation)
+    finally show "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x".
   qed
   then have "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x_f = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c diagonal(X) \<circ>\<^sub>c x_f"
     by (typecheck_cfuncs, smt (z3) cfunc_type_def comp_associative domain_comp f_def x_f)
@@ -120,8 +119,7 @@ proof -
         using comp_associative2 by (typecheck_cfuncs, blast)
       also have "... = eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle>"
         using transpose_func_def by (typecheck_cfuncs, presburger)
-      then show ?thesis
-        by (simp add: calculation)
+      finally show ?thesis.
     qed
     then show "x = y"
       by (metis eq_pred_iff_eq x_type y_type)

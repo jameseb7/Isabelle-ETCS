@@ -276,8 +276,7 @@ proof -
     using assms cfunc_type_def id_left_unit by auto
   also have "... = \<langle>id\<^sub>c Y, id\<^sub>c Y\<rangle> \<circ>\<^sub>c f"
     using assms cfunc_prod_comp id_type by fastforce
-  then show "(f \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>id\<^sub>c X,id\<^sub>c X\<rangle> = \<langle>id\<^sub>c Y,id\<^sub>c Y\<rangle> \<circ>\<^sub>c f"
-    using calculation by auto
+  finally show "(f \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>id\<^sub>c X,id\<^sub>c X\<rangle> = \<langle>id\<^sub>c Y,id\<^sub>c Y\<rangle> \<circ>\<^sub>c f".
 qed
 
 lemma cfunc_cross_prod_comp_cfunc_cross_prod:
@@ -341,8 +340,7 @@ proof -
     by (meson assms cfunc_prod_comp cfunc_prod_type left_cart_proj_type right_cart_proj_type)
   also have "... = \<langle>y, x\<rangle>"
     using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma swap_cross_prod:
@@ -357,8 +355,7 @@ proof -
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
   also have "... = (y \<times>\<^sub>f x) \<circ>\<^sub>c swap A B"
     unfolding swap_def by auto
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma swap_idempotent:
@@ -389,16 +386,14 @@ lemma associate_right_ap:
   assumes "x : A \<rightarrow> X" "y : A \<rightarrow> Y" "z : A \<rightarrow> Z"
   shows "associate_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle> = \<langle>x, \<langle>y, z\<rangle>\<rangle>"
 proof -
-  have "associate_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle> = \<langle>(left_cart_proj X Y \<circ>\<^sub>c  left_cart_proj (X \<times>\<^sub>c Y) Z) \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>, \<langle>right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z,right_cart_proj (X \<times>\<^sub>c Y) Z\<rangle> \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>\<rangle>"
-    by (typecheck_cfuncs, metis assms associate_right_def cfunc_prod_comp)
-  also have "... = \<langle>(left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z) \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>, \<langle>(right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z) \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>, right_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>\<rangle>\<rangle>"
-    by (typecheck_cfuncs, metis assms calculation cfunc_prod_comp cfunc_prod_type right_cart_proj_type)
+  have "associate_right X Y Z \<circ>\<^sub>c \<langle>\<langle>x, y\<rangle>, z\<rangle> = \<langle>(left_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z) \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>, 
+    \<langle>(right_cart_proj X Y \<circ>\<^sub>c left_cart_proj (X \<times>\<^sub>c Y) Z) \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>, right_cart_proj (X \<times>\<^sub>c Y) Z \<circ>\<^sub>c \<langle>\<langle>x,y\<rangle>,z\<rangle>\<rangle>\<rangle>"
+    by (typecheck_cfuncs, smt (verit, best) assms associate_right_def cfunc_prod_comp cfunc_prod_type)
   also have "... = \<langle>left_cart_proj X Y \<circ>\<^sub>c \<langle>x,y\<rangle>, \<langle>right_cart_proj X Y \<circ>\<^sub>c \<langle>x,y\<rangle>, z\<rangle>\<rangle>"
     using assms by (typecheck_cfuncs, smt comp_associative2 left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... =\<langle>x, \<langle>y, z\<rangle>\<rangle>"
     using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma associate_right_crossprod_ap:
@@ -418,7 +413,7 @@ proof-
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
   also have "... = (x \<times>\<^sub>f (y\<times>\<^sub>f z)) \<circ>\<^sub>c  associate_right A B C"   
     unfolding associate_right_def by auto
-  then show ?thesis using calculation by auto
+  finally show ?thesis.
 qed
 
 subsubsection \<open>Permuting a Cartesian Product to Associate to the Left\<close>
@@ -453,8 +448,7 @@ proof -
     using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by (typecheck_cfuncs, auto)
   also have "... = \<langle>\<langle>x, y\<rangle>, z\<rangle>"
     using assms left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod by auto
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma right_left: 
@@ -486,7 +480,7 @@ proof-
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
   also have "... = ((x \<times>\<^sub>f y)\<times>\<^sub>f z) \<circ>\<^sub>c associate_left A B C"   
     unfolding associate_left_def by auto
-  then show ?thesis using calculation by auto
+  finally show ?thesis.
 qed
   
 subsubsection \<open>Distributing over a Cartesian Product from the Right\<close>
@@ -661,8 +655,7 @@ proof -
     using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = \<langle>a, d\<rangle>"
     using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 definition inners :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
@@ -686,8 +679,7 @@ proof -
     using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = \<langle>b, c\<rangle>"
     using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 definition lefts :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
@@ -709,8 +701,7 @@ proof -
     using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = \<langle>a, c\<rangle>"
     using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 definition rights :: "cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cset \<Rightarrow> cfunc" where
@@ -732,8 +723,7 @@ proof -
     using assms by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
   also have "... = \<langle>b, d\<rangle>"
     using assms by (typecheck_cfuncs, simp add: right_cart_proj_cfunc_prod)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 end

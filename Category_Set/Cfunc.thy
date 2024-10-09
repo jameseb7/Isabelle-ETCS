@@ -180,8 +180,8 @@ proof clarify
     by (simp add: gfh_eq_gfk)
   also have "... = g \<circ>\<^sub>c (f \<circ>\<^sub>c k)"
     by (simp add: assms codomain_k comp_associative domain_comp)
-  then have "f \<circ>\<^sub>c h = f \<circ>\<^sub>c k"
-    using assms calculation cfunc_type_def codomain_h codomain_k comp_type domain_comp g_mono by auto
+  ultimately have "f \<circ>\<^sub>c h = f \<circ>\<^sub>c k"
+    using assms cfunc_type_def codomain_h codomain_k comp_type domain_comp g_mono by auto
   then show "k = h"
     by (simp add: codomain_h codomain_k domain_comp f_mono assms)
 qed
@@ -242,9 +242,8 @@ proof clarify
     by (simp add: hgf_eq_kgf)
   also have "... =(k \<circ>\<^sub>c g) \<circ>\<^sub>c f "
     by (simp add: assms codomain_comp comp_associative domain_k)
- 
-  then have "h \<circ>\<^sub>c g = k \<circ>\<^sub>c g"
-    by (simp add: assms calculation codomain_comp domain_comp domain_h domain_k f_epi)
+  ultimately have "h \<circ>\<^sub>c g = k \<circ>\<^sub>c g"
+    by (simp add: assms codomain_comp domain_comp domain_h domain_k f_epi)
   then show "h = k"
     by (simp add: codomain_comp domain_h domain_k g_epi assms)
 qed
@@ -379,8 +378,7 @@ proof safe
     by (simp add: domain_g fg_id)
   also have "... = t"
     by (metis domain_t id_right_unit)    
-  then show "s = t"
-    using calculation by auto
+  finally show "s = t".
 next
   fix g h k
   assume domain_g: "domain g = codomain f"
@@ -405,8 +403,8 @@ next
     by (simp add: gf_id)
   also have "... = k"
     by (metis codomain_k id_left_unit)
-  then show "k = h"
-    using calculation by auto
+  ultimately show "k = h"
+    by simp
 qed
 
 lemma isomorphism_sandwich: 

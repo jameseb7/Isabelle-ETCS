@@ -186,7 +186,7 @@ proof (rule ccontr, clarify)
       using assms u_type by (typecheck_cfuncs, simp add:  comp_associative2 u_square)
     also have "... = \<f>"
       using assms u_type by (etcs_assocr,typecheck_cfuncs, simp add: id_right_unit2 terminal_func_comp_elem)
-    then show ?thesis using calculation by auto
+    finally show ?thesis.
   qed
   then show False
     using true_false_distinct by blast
@@ -280,8 +280,8 @@ proof -
     using cfunc_coprod_type cfunc_type_def comp_associative n_def right_proj_type successor_type zero_type by auto
   also have "... = successor \<circ>\<^sub>c n"
     using right_coproj_cfunc_coprod successor_type zero_type by auto
-  then show ?thesis
-    using   calculation n_def by auto
+  finally show ?thesis
+    using n_def by auto
 qed
 
 subsection \<open>Predecessor\<close>
@@ -332,8 +332,7 @@ proof -
     by (typecheck_cfuncs, auto simp add: comp_associative2)
   also have "... = right_coproj \<one> \<nat>\<^sub>c"
     by (typecheck_cfuncs, simp add: id_left_unit2 predecessor'_def2)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 lemma predecessor'_zero:
@@ -345,8 +344,7 @@ proof -
     by (typecheck_cfuncs, auto simp add: comp_associative2)
   also have "... = left_coproj \<one> \<nat>\<^sub>c"
     by (typecheck_cfuncs, simp add: id_left_unit2 predecessor'_def2)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 definition predecessor :: "cfunc"
@@ -518,8 +516,7 @@ proof(etcs_rule one_separator)
     using assms by (typecheck_cfuncs, simp add: id_left_unit2 metafunc_def2)
   also have "... = (metafunc (id\<^sub>c U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>) \<circ>\<^sub>c z"
     using assms by (typecheck_cfuncs, metis cfunc_type_def comp_associative id_right_unit2 terminal_func_comp_elem)
-  then show "(ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle>) \<circ>\<^sub>c z = (metafunc (id\<^sub>c U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>) \<circ>\<^sub>c z"
-    using calculation by auto
+  finally show "(ITER U \<circ>\<^sub>c \<langle>f,zero \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>\<rangle>) \<circ>\<^sub>c z = (metafunc (id\<^sub>c U) \<circ>\<^sub>c \<beta>\<^bsub>Z\<^esub>) \<circ>\<^sub>c z".
 qed
 
 lemma ITER_zero': 
@@ -567,8 +564,7 @@ proof(etcs_rule one_separator)
     using assms by (typecheck_cfuncs, meson comp_associative2)
   also have "... = (f \<box> (ITER U \<circ>\<^sub>c \<langle>f,n\<rangle>)) \<circ>\<^sub>c z"
     using assms by (typecheck_cfuncs, simp add: meta_comp2_def5)
-  then show "(ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle>) \<circ>\<^sub>c z = (f \<box> ITER U \<circ>\<^sub>c \<langle>f,n\<rangle>) \<circ>\<^sub>c z"
-    by (simp add: calculation)
+  finally show "(ITER U \<circ>\<^sub>c \<langle>f,successor \<circ>\<^sub>c n\<rangle>) \<circ>\<^sub>c z = (f \<box> ITER U \<circ>\<^sub>c \<langle>f,n\<rangle>) \<circ>\<^sub>c z".
 qed
 
 lemma ITER_one:
@@ -610,8 +606,8 @@ proof(etcs_rule one_separator)
     by (metis cnufatem_metafunc id_type)
   also have "... = x"
     by (typecheck_cfuncs, simp add: id_left_unit2)
-  then show "(g\<^bsup>\<circ>zero\<^esup>) \<circ>\<^sub>c x = id\<^sub>c X \<circ>\<^sub>c x"
-    by (simp add: calculation)
+  ultimately show "(g\<^bsup>\<circ>zero\<^esup>) \<circ>\<^sub>c x = id\<^sub>c X \<circ>\<^sub>c x"
+    by simp
 qed
 
 lemma succ_iters:
@@ -627,8 +623,7 @@ proof -
     using assms by (typecheck_cfuncs, metis iter_comp_def3 metafunc_cnufatem)
   also have "... = g \<circ>\<^sub>c (g\<^bsup>\<circ>n\<^esup>)"
     using assms by (typecheck_cfuncs, simp add: comp_as_metacomp)
-  then show ?thesis
-    using calculation by auto
+  finally show ?thesis.
 qed
 
 corollary one_iter:
@@ -662,8 +657,7 @@ next
     by (typecheck_cfuncs, simp add: ITER_zero')
   also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
     using eval_lemma by (typecheck_cfuncs, blast)
-  then show "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero"
-    using calculation by auto
+  finally show "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero".
   show "(eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor =
     successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>"
   proof(etcs_rule one_separator)
@@ -684,9 +678,9 @@ next
       by (typecheck_cfuncs,simp add: id_left_unit2 id_right_unit2 terminal_func_comp_elem)
     also have "... = ((eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m"
       by (typecheck_cfuncs, smt (z3) cfunc_prod_comp comp_associative2)
-    then show "((eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m =
+    ultimately show "((eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor) \<circ>\<^sub>c m =
          (successor \<circ>\<^sub>c eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc successor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c m"
-      using calculation by presburger
+      by simp
   qed
   show "id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor = successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c"
     by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2)
@@ -704,8 +698,8 @@ proof -
     using assms by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2 terminal_func_comp_elem)
   also have "... = (successor\<^bsup>\<circ>n\<^esup>) \<circ>\<^sub>c zero"
     using assms by (typecheck_cfuncs, metis eval_lemma iter_comp_def3 metafunc_cnufatem)
-  then show ?thesis
-    using calculation by auto
+  ultimately show ?thesis
+    by simp
 qed
 
 subsection \<open>Relation of Nat to Other Sets\<close>
