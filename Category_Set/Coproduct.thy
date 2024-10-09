@@ -4,7 +4,7 @@ theory Coproduct
   imports Equivalence
 begin
 
-(* We define our own (ETCS) case_bool later, so we need to hide the HOL \<one>. *)
+(* We define our own (ETCS) case_bool later, so we need to hide the HOL version. *)
 hide_const case_bool
 
 text \<open>The axiomatization below corresponds to Axiom 7 (Coproducts) in Halvorson.\<close>
