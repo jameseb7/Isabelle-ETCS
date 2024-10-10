@@ -297,12 +297,10 @@
 \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ nth{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}def{\isadigit{2}}\ successor{\isacharunderscore}{\kern0pt}type\ zero{\isacharunderscore}{\kern0pt}type\ \isacommand{by}\isamarkupfalse%
 \ fastforce\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -329,12 +327,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}successor\ {\isasymcirc}\isactrlsub c\ successor{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ successor\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}even{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isacommand{qed}\isamarkupfalse%
@@ -360,28 +356,8 @@
 \ {\isacharparenleft}{\kern0pt}etcs{\isacharunderscore}{\kern0pt}rule\ natural{\isacharunderscore}{\kern0pt}number{\isacharunderscore}{\kern0pt}object{\isacharunderscore}{\kern0pt}func{\isacharunderscore}{\kern0pt}unique{\isacharbrackleft}{\kern0pt}\isakeyword{where}\ f{\isacharequal}{\kern0pt}{\isachardoublequoteopen}successor\ {\isasymcirc}\isactrlsub c\ successor{\isachardoublequoteclose}{\isacharbrackright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}successor\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}odd{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ zero\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}nth{\isacharunderscore}{\kern0pt}even\ {\isasymcirc}\isactrlsub c\ successor{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
-\ \ \isacommand{proof}\isamarkupfalse%
-\ {\isacharminus}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}successor\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}odd{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ zero\ {\isacharequal}{\kern0pt}\ successor\ {\isasymcirc}\isactrlsub c\ successor\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ nth{\isacharunderscore}{\kern0pt}odd{\isacharunderscore}{\kern0pt}def{\isadigit{2}}\ successor{\isacharunderscore}{\kern0pt}type\ zero{\isacharunderscore}{\kern0pt}type\ \isacommand{by}\isamarkupfalse%
-\ fastforce\isanewline
-\ \ \ \ \isacommand{also}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}nth{\isacharunderscore}{\kern0pt}even\ {\isasymcirc}\isactrlsub c\ successor{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ nth{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}successor{\isadigit{2}}\ nth{\isacharunderscore}{\kern0pt}odd{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}succ{\isacharunderscore}{\kern0pt}nth{\isacharunderscore}{\kern0pt}even\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
-\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ nth{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}successor{\isadigit{2}}\ nth{\isacharunderscore}{\kern0pt}odd{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}succ{\isacharunderscore}{\kern0pt}nth{\isacharunderscore}{\kern0pt}even{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}successor\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}odd{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ successor\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}successor\ {\isasymcirc}\isactrlsub c\ successor{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ successor\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}odd{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
@@ -734,12 +710,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}{\isasymt}\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ metis\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ id{\isacharunderscore}{\kern0pt}right{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}\ terminal{\isacharunderscore}{\kern0pt}func{\isacharunderscore}{\kern0pt}comp{\isacharunderscore}{\kern0pt}elem{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -772,12 +746,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ id\ {\isasymOmega}\ {\isasymcirc}\isactrlsub c\ is{\isacharunderscore}{\kern0pt}even\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}even{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ id{\isacharunderscore}{\kern0pt}left{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -825,12 +797,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}{\isasymt}\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ metis\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ is{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}nth{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}true\ is{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}type\ is{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}zero\ nth{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}def{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -863,14 +833,11 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ id\ {\isasymOmega}\ {\isasymcirc}\isactrlsub c\ is{\isacharunderscore}{\kern0pt}odd\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}odd{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ id{\isacharunderscore}{\kern0pt}left{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \isacommand{qed}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
 \isanewline
+\ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isasymt}\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ successor\ {\isacharequal}{\kern0pt}\ id\isactrlsub c\ {\isasymOmega}\ {\isasymcirc}\isactrlsub c\ {\isasymt}\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isachardoublequoteclose}\isanewline
@@ -996,22 +963,18 @@
 \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ eq{\isacharunderscore}{\kern0pt}pred{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}eq\ nth{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}zero\ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ blast{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}eq{\isacharunderscore}{\kern0pt}pred\ {\isasymnat}\isactrlsub c\ {\isasymcirc}\isactrlsub c\ {\isasymlangle}nth{\isacharunderscore}{\kern0pt}even{\isacharcomma}{\kern0pt}zero\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isasymrangle}{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ zero\ {\isacharequal}{\kern0pt}\ {\isasymt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}eq{\isacharunderscore}{\kern0pt}pred\ {\isasymnat}\isactrlsub c\ {\isasymcirc}\isactrlsub c\ {\isasymlangle}nth{\isacharunderscore}{\kern0pt}even{\isacharcomma}{\kern0pt}zero\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isasymrangle}{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ zero\ {\isacharequal}{\kern0pt}\ {\isasymt}{\isachardoublequoteclose}\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \ \isacommand{then}\isamarkupfalse%
+\ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
@@ -1119,12 +1082,10 @@
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ blast{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \ \isacommand{then}\isamarkupfalse%
+\ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
@@ -1264,12 +1225,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ left{\isacharunderscore}{\kern0pt}coproj\ {\isasymnat}\isactrlsub c\ {\isasymnat}\isactrlsub c\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ halve{\isacharunderscore}{\kern0pt}with{\isacharunderscore}{\kern0pt}parity{\isacharunderscore}{\kern0pt}zero{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -1322,12 +1281,10 @@
 \ \ \ \ \ \ \ \ {\isasymcirc}\isactrlsub c\ halve{\isacharunderscore}{\kern0pt}with{\isacharunderscore}{\kern0pt}parity\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}even{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ smt\ cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharunderscore}{\kern0pt}comp\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ left{\isacharunderscore}{\kern0pt}coproj{\isacharunderscore}{\kern0pt}cfunc{\isacharunderscore}{\kern0pt}coprod\ right{\isacharunderscore}{\kern0pt}coproj{\isacharunderscore}{\kern0pt}cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -1400,12 +1357,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ right{\isacharunderscore}{\kern0pt}coproj\ {\isasymnat}\isactrlsub c\ {\isasymnat}\isactrlsub c\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ left{\isacharunderscore}{\kern0pt}coproj{\isacharunderscore}{\kern0pt}cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -1457,12 +1412,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}left{\isacharunderscore}{\kern0pt}coproj\ {\isasymnat}\isactrlsub c\ {\isasymnat}\isactrlsub c\ {\isasymcirc}\isactrlsub c\ successor{\isacharparenright}{\kern0pt}\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}right{\isacharunderscore}{\kern0pt}coproj\ {\isasymnat}\isactrlsub c\ {\isasymnat}\isactrlsub c\ {\isasymcirc}\isactrlsub c\ successor{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ halve{\isacharunderscore}{\kern0pt}with{\isacharunderscore}{\kern0pt}parity\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}odd{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ smt\ cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharunderscore}{\kern0pt}comp\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ left{\isacharunderscore}{\kern0pt}coproj{\isacharunderscore}{\kern0pt}cfunc{\isacharunderscore}{\kern0pt}coprod\ right{\isacharunderscore}{\kern0pt}coproj{\isacharunderscore}{\kern0pt}cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -1521,12 +1474,10 @@
 \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ id{\isacharunderscore}{\kern0pt}left{\isacharunderscore}{\kern0pt}unit{\isadigit{2}}\ nth{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}def{\isadigit{2}}\ zero{\isacharunderscore}{\kern0pt}type\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -1574,14 +1525,11 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ successor\ {\isasymcirc}\isactrlsub c\ nth{\isacharunderscore}{\kern0pt}even\ {\isasymamalg}\ nth{\isacharunderscore}{\kern0pt}odd\ {\isasymcirc}\isactrlsub c\ halve{\isacharunderscore}{\kern0pt}with{\isacharunderscore}{\kern0pt}parity{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharunderscore}{\kern0pt}comp\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \isacommand{qed}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
 \isanewline
+\ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}id\isactrlsub c\ {\isasymnat}\isactrlsub c\ {\isasymcirc}\isactrlsub c\ successor\ {\isacharequal}{\kern0pt}\ successor\ {\isasymcirc}\isactrlsub c\ id\isactrlsub c\ {\isasymnat}\isactrlsub c{\isachardoublequoteclose}\isanewline
@@ -1795,12 +1743,11 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}even\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}even{\isacharunderscore}{\kern0pt}zero{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ simp\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -1843,12 +1790,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ NOT\ {\isasymcirc}\isactrlsub c\ {\isacharparenleft}{\kern0pt}{\isasymt}\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}{\isasymf}\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ halve{\isacharunderscore}{\kern0pt}with{\isacharunderscore}{\kern0pt}parity{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ smt\ cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharunderscore}{\kern0pt}comp\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ terminal{\isacharunderscore}{\kern0pt}func{\isacharunderscore}{\kern0pt}unique{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isacommand{qed}\isamarkupfalse%
@@ -1897,12 +1842,11 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}odd\ {\isasymcirc}\isactrlsub c\ zero{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}odd{\isacharunderscore}{\kern0pt}def{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ simp\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isanewline
@@ -1945,12 +1889,10 @@
 \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ NOT\ {\isasymcirc}\isactrlsub c\ {\isacharparenleft}{\kern0pt}{\isasymf}\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymamalg}\ {\isacharparenleft}{\kern0pt}{\isasymt}\ {\isasymcirc}\isactrlsub c\ {\isasymbeta}\isactrlbsub {\isasymnat}\isactrlsub c\isactrlesub {\isacharparenright}{\kern0pt}\ {\isasymcirc}\isactrlsub c\ halve{\isacharunderscore}{\kern0pt}with{\isacharunderscore}{\kern0pt}parity{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ smt\ cfunc{\isacharunderscore}{\kern0pt}coprod{\isacharunderscore}{\kern0pt}comp\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}\ terminal{\isacharunderscore}{\kern0pt}func{\isacharunderscore}{\kern0pt}unique{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isacommand{qed}\isamarkupfalse%
@@ -2307,16 +2249,16 @@
 %:%300=70%:%
 %:%301=70%:%
 %:%302=70%:%
-%:%303=71%:%
+%:%303=70%:%
 %:%304=71%:%
 %:%305=71%:%
 %:%306=72%:%
-%:%307=72%:%
+%:%307=73%:%
 %:%308=73%:%
 %:%309=74%:%
 %:%310=74%:%
 %:%311=75%:%
-%:%312=75%:%
+%:%312=76%:%
 %:%313=76%:%
 %:%314=77%:%
 %:%315=77%:%
@@ -2326,30 +2268,30 @@
 %:%319=79%:%
 %:%320=80%:%
 %:%321=80%:%
-%:%322=81%:%
+%:%322=80%:%
 %:%323=81%:%
 %:%324=81%:%
 %:%325=82%:%
 %:%326=82%:%
-%:%327=83%:%
+%:%327=82%:%
 %:%328=83%:%
 %:%329=83%:%
 %:%330=84%:%
 %:%331=84%:%
-%:%332=85%:%
-%:%333=85%:%
+%:%332=84%:%
+%:%333=84%:%
 %:%334=85%:%
-%:%335=86%:%
+%:%335=85%:%
 %:%336=86%:%
-%:%337=86%:%
-%:%338=87%:%
-%:%339=87%:%
-%:%340=88%:%
+%:%342=86%:%
+%:%345=87%:%
 %:%346=88%:%
-%:%349=89%:%
-%:%350=90%:%
-%:%351=90%:%
-%:%352=91%:%
+%:%347=88%:%
+%:%348=89%:%
+%:%355=90%:%
+%:%356=90%:%
+%:%357=91%:%
+%:%358=91%:%
 %:%359=92%:%
 %:%360=92%:%
 %:%361=93%:%
@@ -2358,252 +2300,252 @@
 %:%364=94%:%
 %:%365=95%:%
 %:%366=95%:%
-%:%367=96%:%
+%:%367=95%:%
 %:%368=96%:%
 %:%369=96%:%
-%:%370=97%:%
+%:%370=96%:%
 %:%371=97%:%
-%:%372=97%:%
-%:%373=98%:%
-%:%374=98%:%
-%:%375=98%:%
-%:%376=99%:%
-%:%377=99%:%
-%:%378=99%:%
-%:%379=100%:%
-%:%380=100%:%
-%:%381=100%:%
-%:%382=101%:%
-%:%383=101%:%
-%:%384=102%:%
-%:%385=103%:%
-%:%386=103%:%
-%:%387=104%:%
-%:%388=104%:%
-%:%389=105%:%
-%:%390=105%:%
-%:%391=105%:%
-%:%392=106%:%
-%:%393=106%:%
-%:%394=106%:%
-%:%395=107%:%
-%:%410=109%:%
-%:%420=111%:%
-%:%421=111%:%
-%:%422=112%:%
-%:%423=113%:%
-%:%424=114%:%
-%:%425=114%:%
-%:%426=115%:%
-%:%429=116%:%
-%:%433=116%:%
-%:%434=116%:%
-%:%435=116%:%
-%:%440=116%:%
-%:%443=117%:%
-%:%444=118%:%
-%:%445=118%:%
-%:%446=119%:%
-%:%449=120%:%
-%:%453=120%:%
-%:%454=120%:%
-%:%459=120%:%
-%:%462=121%:%
-%:%463=122%:%
-%:%464=122%:%
-%:%465=123%:%
-%:%468=124%:%
-%:%472=124%:%
-%:%473=124%:%
-%:%478=124%:%
-%:%481=125%:%
-%:%482=126%:%
-%:%483=126%:%
-%:%484=127%:%
-%:%487=128%:%
-%:%491=128%:%
-%:%492=128%:%
-%:%506=130%:%
-%:%516=132%:%
-%:%517=132%:%
-%:%518=133%:%
-%:%519=134%:%
-%:%520=135%:%
-%:%521=135%:%
-%:%522=136%:%
-%:%525=137%:%
-%:%529=137%:%
-%:%530=137%:%
-%:%531=137%:%
-%:%536=137%:%
-%:%539=138%:%
-%:%540=139%:%
-%:%541=139%:%
-%:%542=140%:%
-%:%545=141%:%
-%:%549=141%:%
-%:%550=141%:%
-%:%555=141%:%
-%:%558=142%:%
-%:%559=143%:%
-%:%560=143%:%
-%:%561=144%:%
-%:%564=145%:%
-%:%568=145%:%
-%:%569=145%:%
-%:%574=145%:%
-%:%577=146%:%
-%:%578=147%:%
-%:%579=147%:%
-%:%580=148%:%
-%:%583=149%:%
-%:%587=149%:%
-%:%588=149%:%
+%:%386=99%:%
+%:%396=101%:%
+%:%397=101%:%
+%:%398=102%:%
+%:%399=103%:%
+%:%400=104%:%
+%:%401=104%:%
+%:%402=105%:%
+%:%405=106%:%
+%:%409=106%:%
+%:%410=106%:%
+%:%411=106%:%
+%:%416=106%:%
+%:%419=107%:%
+%:%420=108%:%
+%:%421=108%:%
+%:%422=109%:%
+%:%425=110%:%
+%:%429=110%:%
+%:%430=110%:%
+%:%435=110%:%
+%:%438=111%:%
+%:%439=112%:%
+%:%440=112%:%
+%:%441=113%:%
+%:%444=114%:%
+%:%448=114%:%
+%:%449=114%:%
+%:%454=114%:%
+%:%457=115%:%
+%:%458=116%:%
+%:%459=116%:%
+%:%460=117%:%
+%:%463=118%:%
+%:%467=118%:%
+%:%468=118%:%
+%:%482=120%:%
+%:%492=122%:%
+%:%493=122%:%
+%:%494=123%:%
+%:%495=124%:%
+%:%496=125%:%
+%:%497=125%:%
+%:%498=126%:%
+%:%501=127%:%
+%:%505=127%:%
+%:%506=127%:%
+%:%507=127%:%
+%:%512=127%:%
+%:%515=128%:%
+%:%516=129%:%
+%:%517=129%:%
+%:%518=130%:%
+%:%521=131%:%
+%:%525=131%:%
+%:%526=131%:%
+%:%531=131%:%
+%:%534=132%:%
+%:%535=133%:%
+%:%536=133%:%
+%:%537=134%:%
+%:%540=135%:%
+%:%544=135%:%
+%:%545=135%:%
+%:%550=135%:%
+%:%553=136%:%
+%:%554=137%:%
+%:%555=137%:%
+%:%556=138%:%
+%:%559=139%:%
+%:%563=139%:%
+%:%564=139%:%
+%:%569=139%:%
+%:%572=140%:%
+%:%573=141%:%
+%:%574=141%:%
+%:%575=142%:%
+%:%582=143%:%
+%:%583=143%:%
+%:%584=144%:%
+%:%585=144%:%
+%:%586=145%:%
+%:%587=145%:%
+%:%588=146%:%
+%:%589=147%:%
+%:%590=147%:%
+%:%591=148%:%
+%:%592=148%:%
 %:%593=149%:%
-%:%596=150%:%
+%:%594=150%:%
+%:%595=150%:%
+%:%596=151%:%
 %:%597=151%:%
-%:%598=151%:%
-%:%599=152%:%
-%:%606=153%:%
+%:%598=152%:%
+%:%604=152%:%
 %:%607=153%:%
 %:%608=154%:%
 %:%609=154%:%
 %:%610=155%:%
-%:%611=155%:%
-%:%612=156%:%
-%:%613=157%:%
-%:%614=157%:%
-%:%615=158%:%
-%:%616=158%:%
-%:%617=159%:%
-%:%618=160%:%
-%:%619=160%:%
-%:%620=161%:%
-%:%621=161%:%
-%:%622=162%:%
+%:%617=156%:%
+%:%618=156%:%
+%:%619=157%:%
+%:%620=157%:%
+%:%621=158%:%
+%:%622=158%:%
+%:%623=159%:%
+%:%624=160%:%
+%:%625=160%:%
+%:%626=161%:%
+%:%627=161%:%
 %:%628=162%:%
-%:%631=163%:%
+%:%629=163%:%
+%:%630=163%:%
+%:%631=164%:%
 %:%632=164%:%
-%:%633=164%:%
-%:%634=165%:%
-%:%641=166%:%
+%:%633=165%:%
+%:%639=165%:%
 %:%642=166%:%
 %:%643=167%:%
 %:%644=167%:%
 %:%645=168%:%
-%:%646=168%:%
-%:%647=169%:%
-%:%648=170%:%
+%:%646=169%:%
 %:%649=170%:%
-%:%650=171%:%
-%:%651=171%:%
-%:%652=172%:%
-%:%653=173%:%
-%:%654=173%:%
-%:%655=174%:%
-%:%656=174%:%
-%:%657=175%:%
-%:%663=175%:%
-%:%666=176%:%
-%:%667=177%:%
-%:%668=177%:%
-%:%669=178%:%
-%:%670=179%:%
-%:%673=180%:%
-%:%677=180%:%
-%:%678=180%:%
-%:%679=180%:%
-%:%684=180%:%
-%:%687=181%:%
-%:%688=182%:%
-%:%689=182%:%
-%:%690=183%:%
-%:%691=184%:%
-%:%694=185%:%
-%:%698=185%:%
-%:%699=185%:%
-%:%704=185%:%
-%:%707=186%:%
-%:%708=187%:%
-%:%709=187%:%
-%:%710=188%:%
+%:%653=170%:%
+%:%654=170%:%
+%:%655=170%:%
+%:%660=170%:%
+%:%663=171%:%
+%:%664=172%:%
+%:%665=172%:%
+%:%666=173%:%
+%:%667=174%:%
+%:%670=175%:%
+%:%674=175%:%
+%:%675=175%:%
+%:%680=175%:%
+%:%683=176%:%
+%:%684=177%:%
+%:%685=177%:%
+%:%686=178%:%
+%:%693=179%:%
+%:%694=179%:%
+%:%695=180%:%
+%:%696=180%:%
+%:%697=181%:%
+%:%698=181%:%
+%:%699=182%:%
+%:%700=182%:%
+%:%701=183%:%
+%:%702=183%:%
+%:%703=184%:%
+%:%704=184%:%
+%:%705=184%:%
+%:%706=185%:%
+%:%707=185%:%
+%:%708=186%:%
+%:%709=186%:%
+%:%710=186%:%
+%:%711=187%:%
+%:%712=187%:%
+%:%713=188%:%
+%:%714=188%:%
+%:%715=188%:%
+%:%716=188%:%
 %:%717=189%:%
 %:%718=189%:%
 %:%719=190%:%
-%:%720=190%:%
+%:%720=191%:%
 %:%721=191%:%
-%:%722=191%:%
+%:%722=192%:%
 %:%723=192%:%
-%:%724=192%:%
+%:%724=193%:%
 %:%725=193%:%
-%:%726=193%:%
+%:%726=194%:%
 %:%727=194%:%
-%:%728=194%:%
-%:%729=194%:%
+%:%728=195%:%
+%:%729=195%:%
 %:%730=195%:%
-%:%731=195%:%
+%:%731=196%:%
 %:%732=196%:%
-%:%733=196%:%
-%:%734=196%:%
+%:%733=197%:%
+%:%734=197%:%
 %:%735=197%:%
-%:%736=197%:%
+%:%736=198%:%
 %:%737=198%:%
-%:%738=198%:%
-%:%739=198%:%
+%:%738=199%:%
+%:%739=199%:%
 %:%740=199%:%
-%:%741=199%:%
-%:%742=199%:%
+%:%741=200%:%
+%:%742=200%:%
 %:%743=200%:%
-%:%744=200%:%
+%:%744=201%:%
 %:%745=201%:%
-%:%746=202%:%
+%:%746=201%:%
 %:%747=202%:%
-%:%748=203%:%
+%:%748=202%:%
 %:%749=203%:%
-%:%750=204%:%
-%:%751=204%:%
-%:%752=205%:%
-%:%753=205%:%
-%:%754=206%:%
-%:%755=206%:%
+%:%750=203%:%
+%:%751=203%:%
+%:%752=203%:%
+%:%753=204%:%
+%:%754=204%:%
+%:%755=205%:%
 %:%756=206%:%
-%:%757=207%:%
+%:%757=206%:%
 %:%758=207%:%
-%:%759=208%:%
+%:%759=207%:%
 %:%760=208%:%
-%:%761=208%:%
-%:%762=209%:%
-%:%763=209%:%
-%:%764=210%:%
-%:%765=210%:%
-%:%766=210%:%
-%:%767=211%:%
-%:%768=211%:%
-%:%769=211%:%
-%:%770=212%:%
-%:%771=212%:%
-%:%772=212%:%
-%:%773=213%:%
-%:%774=213%:%
-%:%775=214%:%
-%:%776=214%:%
-%:%777=214%:%
-%:%778=215%:%
-%:%779=215%:%
-%:%780=215%:%
-%:%781=216%:%
-%:%782=216%:%
-%:%783=217%:%
-%:%784=218%:%
-%:%785=218%:%
-%:%786=219%:%
-%:%787=219%:%
-%:%788=220%:%
-%:%794=220%:%
-%:%797=221%:%
-%:%798=222%:%
-%:%799=222%:%
-%:%800=223%:%
+%:%766=208%:%
+%:%769=209%:%
+%:%770=210%:%
+%:%771=210%:%
+%:%772=211%:%
+%:%779=212%:%
+%:%780=212%:%
+%:%781=213%:%
+%:%782=213%:%
+%:%783=214%:%
+%:%784=214%:%
+%:%785=215%:%
+%:%786=215%:%
+%:%787=216%:%
+%:%788=216%:%
+%:%789=217%:%
+%:%790=217%:%
+%:%791=217%:%
+%:%792=218%:%
+%:%793=218%:%
+%:%794=218%:%
+%:%795=219%:%
+%:%796=219%:%
+%:%797=219%:%
+%:%798=220%:%
+%:%799=220%:%
+%:%800=221%:%
+%:%801=221%:%
+%:%802=221%:%
+%:%803=221%:%
+%:%804=222%:%
+%:%805=222%:%
+%:%806=223%:%
 %:%807=224%:%
 %:%808=224%:%
 %:%809=225%:%
@@ -2614,7 +2556,7 @@
 %:%814=227%:%
 %:%815=228%:%
 %:%816=228%:%
-%:%817=229%:%
+%:%817=228%:%
 %:%818=229%:%
 %:%819=229%:%
 %:%820=230%:%
@@ -2622,7 +2564,7 @@
 %:%822=230%:%
 %:%823=231%:%
 %:%824=231%:%
-%:%825=231%:%
+%:%825=232%:%
 %:%826=232%:%
 %:%827=232%:%
 %:%828=233%:%
@@ -2634,86 +2576,86 @@
 %:%834=235%:%
 %:%835=235%:%
 %:%836=236%:%
-%:%837=237%:%
-%:%838=237%:%
-%:%839=238%:%
-%:%840=238%:%
-%:%841=239%:%
-%:%842=239%:%
-%:%843=240%:%
-%:%844=240%:%
-%:%845=241%:%
-%:%846=241%:%
-%:%847=241%:%
-%:%848=242%:%
-%:%849=242%:%
-%:%850=243%:%
-%:%851=243%:%
-%:%852=243%:%
-%:%853=244%:%
-%:%854=244%:%
-%:%855=245%:%
-%:%856=245%:%
-%:%857=245%:%
-%:%858=246%:%
-%:%859=246%:%
-%:%860=246%:%
-%:%861=247%:%
-%:%862=247%:%
-%:%863=247%:%
-%:%864=248%:%
-%:%865=248%:%
-%:%866=249%:%
-%:%867=249%:%
-%:%868=249%:%
-%:%869=250%:%
-%:%870=250%:%
-%:%871=250%:%
-%:%872=251%:%
-%:%873=251%:%
-%:%874=252%:%
-%:%875=253%:%
-%:%876=253%:%
-%:%877=254%:%
-%:%878=254%:%
-%:%879=255%:%
-%:%885=255%:%
-%:%888=256%:%
-%:%889=257%:%
-%:%890=257%:%
-%:%891=258%:%
-%:%894=259%:%
-%:%898=259%:%
-%:%899=259%:%
-%:%900=260%:%
-%:%905=260%:%
-%:%908=261%:%
-%:%909=262%:%
-%:%910=262%:%
-%:%911=263%:%
-%:%914=264%:%
-%:%918=264%:%
-%:%919=264%:%
-%:%920=265%:%
-%:%925=265%:%
-%:%928=266%:%
-%:%929=267%:%
-%:%930=267%:%
-%:%931=268%:%
-%:%938=269%:%
-%:%939=269%:%
-%:%940=270%:%
-%:%941=270%:%
-%:%942=271%:%
-%:%943=272%:%
-%:%944=272%:%
-%:%945=273%:%
-%:%946=273%:%
-%:%947=273%:%
-%:%948=274%:%
-%:%949=274%:%
-%:%950=275%:%
-%:%951=275%:%
+%:%837=236%:%
+%:%838=236%:%
+%:%839=236%:%
+%:%840=237%:%
+%:%841=237%:%
+%:%842=238%:%
+%:%843=238%:%
+%:%844=239%:%
+%:%845=239%:%
+%:%846=240%:%
+%:%852=240%:%
+%:%855=241%:%
+%:%856=242%:%
+%:%857=242%:%
+%:%858=243%:%
+%:%861=244%:%
+%:%865=244%:%
+%:%866=244%:%
+%:%867=245%:%
+%:%872=245%:%
+%:%875=246%:%
+%:%876=247%:%
+%:%877=247%:%
+%:%878=248%:%
+%:%881=249%:%
+%:%885=249%:%
+%:%886=249%:%
+%:%887=250%:%
+%:%892=250%:%
+%:%895=251%:%
+%:%896=252%:%
+%:%897=252%:%
+%:%898=253%:%
+%:%905=254%:%
+%:%906=254%:%
+%:%907=255%:%
+%:%908=255%:%
+%:%909=256%:%
+%:%910=257%:%
+%:%911=257%:%
+%:%912=258%:%
+%:%913=258%:%
+%:%914=258%:%
+%:%915=259%:%
+%:%916=259%:%
+%:%917=260%:%
+%:%918=260%:%
+%:%919=260%:%
+%:%920=261%:%
+%:%921=261%:%
+%:%922=262%:%
+%:%923=262%:%
+%:%924=262%:%
+%:%925=263%:%
+%:%926=263%:%
+%:%927=264%:%
+%:%928=264%:%
+%:%929=264%:%
+%:%930=265%:%
+%:%931=265%:%
+%:%932=266%:%
+%:%933=266%:%
+%:%934=266%:%
+%:%935=267%:%
+%:%936=267%:%
+%:%937=268%:%
+%:%938=268%:%
+%:%939=268%:%
+%:%940=269%:%
+%:%941=269%:%
+%:%942=270%:%
+%:%943=270%:%
+%:%944=271%:%
+%:%945=271%:%
+%:%946=272%:%
+%:%947=272%:%
+%:%948=273%:%
+%:%949=273%:%
+%:%950=274%:%
+%:%951=274%:%
 %:%952=275%:%
 %:%953=276%:%
 %:%954=276%:%
@@ -2727,334 +2669,334 @@
 %:%962=279%:%
 %:%963=280%:%
 %:%964=280%:%
-%:%965=281%:%
+%:%965=280%:%
 %:%966=281%:%
 %:%967=281%:%
-%:%968=282%:%
-%:%969=282%:%
-%:%970=283%:%
-%:%971=283%:%
+%:%968=281%:%
+%:%969=281%:%
+%:%970=282%:%
+%:%971=282%:%
 %:%972=283%:%
-%:%973=284%:%
+%:%973=283%:%
 %:%974=284%:%
-%:%975=285%:%
-%:%976=285%:%
-%:%977=286%:%
-%:%978=286%:%
-%:%979=287%:%
-%:%980=287%:%
-%:%981=288%:%
-%:%982=288%:%
-%:%983=289%:%
-%:%984=289%:%
-%:%985=290%:%
-%:%986=291%:%
-%:%987=291%:%
-%:%988=292%:%
-%:%989=292%:%
-%:%990=292%:%
-%:%991=293%:%
-%:%992=293%:%
-%:%993=294%:%
-%:%994=294%:%
-%:%995=294%:%
-%:%996=295%:%
-%:%997=295%:%
-%:%998=295%:%
-%:%999=296%:%
-%:%1000=296%:%
-%:%1001=296%:%
-%:%1002=297%:%
-%:%1003=297%:%
-%:%1004=297%:%
-%:%1005=298%:%
-%:%1006=298%:%
-%:%1007=299%:%
-%:%1008=299%:%
-%:%1009=300%:%
-%:%1010=300%:%
-%:%1011=300%:%
-%:%1012=301%:%
-%:%1013=301%:%
-%:%1014=301%:%
-%:%1015=302%:%
-%:%1021=302%:%
-%:%1024=303%:%
-%:%1025=304%:%
-%:%1026=304%:%
-%:%1027=305%:%
-%:%1034=306%:%
-%:%1035=306%:%
-%:%1036=307%:%
-%:%1037=307%:%
-%:%1038=308%:%
-%:%1039=308%:%
-%:%1040=309%:%
-%:%1041=309%:%
-%:%1042=309%:%
-%:%1043=310%:%
-%:%1044=310%:%
-%:%1045=311%:%
-%:%1046=311%:%
-%:%1047=311%:%
-%:%1048=312%:%
-%:%1049=312%:%
-%:%1050=313%:%
-%:%1051=313%:%
-%:%1052=313%:%
-%:%1053=314%:%
-%:%1054=314%:%
-%:%1055=315%:%
-%:%1056=315%:%
-%:%1057=315%:%
-%:%1058=316%:%
-%:%1059=316%:%
-%:%1060=317%:%
-%:%1061=317%:%
-%:%1062=317%:%
-%:%1063=318%:%
-%:%1064=318%:%
-%:%1065=319%:%
-%:%1066=319%:%
-%:%1067=319%:%
-%:%1068=320%:%
-%:%1069=320%:%
-%:%1070=321%:%
-%:%1071=321%:%
-%:%1072=322%:%
-%:%1073=322%:%
-%:%1074=323%:%
-%:%1075=323%:%
-%:%1076=324%:%
-%:%1077=324%:%
-%:%1078=325%:%
-%:%1079=325%:%
-%:%1080=326%:%
-%:%1081=326%:%
-%:%1082=326%:%
-%:%1083=327%:%
-%:%1084=327%:%
-%:%1085=328%:%
-%:%1086=328%:%
-%:%1087=328%:%
-%:%1088=329%:%
-%:%1089=329%:%
-%:%1090=330%:%
-%:%1091=330%:%
-%:%1092=330%:%
-%:%1093=331%:%
-%:%1094=331%:%
-%:%1095=332%:%
-%:%1096=332%:%
-%:%1097=332%:%
-%:%1098=333%:%
-%:%1099=333%:%
-%:%1100=333%:%
-%:%1101=334%:%
-%:%1102=334%:%
-%:%1103=334%:%
-%:%1104=335%:%
-%:%1105=335%:%
-%:%1106=336%:%
-%:%1107=336%:%
-%:%1108=337%:%
-%:%1109=337%:%
-%:%1110=337%:%
-%:%1111=338%:%
-%:%1112=338%:%
-%:%1113=338%:%
-%:%1114=339%:%
-%:%1115=339%:%
-%:%1116=339%:%
-%:%1117=340%:%
-%:%1118=340%:%
-%:%1119=340%:%
-%:%1120=341%:%
-%:%1121=341%:%
-%:%1122=342%:%
-%:%1123=342%:%
-%:%1124=342%:%
-%:%1125=343%:%
-%:%1126=343%:%
-%:%1127=343%:%
-%:%1128=344%:%
-%:%1143=346%:%
-%:%1153=348%:%
-%:%1154=348%:%
-%:%1155=349%:%
-%:%1157=351%:%
-%:%1158=352%:%
-%:%1159=353%:%
-%:%1160=353%:%
-%:%1161=354%:%
-%:%1163=356%:%
-%:%1166=357%:%
-%:%1170=357%:%
-%:%1171=357%:%
-%:%1172=357%:%
-%:%1177=357%:%
-%:%1180=358%:%
-%:%1181=359%:%
-%:%1182=359%:%
-%:%1183=360%:%
-%:%1186=361%:%
-%:%1190=361%:%
-%:%1191=361%:%
-%:%1196=361%:%
-%:%1199=362%:%
-%:%1200=363%:%
-%:%1201=363%:%
-%:%1202=364%:%
-%:%1205=365%:%
-%:%1209=365%:%
-%:%1210=365%:%
-%:%1215=365%:%
-%:%1218=366%:%
-%:%1219=367%:%
-%:%1220=367%:%
-%:%1221=368%:%
-%:%1224=369%:%
-%:%1228=369%:%
-%:%1229=369%:%
-%:%1234=369%:%
-%:%1237=370%:%
-%:%1238=371%:%
-%:%1239=371%:%
-%:%1240=372%:%
+%:%975=284%:%
+%:%976=284%:%
+%:%977=284%:%
+%:%978=285%:%
+%:%984=285%:%
+%:%987=286%:%
+%:%988=287%:%
+%:%989=287%:%
+%:%990=288%:%
+%:%997=289%:%
+%:%998=289%:%
+%:%999=290%:%
+%:%1000=290%:%
+%:%1001=291%:%
+%:%1002=291%:%
+%:%1003=292%:%
+%:%1004=292%:%
+%:%1005=292%:%
+%:%1006=293%:%
+%:%1007=293%:%
+%:%1008=294%:%
+%:%1009=294%:%
+%:%1010=294%:%
+%:%1011=295%:%
+%:%1012=295%:%
+%:%1013=296%:%
+%:%1014=296%:%
+%:%1015=296%:%
+%:%1016=297%:%
+%:%1017=297%:%
+%:%1018=298%:%
+%:%1019=298%:%
+%:%1020=298%:%
+%:%1021=299%:%
+%:%1022=299%:%
+%:%1023=300%:%
+%:%1024=300%:%
+%:%1025=300%:%
+%:%1026=301%:%
+%:%1027=301%:%
+%:%1028=302%:%
+%:%1029=302%:%
+%:%1030=302%:%
+%:%1031=303%:%
+%:%1032=303%:%
+%:%1033=304%:%
+%:%1034=304%:%
+%:%1035=305%:%
+%:%1036=305%:%
+%:%1037=306%:%
+%:%1038=306%:%
+%:%1039=307%:%
+%:%1040=307%:%
+%:%1041=308%:%
+%:%1042=308%:%
+%:%1043=309%:%
+%:%1044=309%:%
+%:%1045=309%:%
+%:%1046=310%:%
+%:%1047=310%:%
+%:%1048=311%:%
+%:%1049=311%:%
+%:%1050=311%:%
+%:%1051=312%:%
+%:%1052=312%:%
+%:%1053=313%:%
+%:%1054=313%:%
+%:%1055=313%:%
+%:%1056=314%:%
+%:%1057=314%:%
+%:%1058=315%:%
+%:%1059=315%:%
+%:%1060=315%:%
+%:%1061=316%:%
+%:%1062=316%:%
+%:%1063=316%:%
+%:%1064=317%:%
+%:%1065=317%:%
+%:%1066=317%:%
+%:%1067=318%:%
+%:%1068=318%:%
+%:%1069=319%:%
+%:%1070=319%:%
+%:%1071=320%:%
+%:%1072=320%:%
+%:%1073=320%:%
+%:%1074=321%:%
+%:%1075=321%:%
+%:%1076=321%:%
+%:%1077=322%:%
+%:%1078=322%:%
+%:%1079=322%:%
+%:%1080=323%:%
+%:%1081=323%:%
+%:%1082=323%:%
+%:%1083=324%:%
+%:%1084=324%:%
+%:%1085=325%:%
+%:%1086=325%:%
+%:%1087=325%:%
+%:%1088=325%:%
+%:%1089=326%:%
+%:%1104=328%:%
+%:%1114=330%:%
+%:%1115=330%:%
+%:%1116=331%:%
+%:%1118=333%:%
+%:%1119=334%:%
+%:%1120=335%:%
+%:%1121=335%:%
+%:%1122=336%:%
+%:%1124=338%:%
+%:%1127=339%:%
+%:%1131=339%:%
+%:%1132=339%:%
+%:%1133=339%:%
+%:%1138=339%:%
+%:%1141=340%:%
+%:%1142=341%:%
+%:%1143=341%:%
+%:%1144=342%:%
+%:%1147=343%:%
+%:%1151=343%:%
+%:%1152=343%:%
+%:%1157=343%:%
+%:%1160=344%:%
+%:%1161=345%:%
+%:%1162=345%:%
+%:%1163=346%:%
+%:%1166=347%:%
+%:%1170=347%:%
+%:%1171=347%:%
+%:%1176=347%:%
+%:%1179=348%:%
+%:%1180=349%:%
+%:%1181=349%:%
+%:%1182=350%:%
+%:%1185=351%:%
+%:%1189=351%:%
+%:%1190=351%:%
+%:%1195=351%:%
+%:%1198=352%:%
+%:%1199=353%:%
+%:%1200=353%:%
+%:%1201=354%:%
+%:%1208=355%:%
+%:%1209=355%:%
+%:%1210=356%:%
+%:%1211=356%:%
+%:%1212=357%:%
+%:%1213=357%:%
+%:%1214=358%:%
+%:%1215=358%:%
+%:%1216=359%:%
+%:%1217=359%:%
+%:%1218=360%:%
+%:%1219=360%:%
+%:%1220=360%:%
+%:%1221=361%:%
+%:%1222=361%:%
+%:%1223=362%:%
+%:%1224=362%:%
+%:%1225=362%:%
+%:%1226=363%:%
+%:%1227=363%:%
+%:%1228=364%:%
+%:%1229=364%:%
+%:%1230=364%:%
+%:%1231=364%:%
+%:%1232=365%:%
+%:%1233=365%:%
+%:%1234=366%:%
+%:%1235=367%:%
+%:%1236=367%:%
+%:%1237=368%:%
+%:%1238=369%:%
+%:%1239=369%:%
+%:%1240=370%:%
+%:%1241=370%:%
+%:%1242=371%:%
+%:%1243=371%:%
+%:%1244=372%:%
+%:%1245=372%:%
+%:%1246=372%:%
 %:%1247=373%:%
 %:%1248=373%:%
 %:%1249=374%:%
 %:%1250=374%:%
-%:%1251=375%:%
+%:%1251=374%:%
 %:%1252=375%:%
-%:%1253=376%:%
+%:%1253=375%:%
 %:%1254=376%:%
-%:%1255=377%:%
-%:%1256=377%:%
-%:%1257=378%:%
-%:%1258=378%:%
+%:%1255=376%:%
+%:%1256=376%:%
+%:%1257=377%:%
+%:%1258=377%:%
 %:%1259=378%:%
-%:%1260=379%:%
-%:%1261=379%:%
-%:%1262=380%:%
+%:%1260=378%:%
+%:%1261=378%:%
+%:%1262=379%:%
 %:%1263=380%:%
 %:%1264=380%:%
 %:%1265=381%:%
 %:%1266=381%:%
-%:%1267=382%:%
+%:%1267=381%:%
 %:%1268=382%:%
-%:%1269=382%:%
+%:%1269=383%:%
 %:%1270=383%:%
-%:%1271=383%:%
-%:%1272=383%:%
+%:%1271=384%:%
+%:%1272=384%:%
 %:%1273=384%:%
-%:%1274=384%:%
-%:%1275=385%:%
-%:%1276=386%:%
-%:%1277=386%:%
-%:%1278=387%:%
+%:%1275=386%:%
+%:%1276=387%:%
+%:%1277=387%:%
+%:%1278=388%:%
 %:%1279=388%:%
 %:%1280=388%:%
 %:%1281=389%:%
-%:%1282=389%:%
+%:%1282=390%:%
 %:%1283=390%:%
-%:%1284=390%:%
+%:%1284=391%:%
 %:%1285=391%:%
 %:%1286=391%:%
 %:%1287=391%:%
 %:%1288=392%:%
 %:%1289=392%:%
 %:%1290=393%:%
-%:%1291=393%:%
-%:%1292=393%:%
-%:%1293=394%:%
-%:%1294=394%:%
-%:%1295=395%:%
-%:%1296=395%:%
-%:%1297=395%:%
-%:%1298=396%:%
-%:%1299=396%:%
-%:%1300=397%:%
-%:%1301=397%:%
+%:%1291=394%:%
+%:%1292=394%:%
+%:%1293=395%:%
+%:%1294=396%:%
+%:%1295=396%:%
+%:%1296=397%:%
 %:%1302=397%:%
-%:%1303=398%:%
-%:%1304=399%:%
-%:%1305=399%:%
-%:%1306=400%:%
-%:%1307=400%:%
+%:%1305=398%:%
+%:%1306=399%:%
+%:%1307=399%:%
 %:%1308=400%:%
-%:%1309=401%:%
-%:%1310=402%:%
-%:%1311=402%:%
-%:%1312=403%:%
-%:%1313=403%:%
-%:%1314=403%:%
-%:%1316=405%:%
-%:%1317=406%:%
-%:%1318=406%:%
-%:%1319=407%:%
-%:%1320=407%:%
-%:%1321=407%:%
-%:%1322=408%:%
-%:%1323=409%:%
-%:%1324=409%:%
-%:%1325=410%:%
-%:%1326=410%:%
-%:%1327=410%:%
-%:%1328=411%:%
-%:%1329=411%:%
-%:%1330=411%:%
-%:%1331=412%:%
-%:%1332=412%:%
-%:%1333=413%:%
-%:%1334=414%:%
-%:%1335=414%:%
-%:%1336=415%:%
-%:%1337=416%:%
-%:%1338=416%:%
-%:%1339=417%:%
-%:%1345=417%:%
-%:%1348=418%:%
-%:%1349=419%:%
-%:%1350=419%:%
-%:%1351=420%:%
-%:%1358=421%:%
-%:%1359=421%:%
-%:%1360=422%:%
-%:%1361=422%:%
-%:%1362=423%:%
-%:%1363=423%:%
-%:%1364=424%:%
-%:%1365=424%:%
-%:%1366=425%:%
-%:%1367=425%:%
-%:%1368=426%:%
-%:%1369=426%:%
-%:%1370=426%:%
-%:%1371=427%:%
-%:%1372=427%:%
-%:%1373=428%:%
-%:%1374=428%:%
-%:%1375=428%:%
-%:%1376=429%:%
-%:%1377=429%:%
-%:%1378=430%:%
-%:%1379=430%:%
-%:%1380=430%:%
-%:%1381=431%:%
-%:%1382=431%:%
-%:%1383=432%:%
-%:%1384=432%:%
-%:%1385=432%:%
-%:%1386=433%:%
-%:%1387=433%:%
-%:%1388=434%:%
-%:%1389=434%:%
+%:%1315=401%:%
+%:%1316=401%:%
+%:%1317=402%:%
+%:%1318=402%:%
+%:%1319=403%:%
+%:%1320=403%:%
+%:%1321=404%:%
+%:%1322=404%:%
+%:%1323=405%:%
+%:%1324=405%:%
+%:%1325=406%:%
+%:%1326=406%:%
+%:%1327=406%:%
+%:%1328=407%:%
+%:%1329=407%:%
+%:%1330=408%:%
+%:%1331=408%:%
+%:%1332=408%:%
+%:%1333=409%:%
+%:%1334=409%:%
+%:%1335=410%:%
+%:%1336=410%:%
+%:%1337=410%:%
+%:%1338=411%:%
+%:%1339=411%:%
+%:%1340=412%:%
+%:%1341=412%:%
+%:%1342=412%:%
+%:%1343=413%:%
+%:%1344=413%:%
+%:%1345=414%:%
+%:%1346=414%:%
+%:%1347=414%:%
+%:%1348=415%:%
+%:%1349=415%:%
+%:%1350=416%:%
+%:%1351=416%:%
+%:%1352=416%:%
+%:%1353=417%:%
+%:%1354=417%:%
+%:%1355=418%:%
+%:%1356=418%:%
+%:%1357=418%:%
+%:%1358=419%:%
+%:%1359=419%:%
+%:%1360=420%:%
+%:%1361=420%:%
+%:%1362=420%:%
+%:%1363=420%:%
+%:%1364=421%:%
+%:%1365=421%:%
+%:%1366=422%:%
+%:%1367=423%:%
+%:%1368=423%:%
+%:%1369=424%:%
+%:%1370=425%:%
+%:%1371=425%:%
+%:%1372=426%:%
+%:%1373=426%:%
+%:%1374=427%:%
+%:%1375=427%:%
+%:%1376=428%:%
+%:%1377=428%:%
+%:%1378=428%:%
+%:%1379=429%:%
+%:%1380=429%:%
+%:%1381=430%:%
+%:%1382=430%:%
+%:%1383=430%:%
+%:%1384=431%:%
+%:%1385=431%:%
+%:%1386=432%:%
+%:%1387=432%:%
+%:%1388=432%:%
+%:%1389=433%:%
 %:%1390=434%:%
-%:%1391=435%:%
+%:%1391=434%:%
 %:%1392=435%:%
-%:%1393=436%:%
-%:%1394=436%:%
+%:%1393=435%:%
+%:%1394=435%:%
 %:%1395=436%:%
 %:%1396=437%:%
 %:%1397=437%:%
@@ -3062,614 +3004,556 @@
 %:%1399=438%:%
 %:%1400=438%:%
 %:%1401=439%:%
-%:%1402=439%:%
+%:%1402=440%:%
 %:%1403=440%:%
-%:%1404=440%:%
-%:%1405=440%:%
+%:%1404=441%:%
+%:%1405=441%:%
 %:%1406=441%:%
-%:%1407=441%:%
-%:%1408=441%:%
-%:%1409=442%:%
-%:%1410=442%:%
-%:%1411=443%:%
+%:%1407=442%:%
+%:%1408=443%:%
+%:%1409=443%:%
+%:%1410=444%:%
+%:%1411=444%:%
 %:%1412=444%:%
-%:%1413=444%:%
+%:%1413=445%:%
 %:%1414=445%:%
 %:%1415=446%:%
 %:%1416=446%:%
-%:%1417=447%:%
-%:%1418=447%:%
-%:%1419=448%:%
-%:%1420=448%:%
-%:%1421=449%:%
+%:%1417=446%:%
+%:%1418=446%:%
+%:%1419=447%:%
+%:%1420=447%:%
+%:%1421=448%:%
 %:%1422=449%:%
 %:%1423=449%:%
 %:%1424=450%:%
-%:%1425=450%:%
+%:%1425=451%:%
 %:%1426=451%:%
-%:%1427=451%:%
-%:%1428=451%:%
-%:%1429=452%:%
-%:%1430=452%:%
-%:%1431=453%:%
-%:%1432=453%:%
-%:%1433=453%:%
-%:%1434=454%:%
-%:%1435=455%:%
-%:%1436=455%:%
-%:%1437=456%:%
-%:%1438=456%:%
-%:%1439=456%:%
-%:%1440=457%:%
-%:%1441=458%:%
-%:%1442=458%:%
-%:%1443=459%:%
-%:%1444=459%:%
-%:%1445=459%:%
-%:%1446=460%:%
-%:%1447=461%:%
-%:%1448=461%:%
-%:%1449=462%:%
-%:%1450=462%:%
-%:%1451=462%:%
-%:%1452=463%:%
-%:%1453=464%:%
-%:%1454=464%:%
-%:%1455=465%:%
-%:%1456=465%:%
-%:%1457=465%:%
-%:%1458=466%:%
-%:%1459=466%:%
-%:%1460=467%:%
-%:%1461=467%:%
-%:%1462=467%:%
-%:%1463=468%:%
-%:%1464=468%:%
-%:%1465=468%:%
-%:%1466=469%:%
-%:%1467=469%:%
-%:%1468=470%:%
-%:%1469=471%:%
-%:%1470=471%:%
-%:%1471=472%:%
-%:%1472=473%:%
-%:%1473=473%:%
-%:%1474=474%:%
-%:%1480=474%:%
-%:%1483=475%:%
-%:%1484=476%:%
-%:%1485=476%:%
-%:%1486=477%:%
-%:%1493=478%:%
-%:%1494=478%:%
-%:%1495=479%:%
-%:%1496=479%:%
-%:%1497=480%:%
-%:%1498=480%:%
-%:%1499=481%:%
-%:%1500=481%:%
-%:%1501=482%:%
-%:%1502=482%:%
-%:%1503=483%:%
-%:%1504=483%:%
-%:%1505=483%:%
-%:%1506=484%:%
-%:%1507=484%:%
-%:%1508=485%:%
-%:%1509=485%:%
-%:%1510=485%:%
-%:%1511=486%:%
-%:%1512=486%:%
-%:%1513=487%:%
-%:%1514=487%:%
-%:%1515=487%:%
-%:%1516=488%:%
-%:%1517=488%:%
-%:%1518=489%:%
-%:%1519=489%:%
-%:%1520=489%:%
-%:%1521=490%:%
-%:%1522=490%:%
-%:%1523=490%:%
-%:%1524=491%:%
-%:%1525=491%:%
-%:%1526=491%:%
-%:%1527=492%:%
-%:%1528=492%:%
-%:%1529=492%:%
-%:%1530=493%:%
-%:%1531=493%:%
-%:%1532=494%:%
-%:%1533=495%:%
-%:%1534=495%:%
-%:%1535=496%:%
-%:%1536=497%:%
-%:%1537=497%:%
-%:%1538=498%:%
-%:%1539=498%:%
-%:%1540=499%:%
-%:%1541=499%:%
-%:%1542=500%:%
-%:%1543=500%:%
-%:%1544=500%:%
-%:%1545=501%:%
-%:%1546=501%:%
-%:%1547=502%:%
-%:%1548=502%:%
-%:%1549=502%:%
-%:%1550=503%:%
-%:%1551=503%:%
-%:%1552=504%:%
-%:%1553=504%:%
-%:%1554=504%:%
-%:%1555=505%:%
-%:%1556=505%:%
-%:%1557=506%:%
-%:%1558=506%:%
-%:%1559=506%:%
-%:%1560=507%:%
-%:%1561=507%:%
-%:%1562=508%:%
-%:%1563=508%:%
-%:%1564=508%:%
-%:%1565=509%:%
-%:%1566=509%:%
-%:%1567=510%:%
-%:%1568=510%:%
-%:%1569=510%:%
-%:%1570=511%:%
-%:%1571=511%:%
-%:%1572=512%:%
-%:%1573=512%:%
-%:%1574=512%:%
-%:%1575=513%:%
-%:%1576=513%:%
-%:%1577=514%:%
-%:%1578=514%:%
-%:%1579=514%:%
-%:%1580=515%:%
-%:%1581=515%:%
-%:%1582=515%:%
-%:%1583=516%:%
-%:%1584=516%:%
-%:%1585=517%:%
-%:%1586=518%:%
-%:%1587=518%:%
-%:%1588=519%:%
-%:%1589=519%:%
-%:%1590=519%:%
-%:%1591=520%:%
-%:%1597=520%:%
-%:%1600=521%:%
-%:%1601=522%:%
-%:%1602=522%:%
-%:%1603=523%:%
-%:%1606=524%:%
-%:%1610=524%:%
-%:%1611=524%:%
-%:%1616=524%:%
-%:%1619=525%:%
-%:%1620=526%:%
-%:%1621=526%:%
-%:%1622=527%:%
-%:%1625=528%:%
-%:%1629=528%:%
-%:%1630=528%:%
-%:%1631=529%:%
-%:%1632=529%:%
-%:%1633=530%:%
-%:%1634=530%:%
-%:%1635=531%:%
-%:%1636=531%:%
-%:%1637=532%:%
-%:%1638=532%:%
-%:%1639=533%:%
-%:%1640=533%:%
-%:%1641=534%:%
-%:%1642=534%:%
-%:%1643=535%:%
-%:%1644=535%:%
-%:%1645=536%:%
-%:%1646=536%:%
-%:%1647=537%:%
-%:%1648=537%:%
-%:%1649=538%:%
-%:%1655=538%:%
-%:%1658=539%:%
-%:%1659=540%:%
-%:%1660=540%:%
-%:%1661=541%:%
-%:%1664=542%:%
-%:%1668=542%:%
-%:%1669=542%:%
-%:%1670=543%:%
-%:%1671=543%:%
-%:%1672=544%:%
-%:%1673=544%:%
-%:%1674=545%:%
-%:%1675=545%:%
-%:%1676=546%:%
-%:%1677=546%:%
-%:%1678=547%:%
-%:%1679=547%:%
-%:%1680=548%:%
-%:%1681=548%:%
-%:%1682=549%:%
-%:%1683=549%:%
-%:%1684=550%:%
-%:%1685=550%:%
-%:%1686=551%:%
-%:%1687=551%:%
-%:%1688=552%:%
-%:%1694=552%:%
-%:%1697=553%:%
-%:%1698=554%:%
-%:%1699=554%:%
-%:%1700=555%:%
-%:%1701=556%:%
-%:%1702=557%:%
-%:%1703=557%:%
-%:%1704=558%:%
-%:%1707=559%:%
-%:%1711=559%:%
-%:%1712=559%:%
-%:%1713=559%:%
-%:%1718=559%:%
-%:%1721=560%:%
-%:%1722=561%:%
-%:%1723=561%:%
-%:%1724=562%:%
-%:%1727=563%:%
-%:%1731=563%:%
-%:%1732=563%:%
-%:%1733=563%:%
-%:%1738=563%:%
-%:%1741=564%:%
-%:%1742=565%:%
-%:%1743=565%:%
-%:%1744=566%:%
-%:%1747=567%:%
-%:%1751=567%:%
-%:%1752=567%:%
-%:%1753=567%:%
-%:%1758=567%:%
-%:%1761=568%:%
-%:%1762=569%:%
-%:%1763=569%:%
-%:%1764=570%:%
+%:%1427=452%:%
+%:%1433=452%:%
+%:%1436=453%:%
+%:%1437=454%:%
+%:%1438=454%:%
+%:%1439=455%:%
+%:%1446=456%:%
+%:%1447=456%:%
+%:%1448=457%:%
+%:%1449=457%:%
+%:%1450=458%:%
+%:%1451=458%:%
+%:%1452=459%:%
+%:%1453=459%:%
+%:%1454=460%:%
+%:%1455=460%:%
+%:%1456=461%:%
+%:%1457=461%:%
+%:%1458=461%:%
+%:%1459=462%:%
+%:%1460=462%:%
+%:%1461=463%:%
+%:%1462=463%:%
+%:%1463=463%:%
+%:%1464=464%:%
+%:%1465=464%:%
+%:%1466=465%:%
+%:%1467=465%:%
+%:%1468=465%:%
+%:%1469=466%:%
+%:%1470=466%:%
+%:%1471=467%:%
+%:%1472=467%:%
+%:%1473=467%:%
+%:%1474=468%:%
+%:%1475=468%:%
+%:%1476=468%:%
+%:%1477=469%:%
+%:%1478=469%:%
+%:%1479=469%:%
+%:%1480=469%:%
+%:%1481=470%:%
+%:%1482=470%:%
+%:%1483=471%:%
+%:%1484=472%:%
+%:%1485=472%:%
+%:%1486=473%:%
+%:%1487=474%:%
+%:%1488=474%:%
+%:%1489=475%:%
+%:%1490=475%:%
+%:%1491=476%:%
+%:%1492=476%:%
+%:%1493=477%:%
+%:%1494=477%:%
+%:%1495=477%:%
+%:%1496=478%:%
+%:%1497=478%:%
+%:%1498=479%:%
+%:%1499=479%:%
+%:%1500=479%:%
+%:%1501=480%:%
+%:%1502=480%:%
+%:%1503=481%:%
+%:%1504=481%:%
+%:%1505=481%:%
+%:%1506=482%:%
+%:%1507=482%:%
+%:%1508=483%:%
+%:%1509=483%:%
+%:%1510=483%:%
+%:%1511=484%:%
+%:%1512=484%:%
+%:%1513=485%:%
+%:%1514=485%:%
+%:%1515=485%:%
+%:%1516=486%:%
+%:%1517=486%:%
+%:%1518=487%:%
+%:%1519=487%:%
+%:%1520=487%:%
+%:%1521=488%:%
+%:%1522=488%:%
+%:%1523=489%:%
+%:%1524=489%:%
+%:%1525=489%:%
+%:%1526=490%:%
+%:%1527=490%:%
+%:%1528=491%:%
+%:%1529=491%:%
+%:%1530=491%:%
+%:%1531=491%:%
+%:%1532=492%:%
+%:%1533=492%:%
+%:%1534=493%:%
+%:%1535=493%:%
+%:%1536=494%:%
+%:%1537=494%:%
+%:%1538=494%:%
+%:%1539=495%:%
+%:%1545=495%:%
+%:%1548=496%:%
+%:%1549=497%:%
+%:%1550=497%:%
+%:%1551=498%:%
+%:%1554=499%:%
+%:%1558=499%:%
+%:%1559=499%:%
+%:%1564=499%:%
+%:%1567=500%:%
+%:%1568=501%:%
+%:%1569=501%:%
+%:%1570=502%:%
+%:%1573=503%:%
+%:%1577=503%:%
+%:%1578=503%:%
+%:%1579=504%:%
+%:%1580=504%:%
+%:%1581=505%:%
+%:%1582=505%:%
+%:%1583=506%:%
+%:%1584=506%:%
+%:%1585=507%:%
+%:%1586=507%:%
+%:%1587=508%:%
+%:%1588=508%:%
+%:%1589=509%:%
+%:%1590=509%:%
+%:%1591=510%:%
+%:%1592=510%:%
+%:%1593=511%:%
+%:%1594=511%:%
+%:%1595=512%:%
+%:%1596=512%:%
+%:%1597=513%:%
+%:%1603=513%:%
+%:%1606=514%:%
+%:%1607=515%:%
+%:%1608=515%:%
+%:%1609=516%:%
+%:%1612=517%:%
+%:%1616=517%:%
+%:%1617=517%:%
+%:%1618=518%:%
+%:%1619=518%:%
+%:%1620=519%:%
+%:%1621=519%:%
+%:%1622=520%:%
+%:%1623=520%:%
+%:%1624=521%:%
+%:%1625=521%:%
+%:%1626=522%:%
+%:%1627=522%:%
+%:%1628=523%:%
+%:%1629=523%:%
+%:%1630=524%:%
+%:%1631=524%:%
+%:%1632=525%:%
+%:%1633=525%:%
+%:%1634=526%:%
+%:%1635=526%:%
+%:%1636=527%:%
+%:%1642=527%:%
+%:%1645=528%:%
+%:%1646=529%:%
+%:%1647=529%:%
+%:%1648=530%:%
+%:%1649=531%:%
+%:%1650=532%:%
+%:%1651=532%:%
+%:%1652=533%:%
+%:%1655=534%:%
+%:%1659=534%:%
+%:%1660=534%:%
+%:%1661=534%:%
+%:%1666=534%:%
+%:%1669=535%:%
+%:%1670=536%:%
+%:%1671=536%:%
+%:%1672=537%:%
+%:%1675=538%:%
+%:%1679=538%:%
+%:%1680=538%:%
+%:%1681=538%:%
+%:%1686=538%:%
+%:%1689=539%:%
+%:%1690=540%:%
+%:%1691=540%:%
+%:%1692=541%:%
+%:%1695=542%:%
+%:%1699=542%:%
+%:%1700=542%:%
+%:%1701=542%:%
+%:%1706=542%:%
+%:%1709=543%:%
+%:%1710=544%:%
+%:%1711=544%:%
+%:%1712=545%:%
+%:%1719=546%:%
+%:%1720=546%:%
+%:%1721=547%:%
+%:%1722=547%:%
+%:%1723=548%:%
+%:%1724=548%:%
+%:%1725=549%:%
+%:%1726=549%:%
+%:%1727=550%:%
+%:%1728=551%:%
+%:%1729=551%:%
+%:%1730=552%:%
+%:%1731=552%:%
+%:%1732=552%:%
+%:%1733=553%:%
+%:%1734=553%:%
+%:%1735=554%:%
+%:%1736=554%:%
+%:%1737=554%:%
+%:%1738=555%:%
+%:%1739=555%:%
+%:%1740=555%:%
+%:%1741=556%:%
+%:%1742=556%:%
+%:%1743=556%:%
+%:%1744=557%:%
+%:%1745=557%:%
+%:%1746=558%:%
+%:%1747=558%:%
+%:%1748=558%:%
+%:%1749=559%:%
+%:%1750=559%:%
+%:%1751=560%:%
+%:%1752=560%:%
+%:%1753=561%:%
+%:%1754=562%:%
+%:%1755=562%:%
+%:%1756=563%:%
+%:%1757=563%:%
+%:%1758=564%:%
+%:%1759=565%:%
+%:%1760=565%:%
+%:%1761=566%:%
+%:%1762=567%:%
+%:%1763=567%:%
+%:%1764=568%:%
+%:%1765=568%:%
+%:%1766=569%:%
+%:%1767=570%:%
+%:%1768=570%:%
+%:%1769=571%:%
+%:%1770=571%:%
 %:%1771=571%:%
-%:%1772=571%:%
-%:%1773=572%:%
-%:%1774=572%:%
-%:%1775=573%:%
-%:%1776=573%:%
-%:%1777=574%:%
-%:%1778=574%:%
-%:%1779=575%:%
-%:%1780=576%:%
-%:%1781=576%:%
-%:%1782=577%:%
-%:%1783=577%:%
-%:%1784=577%:%
-%:%1785=578%:%
-%:%1786=578%:%
-%:%1787=579%:%
-%:%1788=579%:%
-%:%1789=579%:%
-%:%1790=580%:%
-%:%1791=580%:%
-%:%1792=580%:%
-%:%1793=581%:%
-%:%1794=581%:%
-%:%1795=581%:%
-%:%1796=582%:%
-%:%1797=582%:%
-%:%1798=583%:%
-%:%1799=583%:%
-%:%1800=583%:%
-%:%1801=584%:%
-%:%1802=584%:%
-%:%1803=584%:%
-%:%1804=585%:%
+%:%1775=575%:%
+%:%1776=576%:%
+%:%1777=576%:%
+%:%1778=577%:%
+%:%1779=577%:%
+%:%1780=577%:%
+%:%1781=578%:%
+%:%1782=578%:%
+%:%1783=579%:%
+%:%1784=579%:%
+%:%1785=579%:%
+%:%1786=580%:%
+%:%1787=580%:%
+%:%1788=581%:%
+%:%1789=581%:%
+%:%1790=581%:%
+%:%1791=582%:%
+%:%1792=582%:%
+%:%1793=583%:%
+%:%1794=583%:%
+%:%1795=583%:%
+%:%1796=583%:%
+%:%1797=584%:%
+%:%1798=584%:%
+%:%1799=585%:%
 %:%1805=585%:%
-%:%1806=586%:%
-%:%1807=587%:%
-%:%1808=587%:%
-%:%1809=588%:%
-%:%1810=588%:%
-%:%1811=589%:%
-%:%1812=590%:%
-%:%1813=590%:%
-%:%1814=591%:%
-%:%1815=592%:%
-%:%1816=592%:%
-%:%1817=593%:%
-%:%1818=593%:%
-%:%1819=594%:%
-%:%1820=595%:%
-%:%1821=595%:%
-%:%1822=596%:%
-%:%1823=596%:%
-%:%1824=596%:%
-%:%1828=600%:%
-%:%1829=601%:%
-%:%1830=601%:%
-%:%1831=602%:%
-%:%1832=602%:%
-%:%1833=602%:%
-%:%1834=603%:%
-%:%1835=603%:%
-%:%1836=604%:%
-%:%1837=604%:%
-%:%1838=604%:%
-%:%1839=605%:%
-%:%1840=605%:%
-%:%1841=606%:%
-%:%1842=606%:%
-%:%1843=606%:%
-%:%1844=607%:%
-%:%1845=607%:%
-%:%1846=608%:%
-%:%1847=608%:%
-%:%1848=608%:%
-%:%1849=609%:%
-%:%1850=609%:%
-%:%1851=609%:%
-%:%1852=610%:%
-%:%1853=610%:%
-%:%1854=611%:%
-%:%1860=611%:%
-%:%1863=612%:%
-%:%1864=613%:%
-%:%1865=613%:%
-%:%1866=614%:%
-%:%1873=615%:%
-%:%1874=615%:%
-%:%1875=616%:%
-%:%1876=616%:%
-%:%1877=617%:%
-%:%1878=617%:%
-%:%1879=618%:%
-%:%1880=618%:%
-%:%1881=619%:%
-%:%1882=620%:%
-%:%1883=620%:%
-%:%1884=621%:%
-%:%1885=621%:%
-%:%1886=621%:%
-%:%1887=622%:%
-%:%1888=622%:%
-%:%1889=623%:%
-%:%1890=623%:%
-%:%1891=623%:%
-%:%1892=624%:%
-%:%1893=624%:%
-%:%1894=624%:%
-%:%1895=625%:%
-%:%1896=625%:%
-%:%1897=625%:%
-%:%1898=626%:%
-%:%1899=626%:%
-%:%1900=627%:%
-%:%1901=627%:%
-%:%1902=627%:%
-%:%1903=628%:%
+%:%1808=586%:%
+%:%1809=587%:%
+%:%1810=587%:%
+%:%1811=588%:%
+%:%1818=589%:%
+%:%1819=589%:%
+%:%1820=590%:%
+%:%1821=590%:%
+%:%1822=591%:%
+%:%1823=591%:%
+%:%1824=592%:%
+%:%1825=592%:%
+%:%1826=593%:%
+%:%1827=594%:%
+%:%1828=594%:%
+%:%1829=595%:%
+%:%1830=595%:%
+%:%1831=595%:%
+%:%1832=596%:%
+%:%1833=596%:%
+%:%1834=597%:%
+%:%1835=597%:%
+%:%1836=597%:%
+%:%1837=598%:%
+%:%1838=598%:%
+%:%1839=598%:%
+%:%1840=599%:%
+%:%1841=599%:%
+%:%1842=599%:%
+%:%1843=600%:%
+%:%1844=600%:%
+%:%1845=601%:%
+%:%1846=601%:%
+%:%1847=601%:%
+%:%1848=602%:%
+%:%1849=602%:%
+%:%1850=603%:%
+%:%1851=603%:%
+%:%1852=604%:%
+%:%1853=605%:%
+%:%1854=605%:%
+%:%1855=606%:%
+%:%1856=606%:%
+%:%1857=607%:%
+%:%1858=608%:%
+%:%1859=608%:%
+%:%1860=609%:%
+%:%1861=610%:%
+%:%1862=610%:%
+%:%1863=611%:%
+%:%1864=611%:%
+%:%1865=612%:%
+%:%1866=613%:%
+%:%1867=613%:%
+%:%1868=614%:%
+%:%1869=614%:%
+%:%1870=614%:%
+%:%1874=618%:%
+%:%1875=619%:%
+%:%1876=619%:%
+%:%1877=620%:%
+%:%1878=620%:%
+%:%1879=620%:%
+%:%1880=621%:%
+%:%1881=621%:%
+%:%1882=622%:%
+%:%1883=622%:%
+%:%1884=622%:%
+%:%1885=623%:%
+%:%1886=623%:%
+%:%1887=624%:%
+%:%1888=624%:%
+%:%1889=624%:%
+%:%1890=625%:%
+%:%1891=625%:%
+%:%1892=626%:%
+%:%1893=626%:%
+%:%1894=626%:%
+%:%1895=626%:%
+%:%1896=627%:%
+%:%1897=627%:%
+%:%1898=628%:%
 %:%1904=628%:%
-%:%1905=628%:%
-%:%1906=629%:%
 %:%1907=629%:%
 %:%1908=630%:%
-%:%1909=631%:%
+%:%1909=630%:%
 %:%1910=631%:%
 %:%1911=632%:%
-%:%1912=632%:%
-%:%1913=633%:%
-%:%1914=634%:%
-%:%1915=634%:%
-%:%1916=635%:%
-%:%1917=636%:%
-%:%1918=636%:%
-%:%1919=637%:%
-%:%1920=637%:%
-%:%1921=638%:%
-%:%1922=639%:%
-%:%1923=639%:%
-%:%1924=640%:%
-%:%1925=640%:%
-%:%1926=640%:%
-%:%1930=644%:%
-%:%1931=645%:%
-%:%1932=645%:%
-%:%1933=646%:%
-%:%1934=646%:%
-%:%1935=646%:%
-%:%1936=647%:%
-%:%1937=647%:%
-%:%1938=648%:%
-%:%1939=648%:%
-%:%1940=648%:%
-%:%1941=649%:%
-%:%1942=649%:%
-%:%1943=650%:%
-%:%1944=650%:%
-%:%1945=650%:%
-%:%1946=651%:%
-%:%1947=651%:%
-%:%1948=652%:%
-%:%1949=652%:%
-%:%1950=652%:%
-%:%1951=653%:%
-%:%1952=653%:%
-%:%1953=653%:%
-%:%1954=654%:%
-%:%1955=654%:%
-%:%1956=655%:%
-%:%1962=655%:%
-%:%1965=656%:%
-%:%1966=657%:%
-%:%1967=657%:%
-%:%1968=658%:%
-%:%1969=659%:%
-%:%1976=660%:%
-%:%1977=660%:%
-%:%1978=661%:%
-%:%1979=661%:%
-%:%1980=662%:%
-%:%1981=663%:%
-%:%1982=663%:%
-%:%1983=664%:%
-%:%1984=664%:%
-%:%1985=664%:%
-%:%1986=665%:%
-%:%1987=665%:%
-%:%1988=666%:%
-%:%1989=666%:%
-%:%1990=667%:%
-%:%1991=667%:%
-%:%1992=667%:%
-%:%1993=668%:%
-%:%1994=668%:%
-%:%1995=669%:%
-%:%1996=669%:%
-%:%1997=669%:%
-%:%1998=670%:%
-%:%1999=670%:%
-%:%2000=671%:%
-%:%2001=671%:%
-%:%2002=671%:%
-%:%2003=672%:%
-%:%2004=672%:%
-%:%2005=672%:%
-%:%2006=673%:%
-%:%2007=673%:%
-%:%2008=673%:%
-%:%2009=674%:%
-%:%2010=674%:%
-%:%2011=674%:%
-%:%2012=675%:%
-%:%2013=675%:%
-%:%2014=675%:%
-%:%2015=676%:%
-%:%2016=676%:%
-%:%2017=677%:%
-%:%2018=677%:%
-%:%2019=678%:%
-%:%2020=678%:%
-%:%2021=679%:%
-%:%2022=679%:%
-%:%2023=679%:%
-%:%2024=680%:%
-%:%2025=680%:%
-%:%2026=681%:%
-%:%2027=681%:%
-%:%2028=681%:%
-%:%2029=682%:%
-%:%2030=682%:%
-%:%2031=683%:%
-%:%2032=683%:%
-%:%2033=683%:%
-%:%2034=684%:%
-%:%2035=684%:%
-%:%2036=684%:%
-%:%2037=685%:%
-%:%2038=685%:%
-%:%2039=685%:%
-%:%2040=686%:%
-%:%2041=686%:%
-%:%2042=686%:%
-%:%2043=687%:%
-%:%2044=687%:%
-%:%2045=688%:%
-%:%2051=688%:%
-%:%2054=689%:%
-%:%2055=690%:%
-%:%2056=690%:%
-%:%2057=691%:%
-%:%2058=692%:%
-%:%2065=693%:%
-%:%2066=693%:%
-%:%2067=694%:%
-%:%2068=694%:%
-%:%2069=695%:%
-%:%2070=695%:%
-%:%2071=695%:%
-%:%2072=696%:%
-%:%2073=696%:%
-%:%2074=696%:%
-%:%2075=697%:%
-%:%2076=697%:%
-%:%2077=697%:%
-%:%2078=698%:%
-%:%2079=698%:%
-%:%2080=698%:%
-%:%2081=699%:%
-%:%2082=699%:%
-%:%2083=699%:%
-%:%2084=700%:%
-%:%2085=700%:%
-%:%2086=700%:%
-%:%2087=701%:%
-%:%2088=701%:%
-%:%2089=701%:%
-%:%2090=702%:%
-%:%2091=702%:%
-%:%2092=703%:%
-%:%2093=703%:%
-%:%2094=703%:%
-%:%2095=704%:%
-%:%2096=704%:%
-%:%2097=705%:%
-%:%2098=705%:%
-%:%2099=705%:%
-%:%2100=706%:%
-%:%2101=706%:%
-%:%2102=706%:%
-%:%2103=707%:%
-%:%2109=707%:%
-%:%2112=708%:%
-%:%2113=709%:%
-%:%2114=709%:%
-%:%2115=710%:%
-%:%2116=711%:%
-%:%2123=712%:%
-%:%2124=712%:%
-%:%2125=713%:%
-%:%2126=713%:%
-%:%2127=714%:%
-%:%2128=714%:%
-%:%2129=714%:%
-%:%2130=715%:%
-%:%2131=715%:%
-%:%2132=715%:%
-%:%2133=716%:%
-%:%2134=716%:%
-%:%2135=716%:%
-%:%2136=717%:%
-%:%2137=717%:%
-%:%2138=717%:%
-%:%2139=718%:%
-%:%2140=718%:%
-%:%2141=718%:%
-%:%2142=719%:%
-%:%2143=719%:%
-%:%2144=719%:%
-%:%2145=720%:%
-%:%2146=720%:%
-%:%2147=720%:%
-%:%2148=721%:%
-%:%2149=721%:%
-%:%2150=722%:%
-%:%2151=722%:%
-%:%2152=722%:%
-%:%2153=723%:%
-%:%2154=723%:%
-%:%2155=724%:%
-%:%2156=724%:%
-%:%2157=724%:%
-%:%2158=725%:%
-%:%2159=725%:%
-%:%2160=725%:%
-%:%2161=726%:%
-%:%2167=726%:%
-%:%2172=727%:%
-%:%2177=728%:%
+%:%1918=633%:%
+%:%1919=633%:%
+%:%1920=634%:%
+%:%1921=634%:%
+%:%1922=635%:%
+%:%1923=636%:%
+%:%1924=636%:%
+%:%1925=637%:%
+%:%1926=637%:%
+%:%1927=637%:%
+%:%1928=638%:%
+%:%1929=638%:%
+%:%1930=639%:%
+%:%1931=639%:%
+%:%1932=640%:%
+%:%1933=640%:%
+%:%1934=640%:%
+%:%1935=641%:%
+%:%1936=641%:%
+%:%1937=642%:%
+%:%1938=642%:%
+%:%1939=642%:%
+%:%1940=643%:%
+%:%1941=643%:%
+%:%1942=644%:%
+%:%1943=644%:%
+%:%1944=644%:%
+%:%1945=645%:%
+%:%1946=645%:%
+%:%1947=645%:%
+%:%1948=646%:%
+%:%1949=646%:%
+%:%1950=646%:%
+%:%1951=647%:%
+%:%1952=647%:%
+%:%1953=647%:%
+%:%1954=648%:%
+%:%1955=648%:%
+%:%1956=648%:%
+%:%1957=649%:%
+%:%1958=649%:%
+%:%1959=650%:%
+%:%1960=650%:%
+%:%1961=651%:%
+%:%1962=651%:%
+%:%1963=652%:%
+%:%1964=652%:%
+%:%1965=652%:%
+%:%1966=653%:%
+%:%1967=653%:%
+%:%1968=654%:%
+%:%1969=654%:%
+%:%1970=654%:%
+%:%1971=655%:%
+%:%1972=655%:%
+%:%1973=656%:%
+%:%1974=656%:%
+%:%1975=656%:%
+%:%1976=657%:%
+%:%1977=657%:%
+%:%1978=657%:%
+%:%1979=658%:%
+%:%1980=658%:%
+%:%1981=658%:%
+%:%1982=659%:%
+%:%1983=659%:%
+%:%1984=659%:%
+%:%1985=660%:%
+%:%1986=660%:%
+%:%1987=661%:%
+%:%1993=661%:%
+%:%1996=662%:%
+%:%1997=663%:%
+%:%1998=663%:%
+%:%1999=664%:%
+%:%2000=665%:%
+%:%2007=666%:%
+%:%2008=666%:%
+%:%2009=667%:%
+%:%2010=667%:%
+%:%2011=668%:%
+%:%2012=668%:%
+%:%2013=668%:%
+%:%2014=669%:%
+%:%2015=669%:%
+%:%2016=669%:%
+%:%2017=670%:%
+%:%2018=670%:%
+%:%2019=670%:%
+%:%2020=671%:%
+%:%2021=671%:%
+%:%2022=671%:%
+%:%2023=672%:%
+%:%2024=672%:%
+%:%2025=672%:%
+%:%2026=673%:%
+%:%2027=673%:%
+%:%2028=673%:%
+%:%2029=674%:%
+%:%2030=674%:%
+%:%2031=674%:%
+%:%2032=675%:%
+%:%2033=675%:%
+%:%2034=676%:%
+%:%2035=676%:%
+%:%2036=676%:%
+%:%2037=677%:%
+%:%2038=677%:%
+%:%2039=678%:%
+%:%2040=678%:%
+%:%2041=678%:%
+%:%2042=679%:%
+%:%2043=679%:%
+%:%2044=679%:%
+%:%2045=680%:%
+%:%2051=680%:%
+%:%2054=681%:%
+%:%2055=682%:%
+%:%2056=682%:%
+%:%2057=683%:%
+%:%2058=684%:%
+%:%2065=685%:%
+%:%2066=685%:%
+%:%2067=686%:%
+%:%2068=686%:%
+%:%2069=687%:%
+%:%2070=687%:%
+%:%2071=687%:%
+%:%2072=688%:%
+%:%2073=688%:%
+%:%2074=688%:%
+%:%2075=689%:%
+%:%2076=689%:%
+%:%2077=689%:%
+%:%2078=690%:%
+%:%2079=690%:%
+%:%2080=690%:%
+%:%2081=691%:%
+%:%2082=691%:%
+%:%2083=691%:%
+%:%2084=692%:%
+%:%2085=692%:%
+%:%2086=692%:%
+%:%2087=693%:%
+%:%2088=693%:%
+%:%2089=693%:%
+%:%2090=694%:%
+%:%2091=694%:%
+%:%2092=695%:%
+%:%2093=695%:%
+%:%2094=695%:%
+%:%2095=696%:%
+%:%2096=696%:%
+%:%2097=697%:%
+%:%2098=697%:%
+%:%2099=697%:%
+%:%2100=698%:%
+%:%2101=698%:%
+%:%2102=698%:%
+%:%2103=699%:%
+%:%2109=699%:%
+%:%2114=700%:%
+%:%2119=701%:%

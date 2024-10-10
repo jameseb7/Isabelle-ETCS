@@ -811,11 +811,11 @@ The lemma below corresponds to Proposition 2.1.27 in Halvorson.%
 \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ b{\isacharunderscore}{\kern0pt}def\ cfunc{\isacharunderscore}{\kern0pt}cross{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}comp{\isacharunderscore}{\kern0pt}cfunc{\isacharunderscore}{\kern0pt}prod\ type{\isacharunderscore}{\kern0pt}assms\ y{\isacharunderscore}{\kern0pt}type{\isadigit{2}}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{ultimately}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymlangle}x{\isacharcomma}{\kern0pt}b{\isasymrangle}\ {\isacharequal}{\kern0pt}\ {\isasymlangle}y{\isacharcomma}{\kern0pt}b{\isasymrangle}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ calculation\ cfunc{\isacharunderscore}{\kern0pt}type{\isacharunderscore}{\kern0pt}def\ fg{\isacharunderscore}{\kern0pt}inject\ fg{\isacharunderscore}{\kern0pt}type\ injective{\isacharunderscore}{\kern0pt}def\ xb{\isacharunderscore}{\kern0pt}type\ yb{\isacharunderscore}{\kern0pt}type{\isacharparenright}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}metis\ cfunc{\isacharunderscore}{\kern0pt}type{\isacharunderscore}{\kern0pt}def\ fg{\isacharunderscore}{\kern0pt}inject\ fg{\isacharunderscore}{\kern0pt}type\ injective{\isacharunderscore}{\kern0pt}def\ xb{\isacharunderscore}{\kern0pt}type\ yb{\isacharunderscore}{\kern0pt}type{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}x\ {\isacharequal}{\kern0pt}\ y{\isachardoublequoteclose}\isanewline
@@ -1891,12 +1891,10 @@ The lemma below is the dual of Proposition 2.1.23 in Halvorson.%
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ assms\ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ cfunc{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}comp\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \isacommand{then}\isamarkupfalse%
+\ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
@@ -1930,12 +1928,10 @@ The lemma below is the dual of Proposition 2.1.23 in Halvorson.%
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ assms\ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}typecheck{\isacharunderscore}{\kern0pt}cfuncs{\isacharcomma}{\kern0pt}\ simp\ add{\isacharcolon}{\kern0pt}\ cfunc{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}comp\ comp{\isacharunderscore}{\kern0pt}associative{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \isacommand{then}\isamarkupfalse%
+\ \ \isacommand{finally}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\isanewline
-\ \ \ \ \isacommand{using}\isamarkupfalse%
-\ calculation\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
+\ {\isacharquery}{\kern0pt}thesis\isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
 \isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
@@ -3419,74 +3415,74 @@ The definition below corresponds to a definition stated between Definition 2.1.4
 %:%1894=649%:%
 %:%1895=649%:%
 %:%1896=649%:%
-%:%1897=650%:%
+%:%1897=649%:%
 %:%1898=650%:%
-%:%1899=650%:%
-%:%1900=651%:%
-%:%1906=651%:%
+%:%1904=650%:%
+%:%1907=651%:%
+%:%1908=652%:%
 %:%1909=652%:%
 %:%1910=653%:%
-%:%1911=653%:%
-%:%1912=654%:%
-%:%1913=655%:%
+%:%1911=654%:%
+%:%1918=655%:%
+%:%1919=655%:%
 %:%1920=656%:%
 %:%1921=656%:%
 %:%1922=657%:%
 %:%1923=657%:%
-%:%1924=658%:%
+%:%1924=657%:%
 %:%1925=658%:%
 %:%1926=658%:%
-%:%1927=659%:%
+%:%1927=658%:%
 %:%1928=659%:%
 %:%1929=659%:%
-%:%1930=660%:%
+%:%1930=659%:%
 %:%1931=660%:%
 %:%1932=660%:%
-%:%1933=661%:%
-%:%1934=661%:%
+%:%1933=660%:%
+%:%1934=660%:%
 %:%1935=661%:%
-%:%1936=662%:%
-%:%1937=662%:%
-%:%1938=662%:%
-%:%1939=663%:%
-%:%1954=665%:%
+%:%1950=663%:%
+%:%1962=665%:%
+%:%1964=666%:%
+%:%1965=666%:%
 %:%1966=667%:%
-%:%1968=668%:%
-%:%1969=668%:%
-%:%1970=669%:%
-%:%1973=672%:%
-%:%1974=673%:%
-%:%1975=674%:%
-%:%1976=674%:%
-%:%1977=675%:%
-%:%1978=676%:%
+%:%1969=670%:%
+%:%1970=671%:%
+%:%1971=672%:%
+%:%1972=672%:%
+%:%1973=673%:%
+%:%1974=674%:%
+%:%1975=675%:%
+%:%1976=676%:%
 %:%1979=677%:%
-%:%1980=678%:%
-%:%1983=679%:%
-%:%1987=679%:%
-%:%1988=679%:%
-%:%1989=679%:%
-%:%1990=679%:%
+%:%1983=677%:%
+%:%1984=677%:%
+%:%1985=677%:%
+%:%1986=677%:%
+%:%1991=677%:%
+%:%1994=678%:%
 %:%1995=679%:%
-%:%1998=680%:%
-%:%1999=681%:%
-%:%2000=681%:%
-%:%2001=682%:%
-%:%2002=683%:%
-%:%2003=684%:%
-%:%2004=685%:%
+%:%1996=679%:%
+%:%1997=680%:%
+%:%1998=681%:%
+%:%1999=682%:%
+%:%2000=683%:%
+%:%2007=684%:%
+%:%2008=684%:%
+%:%2009=685%:%
+%:%2010=685%:%
 %:%2011=686%:%
 %:%2012=686%:%
 %:%2013=687%:%
 %:%2014=687%:%
-%:%2015=688%:%
+%:%2015=687%:%
 %:%2016=688%:%
-%:%2017=689%:%
+%:%2017=688%:%
 %:%2018=689%:%
 %:%2019=689%:%
-%:%2020=690%:%
+%:%2020=689%:%
 %:%2021=690%:%
-%:%2022=691%:%
+%:%2022=690%:%
 %:%2023=691%:%
 %:%2024=691%:%
 %:%2025=692%:%
@@ -3495,18 +3491,18 @@ The definition below corresponds to a definition stated between Definition 2.1.4
 %:%2028=693%:%
 %:%2029=694%:%
 %:%2030=694%:%
-%:%2031=695%:%
+%:%2031=694%:%
 %:%2032=695%:%
-%:%2033=696%:%
+%:%2033=695%:%
 %:%2034=696%:%
 %:%2035=696%:%
-%:%2036=697%:%
+%:%2036=696%:%
 %:%2037=697%:%
-%:%2038=698%:%
-%:%2039=698%:%
-%:%2040=698%:%
-%:%2041=699%:%
-%:%2042=699%:%
+%:%2038=697%:%
+%:%2042=701%:%
+%:%2043=702%:%
+%:%2044=702%:%
+%:%2045=703%:%
 %:%2046=703%:%
 %:%2047=704%:%
 %:%2048=704%:%
@@ -3516,20 +3512,20 @@ The definition below corresponds to a definition stated between Definition 2.1.4
 %:%2052=706%:%
 %:%2053=707%:%
 %:%2054=707%:%
-%:%2055=708%:%
+%:%2055=707%:%
 %:%2056=708%:%
-%:%2057=709%:%
-%:%2058=709%:%
+%:%2057=708%:%
+%:%2058=708%:%
 %:%2059=709%:%
 %:%2060=710%:%
 %:%2061=710%:%
-%:%2062=710%:%
+%:%2062=711%:%
 %:%2063=711%:%
-%:%2064=712%:%
+%:%2064=711%:%
 %:%2065=712%:%
 %:%2066=713%:%
 %:%2067=713%:%
-%:%2068=713%:%
+%:%2068=714%:%
 %:%2069=714%:%
 %:%2070=715%:%
 %:%2071=715%:%
@@ -3539,9 +3535,9 @@ The definition below corresponds to a definition stated between Definition 2.1.4
 %:%2075=717%:%
 %:%2076=718%:%
 %:%2077=718%:%
-%:%2078=719%:%
+%:%2078=718%:%
 %:%2079=719%:%
-%:%2080=720%:%
+%:%2080=719%:%
 %:%2081=720%:%
 %:%2082=720%:%
 %:%2083=721%:%
@@ -3552,25 +3548,21 @@ The definition below corresponds to a definition stated between Definition 2.1.4
 %:%2088=723%:%
 %:%2089=724%:%
 %:%2090=724%:%
-%:%2091=725%:%
+%:%2091=724%:%
 %:%2092=725%:%
-%:%2093=726%:%
+%:%2093=725%:%
 %:%2094=726%:%
 %:%2095=726%:%
-%:%2096=727%:%
+%:%2096=726%:%
 %:%2097=727%:%
-%:%2098=728%:%
-%:%2099=728%:%
-%:%2100=728%:%
-%:%2101=729%:%
-%:%2102=729%:%
+%:%2098=727%:%
+%:%2101=730%:%
+%:%2102=731%:%
+%:%2103=731%:%
+%:%2104=731%:%
 %:%2105=732%:%
-%:%2106=733%:%
+%:%2106=732%:%
 %:%2107=733%:%
-%:%2108=733%:%
-%:%2109=734%:%
-%:%2110=734%:%
-%:%2111=735%:%
-%:%2117=735%:%
-%:%2122=736%:%
-%:%2127=737%:%
+%:%2113=733%:%
+%:%2118=734%:%
+%:%2123=735%:%
