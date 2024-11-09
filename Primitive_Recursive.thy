@@ -2,6 +2,34 @@ theory Primitive_Recursive
   imports Category_Set.ETCS
 begin
 
+theorem nat_eq_induction:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes f_type[type_rule]: "f : \<nat>\<^sub>c \<rightarrow> X"  and g_type[type_rule]: "g : \<nat>\<^sub>c \<rightarrow> X"
+  assumes base_case: "f \<circ>\<^sub>c zero = g \<circ>\<^sub>c zero"
+  assumes induction_case: "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> f \<circ>\<^sub>c n = g \<circ>\<^sub>c n \<Longrightarrow> f \<circ>\<^sub>c successor \<circ>\<^sub>c n = g \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+  shows "f \<circ>\<^sub>c n = g \<circ>\<^sub>c n"
+proof -
+
+  have "(eq_pred X \<circ>\<^sub>c \<langle>f, g\<rangle>) \<circ>\<^sub>c n = \<t>"
+  proof (etcs_rule nat_induction)
+    show "(eq_pred X \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c zero = \<t>"
+      by (etcs_assocr, typecheck_cfuncs, smt base_case cfunc_prod_comp comp_type eq_pred_iff_eq)
+  next
+    fix n
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume "(eq_pred X \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c n = \<t>"
+    then have "f \<circ>\<^sub>c n = g \<circ>\<^sub>c n"
+      by (typecheck_cfuncs_prems, smt cfunc_prod_comp comp_associative2 comp_type eq_pred_iff_eq)
+    then have "f \<circ>\<^sub>c successor \<circ>\<^sub>c n = g \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+      by (simp add: induction_case n_type)
+    then show "(eq_pred X \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+      by (typecheck_cfuncs_prems, typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 eq_pred_iff_eq)
+  qed
+  then show "f \<circ>\<^sub>c n = g \<circ>\<^sub>c n"
+    by (typecheck_cfuncs_prems, smt cfunc_prod_comp comp_associative2 comp_type eq_pred_iff_eq)
+qed
+      
+
 lemma primitive_recursion:
   assumes f0_type[type_rule]: "f0 : A \<rightarrow> B"
   assumes f_type[type_rule]: "f : A \<times>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c B) \<rightarrow> B"
@@ -141,49 +169,30 @@ proof -
       have "(right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c \<rangle>: \<nat>\<^sub>c \<rightarrow> B"
         by typecheck_cfuncs
 
-      have "(eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle> , (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c m = \<t>"
-      proof(etcs_rule nat_induction)
-        show "(eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,(right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero = \<t>"
-        proof - 
-          have "(eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,(right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero = 
-                 eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a, zero\<rangle>,(right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a, zero\<rangle>\<rangle>"
-            by (typecheck_cfuncs, smt (verit, best) cart_prod_extract_right cfunc_prod_comp cfunc_type_def comp_associative)
-          also have "... = \<t>"
-            by (typecheck_cfuncs, metis eq_pred_iff_eq g1 u_property)
-          finally show ?thesis.
-        qed
+      have "(u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m = ((right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m"
+      proof(etcs_rule nat_eq_induction)
+        show "(u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = ((right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero"
+          by (typecheck_cfuncs, smt cart_prod_extract_right comp_associative2 g1 u_property)
       next
         fix n
         assume  n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
-        assume "(eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,(right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c n = \<t>"
-        then have "\<t> = (eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n,(right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n\<rangle>)"
-          by (etcs_assocl, typecheck_cfuncs, smt (verit, ccfv_SIG)  cfunc_prod_comp cfunc_prod_type comp_associative2)
-        then  have "\<t> = (eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a ,n\<rangle>, (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>)"
-          by (typecheck_cfuncs, metis cart_prod_extract_right)
+        assume "(u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c n = ((right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c n"
         then have induction_hypothesis: "u \<circ>\<^sub>c \<langle>a ,n\<rangle> = (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a, n\<rangle>"
-          using eq_pred_iff_eq by (typecheck_cfuncs, presburger)
+          by (typecheck_cfuncs_prems, smt cart_prod_extract_right comp_associative2)
         have "u \<circ>\<^sub>c \<langle>a ,successor \<circ>\<^sub>c n\<rangle> = f \<circ>\<^sub>c \<langle>a, \<langle>n, u \<circ>\<^sub>c \<langle>a,n\<rangle>\<rangle>\<rangle>"
           using u_property by (typecheck_cfuncs, blast)
         also have "... = f \<circ>\<^sub>c \<langle>a, \<langle>n, (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>\<rangle>"
           by (simp add: induction_hypothesis)
         also have "... = (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a ,successor \<circ>\<^sub>c n\<rangle>"
           by (simp add: a_type g2 n_type)
-        then have "\<t> = (eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a ,successor \<circ>\<^sub>c n\<rangle>, (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle>\<rangle>)"
-          by (typecheck_cfuncs, metis calculation eq_pred_iff_eq)
-        then show "(eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,(right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c (successor \<circ>\<^sub>c n) = \<t>"
-          by (typecheck_cfuncs, smt (verit, best) cart_prod_extract_right cfunc_prod_comp comp_associative2)
-      qed       
-      then have "\<t> = eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle> , (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c m"
-        using  comp_associative2 by (typecheck_cfuncs, force)
-      also have "... = eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m, id \<nat>\<^sub>c \<circ>\<^sub>c m\<rangle> , (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c m, id \<nat>\<^sub>c \<circ>\<^sub>c m\<rangle>\<rangle>"
-        by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2)
-      also have "... = eq_pred B \<circ>\<^sub>c \<langle>u \<circ>\<^sub>c \<langle>a, m\<rangle>, (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a, m\<rangle>\<rangle>"
-        by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+        finally show "(u \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n = ((right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+          by (typecheck_cfuncs, smt cart_prod_extract_right comp_associative2)
+      qed
       then show "u \<circ>\<^sub>c x = (right_cart_proj \<nat>\<^sub>c B \<circ>\<^sub>c y\<^sup>\<flat>) \<circ>\<^sub>c x"
-        by (typecheck_cfuncs, simp add: calculation eq_pred_iff_eq x_def)
+        by (typecheck_cfuncs_prems, smt  cart_prod_extract_right comp_associative2 x_def)
     qed
   qed
-qed 
+qed
   
       
               
