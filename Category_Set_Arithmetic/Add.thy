@@ -1,5 +1,5 @@
 theory Add
-  imports ETCS
+  imports Category_Set.ETCS
 begin
 
 definition add1 :: "cfunc" where
