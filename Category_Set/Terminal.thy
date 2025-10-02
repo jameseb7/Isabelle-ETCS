@@ -26,11 +26,16 @@ lemma terminal_func_comp_elem:
   "x : \<one> \<rightarrow> X \<Longrightarrow> \<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c x = id \<one>"
   by (metis id_type terminal_func_comp terminal_func_unique)
 
+
 subsection \<open>Set Membership and Emptiness\<close>
 
 text \<open>The abbreviation below captures Definition 2.1.16 in Halvorson.\<close>
 abbreviation member :: "cfunc \<Rightarrow> cset \<Rightarrow> bool" (infix "\<in>\<^sub>c" 50) where
   "x \<in>\<^sub>c X \<equiv> (x : \<one> \<rightarrow> X)"
+
+lemma element_of_1:
+  "x \<in>\<^sub>c \<one> \<Longrightarrow> x = id \<one>"
+  by (metis id_type terminal_func_unique)
 
 definition nonempty :: "cset \<Rightarrow> bool" where
   "nonempty X \<equiv> (\<exists>x. x \<in>\<^sub>c X)"
