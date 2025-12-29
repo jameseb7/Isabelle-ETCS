@@ -143,6 +143,13 @@ lemma AND_complementary:
   shows "AND \<circ>\<^sub>c \<langle>p, NOT \<circ>\<^sub>c p\<rangle> =  \<f>"
   by (metis AND_false_left_is_false AND_false_right_is_false NOT_false_is_true NOT_true_is_false assms true_false_only_truth_values true_func_type)
 
+
+lemma AND_true_imp_both_true:
+  assumes "p \<in>\<^sub>c \<Omega>" "q \<in>\<^sub>c \<Omega>"
+  assumes "AND \<circ>\<^sub>c \<langle>p,q\<rangle> = \<t>"
+  shows "p = \<t> \<and> q = \<t>"
+  using assms by (metis AND_commutative AND_false_right_is_false  true_false_only_truth_values)
+
 subsection \<open>NOR\<close>
 
 definition NOR :: "cfunc" where
