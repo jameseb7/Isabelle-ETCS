@@ -78,6 +78,22 @@ next
 next
   show "\<And>F k y.  characteristic_func m \<circ>\<^sub>c m \<circ>\<^sub>c k = (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>) \<circ>\<^sub>c m \<circ>\<^sub>c k \<Longrightarrow> k : F \<rightarrow> B \<Longrightarrow> y : F \<rightarrow> B \<Longrightarrow> m \<circ>\<^sub>c y = m \<circ>\<^sub>c k \<Longrightarrow> k = y"
       by (typecheck_cfuncs, smt m_mono monomorphism_def2)
+  qed
+
+lemma characteristic_func_unique_from_equalizer:
+  assumes m_type[type_rule]: "m : B \<rightarrow> X"
+      and m_mono[type_rule]: "monomorphism m"
+      and chi_type[type_rule]: "\<chi> : X \<rightarrow> \<Omega>"
+      and chi_eq: "equalizer B m \<chi> (\<t> \<circ>\<^sub>c \<beta>\<^bsub>X\<^esub>)"
+  shows "\<chi> = characteristic_func m"
+proof(rule one_separator[where X = X and Y = \<Omega>])  
+  show "\<chi> : X \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "characteristic_func m : X \<rightarrow> \<Omega>"
+    by typecheck_cfuncs
+  show "\<And>x. x \<in>\<^sub>c X \<Longrightarrow> \<chi> \<circ>\<^sub>c x = characteristic_func m \<circ>\<^sub>c x"
+    by (typecheck_cfuncs, smt (verit, best) chi_eq comp_type monomorphism_equalizes_char_func 
+        m_mono terminal_func_type true_false_only_truth_values xfactorthru_equalizer_iff_fx_eq_gx)
 qed
 
 lemma characteristic_func_true_relative_member:
@@ -192,15 +208,13 @@ lemma eq_pred_iff_eq_conv:
   assumes "x : \<one> \<rightarrow> X" "y : \<one> \<rightarrow> X"
   shows "(x \<noteq> y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> = \<f>)"
 proof(safe)
-  assume "x \<noteq> y"
-  then show "eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<f>"
+  show "x \<noteq> y \<Longrightarrow> eq_pred X \<circ>\<^sub>c \<langle>x,y\<rangle> = \<f>"
     using assms eq_pred_iff_eq true_false_only_truth_values by (typecheck_cfuncs, blast)
-next
   show "eq_pred X \<circ>\<^sub>c \<langle>y,y\<rangle> = \<f> \<Longrightarrow> x = y \<Longrightarrow> False"
     by (metis assms(1) eq_pred_iff_eq true_false_distinct)
 qed
 
-lemma eq_pred_iff_eq_conv2:
+corollary eq_pred_iff_eq_conv2:
   assumes "x : \<one> \<rightarrow> X" "y : \<one> \<rightarrow> X"
   shows "(x \<noteq> y) = (eq_pred X \<circ>\<^sub>c \<langle>x, y\<rangle> \<noteq> \<t>)"
   using assms eq_pred_iff_eq by presburger
