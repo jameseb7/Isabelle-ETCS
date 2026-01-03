@@ -66,7 +66,7 @@ proof -
     using calculation by auto
 qed
 
-lemma NAME_ME_PLEASE:
+lemma monus2_successor:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" 
   shows  "(monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor =
       predecessor \<circ>\<^sub>c monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>"
@@ -95,14 +95,14 @@ proof -
   then show ?thesis using calculation by auto
 qed
 
-lemma NAME_ME_PLEASE':
+lemma monus_successor:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
   shows "n \<midarrow>\<^sub>\<nat> (successor \<circ>\<^sub>c m) =  predecessor \<circ>\<^sub>c (n \<midarrow>\<^sub>\<nat> m)"
 proof - 
   have "n \<midarrow>\<^sub>\<nat> (successor \<circ>\<^sub>c m) = (monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c m" 
     by (etcs_assocr, typecheck_cfuncs, smt cart_prod_extract_right monus_def)
   also have "... = predecessor \<circ>\<^sub>c monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c m"
-    by (typecheck_cfuncs, simp add: NAME_ME_PLEASE comp_associative2)
+    by (typecheck_cfuncs, simp add: monus2_successor comp_associative2)
   also have "... = predecessor \<circ>\<^sub>c (n \<midarrow>\<^sub>\<nat> m)"
     by (typecheck_cfuncs, metis cart_prod_extract_right monus_def)
   then show ?thesis
@@ -132,7 +132,7 @@ proof -
         by (typecheck_cfuncs, simp add: calculation eq_pred_iff_eq)
     qed
     have induction_conclusion: "monus2 \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c m\<rangle> = zero"
-      using NAME_ME_PLEASE' induction_hypothesis monus_def predecessor_zero by (typecheck_cfuncs, force)
+      using monus_successor induction_hypothesis monus_def predecessor_zero by (typecheck_cfuncs, force)
     then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c m = \<t>"
       by (typecheck_cfuncs,
       smt (z3) cart_prod_extract_right cfunc_prod_comp comp_associative2 eq_pred_iff_eq_conv2 
@@ -152,7 +152,7 @@ proof -
     have "(successor \<circ>\<^sub>c n) \<midarrow>\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = n \<midarrow>\<^sub>\<nat> zero"
     proof - 
       have "(successor \<circ>\<^sub>c n) \<midarrow>\<^sub>\<nat> (successor \<circ>\<^sub>c zero) = predecessor \<circ>\<^sub>c  (successor \<circ>\<^sub>c n  \<midarrow>\<^sub>\<nat> zero)"
-        using NAME_ME_PLEASE' monus_zero by (typecheck_cfuncs, presburger)
+        using monus_successor monus_zero by (typecheck_cfuncs, presburger)
       also have "... = predecessor \<circ>\<^sub>c  successor \<circ>\<^sub>c n"
         by (simp add: monus_zero n_type)
       also have "... =  n"
@@ -181,7 +181,7 @@ proof -
         using calculation eq_pred_iff_eq by (typecheck_cfuncs, presburger)
     qed
     have induction_conclusion: "monus2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c n, successor \<circ>\<^sub>c successor \<circ>\<^sub>c k\<rangle> = monus2 \<circ>\<^sub>c \<langle>n, successor \<circ>\<^sub>c k\<rangle>"
-      using NAME_ME_PLEASE' induction_hypothesis monus_def by (typecheck_cfuncs, fastforce)
+      using monus_successor induction_hypothesis monus_def by (typecheck_cfuncs, fastforce)
     then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,successor\<rangle>,monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c k = \<t>"
       by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 comp_type eq_pred_iff_eq id_left_unit2 id_right_unit2 induction_conclusion terminal_func_comp_elem)
   qed
@@ -275,7 +275,7 @@ proof -
         by (typecheck_cfuncs, simp add: add_def calculation eq_pred_iff_eq monus_def)
     qed
     then have induction_conclusion: "n \<midarrow>\<^sub>\<nat> (n +\<^sub>\<nat> (successor \<circ>\<^sub>c k)) = zero"
-      by (typecheck_cfuncs, metis NAME_ME_PLEASE' add_respects_succ1 add_type zero_monus)
+      by (typecheck_cfuncs, metis monus_successor add_respects_succ1 add_type zero_monus)
     then show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>monus2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,add2 \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>,zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c k = \<t>"
       by (typecheck_cfuncs, smt (verit, best) add_apply1_left beta_N_succ_nEqs_Id1 cart_prod_extract_left cfunc_prod_comp
           comp_associative2 eq_pred_iff_eq_conv2 id_right_unit2 left_param_def2 left_param_on_el monus_def)
@@ -340,7 +340,7 @@ proof -
     using  add_def calculation eq_pred_iff_eq_conv2 monus_def by (typecheck_cfuncs, auto)
 qed
 
-lemma RENAME_Part1:
+lemma plus_monus:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
   shows "n +\<^sub>\<nat> (m \<midarrow>\<^sub>\<nat> n) = m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m)"
 proof(cases "n \<le>\<^sub>\<nat> m")
@@ -360,12 +360,12 @@ proof(cases "m \<le>\<^sub>\<nat> v")
     by (typecheck_cfuncs, metis leq_infix_def smaller_monus_bigger zero_is_smallest)
 next
   show "\<not> m \<le>\<^sub>\<nat> v \<Longrightarrow> m \<midarrow>\<^sub>\<nat> v \<le>\<^sub>\<nat> n \<midarrow>\<^sub>\<nat> u"
-    by (typecheck_cfuncs, smt (z3) RENAME_Part1 add_associates add_commutes add_type 
+    by (typecheck_cfuncs, smt (z3) plus_monus add_associates add_commutes add_type 
         bigger_monus_smaller fewer_is_less leq_infix_def leq_true_implies_exists 
         lqe_connexity m_leq_n monus_def u_leq_v)
 qed
 
-lemma RENAME_Part2:
+lemma monus_monus:
   assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c" and k_type[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c"
   shows "(n \<midarrow>\<^sub>\<nat> m) \<midarrow>\<^sub>\<nat> k = n \<midarrow>\<^sub>\<nat> (m +\<^sub>\<nat> k)"
 proof(cases "n \<le>\<^sub>\<nat> m +\<^sub>\<nat> k")
@@ -384,7 +384,7 @@ next
   then have Case2: "m +\<^sub>\<nat> k \<le>\<^sub>\<nat> n"
     using leq_infix_def lqe_connexity by (typecheck_cfuncs, auto)
   show "n \<midarrow>\<^sub>\<nat> m \<midarrow>\<^sub>\<nat> k = n \<midarrow>\<^sub>\<nat> (m +\<^sub>\<nat> k)"
-    by (typecheck_cfuncs, smt (verit, del_insts) Case2 RENAME_Part1 add_associates 
+    by (typecheck_cfuncs, smt (verit, del_insts) Case2 plus_monus add_associates 
         add_respects_zero_on_right add_type bigger_monus_smaller smaller_monus_bigger)
 qed
 
@@ -398,7 +398,7 @@ proof -
       by (typecheck_cfuncs, simp add: add_respects_zero_on_right smaller_monus_bigger)
   next
     show "\<not> n \<le>\<^sub>\<nat> m \<Longrightarrow> n \<le>\<^sub>\<nat> m +\<^sub>\<nat> (n \<midarrow>\<^sub>\<nat> m)"
-      by (typecheck_cfuncs, metis RENAME_Part1 add_commutes exists_implies_leq_true leq_infix_def monus_type)
+      by (typecheck_cfuncs, metis plus_monus add_commutes exists_implies_leq_true leq_infix_def monus_type)
   qed
 next
   fix j 
