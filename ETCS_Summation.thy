@@ -114,7 +114,7 @@ proof(cases "n1 = zero")
       by (typecheck_cfuncs, simp add: \<open>n1 = zero\<close> \<open>n2 = zero\<close> add_respects_zero_on_right indexed_sum_zero right_cart_proj_cfunc_prod)
 
 
-
+    oops
 
 
 

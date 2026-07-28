@@ -629,7 +629,10 @@ proof -
   have "\<exists> j. j \<in>\<^sub>c one\<Coprod>one \<and> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) \<circ>\<^sub>c j  = \<langle>\<t>,\<f>\<rangle>"
     by (typecheck_cfuncs, meson left_coproj_cfunc_coprod left_proj_type)
   then show ?thesis
-    by (typecheck_cfuncs, smt (verit, ccfv_threshold) NOT_false_is_true NOT_is_pullback XOR_is_pullback comp_associative2 is_pullback_def square_commutes_def terminal_func_comp)
+    by (typecheck_cfuncs, smt (verit, best) XOR_is_pullback cfunc_coprod_comp characteristic_func_eq
+    characteristic_func_is_pullback characteristic_function_exists comp_associative2 coproduct_of_beta element_monomorphism id_right_unit2
+    left_coproj_cfunc_coprod maps_into_1u1 one_unique_element pre_XOR_type pullback_of_mono_is_mono1 right_coproj_cfunc_coprod terminal_func_comp_elem
+        terminal_func_unique)
 qed
 
 lemma XOR_only_true_right_is_true:
@@ -638,7 +641,10 @@ proof -
   have "\<exists> j. j \<in>\<^sub>c one\<Coprod>one \<and> (\<langle>\<t>, \<f>\<rangle> \<amalg>\<langle>\<f>, \<t>\<rangle>) \<circ>\<^sub>c j  = \<langle>\<f>,\<t>\<rangle>"
     by (typecheck_cfuncs, meson right_coproj_cfunc_coprod right_proj_type)
   then show ?thesis
-    by (typecheck_cfuncs, smt (verit, ccfv_threshold) NOT_false_is_true NOT_is_pullback XOR_is_pullback comp_associative2 is_pullback_def square_commutes_def terminal_func_comp)
+    by (typecheck_cfuncs, smt (verit, best) XOR_is_pullback cfunc_coprod_comp characteristic_func_eq
+    characteristic_func_is_pullback characteristic_function_exists comp_associative2 coproduct_of_beta element_monomorphism id_right_unit2
+    left_coproj_cfunc_coprod maps_into_1u1 one_unique_element pre_XOR_type pullback_of_mono_is_mono1 right_coproj_cfunc_coprod terminal_func_comp_elem
+        terminal_func_unique)
 qed
 
 
@@ -1024,8 +1030,10 @@ proof -
   have "\<exists> j. j \<in>\<^sub>c (one\<Coprod>one) \<and> (\<langle>\<t>, \<t>\<rangle> \<amalg>\<langle>\<f>, \<f>\<rangle>) \<circ>\<^sub>c j  = \<langle>\<t>,\<t>\<rangle>"
     by (typecheck_cfuncs, smt (z3)  comp_associative2 comp_type left_coproj_cfunc_coprod left_proj_type right_coproj_cfunc_coprod right_proj_type true_false_only_truth_values)
   then show ?thesis 
-    by (smt (verit, ccfv_threshold) AND_is_pullback AND_true_true_is_true IFF_is_pullback comp_associative2 is_pullback_def square_commutes_def terminal_func_comp)
-qed
+    by (smt (verit, ccfv_threshold) IFF_is_pullback cfunc_prod_type comp_associative2 
+        id_right_unit2 is_pullback_def left_coproj_cfunc_coprod left_proj_type
+        square_commutes_def terminal_func_comp_elem true_false_only_truth_values)  
+  qed
 
 
 
@@ -1035,8 +1043,10 @@ proof -
   have "\<exists> j. j \<in>\<^sub>c (one\<Coprod>one) \<and> (\<langle>\<t>, \<t>\<rangle> \<amalg>\<langle>\<f>, \<f>\<rangle>) \<circ>\<^sub>c j  = \<langle>\<f>,\<f>\<rangle>"
     by (typecheck_cfuncs, smt (z3)  comp_associative2 comp_type left_coproj_cfunc_coprod left_proj_type right_coproj_cfunc_coprod right_proj_type true_false_only_truth_values)
   then show ?thesis 
-    by (smt (verit, ccfv_threshold) AND_is_pullback AND_true_true_is_true IFF_is_pullback comp_associative2 is_pullback_def square_commutes_def terminal_func_comp)
-qed
+    by (smt (verit, ccfv_threshold) IFF_is_pullback cfunc_prod_type comp_associative2 
+        id_right_unit2 is_pullback_def left_coproj_cfunc_coprod left_proj_type
+        square_commutes_def terminal_func_comp_elem true_false_only_truth_values) 
+  qed
 
 lemma IFF_true_false_is_false:
  "(IFF \<circ>\<^sub>c \<langle>\<t>,\<f>\<rangle> = \<f>)"

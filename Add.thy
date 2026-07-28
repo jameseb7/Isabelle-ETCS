@@ -1,14 +1,18 @@
 theory Add
-  imports Nats
+  imports Category_Set.ETCS 
 begin
+
+
+
+
 
 definition add1 :: "cfunc" where
    "add1 = (THE u. u: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and>
-    u \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c one\<^sup>\<sharp> \<and>
+    u \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp> \<and>
     successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c u = u\<circ>\<^sub>csuccessor)"
 
 lemma add1_property: "(add1: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and>
-    add1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c one\<^sup>\<sharp> \<and>
+    add1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp> \<and>
     successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c add1 = add1 \<circ>\<^sub>c successor)"
   unfolding add1_def
   by (rule theI', typecheck_cfuncs, smt (verit, best) natural_number_object_property)
@@ -16,7 +20,7 @@ lemma add1_property: "(add1: \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup
 lemma add1_type[type_rule]: "add1:  \<nat>\<^sub>c \<rightarrow>  \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   by (simp add: add1_property)
  
-lemma add1_0_eq: "add1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c one\<^sup>\<sharp>"
+lemma add1_0_eq: "add1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp>"
   using add1_property by force
 
 lemma add1_comp_succ_eq: "add1 \<circ>\<^sub>c successor = (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f) \<circ>\<^sub>c add1"
@@ -54,13 +58,13 @@ lemma add_respects_zero_on_right:
 proof -
   have "m +\<^sub>\<nat> zero =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, add1 \<circ>\<^sub>c zero\<rangle>"
     by (simp add: add_def2 assms zero_type)
-  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> \<rangle>"
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>m, (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> \<rangle>"
     by (simp add: add1_0_eq)
-  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp> \<circ>\<^sub>c id one \<rangle>"
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c \<circ>\<^sub>c m, (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> \<circ>\<^sub>c id \<one> \<rangle>"
     using assms by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2)
-  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c ((id \<nat>\<^sub>c \<times>\<^sub>f  (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>) \<circ>\<^sub>c  \<langle>m, id one \<rangle>)"
+  also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c ((id \<nat>\<^sub>c \<times>\<^sub>f  (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp>) \<circ>\<^sub>c  \<langle>m, id \<one> \<rangle>)"
     using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-  also have "... =  (left_cart_proj \<nat>\<^sub>c one) \<circ>\<^sub>c \<langle>m,id one\<rangle>"
+  also have "... =  (left_cart_proj \<nat>\<^sub>c \<one>) \<circ>\<^sub>c \<langle>m,id \<one>\<rangle>"
     using assms by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
   also have "... = m"
     using assms id_type left_cart_proj_cfunc_prod by blast
@@ -196,21 +200,21 @@ proof -
     by (metis add1_property comp_type identity_distributes_across_composition successor_type zero_type)
   also have "... = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c (add1\<circ>\<^sub>c zero)))"
     by (typecheck_cfuncs, simp add: add1_comp_succ_eq comp_associative2)
-  also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f)  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>)"
+  also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f)  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp>)"
     by (typecheck_cfuncs, simp add: add1_0_eq identity_distributes_across_composition)
-  also have "... = (successor \<circ>\<^sub>c eval_func  \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>)"
+  also have "... = (successor \<circ>\<^sub>c eval_func  \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp>)"
     by (typecheck_cfuncs, smt comp_associative2 exp_func_def2 flat_cancels_sharp inv_transpose_func_def3)
-  also have "... = successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
+  also have "... = successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)"
     by (typecheck_cfuncs, metis cfunc_type_def comp_associative transpose_func_def)
   then have fact2: " eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ((add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor))\<^sup>\<sharp> \<circ>\<^sub>c zero)) = 
-   successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
+   successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)"
     using calculation by auto
-  have fact3: "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one))\<^sup>\<sharp>) = successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
+  have fact3: "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>))\<^sup>\<sharp>) = successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)"
     by (typecheck_cfuncs, simp add: transpose_func_def)  
-  then have fact4: "(successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one))\<^sup>\<sharp> = (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor))\<^sup>\<sharp> \<circ>\<^sub>c zero"
+  then have fact4: "(successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>))\<^sup>\<sharp> = (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f successor))\<^sup>\<sharp> \<circ>\<^sub>c zero"
     by (typecheck_cfuncs, simp add: fact2 fact3 same_evals_equal) 
   have fact5: "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f((add2 \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>\<circ>\<^sub>c zero)) =
-              successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)" 
+              successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)" 
   proof -
     have "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f((add2 \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>\<circ>\<^sub>c zero))
      = eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f((add2 \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>)) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>fzero)"
@@ -219,17 +223,17 @@ proof -
       by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
     also have "... =  add2 \<circ>\<^sub>c (successor \<times>\<^sub>f zero)"
       by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_cross_prod comp_associative2 id_left_unit2 id_right_unit2)
-    also have "... = add2 \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c\<circ>\<^sub>c successor)  \<times>\<^sub>f (zero \<circ>\<^sub>c id\<^sub>c one))"
+    also have "... = add2 \<circ>\<^sub>c ((id\<^sub>c \<nat>\<^sub>c\<circ>\<^sub>c successor)  \<times>\<^sub>f (zero \<circ>\<^sub>c id\<^sub>c \<one>))"
       using id_left_unit2 id_right_unit2 successor_type zero_type by auto
-    also have "... =  add2 \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>fzero)  \<circ>\<^sub>c(successor \<times>\<^sub>f id\<^sub>c one)"
+    also have "... =  add2 \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>fzero)  \<circ>\<^sub>c(successor \<times>\<^sub>f id\<^sub>c \<one>)"
       by (smt cfunc_cross_prod_comp_cfunc_cross_prod id_type successor_type zero_type)
-    also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add1) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>fzero) \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c one)"
+    also have "... = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add1) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>fzero) \<circ>\<^sub>c (successor \<times>\<^sub>f id\<^sub>c \<one>)"
       by (typecheck_cfuncs, smt add2_def comp_associative2)
-    also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>) \<circ>\<^sub>c  (successor \<times>\<^sub>f id\<^sub>c one)"
+    also have "... =  eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c(id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp>) \<circ>\<^sub>c  (successor \<times>\<^sub>f id\<^sub>c \<one>)"
       by (typecheck_cfuncs, simp add: add1_0_eq cfunc_cross_prod_comp_cfunc_cross_prod id_left_unit2 id_right_unit2)
-    also have "... = (left_cart_proj \<nat>\<^sub>c one)  \<circ>\<^sub>c  (successor \<times>\<^sub>f id\<^sub>c one)"
+    also have "... = (left_cart_proj \<nat>\<^sub>c \<one>)  \<circ>\<^sub>c  (successor \<times>\<^sub>f id\<^sub>c \<one>)"
       by (typecheck_cfuncs, simp add: comp_associative2 transpose_func_def)
-    also have "... = successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
+    also have "... = successor \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)"
       by (simp add: id_type left_cart_proj_cfunc_cross_prod successor_type)
     then show ?thesis using calculation by auto
   qed
@@ -434,7 +438,7 @@ lemma add_commutes:
 proof - 
   have "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ((add2  \<circ>\<^sub>c 
     \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero)) = 
-    left_cart_proj \<nat>\<^sub>c one"
+    left_cart_proj \<nat>\<^sub>c \<one>"
   proof-
     have "eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c  (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f ((add2  \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero)) = 
           eval_func  \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f (add2 \<circ>\<^sub>c  \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp>)  \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)"
@@ -442,27 +446,27 @@ proof -
     also have "... = add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle> \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f zero)"
       by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative transpose_func_def)
     also have "... = add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle> \<circ>\<^sub>c
-                              \<langle>(left_cart_proj \<nat>\<^sub>c one),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one)\<rangle>"
+                              \<langle>(left_cart_proj \<nat>\<^sub>c \<one>),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c \<one>)\<rangle>"
       by (metis cfunc_cross_prod_def cfunc_type_def id_domain id_left_unit left_cart_proj_type zero_type)
     also have "... = add2 \<circ>\<^sub>c
-              \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c one),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one)\<rangle>,
-              (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c one),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one)\<rangle> \<rangle>"
+              \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c \<one>),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c \<one>)\<rangle>,
+              (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>(left_cart_proj \<nat>\<^sub>c \<one>),zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c \<one>)\<rangle> \<rangle>"
       by (typecheck_cfuncs, simp add: cfunc_prod_comp)
-    also have "... = add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c one), (left_cart_proj \<nat>\<^sub>c one)\<rangle>"
+    also have "... = add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c \<one>), (left_cart_proj \<nat>\<^sub>c \<one>)\<rangle>"
       by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod right_cart_proj_cfunc_prod)
-    also have "... =  add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c(left_cart_proj \<nat>\<^sub>c one), (left_cart_proj \<nat>\<^sub>c one)\<rangle>"
+    also have "... =  add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c(left_cart_proj \<nat>\<^sub>c \<one>), (left_cart_proj \<nat>\<^sub>c \<one>)\<rangle>"
       by (typecheck_cfuncs, metis terminal_func_unique)
-    also have "... =  add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c(left_cart_proj \<nat>\<^sub>c one), id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)\<rangle>"
+    also have "... =  add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c(left_cart_proj \<nat>\<^sub>c \<one>), id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)\<rangle>"
       by (typecheck_cfuncs, simp add: id_left_unit2)
-    also have "... =  add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
+    also have "... =  add2 \<circ>\<^sub>c \<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> , id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)"
       by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
-    also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
+    also have "... = id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)"
       by (typecheck_cfuncs, simp add: comp_associative2 id_N_def2)
-    also have "... = left_cart_proj \<nat>\<^sub>c one"
+    also have "... = left_cart_proj \<nat>\<^sub>c \<one>"
       by (metis cfunc_type_def id_left_unit left_cart_proj_type)
     then show ?thesis using calculation by auto
   qed  
-  then have fact0: "((add2  \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero) = (left_cart_proj \<nat>\<^sub>c one)\<^sup>\<sharp>"
+  then have fact0: "((add2  \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c),(left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c zero) = (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp>"
       by (typecheck_cfuncs, simp add: transpose_func_unique)
   have fact1: "((add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<rangle>)\<^sup>\<sharp> \<circ>\<^sub>c successor)\<^sup>\<flat> = 
                    successor \<circ>\<^sub>c  add2 \<circ>\<^sub>c \<langle>(right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c), (left_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c)\<rangle>"
@@ -513,36 +517,36 @@ proof -
   have triangle: "(add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero = 
     (add2 \<circ>\<^sub>c add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero"
     (is "?lhs = ?rhs")
-  proof (rule same_evals_equal[where X="\<nat>\<^sub>c", where A="\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c", where Z="one"]) 
-    show lhs_type: "?lhs : one \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+  proof (rule same_evals_equal[where X="\<nat>\<^sub>c", where A="\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c", where Z="\<one>"]) 
+    show lhs_type: "?lhs : \<one> \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
       by typecheck_cfuncs
-    show rhs_type: "?rhs : one \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
+    show rhs_type: "?rhs : \<one> \<rightarrow> \<nat>\<^sub>c\<^bsup>(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<^esup>"
       by typecheck_cfuncs    
     have lhs_eval: "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ?lhs)
-      = (add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) one)"
+      = (add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<one>)"
     (is "?lhs1 = ?rhs1")
-    proof (rule one_separator[where X="(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c one", where Y="\<nat>\<^sub>c"])
-      show LHS_type: "?lhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+    proof (rule one_separator[where X="(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c \<one>", where Y="\<nat>\<^sub>c"])
+      show LHS_type: "?lhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         by typecheck_cfuncs
-      show RHS_type: "?rhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+      show RHS_type: "?rhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         by typecheck_cfuncs
     next
       fix x
-      assume "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one"
-      then obtain a b where "x = \<langle>\<langle>a,b\<rangle>, id one\<rangle>" and a_type: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type: "b \<in>\<^sub>c \<nat>\<^sub>c"
+      assume "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<one>"
+      then obtain a b where "x = \<langle>\<langle>a,b\<rangle>, id \<one>\<rangle>" and a_type: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type: "b \<in>\<^sub>c \<nat>\<^sub>c"
         by (metis cart_prod_decomp id_type terminal_func_unique)
       then show "?lhs1 \<circ>\<^sub>c x = ?rhs1 \<circ>\<^sub>c x"
       proof auto
         have "(eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c  (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f
               (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero)) \<circ>\<^sub>c
-            \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>
+            \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>
           = eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
             (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f
               (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp>) \<circ>\<^sub>c
-            (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
+            (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>"
           using a_type b_type by (typecheck_cfuncs, smt comp_associative2 inv_transpose_func_def3 inv_transpose_of_composition transpose_func_def)
         also have "... = (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
-                                      ((id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>)"
+                                      ((id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f zero) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>)"
           using a_type b_type by (typecheck_cfuncs, smt comp_associative2 transpose_func_def)
         also have "... = (add2 \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f add2) \<circ>\<^sub>c associate_right \<nat>\<^sub>c \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>, zero\<rangle>"
           using a_type b_type by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
@@ -556,39 +560,39 @@ proof -
           using a_type b_type by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
         also have "... = add2 \<circ>\<^sub>c \<langle>a, b\<rangle>"
           using add_def add_respects_zero_on_right b_type by auto
-        also have "... = add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) one \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
+        also have "... = add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<one> \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>"
           using a_type b_type by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
-        also have "... = (add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) one) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
+        also have "... = (add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<one>) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>"
           using a_type b_type by (typecheck_cfuncs, simp add: comp_associative2)
-        then show "?lhs1 \<circ>\<^sub>c \<langle>\<langle>a, b\<rangle>, id\<^sub>c one\<rangle> = ?rhs1 \<circ>\<^sub>c \<langle>\<langle>a, b\<rangle>, id\<^sub>c one\<rangle>"
+        then show "?lhs1 \<circ>\<^sub>c \<langle>\<langle>a, b\<rangle>, id\<^sub>c \<one>\<rangle> = ?rhs1 \<circ>\<^sub>c \<langle>\<langle>a, b\<rangle>, id\<^sub>c \<one>\<rangle>"
           using calculation by auto
       qed
     qed
     have rhs_eval: "eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f ?rhs) 
-      = (add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) one)"
+      = (add2 \<circ>\<^sub>c left_cart_proj (\<nat>\<^sub>c\<times>\<^sub>c \<nat>\<^sub>c) \<one>)"
     (is "?lhs1 = ?rhs1")
-    proof (rule one_separator[where X="(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c one", where Y="\<nat>\<^sub>c"])
-      show LHS_type: "?lhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+    proof (rule one_separator[where X="(\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c)\<times>\<^sub>c \<one>", where Y="\<nat>\<^sub>c"])
+      show LHS_type: "?lhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         by typecheck_cfuncs
-      show RHS_type: "?rhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+      show RHS_type: "?rhs1 : (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         by typecheck_cfuncs
     next
       fix x
-      assume "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c one"
-      then obtain a b where "x = \<langle>\<langle>a,b\<rangle>, id one\<rangle>" and a_type: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type: "b \<in>\<^sub>c \<nat>\<^sub>c"
+      assume "x \<in>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>c \<one>"
+      then obtain a b where "x = \<langle>\<langle>a,b\<rangle>, id \<one>\<rangle>" and a_type: "a \<in>\<^sub>c \<nat>\<^sub>c" and b_type: "b \<in>\<^sub>c \<nat>\<^sub>c"
         by (metis cart_prod_decomp id_type terminal_func_unique)
       then show "?lhs1 \<circ>\<^sub>c x = ?rhs1 \<circ>\<^sub>c x"
       proof auto
-        have "?lhs1  \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>  =  
+        have "?lhs1  \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>  =  
           eval_func \<nat>\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c
           (id\<^sub>c (\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c) \<times>\<^sub>f (add2 \<circ>\<^sub>c add2 \<times>\<^sub>f id\<^sub>c \<nat>\<^sub>c)\<^sup>\<sharp> \<circ>\<^sub>c zero) \<circ>\<^sub>c
-          \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
+          \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>"
           using a_type b_type by (typecheck_cfuncs, simp add: comp_associative2)
         also have "... =  
           eval_func  \<nat>\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<circ>\<^sub>c 
             ((id\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>f (add2 \<circ>\<^sub>c (add2 \<times>\<^sub>f  id\<^sub>c \<nat>\<^sub>c))\<^sup>\<sharp>) \<circ>\<^sub>c
               (id\<^sub>c (\<nat>\<^sub>c\<times>\<^sub>c\<nat>\<^sub>c) \<times>\<^sub>f zero)) \<circ>\<^sub>c
-              \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
+              \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>"
           using a_type b_type by (typecheck_cfuncs, simp add: identity_distributes_across_composition)
         also have "... = add2 \<circ>\<^sub>c ((add2 \<times>\<^sub>f  id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,zero\<rangle>)"
           using a_type b_type
@@ -597,9 +601,9 @@ proof -
           using a_type b_type by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
         also have "... = add2 \<circ>\<^sub>c \<langle>a,b\<rangle>"
           using a_type b_type add_def add_respects_zero_on_right by (typecheck_cfuncs, auto)
-        also have "... = ?rhs1 \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
+        also have "... = ?rhs1 \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>"
           using a_type b_type by (typecheck_cfuncs, smt comp_associative2 left_cart_proj_cfunc_prod)
-        then show "?lhs1 \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle> = ?rhs1 \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c one\<rangle>"
+        then show "?lhs1 \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle> = ?rhs1 \<circ>\<^sub>c \<langle>\<langle>a,b\<rangle>,id\<^sub>c \<one>\<rangle>"
           using calculation by auto
       qed
     qed
@@ -726,7 +730,7 @@ proof -
   obtain a_b_add_eq where
     a_b_add_eq_type[type_rule]: "a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>" and
     a_b_add_eq_def: "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>"
-    using assms by typecheck_cfuncs
+    using assms by (typecheck_cfuncs, blast)
 
   have "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
   proof (rule natural_number_object_func_unique[where X=\<Omega>, where f="id \<Omega>"])
@@ -824,7 +828,7 @@ proof -
   obtain a_b_add_eq where
     a_b_add_eq_type: "a_b_add_eq : \<nat>\<^sub>c \<rightarrow> \<Omega>" and
     a_b_add_eq_def: "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, add2 \<circ>\<^sub>c \<langle>b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>\<rangle>"
-    using assms by typecheck_cfuncs
+    using assms by (typecheck_cfuncs, blast)
 
   have "a_b_add_eq = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, b \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"
     unfolding a_b_add_eq_def using add2_cancellative assms successor_type by blast 
@@ -1008,16 +1012,377 @@ proof -
     by (metis add_cancellative add_respects_zero_on_left assms(1,2) calculation zero_type)
 qed
 
+theorem nat_eq_induction:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes f_type[type_rule]: "f : \<nat>\<^sub>c \<rightarrow> X"  and g_type[type_rule]: "g : \<nat>\<^sub>c \<rightarrow> X"
+  assumes base_case: "f \<circ>\<^sub>c zero = g \<circ>\<^sub>c zero"
+  assumes induction_case: "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> f \<circ>\<^sub>c n = g \<circ>\<^sub>c n \<Longrightarrow> f \<circ>\<^sub>c successor \<circ>\<^sub>c n = g \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+  shows "f \<circ>\<^sub>c n = g \<circ>\<^sub>c n"
+proof -
+  have "(eq_pred X \<circ>\<^sub>c \<langle>f, g\<rangle>) \<circ>\<^sub>c n = \<t>"
+  proof (etcs_rule nat_induction)
+    show "(eq_pred X \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c zero = \<t>"
+      by (etcs_assocr, typecheck_cfuncs, smt base_case cfunc_prod_comp comp_type eq_pred_iff_eq)
+  next
+    fix n
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume "(eq_pred X \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c n = \<t>"
+    then have "f \<circ>\<^sub>c n = g \<circ>\<^sub>c n"
+      by (typecheck_cfuncs_prems, smt cfunc_prod_comp comp_associative2 comp_type eq_pred_iff_eq)
+    then have "f \<circ>\<^sub>c successor \<circ>\<^sub>c n = g \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+      by (simp add: induction_case n_type)
+    then show "(eq_pred X \<circ>\<^sub>c \<langle>f,g\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+      by (typecheck_cfuncs_prems, typecheck_cfuncs, smt cfunc_prod_comp comp_associative2 eq_pred_iff_eq)
+  qed
+  then show "f \<circ>\<^sub>c n = g \<circ>\<^sub>c n"
+    by (typecheck_cfuncs_prems, smt cfunc_prod_comp comp_associative2 comp_type eq_pred_iff_eq)
+qed
+thm nat_induction
+
 (*
 lemma iterative_injective_peeling:
-  assumes "g : X \<rightarrow> X"
-  assumes "k \<in>\<^sub>c \<nat>\<^sub>c"
-  assumes "x \<in>\<^sub>c X"
-  assumes "y \<in>\<^sub>c X"
-  assumes "injective g"
-  assumes "(g\<^bsup>\<circ>k\<^esup>) \<circ>\<^sub>c x =(g\<^bsup>\<circ>k\<^esup>) \<circ>\<^sub>c y"
-  shows "x=y"
-  sorry
+  assumes g_type[type_rule]: "g : X \<rightarrow> X"
+  assumes kN[type_rule]: "k \<in>\<^sub>c \<nat>\<^sub>c"
+  assumes x_type[type_rule]: "x \<in>\<^sub>c X"
+  assumes y_type[type_rule]: "y \<in>\<^sub>c X"
+  assumes inj_g: "injective g"
+  assumes eqk: "(g\<^bsup>\<circ>k\<^esup>) \<circ>\<^sub>c x = (g\<^bsup>\<circ>k\<^esup>) \<circ>\<^sub>c y"
+  shows "x = y"
+proof -
+  (*
+    Build the \<Omega>-valued predicate
+      E(n) := [ g^n(x) = g^n(y) ]  : \<nat> \<rightarrow> \<Omega>
+    using ITER + eval.
+  *)
+  define It where It_def:
+    "It = ITER X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id\<^sub>c \<nat>\<^sub>c\<rangle>"     (* \<nat> \<rightarrow> X\<^bsup>X\<^esup> *)
+
+  define xn where xn_def:
+    "xn = eval_func X X \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, It\<rangle>"              (* \<nat> \<rightarrow> X *)
+
+  define yn where yn_def:
+    "yn = eval_func X X \<circ>\<^sub>c \<langle>y \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, It\<rangle>"              (* \<nat> \<rightarrow> X *)
+
+  define E where E_def:
+    "E = eq_pred X \<circ>\<^sub>c \<langle>xn, yn\<rangle>"                              (* \<nat> \<rightarrow> \<Omega> *)
+
+  have It_type[type_rule]: "It : \<nat>\<^sub>c \<rightarrow> X\<^bsup>X\<^esup>"
+    unfolding It_def by typecheck_cfuncs
+  have xn_type[type_rule]: "xn : \<nat>\<^sub>c \<rightarrow> X"
+    unfolding xn_def by typecheck_cfuncs
+  have yn_type[type_rule]: "yn : \<nat>\<^sub>c \<rightarrow> X"
+    unfolding yn_def by typecheck_cfuncs
+  have E_type[type_rule]: "E : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    unfolding E_def by typecheck_cfuncs
+
+    
+
+
+  have f0: "\<langle>(x \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor, It \<circ>\<^sub>c successor\<rangle> = \<langle>x \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, meta_comp X X X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, It\<rangle>\<rangle>"
+    unfolding It_def  
+    by (typecheck_cfuncs, smt (verit, best) ITER_succ cfunc_prod_comp comp_associative2 
+        id_left_unit2 id_right_unit2 meta_comp2_def5 terminal_func_comp)
+
+  have xn_succ: "xn \<circ>\<^sub>c successor = g \<circ>\<^sub>c xn"
+  proof -
+    have "xn \<circ>\<^sub>c successor
+        = eval_func X X \<circ>\<^sub>c (\<langle>x \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, It\<rangle> \<circ>\<^sub>c successor)"
+      by (typecheck_cfuncs, simp add: comp_associative2 xn_def)
+    also have "... = eval_func X X \<circ>\<^sub>c \<langle>(x \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c successor, It \<circ>\<^sub>c successor\<rangle>"
+      by (typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+    also have "... = eval_func X X \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, meta_comp X X X \<circ>\<^sub>c \<langle>metafunc g \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, It\<rangle>\<rangle>"
+      by (simp add: f0)
+    also have "... = g \<circ>\<^sub>c (eval_func X X \<circ>\<^sub>c \<langle>x \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, It\<rangle>)"
+      sorry
+    also have "... = g \<circ>\<^sub>c xn"
+      by (typecheck_cfuncs, simp add: xn_def)
+    finally show ?thesis.
+  qed
+  
+  have yn_succ: "yn \<circ>\<^sub>c successor = g \<circ>\<^sub>c yn"
+    sorry
+
+  have peel_iter:
+  "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> xn \<circ>\<^sub>c n = yn \<circ>\<^sub>c n \<Longrightarrow> x = y"
+  proof -
+    fix n
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume eqn: "xn \<circ>\<^sub>c n = yn \<circ>\<^sub>c n"
+  
+    (*
+      Build a countdown index dec : \<nat> \<rightarrow> \<nat> with
+        dec 0 = n
+        dec (succ m) = predecessor (dec m)
+      so that (xn \<circ> dec) 0  = xn n   (given equal)
+           (xn \<circ> dec) n  = xn 0 = x  (goal)
+    *)
+    define ItP where
+      "ItP = ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc predecessor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id\<^sub>c \<nat>\<^sub>c\<rangle>"
+  
+    define dec where
+      "dec = eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>n \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, ItP\<rangle>"
+  
+    have ItP_type[type_rule]: "ItP : \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c)\<^bsup>(\<nat>\<^sub>c)\<^esup>"
+      unfolding ItP_def by typecheck_cfuncs
+    have dec_type[type_rule]: "dec : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+      unfolding dec_def by typecheck_cfuncs
+  
+    have ItP0: "ItP \<circ>\<^sub>c zero = metafunc (id \<nat>\<^sub>c)"
+    proof -
+      have "ItP \<circ>\<^sub>c zero
+            = (ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc predecessor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero"
+        unfolding ItP_def by simp
+      also have "... = ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>(metafunc predecessor \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c zero, (id\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c zero\<rangle>"
+        by (typecheck_cfuncs, metis cfunc_prod_comp comp_associative2)
+      also have "... = ITER \<nat>\<^sub>c \<circ>\<^sub>c \<langle>metafunc predecessor, zero\<rangle>"      
+        using ITER_zero' id_left_unit2 by (typecheck_cfuncs, presburger)
+      also have "... = metafunc (id \<nat>\<^sub>c)"
+        using ITER_nat_zero_predecessor by blast
+      finally show ?thesis.
+    qed
+  
+      
+  
+  
+    (* These are the standard “eval/ITER” equations, analogous to your It_succ. *)
+    have dec_zero: "dec \<circ>\<^sub>c zero = n"
+      unfolding dec_def ItP_def
+      by (typecheck_cfuncs, smt (verit, ccfv_SIG) cfunc_prod_comp comp_associative2 
+          eval_lemma_for_ITER id_left_unit2 id_right_unit2 terminal_func_comp_elem  zero_iters)
+  
+    have dec_succ:
+      "dec \<circ>\<^sub>c successor = predecessor \<circ>\<^sub>c dec"
+      unfolding dec_def ItP_def
+      sorry
+  
+    (* You need the “pred^n(n)=0” fact for your predecessor (with pred 0 = 0). *)
+    have dec_at_n: "dec \<circ>\<^sub>c n = zero"
+      unfolding dec_def ItP_def
+      sorry
+  
+    define fx where "fx = xn \<circ>\<^sub>c dec"
+    define fy where "fy = yn \<circ>\<^sub>c dec"
+  
+    have fx_type[type_rule]: "fx : \<nat>\<^sub>c \<rightarrow> X"
+      unfolding fx_def by typecheck_cfuncs
+    have fy_type[type_rule]: "fy : \<nat>\<^sub>c \<rightarrow> X"
+      unfolding fy_def by typecheck_cfuncs
+  
+    have base_case: "fx \<circ>\<^sub>c zero = fy \<circ>\<^sub>c zero"
+      using comp_associative2 dec_type dec_zero eqn fx_def fy_def xn_type yn_type by (typecheck_cfuncs, force)
+  
+    have induction_case:
+      "\<And>m. m \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> fx \<circ>\<^sub>c m = fy \<circ>\<^sub>c m
+            \<Longrightarrow> fx \<circ>\<^sub>c successor \<circ>\<^sub>c m = fy \<circ>\<^sub>c successor \<circ>\<^sub>c m"
+    proof -
+      fix m
+      assume m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+      assume IH: "fx \<circ>\<^sub>c m = fy \<circ>\<^sub>c m"
+  
+      define t where t_def: "t = dec \<circ>\<^sub>c m"
+      have t_type[type_rule]: "t \<in>\<^sub>c \<nat>\<^sub>c"
+        unfolding t_def by typecheck_cfuncs
+  
+      have eqt: "xn \<circ>\<^sub>c t = yn \<circ>\<^sub>c t"
+        unfolding fx_def fy_def t_def
+        using IH comp_associative2 fx_def fy_def by (typecheck_cfuncs, force)
+  
+      (* rewrite fx(succ m), fy(succ m) using dec_succ *)
+      have fx_succm:
+        "fx \<circ>\<^sub>c successor \<circ>\<^sub>c m = xn \<circ>\<^sub>c (predecessor \<circ>\<^sub>c t)"
+        unfolding fx_def t_def  
+        by (typecheck_cfuncs, smt (verit, best) comp_associative2 dec_succ)
+      have fy_succm:
+        "fy \<circ>\<^sub>c successor \<circ>\<^sub>c m = yn \<circ>\<^sub>c (predecessor \<circ>\<^sub>c t)"
+        unfolding fy_def t_def  
+        by (typecheck_cfuncs, smt (verit, best) comp_associative2 dec_succ)
+  
+      (* Now “peel” one g using xn_succ/yn_succ + injectivity of g. *)
+      have peeled:
+        "xn \<circ>\<^sub>c (predecessor \<circ>\<^sub>c t) = yn \<circ>\<^sub>c (predecessor \<circ>\<^sub>c t)"
+      proof -
+        (* you need successor \<circ> pred ?t = ?t when ?t \<noteq> 0; usually proved by nat-cases *)
+        have succ_pred_t:
+          "(t = zero) \<or> (successor \<circ>\<^sub>c (predecessor \<circ>\<^sub>c t) = t)"
+          by (typecheck_cfuncs, metis cfunc_type_def comp_associative id_left_unit2 nonzero_is_succ predecessor_successor)
+  
+          show ?thesis
+        proof (cases "t = zero")
+          show "t = zero \<Longrightarrow> xn \<circ>\<^sub>c predecessor \<circ>\<^sub>c t = yn \<circ>\<^sub>c predecessor \<circ>\<^sub>c t"
+            using eqt predecessor_zero by argo
+        next
+          assume "t \<noteq> zero"       
+          then have sp: "successor \<circ>\<^sub>c (predecessor \<circ>\<^sub>c t) = t"
+            using succ_pred_t by blast
+  
+          have "g \<circ>\<^sub>c (xn \<circ>\<^sub>c (predecessor \<circ>\<^sub>c t))
+              = g \<circ>\<^sub>c (yn \<circ>\<^sub>c (predecessor \<circ>\<^sub>c t))"
+            by (typecheck_cfuncs, metis cfunc_type_def comp_associative eqt sp successor_type xn_succ yn_succ)       
+          thus ?thesis
+            using g_type inj_g injective_def2 by (typecheck_cfuncs, blast)
+        qed
+      qed
+  
+      show "fx \<circ>\<^sub>c successor \<circ>\<^sub>c m = fy \<circ>\<^sub>c successor \<circ>\<^sub>c m"
+        using fx_succm fy_succm peeled by simp
+    qed
+  
+    have fx_eq_fy_at_n: "fx \<circ>\<^sub>c n = fy \<circ>\<^sub>c n"
+      using nat_eq_induction n_type fx_type fy_type base_case induction_case by blast
+  
+    (* evaluate at n: dec n = 0, and xn 0 = x, yn 0 = y *)
+    have fxn: "fx \<circ>\<^sub>c n = xn \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, metis cfunc_type_def comp_associative dec_at_n dec_type fx_def)    
+  
+    have fyn: "fy \<circ>\<^sub>c n = yn \<circ>\<^sub>c zero"
+      by (typecheck_cfuncs, metis cfunc_type_def comp_associative dec_at_n dec_type fy_def)    
+  
+    have xn0: "xn \<circ>\<^sub>c zero = x"
+      sorry
+    have yn0: "yn \<circ>\<^sub>c zero = y"
+      sorry
+  
+    show "x = y"
+      using fx_eq_fy_at_n fxn fyn xn0 yn0 by simp
+  qed
+
+
+
+
+  have yn_succ: "yn \<circ>\<^sub>c successor = g \<circ>\<^sub>c yn"
+    unfolding yn_def
+    using yn_def yn_succ by force
+
+  (*
+    3) The single-step "peel" lemma:
+       if E(succ n)=t then E(n)=t.
+       Again: no induction, just injectivity once.
+  *)
+  have peel:
+    "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> E \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t> \<Longrightarrow> E \<circ>\<^sub>c n = \<t>"
+  proof -
+    fix n
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume Esucc: "E \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+    have xn_eq_yn_succ: "xn \<circ>\<^sub>c successor \<circ>\<^sub>c n = yn \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+      sorry 
+    have gx_eq: "g \<circ>\<^sub>c (xn \<circ>\<^sub>c n) = g \<circ>\<^sub>c (yn \<circ>\<^sub>c n)"
+      using peel_iter succ_n_type xn_def xn_eq_yn_succ yn_def by (typecheck_cfuncs, blast)
+
+
+    have xneq: "xn \<circ>\<^sub>c n = yn \<circ>\<^sub>c n"
+      using g_type gx_eq inj_g injective_def2 by (typecheck_cfuncs, blast)
+    show "E \<circ>\<^sub>c n = \<t>"
+      unfolding E_def
+      by (smt (verit, ccfv_SIG) cfunc_prod_comp cfunc_prod_type comp_associative2 
+          comp_type eq_pred_iff_eq eq_pred_type n_type xn_type xneq yn_type)  
+  qed
+
+  (*
+    4) Relate your hypothesis eqk to E(k)=t.
+
+    This is the only “bridge” you need from your ITER-built xn/yn to the
+    already-defined iterate notation (g\<^bsup>\<circ>k\<^esup>).
+
+    In most developments you already have something like:
+      xn \<circ> k = (g\<^bsup>\<circ>k\<^esup>) \<circ> x
+      yn \<circ> k = (g\<^bsup>\<circ>k\<^esup>) \<circ> y
+    because It(k) is the exponential-name of g^k and eval applies it.
+  *)
+  have Ek: "E \<circ>\<^sub>c k = \<t>"
+  proof -
+    have xk: "xn \<circ>\<^sub>c k = (g\<^bsup>\<circ>k\<^esup>) \<circ>\<^sub>c x"
+      unfolding xn_def It_def
+      by (typecheck_cfuncs, smt (verit, best) cart_prod_extract_right cfunc_prod_comp 
+          comp_associative2 eval_lemma_for_ITER id_right_unit2 terminal_func_comp_elem)
+    have yk: "yn \<circ>\<^sub>c k = (g\<^bsup>\<circ>k\<^esup>) \<circ>\<^sub>c y"
+      unfolding yn_def It_def
+      by (typecheck_cfuncs, smt (verit, best) cart_prod_extract_right cfunc_prod_comp 
+          comp_associative2 eval_lemma_for_ITER id_right_unit2 terminal_func_comp_elem)
+    show ?thesis
+      unfolding E_def
+      by (typecheck_cfuncs, smt (verit, ccfv_SIG) cfunc_prod_comp comp_associative2 
+          comp_type eq_pred_iff_eq_conv2 eqk xk yk)
+  qed
+
+  (*
+    5) Now do the *only* induction: propagate “if E(n) then E(0)”
+       forward using nat_induction.
+
+    This is where your earlier observation matters:
+      nat_induction wants goals of the form (p \<circ> n = \<t>).
+
+    So define
+      P : \<nat> \<rightarrow> \<Omega>
+      P(n) := (E(n) \<Rightarrow> E(0))   (internal implication in \<Omega>).
+  *)
+  define E0 where E0_def: "E0 = E \<circ>\<^sub>c zero"          (* \<one> \<rightarrow> \<Omega> *)
+  define P  where P_def:
+    "P = IMPLIES \<circ>\<^sub>c \<langle>E, E0 \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>"               (* \<nat> \<rightarrow> \<Omega> *)
+
+  have P_type[type_rule]: "P : \<nat>\<^sub>c \<rightarrow> \<Omega>"
+    unfolding P_def E0_def by typecheck_cfuncs
+
+  have P_zero: "P \<circ>\<^sub>c zero = \<t>"
+    unfolding P_def E0_def
+    by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 
+        id_right_unit2 implies_implies_IMPLIES terminal_func_comp_elem)
+    (* This is just (a \<Rightarrow> a) = \<t>, with a = E \<circ> zero. *)
+
+
+    have P_step:
+    "\<And>n. n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> P \<circ>\<^sub>c n = \<t> \<Longrightarrow> P \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+  proof -
+    fix n
+    assume nN: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume Pn: "P \<circ>\<^sub>c n = \<t>"
+    (*
+      To show implication is true at succ(n), split on whether E(succ n)=\<t> or 𝗙.
+      If it's 𝗙, implication is trivially \<t>.
+      If it's \<t>, peel to get E(n)=\<t>, then use P(n)=\<t> to get E0=\<t>, hence implication holds.
+    *)
+
+    show "P \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+    proof (cases "E \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>")
+      case True
+      have En: "E \<circ>\<^sub>c n = \<t>"
+        using peel[OF nN] True by simp
+      have E0t: "E0 = \<t>"
+        sorry
+
+      show ?thesis
+        unfolding P_def
+        using True E0t
+        (* if a=\<t> and b=\<t> then (a\<Rightarrow>b)=\<t> *)
+
+    next
+      case False
+      show ?thesis
+        unfolding P_def
+        using False
+        (* if a=𝗙 then (a\<Rightarrow>b)=\<t> *)
+        by (simp add: imp_false_left)
+    qed
+  qed
+
+  have Pk: "P \<circ>\<^sub>c k = \<t>"
+    using nat_induction[OF P_type kN P_zero P_step] .
+
+  (*
+    6) Conclude E(0)=t using P(k)=t and E(k)=t, then unwrap E(0)=t as x=y.
+  *)
+  have E0t: "E0 = \<t>"
+    using Pk Ek
+    unfolding P_def
+    by (simp add: imp_mp E0_def)
+
+  have "x = y"
+    using E0t
+    unfolding E0_def E_def
+    (* eq_pred X \<circ> \<langle>x,y\<rangle> = \<t>  <->  x=y *)
+    by (simp)
+  thus ?thesis .
+qed
 
 lemma iterative_injective_peeling2:
   assumes "g : X \<rightarrow> X"
@@ -1041,9 +1406,6 @@ lemma meta_add_type[type_rule]:
   "meta_add X : (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<times>\<^sub>c (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<rightarrow> \<nat>\<^sub>c\<^bsup>X\<^esup>"
   unfolding meta_add_def by typecheck_cfuncs
 
-
-
-
 lemma comm_lift_to_comm:
   assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
   assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
@@ -1061,18 +1423,18 @@ proof-
     also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c (id X \<times>\<^sub>f \<langle>f,g\<rangle>)"
       using assms by (typecheck_cfuncs, simp add: comp_associative2 flat_cancels_sharp)
     also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c (id X \<times>\<^sub>f \<langle>g,f\<rangle>)"
-    proof(rule one_separator[where X = "X \<times>\<^sub>c one", where Y = "\<nat>\<^sub>c"])
-      show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle> : X \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+    proof(rule one_separator[where X = "X \<times>\<^sub>c \<one>", where Y = "\<nat>\<^sub>c"])
+      show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle> : X \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         using assms by typecheck_cfuncs
-      show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>g,f\<rangle> : X \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+      show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>g,f\<rangle> : X \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         using assms by typecheck_cfuncs
     next
       fix x_one
-      assume x_one_type[type_rule]: "x_one \<in>\<^sub>c X \<times>\<^sub>c one"
-      then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "x_one = \<langle>x, id one\<rangle>"
+      assume x_one_type[type_rule]: "x_one \<in>\<^sub>c X \<times>\<^sub>c \<one>"
+      then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "x_one = \<langle>x, id \<one>\<rangle>"
         by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)
       have "(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c x_one =
-             operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x, \<langle>f,g\<rangle> \<circ>\<^sub>c id one\<rangle>"           
+             operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x, \<langle>f,g\<rangle> \<circ>\<^sub>c id \<one>\<rangle>"           
         using assms  by (etcs_assocr, typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod x_def)
       also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c \<langle>\<langle>x,f\<rangle>, \<langle>x,g\<rangle>\<rangle>"
         using assms distribute_left_ap id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
@@ -1086,7 +1448,7 @@ proof-
         by (typecheck_cfuncs, smt eval_lemma metafunc_cnufatem assms)
       also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c \<langle>\<langle>x,g\<rangle>, \<langle>x,f\<rangle>\<rangle>"
         using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
-      also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x, \<langle>g,f\<rangle> \<circ>\<^sub>c id one\<rangle>"
+      also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x, \<langle>g,f\<rangle> \<circ>\<^sub>c id \<one>\<rangle>"
         using assms distribute_left_ap id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
       also have "... = (operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>g,f\<rangle>) \<circ>\<^sub>c x_one"
         using assms  by (etcs_assocr, typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod x_def)
@@ -1108,72 +1470,11 @@ proof-
     using assms(5) by auto
 qed
 
-
-
 lemma madd_commutes:
   assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
   assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
   shows "meta_add X \<circ>\<^sub>c \<langle>f, g\<rangle> = meta_add X \<circ>\<^sub>c \<langle>g, f\<rangle>"
   using add2_type add_commutes add_def assms comm_lift_to_comm meta_add_def by auto
-
-
-(*
-proof(unfold meta_add_def)
-  have "((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>)\<^sup>\<flat> = 
-        ((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,f\<rangle>)\<^sup>\<flat>"
-  proof - 
-    have "((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>)\<^sup>\<flat> =
-           (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp>\<^sup>\<flat> \<circ>\<^sub>c (id X \<times>\<^sub>f \<langle>f,g\<rangle>)"
-      using assms inv_transpose_of_composition by (typecheck_cfuncs, blast)
-    also have "... = add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c (id X \<times>\<^sub>f \<langle>f,g\<rangle>)"
-      using assms by (typecheck_cfuncs, simp add: comp_associative2 flat_cancels_sharp)
-    also have "... = add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c (id X \<times>\<^sub>f \<langle>g,f\<rangle>)"
-    proof(rule one_separator[where X = "X \<times>\<^sub>c one", where Y = "\<nat>\<^sub>c"])
-      show "add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle> : X \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
-        using assms by typecheck_cfuncs
-      show "add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>g,f\<rangle> : X \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
-        using assms by typecheck_cfuncs
-    next
-      fix x_one
-      assume x_one_type[type_rule]: "x_one \<in>\<^sub>c X \<times>\<^sub>c one"
-      then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "x_one = \<langle>x, id one\<rangle>"
-        by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element)
-      have "(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c x_one =
-             add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x, \<langle>f,g\<rangle> \<circ>\<^sub>c id one\<rangle>"           
-        using assms  by (etcs_assocr, typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod x_def)
-      also have "... = add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c \<langle>\<langle>x,f\<rangle>, \<langle>x,g\<rangle>\<rangle>"
-        using assms distribute_left_ap id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-      also have "... = add2 \<circ>\<^sub>c  \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,f\<rangle>,eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,g\<rangle>\<rangle>"
-        using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
-      also have "... = add2 \<circ>\<^sub>c  \<langle>(cnufatem f) \<circ>\<^sub>c x  , (cnufatem g) \<circ>\<^sub>c x\<rangle>"
-        by (typecheck_cfuncs, smt eval_lemma metafunc_cnufatem assms)
-      also have "... = add2 \<circ>\<^sub>c  \<langle>(cnufatem g) \<circ>\<^sub>c x  , (cnufatem f) \<circ>\<^sub>c x\<rangle>"
-        using assms add_commutes add_def by (typecheck_cfuncs, auto)
-      also have "... = add2 \<circ>\<^sub>c  \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,g\<rangle>,eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,f\<rangle>\<rangle>"
-        by (typecheck_cfuncs, smt eval_lemma metafunc_cnufatem assms)
-      also have "... = add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c \<langle>\<langle>x,g\<rangle>, \<langle>x,f\<rangle>\<rangle>"
-        using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
-      also have "... = add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c \<langle>id X \<circ>\<^sub>c x, \<langle>g,f\<rangle> \<circ>\<^sub>c id one\<rangle>"
-        using assms distribute_left_ap id_left_unit2 id_right_unit2 by (typecheck_cfuncs, force)
-      also have "... = (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>g,f\<rangle>) \<circ>\<^sub>c x_one"
-        using assms  by (etcs_assocr, typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod x_def)
-      then show "(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c x_one =
-         (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>g,f\<rangle>) \<circ>\<^sub>c x_one"
-        using calculation by auto
-    qed
-  also have "... = (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp>\<^sup>\<flat> \<circ>\<^sub>c (id X \<times>\<^sub>f \<langle>g,f\<rangle>)"
-      using assms by (typecheck_cfuncs, simp add: cfunc_type_def comp_associative flat_cancels_sharp)
-  also have "... = ((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,f\<rangle>)\<^sup>\<flat>"
-      using assms inv_transpose_of_composition by (typecheck_cfuncs, auto)
-  then show ?thesis
-    using calculation by argo
-  qed   
-  then show "(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle> =
-             (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,f\<rangle>"
-   using assms by (typecheck_cfuncs, metis sharp_cancels_flat)
-qed
-*)
-
 
 lemma assoc_lift_to_assoc:
   assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
@@ -1183,10 +1484,7 @@ lemma assoc_lift_to_assoc:
   assumes  associative_operation: "\<And> a b c. a \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> b \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> operation \<circ>\<^sub>c \<langle>a, operation \<circ>\<^sub>c \<langle>b, c\<rangle>\<rangle> = operation \<circ>\<^sub>c \<langle>operation \<circ>\<^sub>c \<langle>a, b\<rangle>, c\<rangle>"
   assumes "meta_operation = (operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f  eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp>" 
   shows "meta_operation \<circ>\<^sub>c \<langle>f, meta_operation \<circ>\<^sub>c \<langle>g, h\<rangle>\<rangle> = meta_operation \<circ>\<^sub>c \<langle>meta_operation \<circ>\<^sub>c \<langle>f, g\<rangle>, h\<rangle>"
-proof -
-  
-
-
+proof - 
   have "((operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c
       \<langle>f,(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>)\<^sup>\<flat> =
         ((operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c
@@ -1202,15 +1500,15 @@ proof -
       using assms by (typecheck_cfuncs, simp add: comp_associative2 flat_cancels_sharp)
     also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
       (id X \<times>\<^sub>f  \<langle>(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>)"
-    proof(rule one_separator[where X = "X \<times>\<^sub>c one", where Y = "\<nat>\<^sub>c"])
-      show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle> : X \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+    proof(rule one_separator[where X = "X \<times>\<^sub>c \<one>", where Y = "\<nat>\<^sub>c"])
+      show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle> : X \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         using assms by typecheck_cfuncs
-      show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle> : X \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+      show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle> : X \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         using assms by typecheck_cfuncs
     next
       fix x_one 
-      assume x_one_type[type_rule]: "x_one \<in>\<^sub>c X \<times>\<^sub>c one"
-      then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "x_one = \<langle>x, id one\<rangle>"
+      assume x_one_type[type_rule]: "x_one \<in>\<^sub>c X \<times>\<^sub>c \<one>"
+      then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "x_one = \<langle>x, id \<one>\<rangle>"
         by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element) 
 
       have "(operation \<circ>\<^sub>c
@@ -1221,7 +1519,7 @@ proof -
         operation \<circ>\<^sub>c
           (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c
           distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
-          (id\<^sub>c X \<times>\<^sub>f \<langle>(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>) \<circ>\<^sub>c \<langle>x, id one\<rangle>"
+          (id\<^sub>c X \<times>\<^sub>f \<langle>(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>) \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>"
         using assms by (typecheck_cfuncs, simp add: comp_associative2 x_def)
       also have "... =  operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c
           distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
@@ -1229,7 +1527,7 @@ proof -
         using assms cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, auto)
       also have "... =  operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c
           \<langle>\<langle>x, (operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>\<rangle>, \<langle>x,h\<rangle>\<rangle>"
-        using assms distribute_left_ap by (typecheck_cfuncs, presburger)
+        using assms distribute_left_ap by (typecheck_cfuncs, auto)
       also have "... =   operation \<circ>\<^sub>c 
           \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, (operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>\<rangle>, 
            eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
@@ -1237,13 +1535,13 @@ proof -
       also have "... =   operation \<circ>\<^sub>c 
           \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c (id X \<times>\<^sub>f (operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> )
                           \<circ>\<^sub>c (id X \<times>\<^sub>f  \<langle>f,g\<rangle>)
-                          \<circ>\<^sub>c \<langle>x, id one\<rangle>, 
+                          \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>, 
            eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
         using assms cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, auto)
       also have "... =   operation \<circ>\<^sub>c 
           \<langle>(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) )
                           \<circ>\<^sub>c (id X \<times>\<^sub>f  \<langle>f,g\<rangle>)
-                          \<circ>\<^sub>c \<langle>x, id one\<rangle>, 
+                          \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>, 
            eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
         using assms by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 transpose_func_def)
       also have "... =   operation \<circ>\<^sub>c 
@@ -1252,7 +1550,7 @@ proof -
            eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
         using assms by(typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 id_right_unit2)
       also have "... =   operation \<circ>\<^sub>c \<langle>operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c  \<langle>\<langle>x, f\<rangle>, \<langle>x,g\<rangle>\<rangle>, eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
-        using assms distribute_left_ap by (typecheck_cfuncs, presburger)
+        using assms distribute_left_ap by (typecheck_cfuncs, simp)
       also have "... =  operation \<circ>\<^sub>c \<langle>operation \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, f\<rangle>, eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,g\<rangle>\<rangle>, eval_func \<nat>\<^sub>c X \<circ>\<^sub>c  \<langle>x,h\<rangle>\<rangle>"
         using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
       also have "... = operation \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, f\<rangle>, operation \<circ>\<^sub>c  \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,g\<rangle>, eval_func \<nat>\<^sub>c X \<circ>\<^sub>c  \<langle>x,h\<rangle>\<rangle>\<rangle>"
@@ -1261,7 +1559,7 @@ proof -
         using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
       also have "... = operation \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, f\<rangle>, 
                        operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c \<langle>x, \<langle>g,h\<rangle>\<rangle>\<rangle>"
-        using assms distribute_left_ap by (typecheck_cfuncs, presburger)
+        using assms distribute_left_ap by (typecheck_cfuncs, auto)
       also have "... = operation \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, f\<rangle>, 
         eval_func \<nat>\<^sub>c X \<circ>\<^sub>c  (id X \<times>\<^sub>f (operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x, \<langle>g,h\<rangle>\<rangle>\<rangle>"
         using assms comp_associative2 transpose_func_def by (typecheck_cfuncs, auto)
@@ -1273,9 +1571,9 @@ proof -
         using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
       also have "... = operation \<circ>\<^sub>c(eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
           \<langle>x , \<langle>f,(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>\<rangle>"
-        using assms distribute_left_ap by (typecheck_cfuncs, presburger)
+        using assms distribute_left_ap by (typecheck_cfuncs, auto)
       also have "... = operation \<circ>\<^sub>c(eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
-          (id\<^sub>c X \<times>\<^sub>f \<langle>f,(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>) \<circ>\<^sub>c \<langle>x, id one\<rangle>"
+          (id\<^sub>c X \<times>\<^sub>f \<langle>f,(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>) \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>"
         using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
       also have "... = (operation \<circ>\<^sub>c(eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
            id\<^sub>c X \<times>\<^sub>f \<langle>f,(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>) \<circ>\<^sub>c x_one"
@@ -1293,7 +1591,7 @@ proof -
       using assms comp_associative2 flat_cancels_sharp by (typecheck_cfuncs, auto)
     also have "... = ((operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c
         \<langle>(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>)\<^sup>\<flat>"
-      using assms inv_transpose_of_composition by (typecheck_cfuncs, presburger)
+      using assms inv_transpose_of_composition by (typecheck_cfuncs, simp)
     then show ?thesis
       using calculation by argo
   qed
@@ -1306,18 +1604,11 @@ proof -
     using assms(6) by blast
 qed
 
-
-
-
 lemma madd_associates:
   assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
   assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>"
   assumes "h \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>X\<^esup>" 
   shows "meta_add X \<circ>\<^sub>c \<langle>f, meta_add X \<circ>\<^sub>c \<langle>g, h\<rangle>\<rangle> = meta_add X \<circ>\<^sub>c \<langle>meta_add X \<circ>\<^sub>c \<langle>f, g\<rangle>, h\<rangle>"
-  sorry
-
-
-(*
 proof(unfold meta_add_def)
   have "((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c
       \<langle>f,(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>)\<^sup>\<flat> =
@@ -1334,15 +1625,15 @@ proof(unfold meta_add_def)
       using assms by (typecheck_cfuncs, simp add: comp_associative2 flat_cancels_sharp)
     also have "... = add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
       (id X \<times>\<^sub>f  \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>)"
-    proof(rule one_separator[where X = "X \<times>\<^sub>c one", where Y = "\<nat>\<^sub>c"])
-      show "add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle> : X \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+    proof(rule one_separator[where X = "X \<times>\<^sub>c \<one>", where Y = "\<nat>\<^sub>c"])
+      show "add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>f,(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle> : X \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         using assms by typecheck_cfuncs
-      show "add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle> : X \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+      show "add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c id\<^sub>c X \<times>\<^sub>f \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle> : X \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
         using assms by typecheck_cfuncs
     next
       fix x_one 
-      assume x_one_type[type_rule]: "x_one \<in>\<^sub>c X \<times>\<^sub>c one"
-      then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "x_one = \<langle>x, id one\<rangle>"
+      assume x_one_type[type_rule]: "x_one \<in>\<^sub>c X \<times>\<^sub>c \<one>"
+      then obtain x where x_type[type_rule]: "x \<in>\<^sub>c X" and x_def: "x_one = \<langle>x, id \<one>\<rangle>"
         by (typecheck_cfuncs, metis cart_prod_decomp one_unique_element) 
 
       have "(add2 \<circ>\<^sub>c
@@ -1353,7 +1644,7 @@ proof(unfold meta_add_def)
         add2 \<circ>\<^sub>c
           (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c
           distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
-          (id\<^sub>c X \<times>\<^sub>f \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>) \<circ>\<^sub>c \<langle>x, id one\<rangle>"
+          (id\<^sub>c X \<times>\<^sub>f \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>) \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>"
         using assms by (typecheck_cfuncs, simp add: comp_associative2 x_def)
       also have "... =  add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c
           distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
@@ -1361,7 +1652,7 @@ proof(unfold meta_add_def)
         using assms cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, auto)
       also have "... =  add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c
           \<langle>\<langle>x, (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>\<rangle>, \<langle>x,h\<rangle>\<rangle>"
-        using assms distribute_left_ap by (typecheck_cfuncs, presburger)
+        using assms by (typecheck_cfuncs, simp add: distribute_left_ap)
       also have "... =   add2 \<circ>\<^sub>c 
           \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>\<rangle>, 
            eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
@@ -1369,13 +1660,13 @@ proof(unfold meta_add_def)
       also have "... =   add2 \<circ>\<^sub>c 
           \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c (id X \<times>\<^sub>f (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> )
                           \<circ>\<^sub>c (id X \<times>\<^sub>f  \<langle>f,g\<rangle>)
-                          \<circ>\<^sub>c \<langle>x, id one\<rangle>, 
+                          \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>, 
            eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
         using assms cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2 by (typecheck_cfuncs, auto)
       also have "... =   add2 \<circ>\<^sub>c 
           \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) )
                           \<circ>\<^sub>c (id X \<times>\<^sub>f  \<langle>f,g\<rangle>)
-                          \<circ>\<^sub>c \<langle>x, id one\<rangle>, 
+                          \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>, 
            eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
         using assms by (typecheck_cfuncs, smt (verit, ccfv_threshold) comp_associative2 transpose_func_def)
       also have "... =   add2 \<circ>\<^sub>c 
@@ -1384,7 +1675,7 @@ proof(unfold meta_add_def)
            eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
         using assms by(typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2 id_right_unit2)
       also have "... =   add2 \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c  \<langle>\<langle>x, f\<rangle>, \<langle>x,g\<rangle>\<rangle>, eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,h\<rangle>\<rangle>"
-        using assms distribute_left_ap by (typecheck_cfuncs, presburger)
+        using assms by (typecheck_cfuncs, simp add: distribute_left_ap)
       also have "... =  add2 \<circ>\<^sub>c \<langle>add2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, f\<rangle>, eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,g\<rangle>\<rangle>, eval_func \<nat>\<^sub>c X \<circ>\<^sub>c  \<langle>x,h\<rangle>\<rangle>"
         using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
       also have "... = add2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, f\<rangle>, add2 \<circ>\<^sub>c  \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x,g\<rangle>, eval_func \<nat>\<^sub>c X \<circ>\<^sub>c  \<langle>x,h\<rangle>\<rangle>\<rangle>"
@@ -1393,7 +1684,7 @@ proof(unfold meta_add_def)
         using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
       also have "... = add2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, f\<rangle>, 
                        add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c \<langle>x, \<langle>g,h\<rangle>\<rangle>\<rangle>"
-        using assms distribute_left_ap by (typecheck_cfuncs, presburger)
+        using assms by (typecheck_cfuncs, simp add: distribute_left_ap)
       also have "... = add2 \<circ>\<^sub>c \<langle>eval_func \<nat>\<^sub>c X \<circ>\<^sub>c \<langle>x, f\<rangle>, 
         eval_func \<nat>\<^sub>c X \<circ>\<^sub>c  (id X \<times>\<^sub>f (add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp>) \<circ>\<^sub>c \<langle>x, \<langle>g,h\<rangle>\<rangle>\<rangle>"
         using assms comp_associative2 transpose_func_def by (typecheck_cfuncs, auto)
@@ -1405,9 +1696,9 @@ proof(unfold meta_add_def)
         using assms cfunc_cross_prod_comp_cfunc_prod by (typecheck_cfuncs, force)
       also have "... = add2 \<circ>\<^sub>c(eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
           \<langle>x , \<langle>f,(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>\<rangle>"
-        using assms distribute_left_ap by (typecheck_cfuncs, presburger)
+        using assms by (typecheck_cfuncs, simp add: distribute_left_ap)
       also have "... = add2 \<circ>\<^sub>c(eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
-          (id\<^sub>c X \<times>\<^sub>f \<langle>f,(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>) \<circ>\<^sub>c \<langle>x, id one\<rangle>"
+          (id\<^sub>c X \<times>\<^sub>f \<langle>f,(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>) \<circ>\<^sub>c \<langle>x, id \<one>\<rangle>"
         using assms by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
       also have "... = (add2 \<circ>\<^sub>c(eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>) \<circ>\<^sub>c
            id\<^sub>c X \<times>\<^sub>f \<langle>f,(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>g,h\<rangle>\<rangle>) \<circ>\<^sub>c x_one"
@@ -1425,7 +1716,7 @@ proof(unfold meta_add_def)
       using assms comp_associative2 flat_cancels_sharp by (typecheck_cfuncs, auto)
     also have "... = ((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c
         \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>)\<^sup>\<flat>"
-      using assms inv_transpose_of_composition by (typecheck_cfuncs, presburger)
+      using assms by (typecheck_cfuncs, metis inv_transpose_of_composition)
     then show ?thesis
       using calculation by argo
   qed
@@ -1435,10 +1726,7 @@ proof(unfold meta_add_def)
     \<langle>(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c X \<times>\<^sub>f eval_func \<nat>\<^sub>c X) \<circ>\<^sub>c distribute_left X (\<nat>\<^sub>c\<^bsup>X\<^esup>) (\<nat>\<^sub>c\<^bsup>X\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>,h\<rangle>"
     using assms by(typecheck_cfuncs, metis sharp_cancels_flat)
 qed
-*)
 
-
-(*
 lemma meta_op_as_op:
   assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   assumes "g \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
@@ -1457,19 +1745,19 @@ proof -
         using assms inv_transpose_of_composition by (typecheck_cfuncs, moura)
       also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>)"
         using assms by (typecheck_cfuncs,simp add: comp_associative2 flat_cancels_sharp)
-      also have "... = (operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
-      proof(rule one_separator[where X = "\<nat>\<^sub>c \<times>\<^sub>c one", where Y = "\<nat>\<^sub>c"])
-        show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle> : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+      also have "... = (operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)"
+      proof(rule one_separator[where X = "\<nat>\<^sub>c \<times>\<^sub>c \<one>", where Y = "\<nat>\<^sub>c"])
+        show "operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle> : \<nat>\<^sub>c \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
           using assms by typecheck_cfuncs
-        show "(operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+        show "(operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one> : \<nat>\<^sub>c \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
           using assms by typecheck_cfuncs
       next
         fix n_one
-        assume n_one_type[type_rule]: "n_one \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c one"
-        then obtain n where n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and n_def: "n_one = \<langle>n, id one\<rangle>"
+        assume n_one_type[type_rule]: "n_one \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<one>"
+        then obtain n where n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and n_def: "n_one = \<langle>n, id \<one>\<rangle>"
           using cart_prod_decomp one_unique_element by (typecheck_cfuncs, blast)
         have "(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c n_one = 
-               operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c \<langle>n, id one\<rangle>"
+               operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c \<langle>n, id \<one>\<rangle>"
           using assms n_def by(etcs_assocr, typecheck_cfuncs, argo)
         also have "... = operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>n, f\<rangle>, \<langle>n, g\<rangle>\<rangle>"
           by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod distribute_left_ap id_left_unit2 id_right_unit2 assms)
@@ -1477,18 +1765,18 @@ proof -
           by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod assms)
         also have "... = operation \<circ>\<^sub>c  \<langle>cnufatem f \<circ>\<^sub>c n, cnufatem g \<circ>\<^sub>c n\<rangle>"
           by (typecheck_cfuncs, metis eval_lemma metafunc_cnufatem assms(1,2))
-        also have "... = operation \<circ>\<^sub>c  \<langle>cnufatem f \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one \<circ>\<^sub>c n_one , cnufatem g \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one \<circ>\<^sub>c n_one\<rangle>"  
+        also have "... = operation \<circ>\<^sub>c  \<langle>cnufatem f \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one> \<circ>\<^sub>c n_one , cnufatem g \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one> \<circ>\<^sub>c n_one\<rangle>"  
           using assms id_type left_cart_proj_cfunc_prod n_def by (typecheck_cfuncs, presburger)
-        also have "... = ((operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one) \<circ>\<^sub>c n_one"
+        also have "... = ((operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>) \<circ>\<^sub>c n_one"
           by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 assms)
         then show "(operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c n_one =
-         ((operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one) \<circ>\<^sub>c n_one"
+         ((operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>) \<circ>\<^sub>c n_one"
           using calculation by auto
       qed
-      also have "... = ((operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj (domain (operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>)) one)\<^sup>\<sharp>\<^sup>\<flat>"
+      also have "... = ((operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj (domain (operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>)) \<one>)\<^sup>\<sharp>\<^sup>\<flat>"
         using assms cfunc_prod_type cfunc_type_def cnufatem_type comp_type flat_cancels_sharp left_cart_proj_type by force
       then show "((operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>)\<^sup>\<flat> =
-                 ((operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj (domain (operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>)) one)\<^sup>\<sharp>\<^sup>\<flat>"
+                 ((operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj (domain (operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>)) \<one>)\<^sup>\<sharp>\<^sup>\<flat>"
         using calculation by argo
     qed
     then show ?thesis    
@@ -1499,13 +1787,14 @@ proof -
     by (typecheck_cfuncs, smt assms cnufatem_metafunc)
   have "cnufatem ((operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>) = 
         cnufatem (meta_operation \<circ>\<^sub>c \<langle>f,g\<rangle>)"
-    
-
+    sorry
   then show "cnufatem (meta_operation \<circ>\<^sub>c \<langle>f,g\<rangle>) = operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>"
-    using assms apply typecheck_cfuncs
+    using
+      \<open>cnufatem ((operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>) = cnufatem (meta_operation \<circ>\<^sub>c \<langle>f,g\<rangle>)\<close>
+      \<open>cnufatem ((operation \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>) = operation \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>\<close>
+    by argo
 qed
 
-*)
 
 lemma meta_add_as_add:
   assumes "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
@@ -1524,19 +1813,19 @@ proof(unfold add_def meta_add_def)
         using assms inv_transpose_of_composition by (typecheck_cfuncs, moura)
       also have "... = add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (id \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>)"
         using assms by (typecheck_cfuncs,simp add: comp_associative2 flat_cancels_sharp)
-      also have "... = (add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c one)"
-      proof(rule one_separator[where X = "\<nat>\<^sub>c \<times>\<^sub>c one", where Y = "\<nat>\<^sub>c"])
-        show "add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle> : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+      also have "... = (add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c (left_cart_proj \<nat>\<^sub>c \<one>)"
+      proof(rule one_separator[where X = "\<nat>\<^sub>c \<times>\<^sub>c \<one>", where Y = "\<nat>\<^sub>c"])
+        show "add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle> : \<nat>\<^sub>c \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
           using assms by typecheck_cfuncs
-        show "(add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one : \<nat>\<^sub>c \<times>\<^sub>c one \<rightarrow> \<nat>\<^sub>c"
+        show "(add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one> : \<nat>\<^sub>c \<times>\<^sub>c \<one> \<rightarrow> \<nat>\<^sub>c"
           using assms by typecheck_cfuncs
       next
         fix n_one
-        assume n_one_type[type_rule]: "n_one \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c one"
-        then obtain n where n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and n_def: "n_one = \<langle>n, id one\<rangle>"
+        assume n_one_type[type_rule]: "n_one \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<one>"
+        then obtain n where n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c" and n_def: "n_one = \<langle>n, id \<one>\<rangle>"
           using cart_prod_decomp one_unique_element by (typecheck_cfuncs, blast)
         have "(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c n_one = 
-               add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c \<langle>n, id one\<rangle>"
+               add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c (id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c \<langle>n, id \<one>\<rangle>"
           using assms n_def by(etcs_assocr, typecheck_cfuncs, argo)
         also have "... = add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>\<langle>n, f\<rangle>, \<langle>n, g\<rangle>\<rangle>"
           by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod distribute_left_ap id_left_unit2 id_right_unit2 assms)
@@ -1544,18 +1833,18 @@ proof(unfold add_def meta_add_def)
           by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod assms)
         also have "... = add2 \<circ>\<^sub>c  \<langle>cnufatem f \<circ>\<^sub>c n, cnufatem g \<circ>\<^sub>c n\<rangle>"
           by (typecheck_cfuncs, metis eval_lemma metafunc_cnufatem assms)
-        also have "... = add2 \<circ>\<^sub>c  \<langle>cnufatem f \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one \<circ>\<^sub>c n_one , cnufatem g \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one \<circ>\<^sub>c n_one\<rangle>"  
+        also have "... = add2 \<circ>\<^sub>c  \<langle>cnufatem f \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one> \<circ>\<^sub>c n_one , cnufatem g \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one> \<circ>\<^sub>c n_one\<rangle>"  
           using assms id_type left_cart_proj_cfunc_prod n_def by (typecheck_cfuncs, presburger)
-        also have "... = ((add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one) \<circ>\<^sub>c n_one"
+        also have "... = ((add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>) \<circ>\<^sub>c n_one"
           by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 assms)
         then show "(add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f \<langle>f,g\<rangle>) \<circ>\<^sub>c n_one =
-         ((add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c one) \<circ>\<^sub>c n_one"
+         ((add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj \<nat>\<^sub>c \<one>) \<circ>\<^sub>c n_one"
           using calculation by auto
       qed
-      also have "... = ((add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj (domain (add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>)) one)\<^sup>\<sharp>\<^sup>\<flat>"
+      also have "... = ((add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj (domain (add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>)) \<one>)\<^sup>\<sharp>\<^sup>\<flat>"
         by (smt (verit, ccfv_SIG) add_def add_type cnufatem_type comp_type flat_cancels_sharp left_cart_proj_type metafunc_def metafunc_def2 assms)
       then show "((add2 \<circ>\<^sub>c (eval_func \<nat>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>f eval_func \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c distribute_left \<nat>\<^sub>c (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>) (\<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c \<langle>f,g\<rangle>)\<^sup>\<flat> =
-                 ((add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj (domain (add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>)) one)\<^sup>\<sharp>\<^sup>\<flat>"
+                 ((add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>) \<circ>\<^sub>c left_cart_proj (domain (add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>)) \<one>)\<^sup>\<sharp>\<^sup>\<flat>"
         using calculation by argo
     qed
     then show ?thesis    
@@ -1565,4 +1854,5 @@ proof(unfold add_def meta_add_def)
              add2 \<circ>\<^sub>c \<langle>cnufatem f,cnufatem g\<rangle>"
     by (typecheck_cfuncs, smt assms cnufatem_metafunc)
 qed
+
 end
