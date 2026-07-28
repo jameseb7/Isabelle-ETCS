@@ -1,6 +1,8 @@
 # FOL Port Diary
 
-A running log of porting `Category_Set/Cfunc.thy` (HOL) to `FOL/Cfunc.thy` (plain Isabelle `FOL`).
+A running log of porting the ETCS `Category_Set/*.thy` (HOL) theories to plain Isabelle `FOL` under
+`FOL/`. So far: `Category_Set/Cfunc.thy` → `FOL/Cfunc.thy`, and `Category_Set/Product.thy` →
+`FOL/Product.thy` (the next theory in HOL `imports` dependency order after `Cfunc.thy`).
 Companion file: `FOL/typecheck.ml` (patched copy of `Category_Set/typecheck.ml`).
 
 **Ground rule for this whole effort: `Category_Set/` and the old top-level `ETCS_*.thy` files are
@@ -92,5 +94,48 @@ its two preconditions verified by hand) and chain named facts through an explici
 sequence instead. This was more reliable than any blanket `simp` invocation for multi-step
 re-associations. See `fol-proof-patterns-no-sledgehammer` for this alongside the other patterns.
 
-Next: pick the next theory in the HOL dependency order after `Cfunc.thy` (check `Category_Set/ROOT`
-rather than guessing) and port it the same way.
+## `FOL/Product.thy`
+
+Ported `Category_Set/Product.thy` (729 lines HOL) section by section, verifying each section against
+a headless build before moving to the next, same discipline as `Cfunc.thy`. Covers: the `cart_prod`
+Axiom-2 axiomatization, `is_cart_prod` (dropping HOL's `is_cart_prod_triple` tuple-bundling
+abbreviation — FOL has no tuple type, so the three components stay separate arguments throughout),
+`canonical_cart_prod_is_cart_prod`, `cart_prods_isomorphic`, `product_commutes`, the `cart_prod_eq`
+family (`eq`/`eqI`/`eq2`/`decomp`), `diagonal`/`cfunc_cross_prod` and their whole lemma family
+(`identity_distributes_across_composition`, `cfunc_cross_prod_comp_cfunc_prod`, `id_cross_prod`,
+`cfunc_cross_prod_comp_diagonal`, `cfunc_cross_prod_comp_cfunc_cross_prod`, `cfunc_cross_prod_mono`),
+`swap` (`swap_ap`/`swap_cross_prod`/`swap_idempotent`/`swap_mono`), `associate_right`/`associate_left`
+(with `right_left`/`left_right`/`product_associates`/both `crossprod_ap` lemmas), and finally
+`distribute_right`/`distribute_left` (each with their `_left`/`_right` helper functions and `_mono`)
+plus the "selecting pairs from a pair of pairs" family (`outers`/`inners`/`lefts`/`rights`).
+
+Every HOL `smt`/`metis` call in this file (there were dozens — `associate_right_ap`,
+`distribute_right_left_ap`, `right_left`, `left_right`, etc. all originally relied on them) was
+rewritten as an explicit proof. The dominant technique throughout was the one from pattern #13:
+compute each needed `comp_associative2`/`cfunc_prod_comp`/`cfunc_cross_prod_comp_cfunc_prod` instance
+via `fact[OF arg1 arg2 arg3]` with the argument order matched by hand against the lemma's stated
+variable order, then chain the results through explicit `have`/`also have` sequences — never left a
+multi-step rewrite to `simp`/`blast`/`auto` search. This scaled to every lemma in the file, including
+the large four-argument `outers`/`inners`/`lefts`/`rights` family, with no `smt`/`metis` substitute
+ever needed.
+
+Two new patterns beyond the `Cfunc.thy` set (recorded in `fol-proof-patterns-no-sledgehammer`, items
+14–15):
+- **Cancelling a doubled `id(X) \<circ>\<^sub>c id(X) \<circ>\<^sub>c f` requires an explicit intermediate typed fact for
+  `id(X) \<circ>\<^sub>c f` itself**, then applying `id_left_unit2` to *that* combined term via `OF` — `simp add:
+  id_left_unit2` alone doesn't chain two applications of the same conditional rewrite automatically
+  when the two hits are nested rather than adjacent.
+- **`right_left`/`left_right`-style "these two constructed isomorphisms cancel" proofs are much
+  cleaner via the identity-decomposition trick than via induction on all objects**: apply
+  `cart_prod_decomp` directly to `id(X)` itself (twice, for a doubly-nested product) to obtain
+  `id(X) = \<langle>x1, \<langle>y, z\<rangle>\<rangle>` for fresh `x1`/`y`/`z`, rewrite `id`'s two occurrences via this, then the
+  goal reduces to a single application of each direction's `_ap` lemma — no need for a general
+  "equal after every generalized element" argument.
+
+**Status: `FOL/Product.thy` is complete and independently verified** (2026-07-28): a from-scratch
+`isabelle build -c` (clean, forcing full recompilation) of the committed file finishes with zero
+errors, alongside the already-verified `FOL/Cfunc.thy`.
+
+Next: pick the next theory in the HOL dependency order after `Product.thy` (check `Category_Set/ROOT`
+and the `imports` statements across `Category_Set/*.thy` rather than guessing) and port it the same
+way.
