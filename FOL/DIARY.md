@@ -188,4 +188,58 @@ items 16-17):
 `isabelle build -c` of the committed file (alongside `Cfunc.thy` and `Product.thy`) finishes with
 zero errors.
 
-Next theory per the port order above: **Equalizer**.
+## `FOL/Equalizer.thy`
+
+Ported `Category_Set/Equalizer.thy` (927 lines HOL) — the largest and structurally hardest theory so
+far, for two reasons neither of which came up in `Cfunc.thy`/`Product.thy`/`Terminal.thy`:
+
+1. **Hilbert's choice operator (`SOME`).** HOL defines `inverse_image`, `inverse_image_mapping`,
+   `fibered_product`, and `fibered_product_morphism` all via `SOME`, which plain FOL has no
+   equivalent of. Fix: the same conservative-Skolemization technique already used for
+   `inverse`/`f\<^bold>\<inverse>` in `Cfunc.thy` — since `equalizer_exists` (Axiom 4) already proves existence
+   for *any* parallel pair of same-codomain morphisms, applying it to the specific pair
+   `f \<circ>\<^sub>c left_cart_proj(X,B)` / `m \<circ>\<^sub>c right_cart_proj(X,B)` (resp. the fibered-product analogue)
+   licenses axiomatizing `inverse_image`+`inverse_image_mapping` together (resp.
+   `fibered_product`+`fibered_product_morphism`) as its Skolem witness in one shot. This is a strict
+   simplification over the HOL original: HOL needed *two* nested `SOME`s per construction (one for
+   the object, one for the mapping, each separately justified via `someI2_ex`/`someI_ex`), which
+   collapses to *one* axiomatization here, eliminating the intermediate `_is_equalizer`
+   (existence-only) lemmas entirely — `_is_equalizer2` becomes a one-line corollary of the
+   axiomatization.
+2. **HOL tuples.** `subobject_of`, `relative_subset`, and `relative_member` all bundle a subobject's
+   underlying set and its monomorphism into a HOL `cset \<times> cfunc` pair, accessed via `fst`/`snd`, and
+   written with infix notation on the pair (`(B,m) \<subseteq>\<^sub>c X`, `x \<in>\<^bsub>X\<^esub> (B,m)`). FOL has no tuple type.
+   Fix: flatten to plain multi-argument predicates — `subobject_of(B, m, X)`,
+   `relative_subset(B, m, X, A, n)`, `relative_member(x, X, B, m)` — same convention already used for
+   `is_cart_prod`/`is_pullback`. This loses the HOL infix syntax (a custom multi-slot mixfix
+   preserving the `(_,_) \<subseteq>\<^sub>c _` surface form was considered but rejected as an unnecessary risk for
+   a purely cosmetic win — plain predicate-call syntax is consistent with the rest of the port). Every
+   downstream lemma referencing these (`inverse_image_subobject`, `in_inverse_image`,
+   `fibered_product_pair_member`, `kernel_pair_subset`, ...) was rewritten accordingly; the separate
+   `_def2` lemmas HOL needed to un-bundle `fst`/`snd` become unnecessary since the flat form *is* the
+   primary definition.
+
+Covers, in full: `equalizer`/`equalizer_def2`/`equalizer_eq`/`similar_equalizers`, Axiom 4
+(`equalizer_exists`) + `equalizer_exists2`, `equalizers_isomorphic`,
+`isomorphic_to_equalizer_is_equalizer`, `equalizer_is_monomorphism`, `regular_monomorphism` +
+`epi_regmon_is_iso`, the Subobjects family (`factors_through`, `subobject_of`, `relative_subset`,
+`relative_member`, `subobject_is_relative_subset`, `relative_subobject_member`), the Inverse Image
+family (Skolemized `inverse_image`/`inverse_image_mapping` + all 9 dependent lemmas including
+`inverse_image_pullback` and `in_inverse_image`), and the Fibered Products family (Skolemized
+`fibered_product`/`fibered_product_morphism` + all 13 dependent lemmas including
+`fibered_product_is_pullback`, the three `kern_pair_proj_iso_TFAE` lemmas, and
+`terminal_fib_prod_iso`). Every HOL `smt`/`metis` call was rewritten as an explicit proof.
+
+One simplification found while porting `kern_pair_proj_iso_TFAE1`: the HOL original case-splits on
+whether the fibered product `X \<^bsub>f\<^esub>\<times>\<^sub>c\<^bsub>f\<^esub> X` is empty (using an element-based argument in one
+branch, `one_separator`'s vacuous-implication trick in the other) to show
+`fibered_product_left_proj = fibered_product_right_proj` when `f` is monomorphism. This is
+unnecessary: `fibered_product_proj_eq` (the pullback's commutation clause) *already* gives
+`f \<circ>\<^sub>c left_proj = f \<circ>\<^sub>c right_proj` directly for the kernel-pair case (setting `g := f`), so a single
+`monomorphism_def3` cancellation closes it with no case split at all.
+
+**Status: `FOL/Equalizer.thy` is complete and independently verified** (2026-07-28): a from-scratch
+`isabelle build -c` of the committed file (alongside `Cfunc.thy`, `Product.thy`, `Terminal.thy`)
+finishes with zero errors.
+
+Next theory per the port order above: **Truth**.
