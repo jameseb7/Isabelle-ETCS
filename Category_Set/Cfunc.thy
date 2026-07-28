@@ -340,12 +340,14 @@ lemma is_isomorphic_equiv:
   "equiv UNIV {(X, Y). X \<cong> Y}"
   unfolding equiv_def
 proof safe
+  show "\<And>a b. a \<cong> b \<Longrightarrow> a \<in> UNIV"
+    by simp
+  show "\<And>a b. a \<cong> b \<Longrightarrow> b \<in> UNIV"
+    by simp
   show "refl {(x, y). x \<cong> y}"
     unfolding refl_on_def using isomorphic_is_reflexive by auto
-next
   show "sym {(x, y). x \<cong> y}"
     unfolding sym_def using isomorphic_is_symmetric by blast
-next
   show "trans {(x, y). x \<cong> y}"
     unfolding trans_def using isomorphic_is_transitive by blast
 qed
