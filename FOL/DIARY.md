@@ -94,6 +94,15 @@ its two preconditions verified by hand) and chain named facts through an explici
 sequence instead. This was more reliable than any blanket `simp` invocation for multi-step
 re-associations. See `fol-proof-patterns-no-sledgehammer` for this alongside the other patterns.
 
+## Theory port order
+
+Dustin specified the full remaining port order (2026-07-28), so this no longer needs to be
+re-derived from `Category_Set/*.thy` imports each time. After `Cfunc.thy` and `Product.thy`
+(both done), the order is: **Terminal** (in progress) → Equalizer → Truth → Equivalence →
+Coproduct → Axiom_Of_Choice → Initial → Exponential_Objects → Cardinality → Nats → Pred_Logic →
+Fixed_Points → Quant_Logic → Nat_Parity → Countable → **ETCS** (last). Follow this list rather
+than re-checking `imports` statements, unless a theory turns out to need something out of order.
+
 ## `FOL/Product.thy`
 
 Ported `Category_Set/Product.thy` (729 lines HOL) section by section, verifying each section against
@@ -136,6 +145,47 @@ Two new patterns beyond the `Cfunc.thy` set (recorded in `fol-proof-patterns-no-
 `isabelle build -c` (clean, forcing full recompilation) of the committed file finishes with zero
 errors, alongside the already-verified `FOL/Cfunc.thy`.
 
-Next: pick the next theory in the HOL dependency order after `Product.thy` (check `Category_Set/ROOT`
-and the `imports` statements across `Category_Set/*.thy` rather than guessing) and port it the same
-way.
+## `FOL/Terminal.thy`
+
+Ported `Category_Set/Terminal.thy` (740 lines HOL) section by section against the theory port order
+above. Covers: the Axiom-3 `terminal_func`/`one_set` axiomatization plus `one_separator`, the
+`\<in>\<^sub>c` membership abbreviation and `nonempty`/`is_empty`, `terminal_object` (with
+`terminal_objects_isomorphic`, `iso_to1_is_term`, `iso_to_term_is_term`, `single_elem_iso_one`),
+`injective`/`surjective` (with the `cfunc_cross_prod_inj`/`_surj`/`_mono_converse`/`_surj_converse`
+family), the interactions-with-terminal-objects family (`diag_on_elements`, `X_is_cart_prod1`/`2`,
+`A_x_one_iso_A`, the four `left`/`right_cart_proj_one_*_inverse` lemmas,
+`cfunc_cross_prod_right_terminal_decomp`, `cart_prod_elem_eq`, `element_pair_eq`, the two
+`nonempty_*_imp_*_proj_epimorphism` lemmas, `cart_prod_extract_left`/`right`), and finally
+`is_pullback`/`pullback_unique`/`pullback_iff_product`.
+
+One design choice beyond a literal port: HOL's `iso_to1_is_term` and the forward direction of
+`single_elem_iso_one` both independently re-derive "a set with one distinguished element `x` is
+terminal" (build the unique `Y \<rightarrow> X` map as `x \<circ>\<^sub>c \<beta>\<^bsub>Y\<^esub>`, then use `one_separator` to show every
+`h : Y \<rightarrow> X` equals it by testing against elements of `Y`). Factored this out once as a private
+helper lemma `unique_elem_gives_terminal`, used by both — same mathematical content as the HOL
+original, just not duplicated.
+
+Two new patterns beyond the `Product.thy` set (recorded in `fol-proof-patterns-no-sledgehammer`,
+items 16-17):
+- **`terminal_func_unique`, applied via plain `using ... terminal_func_unique by auto`, reliably
+  proves `h = \<beta>\<^bsub>X\<^esub>` for a single typed `h`, but unreliably proves `A = B` for two *different*
+  typed expressions both landing in `\<one>`** (e.g. `\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c p = q` where both sides are separately
+  known to have type `... \<rightarrow> \<one>`). `auto` needs to instantiate the same conditional rule twice (once
+  per side) and chain through transitivity, and it doesn't reliably do that when both instantiations
+  are left implicit. Fix: name both applications explicitly — `have e1: "A = \<beta>\<^bsub>...\<^esub>\<close> using
+  A_type terminal_func_unique by auto`, `have e2: "B = \<beta>\<^bsub>...\<^esub>\<close> using B_type terminal_func_unique
+  by auto`, then `show "A = B" using e1 e2 by simp`. Same root cause as pattern #3, but easy to miss
+  here because the "bundling" is a *transitivity* chain rather than a conjunction.
+- **A pair of propositions that are logically equivalent but not literal object-level formulas
+  (e.g. `is_pullback(...)` and `is_cart_prod(...)`, both type `o`) must be related with `\<longleftrightarrow>`, not
+  HOL's `=`.** Plain FOL's `=` (`IFOL.eq`) is typed for `term`-sorted values only, not `o`; writing
+  `(P) = (Q)` for two `o`-typed propositions is a type error (`No type arity o :: term`), not a proof
+  failure — caught instantly at parse time, not during proof search. `pullback_iff_product`'s
+  statement needed this fix (HOL's `(is_pullback ...) = (is_cart_prod ...)` became
+  `is_pullback(...) \<longleftrightarrow> is_cart_prod(...)`).
+
+**Status: `FOL/Terminal.thy` is complete and independently verified** (2026-07-28): a from-scratch
+`isabelle build -c` of the committed file (alongside `Cfunc.thy` and `Product.thy`) finishes with
+zero errors.
+
+Next theory per the port order above: **Equalizer**.
