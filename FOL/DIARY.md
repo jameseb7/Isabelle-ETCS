@@ -319,4 +319,95 @@ reference it, and nothing downstream depends on it; a `text` comment documents t
 `isabelle build -c` of the committed file (alongside `Cfunc.thy`, `Product.thy`, `Terminal.thy`,
 `Equalizer.thy`) finishes with zero errors.
 
-Next theory per the port order above: **Equivalence**.
+## FOL/Equivalence.thy
+
+Ports `Category_Set/Equivalence.thy` (1487-line HOL original) to `FOL/Equivalence.thy` (~2012 lines),
+the largest theory in the port so far. Covers equivalence relations, coequalizers, Axiom 6, regular
+epimorphisms, epi-monic factorization, the image of a function, and `distribute_left`/`distribute_right`
+as equivalence relations.
+
+**Relations, flattened.** HOL bundles a relation's underlying set and monomorphism into a
+`cset \<times> cfunc` pair for `reflexive_on`/`symmetric_on`/`transitive_on`/`equiv_rel_on`/`const_on_rel`;
+flattened here to separate arguments, matching `subobject_of`'s convention throughout this port.
+Each gets a `_def2` lemma exposing the underlying `\<exists>` witness directly (e.g. `reflexive_def2:
+reflexive_on(X,Y,m) \<Longrightarrow> x \<in>\<^sub>c X \<Longrightarrow> \<exists>y. y \<in>\<^sub>c Y \<and> m \<circ>\<^sub>c y = \<langle>x,x\<rangle>`), used throughout the rest of
+the file instead of re-unfolding `reflexive_on_def` each time. Two hangs were fixed here (before
+either of the two new bug classes below were identified) by extracting a definitional `\<forall>` clause
+into its own named `have ... unfolding ..._on_def by auto` fact first, then instantiating via
+`[rule_format, where ...]`, rather than combining `unfolding X_on_def using ... by auto` in one step.
+
+**Axiom 6** (`quotient_set`/`equiv_class`/`quotient_func`) is given directly via `axiomatization`,
+not Skolemized — HOL already introduces these via direct `axiomatization`, not `SOME`/`THE`. The
+tupled `R` (cset×cfunc pair) flattens to separate `R, m` args throughout. HOL's `[x]\<^bsub>R\<^esub>` notation
+becomes a plain (non-bracket-nested, so notation-hang-safe — see below) `equiv_class_ap(x, R, m) \<equiv>
+equiv_class(R, m) \<circ>\<^sub>c x` abbreviation.
+
+**`coequalizer`** is new this theory (dual of `equalizer`): `coequalizer(E, m, f, g) \<longleftrightarrow> (\<exists>X Y. f:Y\<rightarrow>X
+\<and> g:Y\<rightarrow>X \<and> m:X\<rightarrow>E \<and> m\<circ>\<^sub>cf=m\<circ>\<^sub>cg \<and> (\<forall>h F. h:X\<rightarrow>F \<and> h\<circ>\<^sub>cf=h\<circ>\<^sub>cg \<longrightarrow> \<exists>!k. k:E\<rightarrow>F \<and> k\<circ>\<^sub>cm=h))`.
+`coequalizer_def2` needs the same `obtain X' Y' ... have XX': X=X' using ... unfolding cfunc_type_def
+by auto` bridging pattern as `equalizer_def2` (documented as proof-pattern item 19 from `Truth.thy`,
+re-encountered identically here in `coequalizer_unique` and `reg_epi_and_mono_is_iso`).
+
+**`epi_monic_factorization`** (with the `coequalizer(...)` conjunct) is kept distinct from
+`epi_monic_factorization2` (drops `coequalizer`, keeps `epimorphism(g)` instead), because the
+Skolemized `image_of` axiomatization needs the coequalizer-preserving version — downstream lemmas
+(`image_rest_map_coequalizer`, used via `coequalizer_unique` in `images_iso`/`image_rel_subset_conv`)
+need the coequalizer fact, not just epimorphism.
+
+**`image_of`/`image_restriction_mapping`/`image_subobject_mapping`**: Skolemized together off
+`epi_monic_factorization`, collapsing HOL's 3-stage `SOME`/`SOME`/`THE` chain into one
+`axiomatization` (`image_of_spec`). **First attempt used custom mixfix notation mirroring HOL's
+`f\<lparr>A\<rparr>\<^bsub>n\<^esub>` / `f\<restriction>\<^bsub>A,n\<^esub>` / `[f\<lparr>A\<rparr>\<^bsub>n\<^esub>]map` (the last nesting `[...]` around `\<lparr>...\<rparr>`),
+and this caused numerous unrelated `by simp`/`by auto` calls to hang indefinitely (100s+, zero
+progress) — a failure mode never seen anywhere else in this multi-thousand-line port. Root cause:
+parser/pretty-printer pathology from the nested bracket notation itself, not a proof error. Fix:
+dropped all custom notation, switched to plain function-call syntax (`image_of(f, A, n)` etc.,
+matching the established "no custom mixfix for flattened multi-arg constants" convention already used
+for `subobject_of`/`relative_subset`) — the whole batch then built in ~28s with zero hangs. Recorded
+as proof-pattern item 21.
+
+**`subset_inv_image_iff_image_subset`** (Proposition 2.3.9) hit a genuine `also`/`finally`
+"Vacuous calculation result" error in its `fd_eq`/`mh_eq` derivations — the same calc-chain idiom
+that works everywhere else in this file (dozens of successful uses) failed here for reasons not
+fully diagnosed. Fixed by replacing the `also`/`finally` chain with an explicit flat sequence of
+named `have`s (`s1`, `s2`, ...) closed by a single `using s1 s2 ... by simp`, the more defensive
+style already favored elsewhere when a derivation chain is nested inside other `have`/`proof -`
+blocks.
+
+**Two more new proof-pattern bugs**, both surfaced while extracting conjuncts from the Skolemized
+`image_of_spec` and while closing `epi_monic_factorization`'s witness existential — recorded as
+items 22-23 in `fol-proof-patterns-no-sledgehammer`:
+- `conjunct1`/`conjunct2` must chain onto the *fact*, not the standalone rule: `fact[..., THEN
+  conjunct2] by (rule conjunct1)`, never `by (rule conjunct2[THEN conjunct1])`.
+- Building a flat "witness" conjunction for an `\<exists>x y. P \<and> Q \<and> ...`-shaped goal must be split into
+  two safe steps: (1) `have witness: "A \<and> B \<and> ..." proof (intro conjI) show "A" by (rule factA)
+  next ... qed` (safe, no existential wrapper), then (2) `show ?thesis by (rule exI[where x=...], ...,
+  rule witness)` (safe, trivial match after instantiation) — combining `exI` and `conjI` in one
+  `intro` on an existential+conjunction goal fails cleanly with "Failed to refine any pending goal"
+  every time it was tried, reconfirming proof-pattern item 12 from `Product.thy`.
+
+**`distribute_left`/`distribute_right` as Equivalence Relations**: `left_pair_subset`/
+`right_pair_subset` reuse `distribute_right`/`distribute_left` and `cfunc_cross_prod_mono` (both
+already in `Product.thy`) plus `composition_of_monic_pair_is_monic`. `left`/`right_pair_reflexive`,
+`left`/`right_pair_symmetric`, and `left`/`right_pair_transitive` are built directly against `s`/`t`/
+`u` as whole elements (never decomposed into `X`/`Z`-components unless the decomposition is actually
+needed to invoke `symmetric_def2`/`transitive_def2`), which is a simplification versus HOL's own
+proof style — same mathematical content, fewer intermediate obtains. `left_pair_equiv_rel`/
+`right_pair_equiv_rel` are one-line combinations via `equiv_rel_on_def`.
+
+Full lemma-by-lemma coverage: `reflexive_on`/`symmetric_on`/`transitive_on`/`equiv_rel_on`/
+`const_on_rel` + 3 `_def2` lemmas + `kernel_pair_equiv_rel`, Axiom 6 + `equiv_class_ap`,
+`coequalizer`/`coequalizer_def2`/`coequalizer_unique`/`coequalizer_is_epimorphism`,
+`canonical_quotient_map_is_coequalizer`/`canonical_quot_map_is_epi`, `regular_epimorphism`/
+`reg_epi_and_mono_is_iso`, `epimorphism_coequalizer_kernel_pair`/`epimorphisms_are_regular`,
+`epi_monic_factorization`(2), the Skolemized `image_of` triple + 7 lemmas, `image_self`/
+`image_smallest_subobject`/`images_iso`/`image_subset_conv`/`image_rel_subset_conv`,
+`subset_inv_image_iff_image_subset`/`in_inv_image_of_image`, and the 10-lemma
+`distribute_left`/`distribute_right`-as-equivalence-relations family.
+
+**Status: `FOL/Equivalence.thy` is complete and independently verified** (2026-07-29): a from-scratch
+`isabelle build -c` of the file (alongside `Cfunc.thy`, `Product.thy`, `Terminal.thy`, `Equalizer.thy`,
+`Truth.thy`) finishes with zero errors. Copied into `/home/dusty/Isabelle-ETCS/FOL/Equivalence.thy`;
+not yet committed pending user confirmation.
+
+Next theory per the port order above: **Coproduct**.
