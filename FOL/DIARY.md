@@ -242,4 +242,81 @@ unnecessary: `fibered_product_proj_eq` (the pullback's commutation clause) *alre
 `isabelle build -c` of the committed file (alongside `Cfunc.thy`, `Product.thy`, `Terminal.thy`)
 finishes with zero errors.
 
-Next theory per the port order above: **Truth**.
+## `FOL/Truth.thy`
+
+Ported `Category_Set/Truth.thy` (1291 lines HOL) — Axiom 5 (the truth-value object) plus everything
+built on top of it: characteristic functions, the equality predicate, monomorphism/epimorphism
+properties, pullbacks of epis/monos, fibers, the `kernel_pair_connection` lemma, set subtraction, and
+graphs. This is the biggest theory ported so far (2191 lines FOL), both in raw size and in the number
+of distinct design decisions it needed.
+
+**Axiom 5 and `characteristic_func`.** `true_func`/`false_func`/`truth_value_set` (`\<t>`/`\<f>`/`\<Omega>`)
+are axiomatized directly, matching the HOL original almost verbatim. HOL's `characteristic_func` is
+`THE`-defined off `characteristic_function_exists`'s `\<exists>!`; ported via the by-now-standard
+conservative-Skolemization technique (same as `inverse`/`f\<^bold>\<inverse>` in `Cfunc.thy`).
+
+**`eq_pred` needed no fresh Skolemization at all.** Since `diagonal(X)` is always monic (`diag_mono`,
+proved in `Product.thy`), HOL's separately-`THE`-defined `eq_pred(X)` is simply
+`characteristic_func(diagonal(X))` — a direct instance of the already-Skolemized `characteristic_func`,
+with no new axiomatization needed.
+
+**Set Subtraction: a real (non-mechanical) Skolemization-design decision.** HOL's `set_subtraction`/
+`complement_morphism` are `SOME`-defined off `Y \<setminus> (X,m)`, a `cset \<times> (cset \<times> cfunc)` bundle. The
+obvious flattening — Skolemize `set_subtraction`/`complement_morphism` directly as functions of the
+mono `m` alone (matching the `graph`/`graph_morph` precedent) — is WRONG: it silently breaks
+`set_subtraction_right_iso` (`C \<setminus> (A,m) = C \<setminus> (B, m \<circ>\<^sub>c i)` for `i` iso), which crucially depends on
+HOL's `SOME`-expression being syntactically a function of `characteristic_func(m)` alone, not of `m`
+directly — two different monics with the *same* characteristic function are guaranteed the *same*
+`SOME`-witness in HOL, a guarantee a naive per-`m` Skolemization would NOT reproduce. Fix: Skolemize
+a primitive pair `set_subtraction_chi`/`complement_chi` directly off the characteristic function
+`\<chi> : Y \<rightarrow> \<Omega>` (mirroring HOL's actual dependency), then define the user-facing
+`set_subtraction(m)`/`m\<^sup>c` as `set_subtraction_chi(characteristic_func(m))`/
+`complement_chi(characteristic_func(m))`. This makes `set_subtraction_right_iso`'s closing step —
+"two monics with equal characteristic functions have equal complements" — a one-line congruence
+(`set_subtraction_cong`/`complement_morphism_cong`) instead of an unprovable dead end.
+
+**Graphs: same tuple-flattening convention as `Equalizer.thy`.** `functional_on(X, Y, R, m)` flattens
+HOL's `cset \<times> cfunc` relation-bundle to a 4-argument predicate. `graph`/`graph_morph` Skolemize
+cleanly off `f` alone (single `cfunc` argument, typed premise), matching the `graph`/`graph_morph`
+precedent HOL itself already used (`domain f`/`codomain f`, no separate `X`/`Y` needed).
+`graphs_are_functional`'s two-part goal (`\<exists>!y. ...`) was restructured around a single reusable
+`\<And>y. relative_member(\<langle>x,y\<rangle>, ..., graph(f), graph_morph(f)) \<longleftrightarrow> f \<circ>\<^sub>c x = y` helper fact rather than
+proving existence and uniqueness by separate ad hoc arguments (as HOL does) — mathematically the same
+content, just less duplicated work. Likewise `functional_relations_are_graphs`'s surjectivity-of-`i`
+argument was organized around one reusable `core_eq` helper (`f \<circ>\<^sub>c (lp \<circ>\<^sub>c (graph_morph(f) \<circ>\<^sub>c z)) =
+rp \<circ>\<^sub>c (graph_morph(f) \<circ>\<^sub>c z)` for any `z : \<one> \<rightarrow> graph(f)`) instead of inlining the same associativity
+chain twice.
+
+**`kernel_pair_connection`: the single hardest lemma in the file, and the source of two new bug
+patterns** (recorded as items 18-20 in `fol-proof-patterns-no-sledgehammer`):
+- A bulk `using s1 s2 ... s7 by simp` closing a multi-hop derivation chain can silently over-rewrite
+  *past* the intended target if the stated goal has the wrong intermediate form — `simp` doesn't stop
+  at "the step you meant," it keeps applying every given fact until nothing more fires, which can
+  produce a residual goal that's false in general rather than failing cleanly. The fix (once suspected)
+  is always the same: restructure as an explicit `have ... also have ... finally show` chain, one
+  named step per line, so each substitution is forced to happen exactly once in exactly the intended
+  place.
+- `equalizer_def`'s `\<exists> X Y. f:X\<rightarrow>Y \<and> ...` existential, unfolded directly via `unfolding equalizer_def
+  by auto`, unpredictably succeeds or fails depending on whether the goal needs the schematic `X`/`Y`
+  unified with a *specific already-known* type — succeeds when the conclusion doesn't mention that
+  type at all (e.g. extracting a bare commutation equation), fails when it does (e.g. extracting a
+  fact literally typed `... \<rightarrow> B` for a concrete `B`). `equalizer_def2` (which takes the parallel
+  pair's type as an explicit premise, forcing the unification up front rather than leaving it to
+  `auto`'s luck) is the robust fix whenever the extracted fact's own conclusion needs a named type.
+
+Full lemma-by-lemma coverage: Section A (Axiom 5, `characteristic_func` + 4 basic lemmas), Section B
+(4 relative-membership lemmas), the Equality Predicate subsection (`eq_pred` + 9 lemmas), the
+Monomorphism/Epimorphism-properties subsection (`regmono_is_mono`, `mono_is_regmono`,
+`epi_mon_is_iso`, `epi_is_surj`), `pullback_of_epi_is_epi1/2` + `pullback_of_mono_is_mono1/2`, the
+Fiber subsection (`fiber`, `fiber_morphism` + 7 lemmas), `kernel_pair_connection`, the Set Subtraction
+subsection (Skolemized `set_subtraction`/`complement_morphism` + 9 lemmas including the two
+isomorphism lemmas), and the Graphs subsection (`functional_on`, Skolemized `graph`/`graph_morph` + 5
+lemmas). The one deliberate omission is HOL's unnamed `card {x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>} = 4` fact (Proposition
+2.2.2) — no `card`/set-comprehension theory exists in plain FOL, the fact is unnamed so nothing can
+reference it, and nothing downstream depends on it; a `text` comment documents the omission in place.
+
+**Status: `FOL/Truth.thy` is complete and independently verified** (2026-07-28): a from-scratch
+`isabelle build -c` of the committed file (alongside `Cfunc.thy`, `Product.thy`, `Terminal.thy`,
+`Equalizer.thy`) finishes with zero errors.
+
+Next theory per the port order above: **Equivalence**.
