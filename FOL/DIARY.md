@@ -407,7 +407,94 @@ Full lemma-by-lemma coverage: `reflexive_on`/`symmetric_on`/`transitive_on`/`equ
 
 **Status: `FOL/Equivalence.thy` is complete and independently verified** (2026-07-29): a from-scratch
 `isabelle build -c` of the file (alongside `Cfunc.thy`, `Product.thy`, `Terminal.thy`, `Equalizer.thy`,
-`Truth.thy`) finishes with zero errors. Copied into `/home/dusty/Isabelle-ETCS/FOL/Equivalence.thy`;
-not yet committed pending user confirmation.
+`Truth.thy`) finishes with zero errors. Committed as `f2139f4` (pushed).
 
-Next theory per the port order above: **Coproduct**.
+## FOL/Coproduct.thy
+
+Ports `Category_Set/Coproduct.thy` (2407-line HOL original) to `FOL/Coproduct.thy` (3309 lines), the
+largest theory in the port so far. Covers Axiom 7 (coproducts), coproduct function properties, the
+equality predicate's interaction with coproducts, the bowtie product, boolean cases, distribution of
+products over coproducts (both directions), casting between a set and a subset/complement, generic
+case-analysis (`cases`/`true_case`/`false_case`), and coproduct set properties (commutativity,
+associativity, distribution, isomorphism-preservation, `X \<Coprod> X \<cong> X \<times>\<^sub>c \<Omega>`).
+
+**`is_coprod`** drops HOL's `is_coprod_triple` tuple-abbreviation (`cset \<times> cfunc \<times> cfunc`) entirely —
+FOL has no tuple type, so it simply takes all five arguments (`W, i0, i1, X, Y`) directly, matching the
+`subobject_of`-style convention used throughout the port.
+
+**Two constants defined directly as the generic isomorphism-inverse** (`_\<^bold>\<inverse>`, from `Cfunc.thy`)
+rather than freshly Skolemized, once the corresponding map was already shown to be an isomorphism —
+the same technique introduced for `case_bool` and `dist_prod_coprod_left` this theory, avoiding HOL's
+`THE` entirely with zero fresh Skolemization:
+- `case_bool = (\<t> \<amalg> \<f>)\<^bold>\<inverse>` (inverse of `truth_value_set_iso_1u1`)
+- `dist_prod_coprod_left(A, B, C) = (factor_prod_coprod_left(A, B, C))\<^bold>\<inverse>` (inverse of
+  `dist_prod_coprod_iso`)
+- `try_cast(m) = (into_super(m))\<^bold>\<inverse>` (inverse of `into_super_iso`)
+
+`dist_prod_coprod_right`/`factor_prod_coprod_right` are instead derived *algebraically*, composed
+from `swap` and the left-side functions (`factor_prod_coprod_right(A,B,C) = swap(C,A∐B) \<circ>\<^sub>c
+factor_prod_coprod_left(C,A,B) \<circ>\<^sub>c (swap(A,C)⋈swap(B,C))`), reusing every left-side lemma rather than
+re-deriving injectivity/surjectivity for the right-hand family from scratch. The mutual-inverse
+cancellation lemmas (`factor_dist_prod_coprod_right`/`dist_factor_prod_coprod_right`) needed long but
+fully mechanical `swap_idempotent`/`cfunc_bowtie_prod_comp_cfunc_bowtie_prod`/`id_bowtie_prod`
+cancellation chains, using `define` to abbreviate the two composite bowtie maps.
+
+**A general Cfunc/Terminal-level fact never needed until this theory, `injective_imp_monomorphism`,
+was added locally** (not re-opening the already-committed `Terminal.thy`) the first time it was
+needed, in `left_coproj_are_monomorphisms`.
+
+**Several lemmas were proven with a noticeably shorter strategy than HOL's own low-level
+injective/surjective case-split proofs**, once the relevant coproduct machinery was in place:
+- `coprod_pres_iso` (`A≅C ⟹ B≅D ⟹ A∐B≅C∐D`) and `prod_pres_iso` are proven by directly constructing
+  the two-sided inverse (`(left_coproj(C,D)∘f) \<amalg> (right_coproj(C,D)∘g)` and its mirror, or
+  `f\<^bold>\<inverse> \<times>\<^sub>f g\<^bold>\<inverse>`) and checking cancellation on the four generators/via
+  `cfunc_cross_prod_comp_cfunc_cross_prod`, instead of HOL's full injective/surjective proof from
+  scratch.
+- `coprod_case_bool_true`/`coprod_case_bool_false`, `cfunc_bowtieprod_inj`/`_surj_converse` and
+  several others were restructured around small reusable pointwise helper facts (e.g. `lc_fg`/`rc_fg`
+  in `cfunc_bowtieprod_inj`) proven once and reused across all case-split branches, rather than
+  re-deriving the same associativity chain in each branch as HOL does.
+
+**Recurring new proof-pattern bug, now the single most common fix needed in this port:
+composition-associativity grouping mismatches.** `\<circ>\<^sub>c` is right-associative infixr, so a stated goal
+`f \<circ>\<^sub>c g \<circ>\<^sub>c h` parses as `f \<circ>\<^sub>c (g \<circ>\<^sub>c h)`, never `(f \<circ>\<^sub>c g) \<circ>\<^sub>c h` — whenever a `have`'s stated goal used
+the opposite (explicitly-parenthesized) grouping from what a cited fact naturally produces, `by simp`
+failed with "Failed to apply initial proof method" even though the two terms are provably equal via
+associativity. The fix is always the same: insert an explicit intermediate `have` using
+`comp_associative2[OF f_type g_type h_type]` to bridge the two groupings before combining — this
+became routine in the long composition chains built from `swap`/`cfunc_bowtie_prod`/
+`factor_prod_coprod_left` pieces (`factor_prod_coprod_right_ap_left`/`_ap_right`,
+`dist_prod_coprod_right_ap_left`/`_ap_right`, `factor_dist_prod_coprod_right`/
+`dist_factor_prod_coprod_right`, `coproduct_associates`, `coprod_pres_iso`, `coproduct_with_self_iso`
+all needed multiple such bridges). A closely related hard parse error (not a proof failure):
+parenthesizing a nested fact expression directly inside an `[OF ...]` list, e.g. `comp_associative2[OF
+a_type b_type (foo[OF c_type])]`, is invalid syntax ("Bad arguments for attribute OF") — the nested
+fact must always be extracted as its own named `have` first. Also re-hit the letter+digit
+variable-collision bug (proof-pattern item 20) with `h2` as a bound variable name inside `is_coprod`'s
+own definition, fixed by renaming to `hh` throughout.
+
+Full lemma-by-lemma coverage: Axiom 7 + `is_coprod`/`is_coprod_def2`/`canonical_coprod_is_coprod`/
+`coprods_isomorphic`; the Coproduct Function Properties section (`cfunc_coprod_comp`, `id_coprod`,
+`injective_imp_monomorphism`, `coproducts_disjoint`, `left`/`right_coproj_are_monomorphisms`,
+`coprod_eq`/`eqI`/`eq2`/`decomp`, `coprojs_jointly_surj`, `maps_into_1u1`, `coprod_preserves_left`/
+`right_epi`, `truth_value_set_iso_1u1`); `eq_pred_left`/`right_coproj`; the Bowtie Product section
+(`cfunc_bowtie_prod` def+type+ap+unique, `identity_distributes_across_composition_dual`,
+`coproduct_of_beta`, `cfunc_bowtieprod_comp_cfunc_coprod`, `id_bowtie_prod`,
+`cfunc_bowtie_prod_comp_cfunc_bowtie_prod`, `cfunc_bowtieprod_epi`/`inj`/`inj_converse`/`iso`/
+`surj_converse`); Boolean Cases (`case_bool` + 8 lemmas); the full Distribution of Products over
+Coproducts section, both left (`factor_prod_coprod_left`/`dist_prod_coprod_left` + 13 lemmas) and
+right (`factor_prod_coprod_right`/`dist_prod_coprod_right` + 10 lemmas); Casting between Sets
+(`into_super` + 4 lemmas, `try_cast` + 7 lemmas); Cases (`cases`/`true_case`/`false_case`); and
+Coproduct Set Properties (`coproduct_commutes`, `coproduct_associates`,
+`product_distribute_over_coproduct_left`/`right`, `prod_pres_iso`, `coprod_pres_iso`,
+`coproduct_with_self_iso`, `oneUone_iso_\<Omega>`). The one deliberate omission is HOL's unnamed `card {x. x
+\<in>\<^sub>c \<Omega> \<Coprod> \<Omega>} = 4` fact (dual to Proposition 2.2.2) — matching the identical omission of `Truth.thy`'s
+`card {x. x \<in>\<^sub>c \<Omega> \<times>\<^sub>c \<Omega>} = 4`: no `card`/set-comprehension theory exists in plain FOL, the fact is
+unnamed so nothing can reference it, and nothing downstream depends on it.
+
+**Status: `FOL/Coproduct.thy` is complete and independently verified** (2026-07-29): a from-scratch
+`isabelle build -c` of the file (alongside `Cfunc.thy`, `Product.thy`, `Terminal.thy`, `Equalizer.thy`,
+`Truth.thy`, `Equivalence.thy`) finishes with zero errors. Copied into
+`/home/dusty/Isabelle-ETCS/FOL/Coproduct.thy`; not yet committed pending user confirmation.
+
+Next theory per the port order above: **Axiom_Of_Choice**.
