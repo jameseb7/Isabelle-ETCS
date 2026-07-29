@@ -497,4 +497,48 @@ unnamed so nothing can reference it, and nothing downstream depends on it.
 `Truth.thy`, `Equivalence.thy`) finishes with zero errors. Copied into
 `/home/dusty/Isabelle-ETCS/FOL/Coproduct.thy`; not yet committed pending user confirmation.
 
-Next theory per the port order above: **Axiom_Of_Choice**.
+## FOL/Axiom_Of_Choice.thy
+
+Ports `Category_Set/Axiom_Of_Choice.thy` (135-line HOL original, by far the smallest theory in the
+port so far) — `section_of`/`split_epimorphism` (Definition 2.7.1), Axiom 11 (Axiom of Choice), and
+five consequence lemmas. No new Skolemization or tuple-flattening was needed: every dependency
+(`nonempty`, `epi_monic_factorization2`, `monomorphism_def2`/`3`, `epimorphism_def2`/`3`,
+`regular_epimorphism`, `epimorphisms_are_regular`, `coequalizer_is_epimorphism`, `mono_is_regmono`,
+`try_cast`/`try_cast_m_m`/`set_subtraction` from `Coproduct.thy`/`Truth.thy`) already existed with a
+matching signature.
+
+**Two proofs simplified relative to HOL's own route**, both by proving `epimorphism`/`monomorphism`
+directly via `epimorphism_def3`/`monomorphism_def3` from the section/retraction equation, rather than
+building a `coequalizer(...)` from scratch and going through `coequalizer_is_epimorphism`:
+- `split_epis_are_regular` (Exercise 2.7.2i): given `f \<circ>\<^sub>c s = id(Y)`, for any `a,b : Y \<rightarrow> A` with
+  `a \<circ>\<^sub>c f = b \<circ>\<^sub>c f`, composing both sides with `s` on the right and simplifying via `f \<circ>\<^sub>c s = id(Y)`
+  gives `a = b` directly — `epimorphism(f)` in ~7 lines, then `epimorphisms_are_regular` finishes it.
+- `sections_are_regular_monos` (Exercise 2.7.2ii): the dual argument (compose on the left with `f`)
+  gives `monomorphism(s)` directly, then `mono_is_regmono` finishes it.
+
+Both are markedly shorter than HOL's `unfolding coequalizer_def` + heavy `smt` construction, and
+needed no `also`/`finally` chain, matching the general "prove the simpler intermediate fact directly,
+then reuse an existing general lemma" strategy already used repeatedly in `Coproduct.thy`.
+
+**`monos_give_epis` (Proposition 2.6.8)**, the largest lemma in the file, follows HOL's own strategy
+closely: factor `f = m \<circ>\<^sub>c g` (epi-monic factorization), show `g` is also monic (hence iso, via
+`epi_mon_is_iso`), take an arbitrary element `x : X` to handle the "off-image" branch of `Y`, and
+build the retraction as `h = (g\<^bold>\<inverse> \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>Y\<setminus>(E,m)\<^esub>)) \<circ>\<^sub>c try_cast(m)`, reusing `try_cast_m_m`
+and `left_coproj_cfunc_coprod` to show `h \<circ>\<^sub>c f = id(X)` pointwise, then `one_separator` to lift to
+full equality and `surjective_is_epimorphism` for the epimorphism conclusion. One associativity-grouping
+bug (proof-pattern item 24, the same class as `Coproduct.thy`'s most common fix) hit on the first build
+attempt: `h \<circ>\<^sub>c (f \<circ>\<^sub>c yy)` with `f` unfolded to `m \<circ>\<^sub>c g` produces `h \<circ>\<^sub>c ((m \<circ>\<^sub>c g) \<circ>\<^sub>c yy)`, which does not
+`simp`-match the intended `h \<circ>\<^sub>c (m \<circ>\<^sub>c (g \<circ>\<^sub>c yy))` without an explicit bridging
+`comp_associative2[OF yy_type g_type m_type]` step first — fixed by inserting that as its own named
+`have` before the substitution, the standard fix for this bug class.
+
+Full lemma-by-lemma coverage: `section_of`/`split_epimorphism`/`split_epimorphism_def2`/
+`sections_define_splits`, Axiom 11 (`axiom_of_choice`), `epis_give_monos`/`epis_are_split`,
+`monos_give_epis`, `split_epis_are_regular`, `sections_are_regular_monos`.
+
+**Status: `FOL/Axiom_Of_Choice.thy` is complete and independently verified** (2026-07-29): a
+from-scratch `isabelle build -c` of the file (alongside `Cfunc.thy`, `Product.thy`, `Terminal.thy`,
+`Equalizer.thy`, `Truth.thy`, `Equivalence.thy`, `Coproduct.thy`) finishes with zero errors. Copied
+into `/home/dusty/Isabelle-ETCS/FOL/Axiom_Of_Choice.thy`; not yet committed pending user confirmation.
+
+Next theory per the port order above: **Initial**.
