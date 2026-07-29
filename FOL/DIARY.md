@@ -1,8 +1,8 @@
 # FOL Port Diary
 
 A running log of porting the ETCS `Category_Set/*.thy` (HOL) theories to plain Isabelle `FOL` under
-`FOL/`. So far: `Category_Set/Cfunc.thy` → `FOL/Cfunc.thy`, and `Category_Set/Product.thy` →
-`FOL/Product.thy` (the next theory in HOL `imports` dependency order after `Cfunc.thy`).
+`FOL/`. The independent port currently runs from `Cfunc.thy` through the in-progress
+`Exponential_Objects.thy` in the theory order recorded below.
 Companion file: `FOL/typecheck.ml` (patched copy of `Category_Set/typecheck.ml`).
 
 **Ground rule for this whole effort: `Category_Set/` and the old top-level `ETCS_*.thy` files are
@@ -542,3 +542,184 @@ from-scratch `isabelle build -c` of the file (alongside `Cfunc.thy`, `Product.th
 into `/home/dusty/Isabelle-ETCS/FOL/Axiom_Of_Choice.thy`; not yet committed pending user confirmation.
 
 Next theory per the port order above: **Initial**.
+
+## FOL/Initial.thy
+
+Ports `Category_Set/Initial.thy` (230-line HOL original) to `FOL/Initial.thy`. The theory continues
+to import `Coproduct`, exactly as the HOL theory does; it does not introduce an unnecessary
+dependency on `Axiom_Of_Choice` merely because that independent theory precedes it in the requested
+port order.
+
+**Axiom 8 and initial objects.** `initial_func`/`emptyset` and their three axioms port directly,
+with `initial_object` returning FOL's proposition type `o` rather than HOL's `bool`.
+`emptyset_is_initial` explicitly constructs the unique map. For `initial_iso_empty`, the HOL proof's
+single `metis` invocation is replaced by a direct argument: obtain the map `X \<rightarrow> \<emptyset>` supplied
+by initiality, show that any alleged element of `X` would compose to an impossible element of
+`\<emptyset>`, and hence prove the map injective and surjective vacuously before applying
+`epi_mon_is_iso`.
+
+**Empty coproducts and products.** `coproduct_with_empty` explicitly uses
+`id(X) \<amalg> initial_func(X)` and `left_coproj(X, \<emptyset>)` as inverse maps. Their first cancellation is
+`left_coproj_cfunc_coprod`; the second is proved on both coproduct injections and lifted by
+`cfunc_coprod_unique`. `empty_prod_X` and `X_prod_empty` then apply
+`function_to_empty_is_iso` to the appropriate product projection. This replaces all HOL
+`metis`/`smt` calls with typed, named steps.
+
+**Emptiness consequences.** `no_el_iff_iso_empty`, `initial_maps_mono`,
+`iso_empty_initial`, `function_to_empty_set_is_iso`, and both
+`prod_iso_to_empty_left`/`right` are all ported. The recurring proof is made explicit throughout:
+turn `is_empty(X)` into `\<not>(\<exists>x. x \<in>\<^sub>c X)`, eliminate an alleged witness with `exE`, and use
+`notE` after composition or pairing produces the forbidden element. In particular,
+`iso_empty_initial` uses `one_separator` with a meta-level `\<And>x` premise, not an object-level
+`\<forall>x` formula.
+
+The HOL tuple notation `(\<emptyset>, \<alpha>\<^bsub>X\<^esub>) \<subseteq>\<^sub>c X` in `empty_subset` is flattened to
+`subobject_of(\<emptyset>, initial_func(X), X)`, matching the FOL `Equalizer.thy` convention.
+The final four initial/terminal-object coproduct/product isomorphisms are retained in full and use
+the already-ported `coprod_pres_iso`, `prod_pres_iso`, coproduct/product commutativity, and explicit
+instances of isomorphism transitivity.
+
+One unnamed HOL-only fact is deliberately omitted: Proposition 2.2.1,
+`card ({(X,m). (X,m) \<subseteq>\<^sub>c \<one>} // ...) = 2`. Plain FOL has no HOL set-comprehension,
+quotient-set, or cardinality library with which to state it; because the theorem is unnamed, nothing
+downstream can reference it. A `text` block records the omission in `Initial.thy`, consistently with
+the analogous unnamed cardinality omissions in `Truth.thy` and `Coproduct.thy`.
+
+Two FOL proof-engineering lessons were reinforced during this theory:
+- Do not ask `auto` to unpack `\<forall>Y. \<exists>!f. ...` and choose a concrete `Y` in one step. Split it
+  into `iffD1`, `spec`, `ex1E`, and `exE`; the broad call can enter expensive search.
+- A negated premise such as `emptyset_is_empty: \<not>(x \<in>\<^sub>c \<emptyset>)` is not itself a rule with
+  conclusion `False`; combine it with the positive fact explicitly via `notE`. Likewise,
+  `one_separator` requires its stated meta-level `\<And>x` premise, not an object-level universal.
+
+**Status: `FOL/Initial.thy` is complete and independently verified** (2026-07-29): the full theory
+processes successfully in Isabelle/jEdit, and a headless `isabelle build` of the independent
+`ETCS_FOL_Initial` session finishes with zero errors. The next theory per the requested port order
+is **Exponential_Objects**.
+
+## FOL/Exponential_Objects.thy
+
+**Progress checkpoint (2026-07-29).** The independent FOL port is in progress. The exponential
+object/evaluation axioms, transpose operation, exponential action on arrows, inverse transpose,
+elementwise sharp/flat results, `metafunc`, `cnufatem`, and the first meta-composition results have
+been translated. The HOL source remains unchanged.
+
+HOL definitions that used definite description (`THE`) have no direct FOL counterpart. They are
+being replaced by conservative Skolem constants with specification axioms proved satisfiable from
+the corresponding existence-and-uniqueness results before use. This has been done for inverse
+transpose, `cnufatem`, `meta_comp2`, and the parameter maps reached so far.
+
+The recurring proof changes are explicit FOL typing with `typecheck_cfuncs`, tuple-form arguments
+such as `eval_func(X,A)`, and named equality chains in place of HOL-only automation. In the current
+meta-composition proof, product elements are decomposed using `cart_prod_decomp` together with
+`one_unique_element`; `fastforce` then identifies the terminal component. A separate typed fact
+`domain(K) = X` is used to normalize the `left_cart_proj(domain(K),\<one>)` expression left by
+unfolding `metafunc`.
+
+**Verified frontier:** headless `isabelle eval_at -l FOL` succeeds through `exp_pres_iso_left`,
+including
+`meta_comp_on_els`, `meta_comp2_def5`, the meta-composition identity and associativity laws, both
+parameter-map element laws, `exp_one`, `exp_empty`, and `one_exp`.
+`meta_comp_on_els` now proves its difficult point-evaluation step explicitly: it calculates the
+right product projection, applies `inv_transpose_of_composition`, and concludes with
+`transpose_func_unique`. The identity laws are explicit calculation chains through
+`meta_comp2_def3`, `cnufatem_metafunc`, and the typed composition unit laws.
+
+The `exp_one` surjectivity argument now uses a concrete inverse pair for
+`left_cart_proj(\<one>,\<one>)` and an explicit transpose-based witness. Its evaluation equation is
+proved by typed associativity and inverse/unit calculations rather than broad proof search.
+In `exp_empty`, equality of `id(\<emptyset>) \<times>\<^sub>f z` and
+`id(\<emptyset>) \<times>\<^sub>f f\<^sup>\<sharp>` is proved directly with `one_separator`: an alleged
+element of their domain `\<emptyset> \<times>\<^sub>c \<one>` projects to an element of `\<emptyset>`,
+contradicting `emptyset_is_empty`. This removes the unused product/empty isomorphism witnesses from
+the HOL proof and supplies the meta-level element premise that `blast` could not synthesize.
+For `one_exp`, the original single `metis`-style uniqueness step is split explicitly. Nonemptiness
+provides a witness, terminality gives every element the same evaluation equation, and
+`transpose_func_unique` identifies every element with
+`\<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>\<^sup>\<sharp>`.
+`power_rule` is complete. Its `is_cart_prod_def2` expansion cannot use the HOL
+`etcs_subst` call directly because the FOL lemma has explicit projection-typing premises. The two
+lifted projections are now typed first, and the proof applies `iffD2` to the instantiated
+equivalence; `eval_at` confirms that this enters the intended universal-property goal. Both
+projection equations for the proposed mediator
+`\<langle>f\<^sup>\<flat>,g\<^sup>\<flat>\<rangle>\<^sup>\<sharp>` are also verified using parallel,
+explicit calculation chains through `transpose_of_comp`, the appropriate product projection, and
+`sharp_cancels_flat`. Mediator uniqueness is proved directly with `cfunc_prod_unique`.
+
+`exponential_coprod_distribution`, `empty_exp_nonempty`, and `exp_pres_iso_left` are also complete.
+The coproduct-distribution proof required tuple-form applications throughout the translated tail
+(`eval_func(Z,A)`, `left_coproj(X,Y)`, `dist_prod_coprod_right(X,Y,H)`, and similar constants).
+Its associativity subproofs now state full left-hand sides rather than beginning a nested
+calculation with `...`, because an ellipsis there inherits the preceding outer fact in Isabelle.
+Each application of `comp_associative2` is supplied with three named arrow-type facts. The
+left/right coproduct uniqueness cases were checked independently with `eval_at`.
+
+For preservation of an isomorphism in the exponential base, the HOL proof's broad search for the
+second inverse equation is replaced by an explicit inverse witness from
+`isomorphism_def3`. A short typed calculation proves that the selected left inverse is that
+witness, after which the induced exponential arrow is shown isomorphic directly with
+`isomorphism_def3` and `is_isomorphic_def`.
+
+Work is now in `expset_power_tower`. The former failing expansion of `\<psi>` is verified: the
+four-arrow term must be reassociated in two explicit `comp_associative2` steps, since the displayed
+source layout hides the parser's right association. Headless `eval_at` succeeds through that
+calculation (the current source checkpoint ending at the local proof formerly reported as line
+2351). The remainder of `expset_power_tower` is not yet claimed to compile.
+
+The Isabelle method syntax was also normalized throughout the remaining source. Facts must be
+supplied before a method with `using`; `blast`, `force`, and `fastforce` are terminal method names,
+not prefixes accepting trailing theorem arguments. Thus forms such as
+`by (typecheck_cfuncs, blast theorem_name)` have been eliminated from the entire theory in favor
+of `using theorem_name by (typecheck_cfuncs, blast)`. This prevents the repeated parse failures
+encountered in the untranslated tail.
+
+**Status: `FOL/Exponential_Objects.thy` is complete and independently verified** (2026-07-29): a
+from-scratch `isabelle build -c` of a fresh session containing every already-committed `FOL/*.thy`
+file (`Cfunc` through `Axiom_Of_Choice`) plus `Initial` and this theory finishes with zero errors,
+in ~30s total. Full lemma coverage matches the HOL original: Axiom 9, `exp_func`, `transpose_of_comp`,
+the flat/sharp cancellation family, `metafunc`/`cnufatem` and their Skolemized inverses, the full
+`meta_comp`/`meta_comp2` family (identity, associativity, comp-as-metacomp), `left_param`/`right_param`,
+`exp_one`, `exp_empty`, `one_exp`, `power_rule`, `exponential_coprod_distribution`, `empty_exp_nonempty`,
+`exp_pres_iso_left`/`_right`/`exp_pres_iso`, `expset_power_tower`, the empty/nonempty exponential family
+(`empty_to_nonempty`, `exp_is_empty`, `nonempty_to_nonempty`, `empty_to_nonempty_converse`), `powerset`,
+and `sets_squared`.
+
+Finishing this theory (continuing from a large in-progress draft) surfaced four recurring bug classes,
+none seen in quite this combination before, now folded into
+[[fol-proof-patterns-no-sledgehammer]] as items 25-28:
+- **Curried calls to constants with custom mixfix notation must use the notation's own template, not
+  bare juxtaposition.** `eval_func A \<Omega>` (space-separated, mimicking the HOL original's curried
+  syntax) is a hard parse error; only `eval_func(A, \<Omega>)` parses, because plain multi-argument
+  constants in this port rely on the generic `_applC`-style call syntax rather than true HOL-style
+  currying. This was the single most common defect in the draft handed off mid-theory and matches
+  the user's own diagnosis from direct jEdit inspection.
+- **`rule cfunc_prod_comp[OF ...]`/`rule comp_associative2[OF ...]` require the goal to already be
+  stated with the EXACT grouping the rule's conclusion produces** (e.g. `\<langle>(a \<circ>\<^sub>c f), (b
+  \<circ>\<^sub>c f)\<rangle>`, not the flatter `\<langle>a \<circ>\<^sub>c f, b \<circ>\<^sub>c f\<rangle>` a reader would
+  write by hand) — `rule` does exact syntactic matching, so a goal phrased in the "natural" flat
+  form fails even though the two terms are equal by associativity. The robust fix used throughout:
+  state the bridging fact with `using cfunc_prod_comp[OF ...] comp_associative2[OF ...] ... by simp`
+  instead of `rule`, letting `simp`'s rewriting (which is direction- and grouping-agnostic) close the
+  gap; when several sequential re-associations/distributions are needed (e.g. un-bundling a pair
+  composed with `f` all the way down to its two separately-composed components), each one may need
+  its own explicit `comp_associative2`/`cfunc_prod_comp` instance supplied to `simp`, since `simp`
+  will not discover an un-given instantiation on its own.
+- **`also`/`...` tracks the single most-recently-established fact (`this`), not "the most recent step
+  of an `also`-chain."** Inserting an ordinary `have` (even one needed only as a side lemma) between
+  two `also have "..."` steps breaks the chain with a confusing "Vacuous calculation result" error,
+  because the `...` in the next `also have` resolves against the intervening plain `have` instead of
+  the chain's actual last link. Reconfirms and sharpens the general guidance already in
+  [[fol-proof-patterns-no-sledgehammer]] to prefer flat named `have s1`/`s2`/... steps combined by a
+  final `using s1 s2 ... by simp` over `also`/`finally` chains whenever any other reasoning must be
+  interleaved.
+- **A nested fact expression inside an `[OF ...]` list must always be its own named `have` first**
+  (`comp_associative2[OF a_type b_type (cfunc_cross_prod_type[OF c_type d_type])]` is a hard
+  "Bad arguments for attribute OF" parse error) — this bit twice in `exp_pres_iso_right`, both times
+  because a plain `\<psi> : A \<rightarrow> X`/`\<phi> : X \<rightarrow> A` fact was not itself tagged
+  `[type_rule]`, which is also worth tagging on any such fact used later by `typecheck_cfuncs` in the
+  same lemma.
+
+`FOL/Initial.thy` was completed in an earlier segment of this same port (see its own status note
+above) and is committed alongside `Exponential_Objects.thy` in this step.
+
+Next theory per the port order: **Cardinality**.
