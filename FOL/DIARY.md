@@ -978,4 +978,47 @@ New proof-pattern bugs found and fixed this file (folded into
   downstream (as here), the simplest fix is to drop it from the `obtain` pattern entirely rather than
   getting its direction right, matching what HOL's own proof did at the same spot.
 
-Next theory per the port order: **Quant_Logic**.
+**Status: FOL/Quant_Logic.thy is complete** (~430-line FOL port of the 236-line HOL original),
+verified via a full from-scratch headless build (`Finished ETCS_FOL_QuantLogic`) plus an independent
+verification build in a fresh scratch directory against fresh copies of every already-committed
+`FOL/*.thy` file (`Finished ETCS_FOL_QuantLogic_Verify`). Covers `FORALL(X)` (defined by reusing
+`characteristic_func` directly on `(\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>)\<^sup>\<sharp>`, exactly like `NOT`/`AND`/`NOR` in
+`Pred_Logic.thy`, rather than porting HOL's fresh `THE \<chi>. is_pullback ...` construction),
+`FORALL_is_pullback`, `FORALL_type`, `all_true_implies_FORALL_true`/`_true2`/`_true3`,
+`FORALL_true_implies_all_true`/`_true2`/`_true3`, `FORALL_elim`/`_elim'`, then `EXISTS(X) := NOT \<circ>\<^sub>c
+FORALL(X) \<circ>\<^sub>c exp_func(NOT, X)` (using the plain-application form `exp_func(NOT, X)` rather than the
+`NOT\<^bsup>X\<^esup>\<^sub>f` mixfix notation, proactively avoiding the same custom-mixfix hazard hit in
+`Fixed_Points.thy`), `EXISTS_type`, `EXISTS_true_implies_exists_true`, `EXISTS_elim`,
+`exists_true_implies_EXISTS_true`.
+
+New proof-pattern bugs found and fixed this file (folded into
+[[fol-proof-patterns-no-sledgehammer]] as items 41-42):
+- **`terminal_func_unique[OF h_type]` needs `h_type` to be the type fact for the *entire* composite
+  function mapping into `\<one>`, not the type fact for an intermediate factor of that composite.**
+  Proving `\<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<beta>\<^bsub>Y\<^esub>) = \<beta>\<^bsub>X \<times>\<^sub>c Y\<^esub>` needs the type fact for the whole
+  LHS composite, `\<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<beta>\<^bsub>Y\<^esub>) : X \<times>\<^sub>c Y \<rightarrow> \<one>` — supplying instead the type of just
+  the second factor, `id(X) \<times>\<^sub>f \<beta>\<^bsub>Y\<^esub> : X \<times>\<^sub>c Y \<rightarrow> X \<times>\<^sub>c \<one>` (which was already in scope as a
+  `type_rule` from an adjacent step and so was the "obvious" fact to reach for), makes `OF` fail
+  outright with `*** exception THM 0 raised: OF: no unifiers` since that function's codomain isn't
+  `\<one>`. Hit at two symmetric call sites (`all_true_implies_FORALL_true2` and
+  `FORALL_true_implies_all_true2`), both needing a fresh `have comp_type1b[type_rule]: "\<beta>\<^bsub>X \<times>\<^sub>c
+  \<one>\<^esub> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<beta>\<^bsub>Y\<^esub>) : X \<times>\<^sub>c Y \<rightarrow> \<one>" by typecheck_cfuncs` added before the
+  `terminal_func_unique` call. **Fix:** before invoking `terminal_func_unique`, re-derive the type of
+  the *exact* term appearing as the equation's LHS (typecheck the whole composite, not a sub-term),
+  and supply that as `OF`'s argument.
+- **A `have ... using f1 f2 f3 f4 by simp` that chains four-plus equalities through a shared complex
+  LHS term can hang indefinitely (not fail — genuinely not terminate) even though the chain is
+  logically trivial**, because handing `simp` several rewrite rules that share the same complex LHS
+  (here, two facts both of the shape `(... \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>) \<circ>\<^sub>c \<langle>x, id(\<one>)\<rangle> = ...`) lets it
+  oscillate between rewrite directions instead of terminating. Diagnosed via `isabelle build -v`'s
+  `command "by" running for N.NNNs` progress lines climbing past 90 seconds with `Warning - Unable to
+  increase stack - interrupting thread` — a distinct failure signature from a normal proof error (no
+  `*** exception` naming a specific mismatched fact, just an eventual `Interrupt_Breakdown`) that
+  means "look for a rewriting loop in the `using` list," not "look for a wrong instantiation." **Fix:**
+  replace the flat `using f1 f2 f3 f4 by simp` with an explicit `also`/`finally` calculational chain
+  (one `have "\<t> = term1" using fact1 by (rule sym)`, then three `also have "... = term2" using fact2 .`
+  steps down to `\<f>`), which fixes the rewrite order explicitly and eliminates the ambiguity that
+  caused the loop. Hit once, in `FORALL_true_implies_all_true`'s final `rule ccontr` contradiction
+  step.
+
+Next theory per the port order: **Nat_Parity**.
