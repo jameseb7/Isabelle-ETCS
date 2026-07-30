@@ -800,4 +800,65 @@ Finishing this theory surfaced several new proof-pattern gotchas, now folded int
   the two given points; worth extracting as a reusable local helper lemma (named `third_point` in
   this file) rather than inlining the six-way case split at each call site.
 
-Next theory per the port order: **Nats**.
+**Status: FOL/Nats.thy is complete** (1593 lines), verified via a full from-scratch headless build
+(`Finished ETCS_FOL_Nats`) plus an independent verification build in a fresh scratch directory against
+fresh copies of every already-committed `FOL/*.thy` file (`Finished ETCS_FOL_Nats_Verify`).
+
+Full lemma coverage matches HOL's `Nats.thy`: the `\<nat>\<^sub>c`/`zero`/`successor` axiomatization and
+`natural_number_object_property`/`_property2`, `natural_number_object_func_unique`; `is_NNO`,
+`N_is_a_NNO`, `NNOs_are_iso_N`, `Iso_to_N_is_NNO`; `zero_is_not_successor`,
+`oneUN_iso_N_isomorphism` (Proposition 2.6.6), `nonzero_is_succ`; `predecessor'`/`predecessor` and
+their defining lemmas; `Peano's_Axioms`, `succ_inject`; `nat_induction`; the `ITER_curried`/`ITER`
+axiomatization and `ITER_zero`/`ITER_zero'`/`ITER_succ`/`ITER_one`; `iter_comp` (notation
+`_\<^bsup>\<circ>_\<^esup>`) and `iter_comp_type`/`iter_comp_def3`, `zero_iters`, `succ_iters`, `one_iter`,
+`eval_lemma_for_ITER`, `n_accessible_by_succ_iter_aux`, `n_accessible_by_succ_iter`; and finally
+`oneUN_iso_N`/`NUone_iso_N`.
+
+Design decisions vs. HOL:
+- **Dropped `zUs_epic`, `zUs_surj`, `nonzero_is_succ_aux`** (confirmed via grep they are referenced
+  nowhere else in the HOL repo). `nonzero_is_succ` is instead proved directly off the already-derived
+  isomorphism `zero \<amalg> successor` and its generic inverse `(zero \<amalg> successor)\<^bold>\<inverse>`
+  (reusing the `f\<^bold>\<inverse>` operator from `Cfunc.thy` rather than a fresh `THE`-based
+  Skolemization) plus `coprojs_jointly_surj`, bypassing HOL's `surjective_def`-based route entirely.
+- **`predecessor'` is defined directly as `(zero \<amalg> successor)\<^bold>\<inverse>`** for the same reason —
+  once `oneUN_iso_N_isomorphism` establishes `isomorphism(zero \<amalg> successor)`, the generic
+  inverse operator already has everything needed (`inverse_def2`), so no separate Skolem constant is
+  introduced for the predecessor map on `\<one> \<Coprod> \<nat>\<^sub>c`.
+- **`ITER_curried :: cset \<Rightarrow> cfunc` is axiomatized directly via its defining spec** (existence +
+  uniqueness guaranteed pointwise by `natural_number_object_property2`), the same conservative-extension
+  justification used throughout the port for `inverse`, `cnufatem`, etc. `ITER` is then a plain
+  `definition` unfolding to `(ITER_curried(U))\<^sup>\<flat>`.
+- Added one small reusable helper not present in HOL, **`eval_func_cnufatem`**
+  (`eval_func(Y,X) \<circ>\<^sub>c \<langle>x,g\<rangle> = cnufatem(g) \<circ>\<^sub>c x` for `g \<in>\<^sub>c Y\<^bsup>X\<^esup>`,
+  `x \<in>\<^sub>c X`), factored out of `eval_lemma_for_ITER`'s inline derivation and reused again in
+  `n_accessible_by_succ_iter_aux`/`n_accessible_by_succ_iter` to avoid duplicating the same
+  `cnufatem_def2` + associativity/`cfunc_prod_comp` unwinding twice.
+
+New proof-pattern bugs found and fixed this file (folded into
+[[fol-proof-patterns-no-sledgehammer]] as items 33-35):
+- **A `have`/`axiomatization`-adjacent type judgement for a long composition chain can be flatly
+  FALSE if the domain/codomain of an intermediate factor is miscomputed** — e.g. for
+  `meta_comp(U,U,U) \<circ>\<^sub>c (id \<times>\<^sub>f eval) \<circ>\<^sub>c associate_right(...) \<circ>\<^sub>c (diagonal(...) \<times>\<^sub>f id(...))`,
+  the correct domain is `(U\<^bsup>U\<^esup>) \<times>\<^sub>c (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>` (the domain of the
+  *rightmost* factor, `diagonal(...) \<times>\<^sub>f id(...)`), NOT
+  `(U\<^bsup>U\<^esup>) \<times>\<^sub>c ((U\<^bsup>U\<^esup>) \<times>\<^sub>c (U\<^bsup>U\<^esup>)\<^bsup>U\<^bsup>U\<^esup>\<^esup>)` (an intermediate stage's
+  *codomain*, after `associate_right` reassociates) — `typecheck_cfuncs` failing with a large dumped
+  goal listing many partially-matched premises is a strong signal to re-derive the domain/codomain of
+  the WHOLE chain by hand from its rightmost/leftmost factors before assuming the tactic is simply
+  "not smart enough."
+- **When `typecheck_cfuncs` alone cannot close a deep (3+ factor) composition-chain type goal, build
+  it bottom-up as individual named `have ..._type[type_rule]` facts, one `comp_type[OF inner outer]`
+  application per factor** (innermost/rightmost first), rather than one blanket
+  `by typecheck_cfuncs` call on the whole chain — this both diagnoses exactly which stage's type is
+  wrong (per the item above) and reliably succeeds once every stage's type is individually correct.
+- **`using fact_a by simp` where `fact_a`'s statement and the goal differ only by
+  left-vs-right-association of the same three-term composition chain is NOT closed by `simp` alone**
+  (this is the same underlying `comp_associative2`-direction issue as items 28-32, but caught here in
+  a *fresh* spot: restating a previously-derived equation `id(\<nat>\<^sub>c) \<circ>\<^sub>c n = A \<circ>\<^sub>c B \<circ>\<^sub>c n`
+  post-substitution). Diagnosed from the exact `Failed to apply initial proof method ... using this:
+  ... goal (1 subgoal): ...` shape (the "using this" fact and the goal are visibly the same terms in
+  different parenthesizations) — fix by inserting an explicit intermediate `have` in the
+  matching (left-associated) parenthesization first, then bridging to the target parenthesization via
+  a named `comp_associative2`/`sym[OF comp_associative2]` step, exactly as for a fresh derivation.
+
+Next theory per the port order: **Pred_Logic**.
