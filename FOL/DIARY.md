@@ -1021,4 +1021,81 @@ New proof-pattern bugs found and fixed this file (folded into
   caused the loop. Hit once, in `FORALL_true_implies_all_true`'s final `rule ccontr` contradiction
   step.
 
-Next theory per the port order: **Nat_Parity**.
+**Status: FOL/Nat_Parity.thy is complete** (~1150-line FOL port of the 700-line HOL original, by far
+the most `smt`/`metis`-dense theory ported so far — ~35 occurrences to hand-translate). Verified via
+a from-scratch headless build (`Finished ETCS_FOL_NatParity_Final`) plus an independent verification
+build against fresh copies of every already-committed `FOL/*.thy` file
+(`Finished ETCS_FOL_NatParity_Verify`). Covers `nth_even`/`nth_odd` (each axiomatized directly off
+its defining spec — the same conservative-extension technique as `ITER_curried` in `Nats.thy` —
+rather than porting HOL's `THE u. ...` construction), `nth_odd_is_succ_nth_even`,
+`succ_nth_odd_is_nth_even_succ` (given directly from `nth_odd_is_succ_nth_even` +
+`nth_even_successor` rather than HOL's induction, since it turns out to need no induction at all),
+`is_even`/`is_odd` (same axiomatization pattern), `is_even_not_is_odd`/`is_odd_not_is_even` (+ two
+reusable double-negation helper lemmas `NOT_NOT_is_even`/`NOT_NOT_is_odd`, replacing HOL's ad hoc
+re-derivation of the same fact at each call site), `not_even_and_odd`/`even_or_odd`,
+`is_even_nth_even_true`/`is_odd_nth_odd_true` (+ two reusable helpers `t_beta_N_zero`/`t_beta_N_succ`
+factored out since both lemmas need the identical fact), `is_odd_nth_even_false`/
+`is_even_nth_odd_false`, `EXISTS_zero_nth_even`/`not_EXISTS_zero_nth_odd`, `halve_with_parity`
+(same axiomatization pattern) with `halve_with_parity_nth_even`/`_nth_odd`,
+`nth_even_nth_odd_halve_with_parity`, `halve_with_parity_nth_even_nth_odd`, `even_odd_iso`/
+`halve_with_parity_iso` (using `isomorphism_def3` rather than HOL's raw `cfunc_type_def` unfold, for
+a cleaner FOL-native proof), `halve`/`halve_type`/`halve_nth_even`/`halve_nth_odd`, `is_even_def3`/
+`is_odd_def3`, `nth_even_or_nth_odd`, and `is_even_exists_nth_even`/`is_odd_exists_nth_odd`.
+
+New proof-pattern bugs found and fixed this file (folded into
+[[fol-proof-patterns-no-sledgehammer]] as items 43-46):
+- **`\<nexists>` is not defined in plain FOL** (unlike HOL, which gets it from `Main`/`HOL.thy`) —
+  using it produces `*** Inner lexical error ... Failed to parse prop`, not a semantic error, since
+  the tokenizer doesn't recognize the symbol as bound to any syntax at all in this object logic. **Fix:**
+  write `\<not> (\<exists> x. P(x))` explicitly instead of `\<nexists> x. P(x)` everywhere in the FOL port (no
+  prior occurrence of this symbol existed anywhere else in the port, confirmed by a repo-wide grep,
+  making this an easy trap to fall into out of pure HOL habit).
+- **`cfunc_coprod_comp[OF a_type b_type c_type]` (statement `(a \<circ>\<^sub>c b) \<amalg> (a \<circ>\<^sub>c c) = a \<circ>\<^sub>c (b \<amalg> c)`)
+  needs `sym` whenever the goal states the distributed form first** (`a \<circ>\<^sub>c (b \<amalg> c) = (a \<circ>\<^sub>c b) \<amalg>
+  (a \<circ>\<^sub>c c)`, the mirror of the lemma's own left-to-right direction) — the same mechanical
+  direction-checking discipline already established for `comp_associative2`, but easy to forget applies
+  to `cfunc_coprod_comp` too since its asymmetric shape (one single function distributed over a
+  coproduct of two) doesn't visually suggest a "sides swapped" mistake the way associativity
+  parenthesization does. Hit at three call sites (`halve_with_parity_nth_even_nth_odd`,
+  `is_even_def3`/`is_odd_def3`'s `NOT`-distribution steps).
+- **`left_coproj_cfunc_coprod`/`right_coproj_cfunc_coprod` compute `h \<circ>\<^sub>c` bare injections, never a
+  self-composition `h \<circ>\<^sub>c h`** — when a proof needs `h \<circ>\<^sub>c h` for `h` itself built as `f \<amalg> g`
+  (e.g. proving `(right_coproj \<amalg> (left_coproj \<circ>\<^sub>c successor)) \<circ>\<^sub>c (right_coproj \<amalg> (left_coproj
+  \<circ>\<^sub>c successor)) = ...` in `halve_with_parity_nth_even`/`_nth_odd`), it is tempting but wrong to
+  reach directly for `cfunc_coprod_unique` with the WRONG witness equations (mixing up "what `h`
+  does to the bare injections" with "what `h \<circ>\<^sub>c h` does to the bare injections"). **Fix:** first
+  establish `h \<circ>\<^sub>c left_coproj(X,Y) = ...`/`h \<circ>\<^sub>c right_coproj(X,Y) = ...` (the direct injection facts,
+  `h_left`/`h_right`), THEN separately re-derive `(h \<circ>\<^sub>c h) \<circ>\<^sub>c left_coproj(X,Y)`/`(h \<circ>\<^sub>c h) \<circ>\<^sub>c
+  right_coproj(X,Y)` by chaining `h_left`/`h_right` through an explicit `comp_associative2` step
+  (`(h∘h)∘inj = h∘(h∘inj) = h∘(target of h_left/h_right)`, possibly needing a further associativity
+  step if that target itself factors through an injection), and only THEN apply `cfunc_coprod_unique`
+  to the fully-derived `hh_left`/`hh_right` facts.
+- **A missing `terminal_func_comp` cancellation step can silently vanish from an "also" chain when the
+  adjacent `cfunc_coprod_comp`-distribution step is the one visibly needing a fix** — in `is_even_def3`'s
+  successor case, the step "`(NOT \<circ>\<^sub>c \<t> \<circ>\<^sub>c \<beta>) \<amalg> (NOT \<circ>\<^sub>c \<f> \<circ>\<^sub>c \<beta> \<circ>\<^sub>c successor) \<circ>\<^sub>c
+  halve_with_parity = NOT \<circ>\<^sub>c (\<t> \<circ>\<^sub>c \<beta>) \<amalg> (\<f> \<circ>\<^sub>c \<beta>) \<circ>\<^sub>c halve_with_parity`" silently drops a
+  `successor` on one side — the `cfunc_coprod_comp`-based derivation of the "NOT distributes over amalg"
+  half of the step is necessary but not sufficient; a separate `\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c successor = \<beta>\<^bsub>X\<^esub>`
+  cancellation (via `terminal_func_comp[OF successor_type]`) must ALSO be derived and folded in before
+  the final `simp` combination, or the residual goal keeps the un-cancelled `successor` and fails with
+  no obviously-related error message pointing at the missing fact. **Fix:** when an "also" step's
+  target drops a subterm present in the source that doesn't obviously come from the cited lemma, check
+  for a missing cancellation fact (`terminal_func_comp`, `id_left_unit2`/`id_right_unit2`, etc.)
+  needed in addition to the main rewrite, not just a direction/instantiation bug in the main rewrite
+  itself.
+
+**Debugging workflow note:** this theory was large enough (~1150 lines) that repeated full headless
+`isabelle build` cycles started colliding with a concurrently-open jEdit session on the same
+directory/session name, corrupting the shared build database (`SQLITE_READONLY_DBMOVED`,
+`SQLITE_CONSTRAINT_PRIMARYKEY`) — a sharper version of the "avoid concurrent builds" caution in
+[[isabelle-collab-hygiene]]. The fix that unblocked iteration: use `isabelle eval_at -l
+<stable-base-session> -d <dir1> -d <dir2> file.thy <last-line>` (a fast, non-heap-persisting
+line-level checker) to verify the whole file against an already-built, unrelated base heap
+(`ETCS_FOL_QuantLogic`) while editing, and reserve genuine `isabelle build` invocations (which DO
+write to the shared session database) for a single final from-scratch pass once `eval_at` reports a
+clean run — never running a headless `isabelle build` of a session while jEdit has that same session
+open for live editing/building.
+
+Next theory per the port order: **Countable** (not Cardinality, which was already ported earlier in
+the sequence — confirmed via `Category_Set/Countable.thy`'s own `imports Nat_Parity`, the actual next
+dependency).
