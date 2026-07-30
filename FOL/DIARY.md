@@ -923,4 +923,59 @@ New proof-pattern bugs found and fixed this file (folded into
   (the latter from a *missing* substitution fact — `implies_qp`'s derivation needs both `p_true` and
   `q_eq_f` supplied to `simp`, not just `q_eq_f` — rather than a wrong one).
 
-Next theory per the port order: **Fixed_Points**.
+**Status: FOL/Fixed_Points.thy is complete** (283-line FOL port of the 191-line HOL original),
+verified via a full from-scratch headless build (`Finished ETCS_FOL_FixedPoints`) plus an independent
+verification build in a fresh scratch directory against fresh copies of every already-committed
+`FOL/*.thy` file (`Finished ETCS_FOL_FixedPoints_Verify`). Covers `fixed_point`/`has_fixed_point`/
+`fixed_point_property` (flattened `o`-valued definitions), `fixed_point_def2`,
+`Lawveres_fixed_point_theorem` (Theorem 2.6.13), `Cantors_Negative_Theorem` (Theorem 2.6.14,
+`\<not> (\<exists>s. s : X \<rightarrow> powerset(X) \<and> surjective(s))`), `Cantors_Positive_Theorem` (Exercise 2.6.15, via
+`eq_pred(X)\<^sup>\<sharp>` injectivity), the unnamed Corollary 2.6.16 (`X \<le>\<^sub>c \<P>X \<and> \<not> (X \<cong> \<P>X)`, named
+`Cantor_X_leq_PX_and_not_iso` since FOL lemmas need names), and
+`Generalized_Cantors_Positive_Theorem`/`Generalized_Cantors_Negative_Theorem`.
+
+New proof-pattern bugs found and fixed this file (folded into
+[[fol-proof-patterns-no-sledgehammer]] as items 38-40):
+- **A theory's `imports` clause must independently reach every fact actually used in its proofs —
+  merely LISTING a dependency theory in the scratch `ROOT` session file's `theories` block is NOT
+  enough to make its facts visible**, because Isabelle's fact namespace is governed by the Isar
+  `theory X imports Y` graph, not by "already processed earlier in the same session." Concretely,
+  `Fixed_Points.thy` needs `epis_give_monos`/`monos_give_epis` from `Axiom_Of_Choice.thy`, but the
+  actual import chain `Fixed_Points → Pred_Logic → Nats → {Exponential_Objects, Cardinality} → ... →
+  Initial → Coproduct` never passes through `Axiom_Of_Choice` (which itself only imports
+  `Coproduct`, so nothing pulls it in transitively) — even though `Axiom_Of_Choice` was correctly
+  listed in the `ROOT` session's `theories` list and built successfully earlier in the log. The
+  failure surfaces as `*** Undefined fact: "epis_give_monos"`, which is easy to misread as a typo or
+  missing lemma rather than a missing `imports` line. **Fix:** always cross-check a new theory's
+  `imports` clause against HOL's own original `imports` line for that file (here, HOL's
+  `Fixed_Points.thy` explicitly imports `Axiom_Of_Choice Pred_Logic Cardinality` — three theories,
+  not just the one that happens to be "furthest along" the port order) rather than assuming transitive
+  imports from whichever theory is imported for its type-rule-heavy content.
+- **Custom prefix mixfix notation for a unary constant (e.g. `("\<P>_" [101]100)` for `powerset`) is
+  not safe to rely on even for straightforward substitution goals** — `have "s : X \<rightarrow> \<Omega>\<^bsup>X\<^esup>" using
+  s_type by (simp add: powerset_def)` (and the `unfolding powerset_def` variant) both failed
+  to close a goal that should have been a one-line rewrite, with the residual goal dump showing the
+  `\<P>X`-containing term simply never getting rewritten by `powerset_def` at all, in either direction.
+  Root cause not fully diagnosed (possibly a parse/priority interaction specific to this notation,
+  though no direct evidence of a bad parse was found) — but switching every occurrence of `\<P>X` to
+  the underlying constant-application form `powerset(X)` immediately fixed all three failure sites
+  with no other change, confirming the mixfix notation itself was the problem. **Fix, reconfirming
+  and extending item 21's "no custom mixfix" caution:** avoid relying on a freshly-introduced prefix
+  mixfix notation in proof text even when it renders identically to the constant-application form —
+  prefer writing `powerset(X)` explicitly throughout proofs (the notation can still be used freely in
+  informal/display text or kept for the `definition` itself) until/unless the notation has a track
+  record of working reliably in proof scripts.
+- **When instantiating a general two-premise existence lemma like `epis_give_monos`/`monos_give_epis`
+  (`f:X\<to>Y \<Longrightarrow> ... \<Longrightarrow> \<exists>g. g:Y\<to>X \<and> ... \<and> g\<circ>\<^sub>cf=id(Y)` or the dual `f\<circ>\<^sub>cg=id(X)`) at a SPECIFIC
+  call site, it is easy to get the identity equation's domain/codomain backwards** — writing
+  `s \<circ>\<^sub>c m = id(X)` when the lemma (with `f=s:X\<to>Y\<^bsup>X\<^esup>`, so the lemma's own "Y" is `Y\<^bsup>X\<^esup>`) actually
+  produces `s \<circ>\<^sub>c m = id(Y\<^bsup>X\<^esup>)`. Diagnosed from an `obtain ... using lemma_app by auto` failure whose
+  printed residual goal shows the correctly-instantiated fact side by side with the wrongly-stated
+  `obtain` pattern — same diagnostic shape as item 37, but for an existential `obtain` rather than a
+  `using ... by simp` step. **Fix:** re-derive which object plays the lemma's "X" and "Y" roles from
+  the concrete types at the call site before writing the `obtain` pattern's equation, rather than
+  guessing from the shape of the surrounding proof; when the identity equation isn't actually needed
+  downstream (as here), the simplest fix is to drop it from the `obtain` pattern entirely rather than
+  getting its direction right, matching what HOL's own proof did at the same spot.
+
+Next theory per the port order: **Quant_Logic**.
