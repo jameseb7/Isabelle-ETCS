@@ -861,4 +861,66 @@ New proof-pattern bugs found and fixed this file (folded into
   matching (left-associated) parenthesization first, then bridging to the target parenthesization via
   a named `comp_associative2`/`sym[OF comp_associative2]` step, exactly as for a fresh derivation.
 
-Next theory per the port order: **Pred_Logic**.
+**Status: FOL/Pred_Logic.thy is complete** (1379-line FOL port of the 1633-line HOL original),
+verified via a full from-scratch headless build (`Finished ETCS_FOL_PredLogic`) plus an independent
+verification build in a fresh scratch directory against fresh copies of every already-committed
+`FOL/*.thy` file (`Finished ETCS_FOL_PredLogic_Verify`).
+
+**Major design decision, applied throughout this file:** HOL defines `NOT`/`AND`/`NOR` via fresh
+`THE \<chi>. is_pullback ...` pullbacks on a single monic point of `\<Omega>` or `\<Omega> \<times>\<^sub>c \<Omega>` (ported
+directly, reusing `characteristic_func` exactly as for `NOT`/`AND`/`NOR` — see below), but
+`OR`/`XOR`/`NAND`/`IFF`/`IMPLIES` each additionally require a fresh pullback over a 2- or 3-way
+coproduct (`\<one> \<Coprod> \<one>` or `\<one> \<Coprod> (\<one> \<Coprod> \<one>)`), each needing its own ~60-100 line
+injective-witness case-bash (`pre_OR_injective`, `pre_XOR_injective`, `pre_NAND_injective`,
+`pre_IFF_injective`, `pre_IMPLIES_injective`, plus `set_three`/`set_three_card`). HOL itself proves,
+as *corollaries*, that each of these five connectives equals a composition of already-defined
+connectives (`NOT_NOR_is_OR`, `NOT_AND_is_NAND`, `NOT_IFF_is_XOR`, `IMPLIES_is_OR_NOT_id`,
+`iff_is_and_implies_implies_swap`). This port inverts the dependency: each of `OR`/`XOR`/`NAND`/
+`IFF`/`IMPLIES` is *defined* directly as that composition —
+`OR := NOT \<circ>\<^sub>c NOR`, `XOR := AND \<circ>\<^sub>c \<langle>OR, NOT \<circ>\<^sub>c AND\<rangle>`, `NAND := NOT \<circ>\<^sub>c AND`,
+`IFF := OR \<circ>\<^sub>c \<langle>AND, AND \<circ>\<^sub>c (NOT \<times>\<^sub>f NOT)\<rangle>`, `IMPLIES := OR \<circ>\<^sub>c (NOT \<times>\<^sub>f id(\<Omega>))` — with truth
+tables verified by direct case-bash on point values rather than pullback universal properties. Every
+HOL lemma statement about these five connectives (truth tables, monotonicity facts, the identity
+lemmas themselves, associativity/commutativity/absorption/de Morgan facts) is still proved and
+present with an unchanged statement; what's eliminated entirely is the coproduct injective-witness
+machinery (`pre_*_type`/`pre_*_injective`/`*_is_pullback`/`set_three`/`set_three_card`), none of
+which survives into the port since nothing downstream references those particular lemma names
+(confirmed via grep — only the point-level truth-table facts and the identity corollaries are ever
+used elsewhere in the HOL repo). `NOT`/`AND`/`NOR` themselves ARE ported via genuine fresh pullbacks,
+but even these reuse the existing `characteristic_func`/`characteristic_func_is_pullback`
+infrastructure from `Truth.thy` rather than a fresh `THE`-elimination, since each is exactly
+`characteristic_func` applied to a single already-monic point (`\<f>`, `\<langle>\<t>,\<t>\<rangle>`, `\<langle>\<f>,\<f>\<rangle>`
+respectively) — matching the `characteristic_func` axiomatization's own parameter pattern exactly.
+
+One further deliberate omission: HOL's `IMPLIES_elim''` (stated with
+`IMPLIES \<circ>\<^sub>c (P \<times>\<^sub>f Q) = \<t>` for `P Q : \<one> \<rightarrow> \<Omega>`) is dropped. As stated it is only well-typed
+if `\<one> \<times>\<^sub>c \<one>` and `\<one>` coincide as literal terms (not merely up to isomorphism) — a coincidence
+HOL's specific choice-based product construction happens to provide but which plain FOL's abstractly
+axiomatized `cart_prod` gives no way to reproduce. Confirmed via grep across every file in the whole
+`Isabelle-ETCS` repo (not just this port) that `IMPLIES_elim''` is never referenced anywhere else —
+only `IMPLIES_elim'` (the sensible `\<langle>P,Q\<rangle> : \<one> \<rightarrow> \<Omega> \<times>\<^sub>c \<Omega>` version, ported unchanged and used
+downstream in `Count.thy`/`Countable_.thy`/`Inequality.thy`) is actually needed, so nothing is lost.
+
+New proof-pattern bugs found and fixed this file (folded into
+[[fol-proof-patterns-no-sledgehammer]] as items 36-37):
+- **When a connective is *defined* as `X := A \<circ>\<^sub>c B` and a lemma's goal (after
+  `unfolding X_def`) restates `X \<circ>\<^sub>c arg` as `A \<circ>\<^sub>c (B \<circ>\<^sub>c arg)`, the goal is
+  `(A \<circ>\<^sub>c B) \<circ>\<^sub>c arg = A \<circ>\<^sub>c (B \<circ>\<^sub>c arg)` — left-associated = right-associated — and needs
+  `sym[OF comp_associative2[...]]`, NOT a bare `comp_associative2[...]`,** by the same mechanical
+  rule established throughout this port (`have "A \<circ>\<^sub>c (B \<circ>\<^sub>c C) = (A \<circ>\<^sub>c B) \<circ>\<^sub>c C"` needs no `sym`;
+  the reverse phrasing does). This is an easy slip specifically right after `unfolding X_def`
+  because the temptation is to reach for `comp_associative2` directly without re-checking which side
+  of the freshly-unfolded goal is left- vs. right-associated. Hit repeatedly (`OR_true_left_is_true`,
+  `OR_true_right_is_true`, `OR_false_false_is_false`) immediately after introducing `OR := NOT \<circ>\<^sub>c NOR`.
+- **When instantiating a truth-table lemma like `OR_true_right_is_true[OF p_type]` (which proves
+  `OR \<circ>\<^sub>c \<langle>p,\<t>\<rangle> = \<t>` for the *first* component `p`), it is easy to accidentally supply the type
+  fact for the wrong constant truth value** (e.g. `OF true_func_type` when the needed first
+  component is actually `\<f>`, giving the useless instance `OR \<circ>\<^sub>c \<langle>\<t>,\<t>\<rangle> = \<t>` instead of the
+  needed `OR \<circ>\<^sub>c \<langle>\<f>,\<t>\<rangle> = \<t>`) — the resulting `by simp` failure's residual goal names the *correct*
+  target value, making the bug immediately visible once the printed residual is actually read (the
+  `using this: ...` dump shows the wrong instantiated fact side-by-side with the real goal). Hit in
+  `OR_complementary`'s `p = \<f>` branch and `iff_is_and_implies_implies_swap`'s `p = \<t>, q = \<f>` branch
+  (the latter from a *missing* substitution fact — `implies_qp`'s derivation needs both `p_true` and
+  `q_eq_f` supplied to `simp`, not just `q_eq_f` — rather than a wrong one).
+
+Next theory per the port order: **Fixed_Points**.
