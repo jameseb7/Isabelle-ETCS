@@ -1118,5 +1118,16 @@ exactly one final from-scratch pass plus one independent-verification pass, both
 untouched by the open jEdit session. This is now the standing workflow for all remaining theories in
 this port (see item 47 in [[fol-proof-patterns-no-sledgehammer]]).
 
-Next theory per the port order: **ETCS** (the last theory in the full port — `Category_Set/ETCS.thy`
-imports the whole stack including `Countable`).
+**Status: FOL/ETCS.thy is complete — and with it, the full port is complete.** `ETCS.thy` itself is
+trivial (3-line HOL original, purely `imports Axiom_Of_Choice Nats Quant_Logic Countable Fixed_Points
+begin end` with no content of its own — a bundling theory pulling the whole development together).
+Verified via a from-scratch headless build (`Finished ETCS_FOL_Full_Final`) plus an independent
+verification build against fresh copies of every committed `FOL/*.thy` file
+(`Finished ETCS_FOL_Full_Verify`), both covering the complete stack `Cfunc` through `ETCS`.
+
+**The full HOL-to-FOL port is now done: all 18 theories (`Cfunc`, `Product`, `Terminal`, `Equalizer`,
+`Truth`, `Equivalence`, `Coproduct`, `Axiom_Of_Choice`, `Initial`, `Exponential_Objects`,
+`Cardinality`, `Nats`, `Pred_Logic`, `Fixed_Points`, `Quant_Logic`, `Nat_Parity`, `Countable`, `ETCS`)
+live under `FOL/`, each independently verified via headless `isabelle build`, matching the entire
+`Category_Set/` HOL development.** A persisted heap image collecting the whole stack was built
+(`ETCS_FOL_Full`) as the final checkpoint. No further theories remain in the port order.
