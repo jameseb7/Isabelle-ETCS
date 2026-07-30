@@ -1096,6 +1096,27 @@ write to the shared session database) for a single final from-scratch pass once 
 clean run — never running a headless `isabelle build` of a session while jEdit has that same session
 open for live editing/building.
 
-Next theory per the port order: **Countable** (not Cardinality, which was already ported earlier in
-the sequence — confirmed via `Category_Set/Countable.thy`'s own `imports Nat_Parity`, the actual next
-dependency).
+**Status: FOL/Countable.thy is complete** (139-line FOL port of the 78-line HOL original — small and
+entirely `smt`/`metis`/`meson`-free once translated, unlike `Nat_Parity.thy`). Verified via a
+from-scratch headless build (`Finished ETCS_FOL_Countable_Final`) plus an independent verification
+build against fresh copies of every committed `FOL/*.thy` file (`Finished ETCS_FOL_Countable_Verify`).
+Covers `epi_countable`/`emptyset_is_not_epi_countable`, `countable`/`epi_countable_is_countable`,
+`emptyset_is_countable`, `natural_numbers_are_countably_infinite`, `iso_to_N_is_countably_infinite`,
+`smaller_than_countable_is_countable`, `iso_pres_countable`, `NuN_is_countable` (via
+`halve_with_parity`'s inverse, ported earlier in `Nat_Parity.thy`), and
+`coproduct_of_countables_is_countable` (Exercise 2.6.11, via `cfunc_bowtieprod_inj` +
+`injective_imp_monomorphism` + `composition_of_monic_pair_is_monic`). No new proof-pattern bugs
+found — every HOL `smt`/`metis`/`meson` call unpacked cleanly into explicit `obtain`/`have` chains
+using facts already established elsewhere in the port, first-try clean per `isabelle eval_at`.
+
+**Workflow note (per user instruction, 2026-07-30):** rather than repeatedly running `isabelle build`
+against a session including the theory under active development, drafted and iterated using
+`isabelle eval_at -l ETCS_FOL_NatParity -d <dirs> Countable.thy <last-line>` against the persisted
+`ETCS_FOL_NatParity` heap image (built once, covering `Cfunc` through `Nat_Parity`, kept as a stable
+base and NOT rebuilt/extended mid-iteration) — reserving genuine `isabelle build` invocations for
+exactly one final from-scratch pass plus one independent-verification pass, both run in directories
+untouched by the open jEdit session. This is now the standing workflow for all remaining theories in
+this port (see item 47 in [[fol-proof-patterns-no-sledgehammer]]).
+
+Next theory per the port order: **ETCS** (the last theory in the full port — `Category_Set/ETCS.thy`
+imports the whole stack including `Countable`).
