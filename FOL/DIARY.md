@@ -722,4 +722,82 @@ none seen in quite this combination before, now folded into
 `FOL/Initial.thy` was completed in an earlier segment of this same port (see its own status note
 above) and is committed alongside `Exponential_Objects.thy` in this step.
 
-Next theory per the port order: **Cardinality**.
+**Status: `FOL/Cardinality.thy` is complete and independently verified** (2026-07-29): a
+from-scratch `isabelle build -c` of a fresh session containing every already-committed `FOL/*.thy`
+file (`Cfunc` through `Exponential_Objects`) plus this theory finishes with zero errors in ~24s.
+Full lemma coverage matches the 1147-line HOL original (`Category_Set/Cardinality.thy`), ported to
+a 1927-line FOL file: `is_finite`/`is_infinite`/`either_finite_or_infinite`, `is_smaller_than`
+(`\<le>\<^sub>c`) and `subobject_iff_smaller_than`/`set_card_transitive`, `all_emptysets_are_finite`,
+`emptyset_is_smallest_set`, `truth_set_is_finite`, `smaller_than_finite_is_finite`,
+`larger_than_infinite_is_infinite`, `iso_pres_finite`/`iso_pres_infinite`, `not_finite_and_infinite`,
+`size_2_sets`/`size_2plus_sets`, `not_init_not_term`, `sets_size_3_plus`,
+`smaller_than_coproduct1`/`2`, `smaller_than_product1`/`2`, `Y_nonempty_then_X_le_XtoY`,
+`non_init_non_ter_sets`, `exp_preserves_card1`/`2`/`3`, and the two hardest lemmas,
+**`coprod_leq_product`** and **`prod_leq_exp`**.
+
+`coprod_leq_product` deliberately uses a SIMPLER witness construction than HOL's own
+`try_cast`/`set_subtraction`-based one: given `X`, `Y` both non-initial/non-terminal (so each has
+two distinct elements `x1\<noteq>x2`, `y1\<noteq>y2`), define `q : Y \<rightarrow> X \<times>\<^sub>c Y` by
+`q = \<langle>x2\<circ>\<^sub>c\<beta>_Y, id(Y)\<rangle>` (constant-`x2` on the first coordinate) and
+`p : X \<rightarrow> X \<times>\<^sub>c Y` via a single `eq_pred(X)`/`case_bool`/`dist_prod_coprod_left(X,\<one>,\<one>)`
+case split giving `p(x2)=\<langle>x1,y2\<rangle>` and `p(x)=\<langle>x,y1\<rangle>` for `x\<noteq>x2`; then `m = p \<amalg> q`
+is shown monic by a full case split on `coprojs_jointly_surj` (left/left, left/right, right/left,
+right/right) using the explicit value facts and `cart_prod_eq2` to derive contradictions from the
+distinctness of `x1,x2` and `y1,y2`.
+
+`prod_leq_exp` follows HOL's own case structure (`initial_object Y`, `X \<cong> \<Omega>`,
+`initial_object X`, `terminal_object X`, and the general case) and in the hardest branch builds the
+same `\<Theta>` witness as HOL via `dist_prod_coprod_left`/`eq_pred`/`case_bool`/`swap`/
+`associate_right`, then proves `injective(\<Theta>)` by an explicit 9-leaf case split (on whether
+`y`/`t` equal `y1`/`y2` and whether `x` equals `s`) instead of HOL's `metis`-driven case analysis,
+using a `third_point` helper lemma (pigeonhole-style: given any two elements of a \<ge>3-element set,
+find a third element distinct from both, proved via `sets_size_3_plus` plus nested `disjE`
+case-splits, no `cases`/`case True`/`case False`) to supply a witness `z` distinct from both
+compared points whenever needed.
+
+Finishing this theory surfaced several new proof-pattern gotchas, now folded into
+[[fol-proof-patterns-no-sledgehammer]] as items 28-32:
+- **`proof (clarify)` cannot open a goal whose statement is already meta-level** (i.e. a `have
+  "\<And>x y z. ... \<Longrightarrow> ... \<Longrightarrow> concl"` string) — it fails with "Failed to apply
+  initial proof method" because `clarify` expects an OBJECT-level `\<forall>`/`\<longrightarrow>`/`\<and>`
+  to simplify into meta form; when the goal is already stated with meta `\<And>`/`\<Longrightarrow>`,
+  use plain `proof -` followed directly by `fix`/`assume`/`show`. `proof (clarify)` remains correct
+  and necessary when the goal starts as an object-level formula (e.g. right after `unfolding
+  injective_def2[OF f_type]`, whose RHS is `\<forall>x y. ... \<longrightarrow> ...`).
+- **`conjI[OF conjI[OF A B] C]` and `conjI[OF A conjI[OF B C]]` are NOT interchangeable** even though
+  `A \<and> B \<and> C` "looks the same" either way — a lemma's LHS conjunction associates according to
+  how it was literally written (`\<and>` is right-associative, so `P \<and> Q \<and> R` means `P \<and> (Q
+  \<and> R)`), and `OF`'s unifier will reject the wrong nesting with "no unifiers" rather than silently
+  fixing it. Always match the target lemma's own parenthesization exactly when building a conjunction
+  via nested `conjI`.
+- **`comp_associative2` (`h \<circ>\<^sub>c (g \<circ>\<^sub>c f) = (h \<circ>\<^sub>c g) \<circ>\<^sub>c f`) as a `simp` rule only
+  ever rewrites TOWARD full left-association** — feeding it to `simp` can prove two *different*
+  left-grouped parenthesizations of the same composition-chain-applied-to-an-argument are equal (both
+  normalize to the same canonical left-associated form), but it can NEVER produce or match a
+  right-associated target (e.g. the natural `A \<circ>\<^sub>c B \<circ>\<^sub>c C \<circ>\<^sub>c x` chain, which
+  parses right-associatively since `\<circ>\<^sub>c` is `infixr`), because the rule only fires in one
+  direction. When a lemma's *stated* conclusion is a right-associated chain, close it by peeling one
+  layer at a time with named `have step_k : ... = ...` facts each proved via `sym[OF
+  comp_associative2[OF ...]]` (the symmetric/right-associating direction), rather than reaching for a
+  blanket `simp add: comp_associative2`.
+- **A `have`/`show` goal combining several large opaque terms (e.g. involving `\<Theta>\<^sup>\<flat>`
+  applied to a giant composite) via a plain `using fact1 fact2 fact3 by simp` can be genuinely SLOW
+  (tens of seconds, occasionally hitting the ML stack limit and getting killed as
+  `Interrupt_Breakdown`) even when the combination is logically trivial** — `simp`'s default behavior
+  of pulling in the entire local proof context as additional (conditional) rewrite rules can make it
+  thrash searching for a rewrite path through a large in-scope fact set (e.g. several big generalized
+  lemmas like `f1`/`f2`/`f3` from an enclosing `have`, each a `\<forall>`-schematic conditional
+  equation matching the same term shape). The robust, fast fix: use `fact[unfolded eq_thm]` to
+  perform a single, targeted rewrite of ONE specific fact by ONE specific equation (this does not
+  consult the ambient context at all), then close the final numeric/scalar equality with a direct
+  `rule trans[OF fact_a[symmetric] fact_b]` instead of `by simp` — this reduces a search that was
+  timing out to sub-second, purely syntactic term matching.
+- **The "pigeonhole: given two points, find a third element of a \<ge>3-element set distinct from
+  both" pattern** (needed repeatedly for injectivity arguments over sets that are merely known to be
+  "big enough", e.g. via `sets_size_3_plus`) has no library lemma and must be hand-built each time via
+  nested `disjE`-based case splits (never `cases`/`case True`/`case False`, per longstanding
+  practice) on whether the first/second of three obtained distinct witnesses coincides with either of
+  the two given points; worth extracting as a reusable local helper lemma (named `third_point` in
+  this file) rather than inlining the six-way case split at each call site.
+
+Next theory per the port order: **Nats**.
