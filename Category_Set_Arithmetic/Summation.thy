@@ -742,36 +742,228 @@ proof -
     using calculation by auto
 qed
 
-(*
 lemma summation_tail:
-  assumes l_type[type_rule]: "lower \<in>\<^sub>c \<nat>\<^sub>c"  
+  assumes l_type[type_rule]: "lower \<in>\<^sub>c \<nat>\<^sub>c"
   assumes u_type[type_rule]: "upper \<in>\<^sub>c \<nat>\<^sub>c"
   assumes lt: "lower \<le>\<^sub>\<nat> upper"
   assumes f_type[type_rule]: "f \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
   shows "summation \<circ>\<^sub>c \<langle>\<langle>lower, successor \<circ>\<^sub>c upper\<rangle>, f\<rangle> = (summation \<circ>\<^sub>c \<langle>\<langle>lower, upper\<rangle>, f\<rangle>) +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c successor \<circ>\<^sub>c upper)"
-proof - 
+proof -
+  obtain d where d_type[type_rule]: "d \<in>\<^sub>c \<nat>\<^sub>c" and d_def': "d +\<^sub>\<nat> lower = upper"
+    using lt leq_infix_def leq_true_implies_exists by (typecheck_cfuncs, blast)
+  have d_def: "lower +\<^sub>\<nat> d = upper"
+    using d_def' by (typecheck_cfuncs, simp add: add_commutes)
+
+  have monus_eq: "upper \<midarrow>\<^sub>\<nat> lower = d"
+    using d_def bigger_monus_smaller[of lower d] by (typecheck_cfuncs, auto)
+
+  have succ_step: "lower +\<^sub>\<nat> (successor \<circ>\<^sub>c d) = successor \<circ>\<^sub>c upper"
+    using d_def by (typecheck_cfuncs, simp add: add_respects_succ1)
+
+  have lt_succ: "lower \<le>\<^sub>\<nat> successor \<circ>\<^sub>c upper"
+    unfolding leq_infix_def
+  proof (rule exists_implies_leq_true)
+    show "lower \<in>\<^sub>c \<nat>\<^sub>c" by typecheck_cfuncs
+    show "successor \<circ>\<^sub>c upper \<in>\<^sub>c \<nat>\<^sub>c" by typecheck_cfuncs
+    show "\<exists>k. k \<in>\<^sub>c \<nat>\<^sub>c \<and> k +\<^sub>\<nat> lower = successor \<circ>\<^sub>c upper"
+      using succ_step
+      by (metis add_commutes d_type l_type succ_n_type) 
+  qed
+
+  have succ_monus_eq: "(successor \<circ>\<^sub>c upper) \<midarrow>\<^sub>\<nat> lower = successor \<circ>\<^sub>c d"
+    using succ_step bigger_monus_smaller[of lower "successor \<circ>\<^sub>c d"] by (typecheck_cfuncs, auto)
+
   have "summation \<circ>\<^sub>c \<langle>\<langle>lower, successor \<circ>\<^sub>c upper\<rangle>, f\<rangle> = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, (successor \<circ>\<^sub>c upper) \<midarrow>\<^sub>\<nat> lower\<rangle>"
-    by (metis assms leq_infix_def lqe_connexity nat_strict_total_order nonempty_sum succ_n_type)
-  also have "... = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>,  successor \<circ>\<^sub>c (upper \<midarrow>\<^sub>\<nat> lower)\<rangle>"
-    by (typecheck_cfuncs, smt (verit, ccfv_SIG) RENAME_Part1 add_commutes add_respects_succ3 
-        add_respects_zero_on_right bigger_monus_smaller lt smaller_monus_bigger)
-  also have "... = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>,  upper \<midarrow>\<^sub>\<nat> lower\<rangle> +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c (lower +\<^sub>\<nat> (successor \<circ>\<^sub>c (upper \<midarrow>\<^sub>\<nat> lower))))"
-    using indexed_sum_tail_term apply (-, typecheck_cfuncs)
-    oops
+    using lt_succ by (typecheck_cfuncs, simp add: nonempty_sum)
+  also have "... = indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, successor \<circ>\<^sub>c d\<rangle>"
+    by (simp add: succ_monus_eq)
+  also have "... = (indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, d\<rangle>) +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c (lower +\<^sub>\<nat> (successor \<circ>\<^sub>c d)))"
+    by (typecheck_cfuncs, simp add: indexed_sum_tail_term)
+  also have "... = (indexed_sum \<circ>\<^sub>c \<langle>\<langle>lower, f\<rangle>, upper \<midarrow>\<^sub>\<nat> lower\<rangle>) +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c successor \<circ>\<^sub>c upper)"
+    by (simp add: monus_eq succ_step)
+  also have "... = (summation \<circ>\<^sub>c \<langle>\<langle>lower, upper\<rangle>, f\<rangle>) +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c successor \<circ>\<^sub>c upper)"
+    using lt by (typecheck_cfuncs, simp add: nonempty_sum)
+  finally show ?thesis .
+qed
 
-(* indexed_sum_tail_term
-indexed_sum \<circ>\<^sub>c \<langle>\<langle>n, f\<rangle>, successor \<circ>\<^sub>c m\<rangle> = (indexed_sum \<circ>\<^sub>c \<langle>\<langle>n, f\<rangle>, m\<rangle>) +\<^sub>\<nat> (cnufatem f \<circ>\<^sub>c (n +\<^sub>\<nat> (successor \<circ>\<^sub>c m)))
-*)
-*)
+(* The classic result: 0 + 1 + 2 + ... + n = n(n+1)/2. Stated multiplicatively (2 * sum = n(n+1))
+   since \<nat>\<^sub>c has no division. *)
+theorem gauss_sum:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (summation \<circ>\<^sub>c \<langle>\<langle>zero, n\<rangle>, metafunc (id \<nat>\<^sub>c)\<rangle>) = n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+proof -
+  define two :: cfunc where "two = successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero"
+  have two_type[type_rule]: "two \<in>\<^sub>c \<nat>\<^sub>c"
+    unfolding two_def by typecheck_cfuncs
+  define idf :: cfunc where "idf = metafunc (id \<nat>\<^sub>c)"
+  have idf_type[type_rule]: "idf \<in>\<^sub>c \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+    unfolding idf_def by typecheck_cfuncs
+  have cnufatem_idf: "cnufatem idf = id \<nat>\<^sub>c"
+    unfolding idf_def by (typecheck_cfuncs, simp add: cnufatem_metafunc)
 
+  have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>, idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>id \<nat>\<^sub>c, successor \<circ>\<^sub>c id \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c n = \<t>"
+  proof (etcs_rule nat_induction)
+    show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero = \<t>"
+    proof -
+      have lhs: "(mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero = zero"
+      proof -
+        have "(mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>) \<circ>\<^sub>c zero
+            = mult2 \<circ>\<^sub>c \<langle>two, summation \<circ>\<^sub>c \<langle>\<langle>zero, zero\<rangle>, idf\<rangle>\<rangle>"
+          by (etcs_assocr, typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2
+              id_left_unit2 id_right_unit2 terminal_func_comp_elem)
+        also have "... = mult2 \<circ>\<^sub>c \<langle>two, cnufatem idf \<circ>\<^sub>c zero\<rangle>"
+          by (typecheck_cfuncs, simp add: sum_one_term)
+        also have "... = mult2 \<circ>\<^sub>c \<langle>two, zero\<rangle>"
+          by (typecheck_cfuncs, simp add: cnufatem_idf id_left_unit2)
+        also have "... = zero"
+          by (typecheck_cfuncs, metis mult_def mult_respects_zero_right)
+        finally show ?thesis .
+      qed
+      have rhs: "(mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = zero"
+      proof -
+        have "(mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = mult2 \<circ>\<^sub>c \<langle>zero, successor \<circ>\<^sub>c zero\<rangle>"
+          by (etcs_assocr, typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 id_left_unit2)
+        also have "... = zero"
+          by (typecheck_cfuncs, metis mult_def mult_respects_zero_left)
+        finally show ?thesis .
+      qed
+      show ?thesis
+      proof -
+        have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>,
+                              mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c zero
+            = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, zero\<rangle>"
+          using lhs rhs by (etcs_assocr, typecheck_cfuncs, simp add: cfunc_prod_comp)
+        also have "... = \<t>"
+        proof -
+          have "(zero = zero) = (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>zero, zero\<rangle> = \<t>)"
+            by (typecheck_cfuncs, rule eq_pred_iff_eq)
+          then show ?thesis by simp
+        qed
+        finally show ?thesis .
+      qed
+    qed
+  next
+    fix n
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume hyp: "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c n = \<t>"
+    have IH: "two \<cdot>\<^sub>\<nat> (summation \<circ>\<^sub>c \<langle>\<langle>zero, n\<rangle>, idf\<rangle>) = n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+    proof -
+      have "\<t> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle> \<circ>\<^sub>c n,
+                            mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c n\<rangle>"
+        using hyp by (etcs_assocl, typecheck_cfuncs, smt (verit, best) cfunc_prod_comp cfunc_prod_type comp_associative2)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c n\<rangle>\<rangle>,
+                            mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c n,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c n\<rangle>\<rangle>"
+        by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2)
+      then have "mult2 \<circ>\<^sub>c \<langle>two, summation \<circ>\<^sub>c \<langle>\<langle>zero, n\<rangle>, idf\<rangle>\<rangle> = mult2 \<circ>\<^sub>c \<langle>n, successor \<circ>\<^sub>c n\<rangle>"
+        by (typecheck_cfuncs, metis calculation eq_pred_iff_eq_conv id_left_unit2 id_right_unit2
+            terminal_func_comp_elem true_false_distinct)
+      then show ?thesis
+        unfolding mult_def by simp
+    qed
+    have succ_step: "summation \<circ>\<^sub>c \<langle>\<langle>zero, successor \<circ>\<^sub>c n\<rangle>, idf\<rangle> = (summation \<circ>\<^sub>c \<langle>\<langle>zero, n\<rangle>, idf\<rangle>) +\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+    proof -
+      have "summation \<circ>\<^sub>c \<langle>\<langle>zero, successor \<circ>\<^sub>c n\<rangle>, idf\<rangle> = (summation \<circ>\<^sub>c \<langle>\<langle>zero, n\<rangle>, idf\<rangle>) +\<^sub>\<nat> (cnufatem idf \<circ>\<^sub>c (successor \<circ>\<^sub>c n))"
+        using zero_is_smallest by (typecheck_cfuncs, simp add: leq_infix_def summation_tail)
+      then show ?thesis
+        by (typecheck_cfuncs, simp add: cnufatem_idf id_left_unit2)
+    qed
+    have induction_conclusion: "two \<cdot>\<^sub>\<nat> (summation \<circ>\<^sub>c \<langle>\<langle>zero, successor \<circ>\<^sub>c n\<rangle>, idf\<rangle>) = (successor \<circ>\<^sub>c n) \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c n)"
+    proof -
+      have "two \<cdot>\<^sub>\<nat> (summation \<circ>\<^sub>c \<langle>\<langle>zero, successor \<circ>\<^sub>c n\<rangle>, idf\<rangle>) = two \<cdot>\<^sub>\<nat> ((summation \<circ>\<^sub>c \<langle>\<langle>zero, n\<rangle>, idf\<rangle>) +\<^sub>\<nat> (successor \<circ>\<^sub>c n))"
+        by (simp add: succ_step)
+      also have "... = (two \<cdot>\<^sub>\<nat> (summation \<circ>\<^sub>c \<langle>\<langle>zero, n\<rangle>, idf\<rangle>)) +\<^sub>\<nat> (two \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n))"
+        by (typecheck_cfuncs, simp add: mult_right_distributivity)
+      also have "... = (n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)) +\<^sub>\<nat> (two \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n))"
+        by (simp add: IH)
+      also have "... = (n +\<^sub>\<nat> two) \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+        by (typecheck_cfuncs, simp add: mult_Left_Distributivity)
+      also have "... = (successor \<circ>\<^sub>c successor \<circ>\<^sub>c n) \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+      proof -
+        have "n +\<^sub>\<nat> two = successor \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+          unfolding two_def
+          by (typecheck_cfuncs, simp add: add_respects_succ1 add_respects_zero_on_right)
+        then show ?thesis by simp
+      qed
+      also have "... = (successor \<circ>\<^sub>c n) \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c successor \<circ>\<^sub>c n)"
+        by (typecheck_cfuncs, simp add: mult_commutative)
+      finally show ?thesis .
+    qed
+    show "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n = \<t>"
+    proof -
+      have "(eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n =
+             eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle> \<circ>\<^sub>c successor \<circ>\<^sub>c n,
+                          mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle> \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>"
+        by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n,id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor \<circ>\<^sub>c n,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>"
+        by (typecheck_cfuncs, smt (verit, ccfv_SIG) cfunc_prod_comp comp_associative2)
+      also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two,summation \<circ>\<^sub>c \<langle>\<langle>zero,successor \<circ>\<^sub>c n\<rangle>,idf\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c n,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle>"
+        by (typecheck_cfuncs, metis id_left_unit2 id_right_unit2 one_unique_element terminal_func_comp_elem)
+      also have "... = \<t>"
+      proof -
+        have "(mult2 \<circ>\<^sub>c \<langle>two,summation \<circ>\<^sub>c \<langle>\<langle>zero,successor \<circ>\<^sub>c n\<rangle>,idf\<rangle>\<rangle> = mult2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c n,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>)
+            = (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two,summation \<circ>\<^sub>c \<langle>\<langle>zero,successor \<circ>\<^sub>c n\<rangle>,idf\<rangle>\<rangle>,
+                                mult2 \<circ>\<^sub>c \<langle>successor \<circ>\<^sub>c n,successor \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>\<rangle> = \<t>)"
+          by (typecheck_cfuncs, rule eq_pred_iff_eq)
+        then show ?thesis
+          using induction_conclusion unfolding mult_def by simp
+      qed
+      then show ?thesis
+        using calculation by auto
+    qed
+  qed
+  then have "\<t> = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,summation \<circ>\<^sub>c \<langle>\<langle>zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>,idf \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>id\<^sub>c \<nat>\<^sub>c,successor \<circ>\<^sub>c id\<^sub>c \<nat>\<^sub>c\<rangle>\<rangle> \<circ>\<^sub>c n"
+    using comp_associative2 by (typecheck_cfuncs, force)
+  also have "... = eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two,summation \<circ>\<^sub>c \<langle>\<langle>zero,n\<rangle>,idf\<rangle>\<rangle>,
+                          mult2 \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c n\<rangle>\<rangle>"
+    by (typecheck_cfuncs, smt (verit, best) cfunc_prod_comp comp_associative2 id_left_unit2 id_right_unit2 one_unique_element terminal_func_comp_elem)
+  then have "eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two,summation \<circ>\<^sub>c \<langle>\<langle>zero,n\<rangle>,idf\<rangle>\<rangle>, mult2 \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c n\<rangle>\<rangle> = \<t>"
+    using calculation by argo
+  then have "two \<cdot>\<^sub>\<nat> (summation \<circ>\<^sub>c \<langle>\<langle>zero,n\<rangle>,idf\<rangle>) = n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+  proof -
+    have "(mult2 \<circ>\<^sub>c \<langle>two,summation \<circ>\<^sub>c \<langle>\<langle>zero,n\<rangle>,idf\<rangle>\<rangle> = mult2 \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c n\<rangle>)
+        = (eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two,summation \<circ>\<^sub>c \<langle>\<langle>zero,n\<rangle>,idf\<rangle>\<rangle>, mult2 \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c n\<rangle>\<rangle> = \<t>)"
+      by (typecheck_cfuncs, rule eq_pred_iff_eq)
+    then show ?thesis
+      using \<open>eq_pred \<nat>\<^sub>c \<circ>\<^sub>c \<langle>mult2 \<circ>\<^sub>c \<langle>two,summation \<circ>\<^sub>c \<langle>\<langle>zero,n\<rangle>,idf\<rangle>\<rangle>, mult2 \<circ>\<^sub>c \<langle>n,successor \<circ>\<^sub>c n\<rangle>\<rangle> = \<t>\<close>
+      unfolding mult_def by simp
+  qed
+  then show ?thesis
+    unfolding two_def idf_def mult_def by simp
+qed
 
+(* Binder notation: \<Sigma> n = lower..upper. body, where body is any cfunc-composition expression
+   in the bound variable n. Since a cfunc isn't a native HOL function, n stands for the generic
+   point id \<nat>\<^sub>c: body is a genuine HOL function cfunc \<Rightarrow> cfunc, and applying it to id \<nat>\<^sub>c
+   beta-reduces to substituting id \<nat>\<^sub>c for every occurrence of n in the expression, which is
+   exactly the point-free cfunc \<nat>\<^sub>c \<rightarrow> B that summation's third argument expects (after metafunc).
+   This mirrors how HOL's own \<Sum>i=m..n. f i binder is set up. *)
 
+definition Sigma_sum :: "cfunc \<Rightarrow> cfunc \<Rightarrow> (cfunc \<Rightarrow> cfunc) \<Rightarrow> cfunc" where
+  "Sigma_sum lower upper body = summation \<circ>\<^sub>c \<langle>\<langle>lower, upper\<rangle>, metafunc (body (id \<nat>\<^sub>c))\<rangle>"
 
+syntax
+  "_Sigma_sum" :: "idt \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc \<Rightarrow> cfunc" ("(3\<Sigma> _ = _.._./ _)" [0,0,0,10] 10)
+translations
+  "\<Sigma> n = lower..upper. body" == "CONST Sigma_sum lower upper (\<lambda>n. body)"
 
+lemma Sigma_sum_type[type_rule]:
+  assumes "lower \<in>\<^sub>c \<nat>\<^sub>c" "upper \<in>\<^sub>c \<nat>\<^sub>c" "body (id \<nat>\<^sub>c) : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+  shows "Sigma_sum lower upper body \<in>\<^sub>c \<nat>\<^sub>c"
+  unfolding Sigma_sum_def using assms by typecheck_cfuncs
 
-
-
-
-
+(* Sanity check: Gauss's classic result, restated in the new \<Sigma> notation and derived directly
+   from gauss_sum. Here body = (\<lambda>k. k), so body (id \<nat>\<^sub>c) = id \<nat>\<^sub>c, matching gauss_sum exactly. *)
+lemma gauss_sum_notation:
+  assumes n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "(successor \<circ>\<^sub>c successor \<circ>\<^sub>c zero) \<cdot>\<^sub>\<nat> (\<Sigma> k = zero..n. k) = n \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+  unfolding Sigma_sum_def using gauss_sum[OF n_type] by simp
 
 end

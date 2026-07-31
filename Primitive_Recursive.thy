@@ -1,5 +1,7 @@
-theory Primitive_Recursive 
-  imports Comparison
+theory Primitive_Recursive
+  imports Mult
+  keywords "iteration_qf" :: thy_decl
+    and "iteration_script" :: thy_decl
 begin
 
 theorem nat_eq_induction:
@@ -1459,6 +1461,552 @@ proof -
       qed
     qed
   qed
-qed  
+qed
+
+(* How to build a two-argument recursive function by hand, step by step -- and what an
+   automated tool would need to do instead.
+
+   The raw natural number object axiom (natural_number_object_property2 in Nats.thy) only ever
+   hands you a ONE-argument function u : N --> X, built from two ingredients:
+     q : 1 --> X    (a chosen starting point of X)
+     f : X --> X    (a chosen "step" endomorphism of X)
+   and it guarantees u(zero) = q and f(u(n)) = u(succ n), i.e. u(n) = f applied n times to q.
+
+   To define something like m +N n (add1/add2 in Add.thy) or m *N n (mult1/mult2 in Mult.thy),
+   the desired function has TWO arguments, not one, and X = N is the wrong space to recurse in --
+   what actually needs to be built up step by step, as n counts 0,1,2,..., is not a number but a
+   whole FUNCTION of the other argument ("add n more", "multiply by n more"). That function
+   lives in an exponential object. So the recipe used by hand in Add.thy/Mult.thy is:
+
+   Step 1. Pick the space to recurse in: X = B^A, functions from the OTHER argument's type A
+     into the result type B. (For add2 and mult2, A = B = N.)
+
+   Step 2. Turn the desired base case f0 : A --> B into a POINT of X, by first extending it to a
+     map A x 1 --> B (compose with left_cart_proj A 1, which just discards the dummy 1 factor)
+     and then transposing:
+        q := (f0 o left_cart_proj A 1) sharp  : 1 --> B^A
+
+   Step 3. Turn the desired step behaviour step : A x B --> B into an ENDOMORPHISM of X. Given the
+     current function h : A --> B (a point of X), we want the next function a |-> step(a, h(a)).
+     Evaluation does exactly this: eval_func B A : A x B^A --> B sends (a,h) to h(a). So pair a
+     with the evaluation, feed the result through step, and transpose again:
+        f := (step o <left_cart_proj A (B^A), eval_func B A>) sharp  : B^A --> B^A
+
+   Step 4. Feed q and f from Steps 2-3 into natural_number_object_property2 to get the unique
+     u : N --> B^A -- this is the raw axiom's output, still a function INTO an exponential object,
+     still awkward to use directly (this is the "indirect and unnatural" step).
+
+   Step 5. Undo the currying: evaluate u against its A argument to land back on an ordinary
+     two-argument function g : A x N --> B:
+        g := eval_func B A o (id A x_f u)
+     (this is exactly what add2/mult2's own definitions do to add1/mult1).
+
+   The theorem below packages Steps 1-5 into a single existence-and-uniqueness statement, so that
+   from now on nobody has to re-derive q, f, or the eval_func uncurrying step by hand: supply f0
+   and step, and g (satisfying the ordinary recursive equations) drops out. An ML tool built on
+   top of this would only need to parse a user's equations into f0/step and call this theorem --
+   none of the sharp/eval_func bookkeeping above would need to be re-invented or even seen by the
+   user. Compare with primitive_recursion above, which additionally lets step see the recursion
+   index n itself (at the cost of recursing in (N x B)^A instead of the smaller B^A) --
+   use iteration_recursion below whenever the step rule does not need to know n. *)
+
+(* Note: iteration_recursion below would follow as a quick corollary of primitive_recursion
+   above -- just pad step : A x B --> B out to a step' : A x (N x B) --> B that ignores its N
+   component (e.g. step' = step o <left_cart_proj A (N x B), right_cart_proj N B o right_cart_proj
+   A (N x B)>), feed that into primitive_recursion, and the resulting u already satisfies
+   iteration_recursion's equations verbatim. We prove it directly from the raw NNO axiom instead,
+   because the point of this theorem is didactic: the direct proof is exactly Steps 1-5 above
+   made rigorous, and it is that q/f construction -- not the shorter derivation via
+   primitive_recursion -- that mirrors what add1/mult1 do by hand and that the ML tool below
+   needs to mechanize. *)
+theorem iteration_recursion:
+  assumes f0_type[type_rule]: "f0 : A \<rightarrow> B"
+  assumes step_type[type_rule]: "step : A \<times>\<^sub>c B \<rightarrow> B"
+  shows "\<exists>!g. g : A \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> B \<and> (\<forall> a n. (a \<in>\<^sub>c A \<and> n \<in>\<^sub>c \<nat>\<^sub>c) \<longrightarrow>
+    g \<circ>\<^sub>c \<langle>a, zero\<rangle> = f0 \<circ>\<^sub>c a \<and>
+    g \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = step \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>)"
+proof -
+
+  define q :: cfunc where
+    "q = (f0 \<circ>\<^sub>c left_cart_proj A \<one>)\<^sup>\<sharp>"
+  have q_type[type_rule]: "q : \<one> \<rightarrow> B\<^bsup>A\<^esup>"
+    unfolding q_def by typecheck_cfuncs
+
+  define f :: cfunc where
+    "f = (step \<circ>\<^sub>c \<langle>left_cart_proj A (B\<^bsup>A\<^esup>), eval_func B A\<rangle>)\<^sup>\<sharp>"
+  have f_type[type_rule]: "f : B\<^bsup>A\<^esup> \<rightarrow> B\<^bsup>A\<^esup>"
+    unfolding f_def by typecheck_cfuncs
+
+  obtain u where u_type[type_rule]: "u : \<nat>\<^sub>c \<rightarrow> B\<^bsup>A\<^esup>"
+    and u_zero: "u \<circ>\<^sub>c zero = q"
+    and u_succ: "f \<circ>\<^sub>c u = u \<circ>\<^sub>c successor"
+    using natural_number_object_property2[OF q_type f_type] by blast
+
+  define g :: cfunc where
+    "g = eval_func B A \<circ>\<^sub>c (id A \<times>\<^sub>f u)"
+  have g_type[type_rule]: "g : A \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> B"
+    unfolding g_def by typecheck_cfuncs
+
+  have g_zero: "\<And>a. a \<in>\<^sub>c A \<Longrightarrow> g \<circ>\<^sub>c \<langle>a, zero\<rangle> = f0 \<circ>\<^sub>c a"
+  proof -
+    fix a
+    assume a_type[type_rule]: "a \<in>\<^sub>c A"
+    have "g \<circ>\<^sub>c \<langle>a, zero\<rangle> = eval_func B A \<circ>\<^sub>c \<langle>id A \<circ>\<^sub>c a, u \<circ>\<^sub>c zero\<rangle>"
+      unfolding g_def
+      by (smt (verit, best) a_type cfunc_cross_prod_comp_cfunc_prod cfunc_cross_prod_type 
+          cfunc_prod_type comp_associative2 eval_func_type id_type u_type zero_type)    
+    also have "... = eval_func B A \<circ>\<^sub>c \<langle>a, q\<rangle>"
+      using a_type id_left_unit2 u_zero by force
+    also have "... = eval_func B A \<circ>\<^sub>c ((id A \<times>\<^sub>f q) \<circ>\<^sub>c \<langle>a, id \<one>\<rangle>)"
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_right_unit2)
+    also have "... = (eval_func B A \<circ>\<^sub>c (id A \<times>\<^sub>f q)) \<circ>\<^sub>c \<langle>a, id \<one>\<rangle>"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (f0 \<circ>\<^sub>c left_cart_proj A \<one>) \<circ>\<^sub>c \<langle>a, id \<one>\<rangle>"
+      unfolding q_def by (typecheck_cfuncs, simp add: transpose_func_def)
+    also have "... = f0 \<circ>\<^sub>c (left_cart_proj A \<one> \<circ>\<^sub>c \<langle>a, id \<one>\<rangle>)"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = f0 \<circ>\<^sub>c a"
+      by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
+    finally show "g \<circ>\<^sub>c \<langle>a, zero\<rangle> = f0 \<circ>\<^sub>c a".
+  qed
+
+  have g_succ: "\<And>a n. a \<in>\<^sub>c A \<Longrightarrow> n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+      g \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = step \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>"
+  proof -
+    fix a n
+    assume a_type[type_rule]: "a \<in>\<^sub>c A"
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    have "g \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = eval_func B A \<circ>\<^sub>c \<langle>id A \<circ>\<^sub>c a, u \<circ>\<^sub>c successor \<circ>\<^sub>c n\<rangle>"
+      unfolding g_def
+      by (smt (verit, ccfv_SIG) a_type cfunc_cross_prod_comp_cfunc_prod cfunc_cross_prod_type 
+          cfunc_prod_type comp_associative2 eval_func_type id_type n_type succ_n_type u_type)
+    also have "... = eval_func B A \<circ>\<^sub>c \<langle>a, (u \<circ>\<^sub>c successor) \<circ>\<^sub>c n\<rangle>"
+      by (typecheck_cfuncs, simp add: id_left_unit2 comp_associative2)
+    also have "... = eval_func B A \<circ>\<^sub>c \<langle>a, (f \<circ>\<^sub>c u) \<circ>\<^sub>c n\<rangle>"
+      by (simp add: u_succ)
+    also have "... = eval_func B A \<circ>\<^sub>c \<langle>id A \<circ>\<^sub>c a, f \<circ>\<^sub>c (u \<circ>\<^sub>c n)\<rangle>"
+      by (typecheck_cfuncs, simp add: comp_associative2 id_left_unit2)
+    also have "... = eval_func B A \<circ>\<^sub>c ((id A \<times>\<^sub>f f) \<circ>\<^sub>c \<langle>a, u \<circ>\<^sub>c n\<rangle>)"
+      by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod id_left_unit2)
+    also have "... = (eval_func B A \<circ>\<^sub>c (id A \<times>\<^sub>f f)) \<circ>\<^sub>c \<langle>a, u \<circ>\<^sub>c n\<rangle>"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = (step \<circ>\<^sub>c \<langle>left_cart_proj A (B\<^bsup>A\<^esup>), eval_func B A\<rangle>) \<circ>\<^sub>c \<langle>a, u \<circ>\<^sub>c n\<rangle>"
+      unfolding f_def by (typecheck_cfuncs, simp add: transpose_func_def)
+    also have "... = step \<circ>\<^sub>c (\<langle>left_cart_proj A (B\<^bsup>A\<^esup>), eval_func B A\<rangle> \<circ>\<^sub>c \<langle>a, u \<circ>\<^sub>c n\<rangle>)"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = step \<circ>\<^sub>c \<langle>left_cart_proj A (B\<^bsup>A\<^esup>) \<circ>\<^sub>c \<langle>a, u \<circ>\<^sub>c n\<rangle>, eval_func B A \<circ>\<^sub>c \<langle>a, u \<circ>\<^sub>c n\<rangle>\<rangle>"
+      by (typecheck_cfuncs, simp add: cfunc_prod_comp)
+    also have "... = step \<circ>\<^sub>c \<langle>a, eval_func B A \<circ>\<^sub>c \<langle>a, u \<circ>\<^sub>c n\<rangle>\<rangle>"
+      by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
+    also have "... = step \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>"
+      unfolding g_def by (typecheck_cfuncs, 
+          smt (verit, ccfv_SIG) cfunc_cross_prod_comp_cfunc_prod comp_associative2 id_left_unit2)
+    finally show "g \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = step \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>".
+  qed
+
+  show ?thesis
+  proof (intro ex1I[where a=g], safe)
+    show "g : A \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> B"
+      by (rule g_type)
+    show "\<And>a n. a \<in>\<^sub>c A \<Longrightarrow> n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> g \<circ>\<^sub>c \<langle>a,zero\<rangle> = f0 \<circ>\<^sub>c a"
+      using g_zero by blast
+    show "\<And>a n. a \<in>\<^sub>c A \<Longrightarrow> n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow> g \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c n\<rangle> = step \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a,n\<rangle>\<rangle>"
+      using g_succ by blast
+
+    fix g'
+    assume g'_type[type_rule]: "g' : A \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> B"
+    assume g'_property: "\<forall>a n. a \<in>\<^sub>c A \<and> n \<in>\<^sub>c \<nat>\<^sub>c \<longrightarrow>
+       g' \<circ>\<^sub>c \<langle>a,zero\<rangle> = f0 \<circ>\<^sub>c a \<and> g' \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c n\<rangle> = step \<circ>\<^sub>c \<langle>a, g' \<circ>\<^sub>c \<langle>a,n\<rangle>\<rangle>"
+
+    show "g' = g"
+    proof(rule one_separator[where X = "A \<times>\<^sub>c \<nat>\<^sub>c", where Y = B])
+      show "g' : A \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> B"
+        by typecheck_cfuncs
+      show "g : A \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> B"
+        by typecheck_cfuncs
+      fix x
+      assume x_type[type_rule]: "x \<in>\<^sub>c A \<times>\<^sub>c \<nat>\<^sub>c"
+      obtain a m where a_type[type_rule]: "a \<in>\<^sub>c A" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+        and x_def: "x = \<langle>a, m\<rangle>"
+        using cart_prod_decomp x_type by blast
+
+      have "(g' \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m = (g \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m"
+      proof(etcs_rule nat_eq_induction)
+        show "(g' \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = (g \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero"
+          using g'_property g_zero by (typecheck_cfuncs, smt cart_prod_extract_right comp_associative2)
+      next
+        fix n
+        assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+        assume "(g' \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c n = (g \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c n"
+        then have IH: "g' \<circ>\<^sub>c \<langle>a, n\<rangle> = g \<circ>\<^sub>c \<langle>a, n\<rangle>"
+          by (typecheck_cfuncs_prems, smt cart_prod_extract_right comp_associative2)
+        have "g' \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = step \<circ>\<^sub>c \<langle>a, g' \<circ>\<^sub>c \<langle>a,n\<rangle>\<rangle>"
+          using g'_property by (typecheck_cfuncs, blast)
+        also have "... = step \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a,n\<rangle>\<rangle>"
+          by (simp add: IH)
+        also have "... = g \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle>"
+          by (simp add: a_type g_succ n_type)
+        finally show "(g' \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n = (g \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+          by (typecheck_cfuncs, smt cart_prod_extract_right comp_associative2)
+      qed
+      then show "g' \<circ>\<^sub>c x = g \<circ>\<^sub>c x"
+        by (typecheck_cfuncs_prems, smt cart_prod_extract_right comp_associative2 x_def)
+    qed
+  qed
+qed
+
+(* Tier 1 tool: given the base case f0 and step function you intend to feed into
+   iteration_recursion above, print the q and f terms that would have to be built by hand to
+   invoke the raw natural_number_object_property2 axiom (Nats.thy) directly. This performs no
+   proof -- it only builds and displays the two terms (unsimplified, exactly as
+   iteration_recursion's own q_def/f_def would construct them). Use iteration_recursion itself,
+   or a later Tier 2 tool, to actually define a function.
+
+   SYNTAX:
+
+     iteration_qf "A" "B" "f0" "step"
+
+   Exactly four arguments, each written as an ordinary double-quoted Isabelle string (the
+   quotes are required -- this is plain text that gets re-parsed as a term, not a term you type
+   directly). They are positional and must appear in this order:
+
+     "A"    -- the OTHER argument's type, as a cset term. This is whatever you are recursing
+               alongside n (e.g. "\<nat>\<^sub>c" if the function you want has type N x N --> _, or
+               "\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c" if it has type (N x N) x N --> _, and so on).
+
+     "B"    -- the RESULT type, as a cset term (e.g. "\<nat>\<^sub>c").
+
+     "f0"   -- the base case, as a cfunc term of type A --> B. This is g(a,0) written as a
+               function of a alone. If the base case is "return a unchanged" use "id \<nat>\<^sub>c" (or
+               "id A" for whatever A is); if it is "always return some fixed constant c" use
+               something like "c \<circ>\<^sub>c \<beta>\<^bsub>A\<^esub>" (the constant map, using the terminal
+               projection \<beta> to first collapse A down to a point, then land on c).
+
+     "step" -- the recursive step, as a cfunc term of type A \<times>\<^sub>c B --> B. This describes how to
+               get g(a, succ n) out of a and the ALREADY-COMPUTED g(a,n) -- but you write it as
+               an ordinary two-argument cfunc, where the first slot of the product stands for a
+               and the second slot stands for the current value g(a,n); you never write n, succ,
+               or g itself here, only how to combine a with "the value so far". Two common
+               shapes: if the step ignores a and just transforms the current value, use
+               "h \<circ>\<^sub>c right_cart_proj A B" for whatever h : B --> B does the transforming
+               (e.g. "successor \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c" below, which just applies
+               successor to the current value and ignores a); if the step combines a with the
+               current value via some binary operation "op", use "op" directly if op already has
+               type A \<times>\<^sub>c B --> B (e.g. "add2" below, since add2 : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c --> \<nat>\<^sub>c already
+               takes (a, current value) and adds them).
+
+   The command does NOT check that f0/step actually have the types you claimed for A/B -- it
+   just splices your four strings into the q/f formulas from Steps 2-3 above and asks Isabelle
+   to parse the result. If you got a type wrong, you will see an ordinary type-mismatch error
+   from that parse, pointing at the offending piece. *)
+
+ML \<open>
+structure Iteration_QF =
+struct
+
+fun print_qf ctxt a_src b_src f0_src step_src =
+  let
+    val q_src =
+      "(" ^ f0_src ^ " \<circ>\<^sub>c left_cart_proj (" ^ a_src ^ ") \<one>)\<^sup>\<sharp>"
+    val f_src =
+      "(" ^ step_src ^ " \<circ>\<^sub>c \<langle>left_cart_proj (" ^ a_src ^ ") ((" ^ b_src ^ ")\<^bsup>(" ^ a_src ^ ")\<^esup>), " ^
+      "eval_func (" ^ b_src ^ ") (" ^ a_src ^ ")\<rangle>)\<^sup>\<sharp>"
+
+    val q = Syntax.read_term ctxt q_src
+    val f = Syntax.read_term ctxt f_src
+  in
+    writeln ("q : \<one> \<rightarrow> " ^ b_src ^ "^" ^ a_src ^ "  (the base point) =");
+    writeln (Syntax.string_of_term ctxt q);
+    writeln "";
+    writeln ("f : " ^ b_src ^ "^" ^ a_src ^ " \<rightarrow> " ^ b_src ^ "^" ^ a_src ^
+      "  (the step endomorphism) =");
+    writeln (Syntax.string_of_term ctxt f)
+  end
+
+end
+\<close>
+
+ML \<open>
+Outer_Syntax.command \<^command_keyword>\<open>iteration_qf\<close>
+  "print the q and f terms needed to define a recursive function via iteration_recursion"
+  (Parse.string -- Parse.string -- Parse.string -- Parse.string >>
+    (fn (((a, b), f0), step) =>
+      Toplevel.keep (fn state =>
+        Iteration_QF.print_qf (Toplevel.context_of state) a b f0 step)))
+\<close>
+
+(* Worked example: reproduce add1/add2's q and f from Add.thy (add's base case is the identity,
+   since m + 0 = m; add's step ignores its A-argument entirely and just applies successor to
+   the current value). *)
+iteration_qf "\<nat>\<^sub>c" "\<nat>\<^sub>c" "id \<nat>\<^sub>c" "successor \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c"
+
+(* Worked example: reproduce mult1/mult2's q and f from Mult.thy (mult's base case is the
+   constant zero map, since m \<cdot> 0 = 0; mult's step adds the A-argument to the current value). *)
+iteration_qf "\<nat>\<^sub>c" "\<nat>\<^sub>c" "zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>" "add2"
+
+(* Tier 2 tool: given a name plus the same base case f0 and step function as iteration_qf, print
+   the ready-to-paste Isabelle source -- a definition plus four lemmas -- that defines a function
+   with exactly those properties via iteration_recursion. This does NOT define anything itself
+   and proves nothing on its own; it only writes out the text you would otherwise have to type by
+   hand, for you to copy out of the Output window and paste into your theory. q and f never
+   appear anywhere in the printed text, because iteration_recursion has already absorbed that
+   bookkeeping -- what gets printed is exactly the same shape of definition + lemmas that
+   add1/add2/add_respects_zero_on_right (Add.thy) or mult1/mult2 (Mult.thy) build by hand:
+
+     definition NAME :: "cfunc" where "NAME = (THE g. ...)"
+     lemma NAME_property: "NAME : A x N --> B \<and> (\<forall> a n. ...)"
+     lemma NAME_type[type_rule]: "NAME : A x N --> B"
+     lemma NAME_zero: "a \<in>\<^sub>c A \<Longrightarrow> NAME \<circ>\<^sub>c \<langle>a,zero\<rangle> = f0 \<circ>\<^sub>c a"
+     lemma NAME_succ: "a \<in>\<^sub>c A \<Longrightarrow> n \<in>\<^sub>c \<nat>\<^sub>c \<Longrightarrow>
+       NAME \<circ>\<^sub>c \<langle>a,successor \<circ>\<^sub>c n\<rangle> = step \<circ>\<^sub>c \<langle>a, NAME \<circ>\<^sub>c \<langle>a,n\<rangle>\<rangle>"
+
+   SYNTAX:
+
+     iteration_script name "A" "B" "f0" "step"
+
+   Five arguments. "name" is a plain (unquoted) new constant name of your choosing -- it must
+   not already be in use once pasted. The remaining four are exactly as in iteration_qf above
+   (see that comment for how to write A, B, f0, and step); consult it first if you are unsure
+   what to supply. Once pasted into your theory, the generated proof of NAME_property will fail
+   with an ordinary typechecking error if f0/step do not actually typecheck at A/B as claimed --
+   exactly as it would if you had written the definition by hand. *)
+
+ML \<open>
+structure Iteration_Script =
+struct
+
+fun generate_source name aT bT f0 step =
+  cat_lines
+    ["definition " ^ name ^ " :: \"cfunc\" where",
+     "  \"" ^ name ^ " = (THE g. g : (" ^ aT ^ ") \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (" ^ bT ^ ") \<and> (\<forall> a n. " ^
+       "(a \<in>\<^sub>c (" ^ aT ^ ") \<and> n \<in>\<^sub>c \<nat>\<^sub>c) \<longrightarrow>",
+     "    g \<circ>\<^sub>c \<langle>a, zero\<rangle> = (" ^ f0 ^ ") \<circ>\<^sub>c a \<and>",
+     "    g \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (" ^ step ^ ") \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>))\"",
+     "",
+     "lemma " ^ name ^ "_property:",
+     "  \"" ^ name ^ " : (" ^ aT ^ ") \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (" ^ bT ^ ") \<and> (\<forall> a n. " ^
+       "(a \<in>\<^sub>c (" ^ aT ^ ") \<and> n \<in>\<^sub>c \<nat>\<^sub>c) \<longrightarrow>",
+     "    " ^ name ^ " \<circ>\<^sub>c \<langle>a, zero\<rangle> = (" ^ f0 ^ ") \<circ>\<^sub>c a \<and>",
+     "    " ^ name ^ " \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (" ^ step ^ ") \<circ>\<^sub>c " ^
+       "\<langle>a, " ^ name ^ " \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>)\"",
+     "  unfolding " ^ name ^ "_def",
+     "  by (rule theI', rule iteration_recursion, typecheck_cfuncs+)",
+     "",
+     "lemma " ^ name ^ "_type[type_rule]: \"" ^ name ^ " : (" ^ aT ^ ") \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (" ^ bT ^ ")\"",
+     "  using " ^ name ^ "_property by blast",
+     "",
+     "lemma " ^ name ^ "_zero:",
+     "  assumes \"a \<in>\<^sub>c (" ^ aT ^ ")\"",
+     "  shows \"" ^ name ^ " \<circ>\<^sub>c \<langle>a, zero\<rangle> = (" ^ f0 ^ ") \<circ>\<^sub>c a\"",
+     "  using assms " ^ name ^ "_property by blast",
+     "",
+     "lemma " ^ name ^ "_succ:",
+     "  assumes \"a \<in>\<^sub>c (" ^ aT ^ ")\" \"n \<in>\<^sub>c \<nat>\<^sub>c\"",
+     "  shows \"" ^ name ^ " \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (" ^ step ^ ") \<circ>\<^sub>c " ^
+       "\<langle>a, " ^ name ^ " \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>\"",
+     "  using assms " ^ name ^ "_property by blast"]
+
+fun print_script name aT bT f0 step =
+  writeln (generate_source name aT bT f0 step)
+
+end
+\<close>
+
+ML \<open>
+Outer_Syntax.command \<^command_keyword>\<open>iteration_script\<close>
+  "print ready-to-paste Isabelle source defining a recursive function via iteration_recursion"
+  (Parse.name -- Parse.string -- Parse.string -- Parse.string -- Parse.string >>
+    (fn ((((name, aT), bT), f0), step) =>
+      Toplevel.keep (fn _ =>
+        Iteration_Script.print_script name aT bT f0 step)))
+\<close>
+
+(* Worked example: print the paste-ready definition of addition. Copy the printed text out of
+   the Output window into a theory to get add2 / add2_type / add2_zero / add2_succ
+   matching add1/add2's behaviour, without ever building add1 or the exponential object
+   \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> by hand. *)
+iteration_script autogenerated_add2 "\<nat>\<^sub>c" "\<nat>\<^sub>c" "id \<nat>\<^sub>c" "successor \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c"
+
+(* The printed text pasted verbatim, followed by a proof that this really is the same function
+   as the hand-built add2 -- not just something that looks superficially similar. *)
+
+definition autogenerated_add2 :: "cfunc" where
+  "autogenerated_add2 = (THE g. g : (\<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c) \<and> (\<forall> a n. (a \<in>\<^sub>c (\<nat>\<^sub>c) \<and> n \<in>\<^sub>c \<nat>\<^sub>c) \<longrightarrow>
+    g \<circ>\<^sub>c \<langle>a, zero\<rangle> = (id \<nat>\<^sub>c) \<circ>\<^sub>c a \<and>
+    g \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (successor \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>))"
+
+lemma autogenerated_add2_property:
+  "autogenerated_add2 : (\<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c) \<and> (\<forall> a n. (a \<in>\<^sub>c (\<nat>\<^sub>c) \<and> n \<in>\<^sub>c \<nat>\<^sub>c) \<longrightarrow>
+    autogenerated_add2 \<circ>\<^sub>c \<langle>a, zero\<rangle> = (id \<nat>\<^sub>c) \<circ>\<^sub>c a \<and>
+    autogenerated_add2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (successor \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>a, autogenerated_add2 \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>)"
+  unfolding autogenerated_add2_def
+  by (rule theI', rule iteration_recursion, typecheck_cfuncs+)
+
+lemma autogenerated_add2_type[type_rule]: "autogenerated_add2 : (\<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c)"
+  using autogenerated_add2_property by blast
+
+lemma autogenerated_add2_zero:
+  assumes "a \<in>\<^sub>c (\<nat>\<^sub>c)"
+  shows "autogenerated_add2 \<circ>\<^sub>c \<langle>a, zero\<rangle> = (id \<nat>\<^sub>c) \<circ>\<^sub>c a"
+  using assms autogenerated_add2_property by blast
+
+lemma autogenerated_add2_succ:
+  assumes "a \<in>\<^sub>c (\<nat>\<^sub>c)" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "autogenerated_add2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (successor \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>a, autogenerated_add2 \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>"
+  using assms autogenerated_add2_property by blast
+
+theorem autogenerated_add2_is_add2: "autogenerated_add2 = add2"
+proof (rule one_separator[where X = "\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c", where Y = "\<nat>\<^sub>c"])
+  show "autogenerated_add2 : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "add2 : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  fix x
+  assume x_type[type_rule]: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+  obtain a m where a_type[type_rule]: "a \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+    and x_def: "x = \<langle>a, m\<rangle>"
+    using cart_prod_decomp x_type by blast
+
+  have "(autogenerated_add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m = (add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m"
+  proof (etcs_rule nat_eq_induction)
+    show "(autogenerated_add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = (add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero"
+    proof -
+      have "(autogenerated_add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero
+          = autogenerated_add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero, id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero\<rangle>"
+        by (etcs_assocr, typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+      also have "... = autogenerated_add2 \<circ>\<^sub>c \<langle>a, zero\<rangle>"
+        using a_type id_left_unit2 id_right_unit2 terminal_func_comp_elem zero_type by auto
+      also have "... = id \<nat>\<^sub>c \<circ>\<^sub>c a"
+        by (simp add: autogenerated_add2_zero a_type)
+      also have "... = a"
+        using a_type id_left_unit2 by auto
+      also have "... = add2 \<circ>\<^sub>c \<langle>a, zero\<rangle>"
+        using add_respects_zero_on_right[OF a_type] by (simp add: add_def)
+      also have "... = (add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero"
+        by (typecheck_cfuncs, smt cart_prod_extract_right comp_associative2)
+      finally show ?thesis .
+    qed
+  next
+    fix n
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume "(autogenerated_add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c n = (add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c n"
+    then have IH: "autogenerated_add2 \<circ>\<^sub>c \<langle>a, n\<rangle> = add2 \<circ>\<^sub>c \<langle>a, n\<rangle>"
+      by (typecheck_cfuncs_prems, smt cart_prod_extract_right comp_associative2)
+    have "autogenerated_add2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle>
+        = (successor \<circ>\<^sub>c right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c) \<circ>\<^sub>c \<langle>a, autogenerated_add2 \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>"
+      using autogenerated_add2_succ by (typecheck_cfuncs, blast)
+    also have "... = successor \<circ>\<^sub>c (right_cart_proj \<nat>\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c \<langle>a, autogenerated_add2 \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>)"
+      by (typecheck_cfuncs, simp add: comp_associative2)
+    also have "... = successor \<circ>\<^sub>c (autogenerated_add2 \<circ>\<^sub>c \<langle>a, n\<rangle>)"
+      by (typecheck_cfuncs, simp add: right_cart_proj_cfunc_prod)
+    also have "... = successor \<circ>\<^sub>c (add2 \<circ>\<^sub>c \<langle>a, n\<rangle>)"
+      by (simp add: IH)
+    also have "... = add2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle>"
+      using add2_respects_succ_right[OF a_type n_type] by simp
+    finally show "(autogenerated_add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n
+        = (add2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+      by (typecheck_cfuncs, smt cart_prod_extract_right comp_associative2)
+  qed
+  then show "autogenerated_add2 \<circ>\<^sub>c x = add2 \<circ>\<^sub>c x"
+    by (typecheck_cfuncs_prems, smt cart_prod_extract_right comp_associative2 x_def)
+qed
+
+(* Now we try this for multiplication.
+
+   f0 = zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>: "multiply anything by 0 and you get 0" -- the constant-zero map.
+
+   step = add2: g \<langle>a, successor m\<rangle> = step \<langle>a, g \<langle>a, m\<rangle>\<rangle>, and step only ever sees "a" and the
+   current value "g \<langle>a,m\<rangle>", never m itself. Writing n for a, we know g \<langle>n,m\<rangle> = n \<sqdot> m, and we want
+   g \<langle>n, m+1\<rangle> = n \<sqdot> (m+1). Since n \<sqdot> (m+1) = n\<sqdot>m + n = n + n\<sqdot>m, step just needs to add its two
+   inputs together -- so step = add2 works directly, with no need to reorder the pair first. *)
+iteration_script autogenerated_mult2 "\<nat>\<^sub>c" "\<nat>\<^sub>c" "zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>" "add2"
+
+definition autogenerated_mult2 :: "cfunc" where
+  "autogenerated_mult2 = (THE g. g : (\<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c) \<and> (\<forall> a n. (a \<in>\<^sub>c (\<nat>\<^sub>c) \<and> n \<in>\<^sub>c \<nat>\<^sub>c) \<longrightarrow>
+    g \<circ>\<^sub>c \<langle>a, zero\<rangle> = (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c a \<and>
+    g \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (add2) \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>))"
+
+lemma autogenerated_mult2_property:
+  "autogenerated_mult2 : (\<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c) \<and> (\<forall> a n. (a \<in>\<^sub>c (\<nat>\<^sub>c) \<and> n \<in>\<^sub>c \<nat>\<^sub>c) \<longrightarrow>
+    autogenerated_mult2 \<circ>\<^sub>c \<langle>a, zero\<rangle> = (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c a \<and>
+    autogenerated_mult2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (add2) \<circ>\<^sub>c \<langle>a, autogenerated_mult2 \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>)"
+  unfolding autogenerated_mult2_def
+  by (rule theI', rule iteration_recursion, typecheck_cfuncs+)
+
+lemma autogenerated_mult2_type[type_rule]: "autogenerated_mult2 : (\<nat>\<^sub>c) \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> (\<nat>\<^sub>c)"
+  using autogenerated_mult2_property by blast
+
+lemma autogenerated_mult2_zero:
+  assumes "a \<in>\<^sub>c (\<nat>\<^sub>c)"
+  shows "autogenerated_mult2 \<circ>\<^sub>c \<langle>a, zero\<rangle> = (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c a"
+  using assms autogenerated_mult2_property by blast
+
+lemma autogenerated_mult2_succ:
+  assumes "a \<in>\<^sub>c (\<nat>\<^sub>c)" "n \<in>\<^sub>c \<nat>\<^sub>c"
+  shows "autogenerated_mult2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = (add2) \<circ>\<^sub>c \<langle>a, autogenerated_mult2 \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>"
+  using assms autogenerated_mult2_property by blast
+
+(* And, as with add2, a proof that this really is the same function as the hand-built mult2 --
+   using mult_respects_zero_right and mult_respects_succ_right (Mult.thy) to identify mult2's
+   own base/step behaviour with autogenerated_mult2's. *)
+
+theorem autogenerated_mult2_is_mult2: "autogenerated_mult2 = mult2"
+proof (rule one_separator[where X = "\<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c", where Y = "\<nat>\<^sub>c"])
+  show "autogenerated_mult2 : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  show "mult2 : \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c"
+    by typecheck_cfuncs
+  fix x
+  assume x_type[type_rule]: "x \<in>\<^sub>c \<nat>\<^sub>c \<times>\<^sub>c \<nat>\<^sub>c"
+  obtain a m where a_type[type_rule]: "a \<in>\<^sub>c \<nat>\<^sub>c" and m_type[type_rule]: "m \<in>\<^sub>c \<nat>\<^sub>c"
+    and x_def: "x = \<langle>a, m\<rangle>"
+    using cart_prod_decomp x_type by blast
+
+  have "(autogenerated_mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m = (mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>, id \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c m"
+  proof (etcs_rule nat_eq_induction)
+    show "(autogenerated_mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero = (mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero"
+    proof -
+      have "(autogenerated_mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero
+          = autogenerated_mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c zero, id\<^sub>c \<nat>\<^sub>c \<circ>\<^sub>c zero\<rangle>"
+        by (etcs_assocr, typecheck_cfuncs, simp add: cfunc_prod_comp comp_associative2)
+      also have "... = autogenerated_mult2 \<circ>\<^sub>c \<langle>a, zero\<rangle>"
+        using a_type id_left_unit2 id_right_unit2 terminal_func_comp_elem zero_type by auto
+      also have "... = (zero \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>) \<circ>\<^sub>c a"
+        by (simp add: autogenerated_mult2_zero a_type)
+      also have "... = zero \<circ>\<^sub>c (\<beta>\<^bsub>\<nat>\<^sub>c\<^esub> \<circ>\<^sub>c a)"
+        by (typecheck_cfuncs, simp add: comp_associative2)
+      also have "... = zero"
+        using a_type by (typecheck_cfuncs, metis id_right_unit2 terminal_func_comp_elem)
+      also have "... = a \<cdot>\<^sub>\<nat> zero"
+        using mult_respects_zero_right[OF a_type] by simp
+      also have "... = mult2 \<circ>\<^sub>c \<langle>a, zero\<rangle>"
+        by (simp add: mult_def)
+      also have "... = (mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c zero"
+        by (typecheck_cfuncs, smt cart_prod_extract_right comp_associative2)
+      finally show ?thesis .
+    qed
+  next
+    fix n
+    assume n_type[type_rule]: "n \<in>\<^sub>c \<nat>\<^sub>c"
+    assume "(autogenerated_mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c n = (mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c n"
+    then have IH: "autogenerated_mult2 \<circ>\<^sub>c \<langle>a, n\<rangle> = mult2 \<circ>\<^sub>c \<langle>a, n\<rangle>"
+      by (typecheck_cfuncs_prems, smt cart_prod_extract_right comp_associative2)
+    have "autogenerated_mult2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle> = add2 \<circ>\<^sub>c \<langle>a, autogenerated_mult2 \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>"
+      using autogenerated_mult2_succ by (typecheck_cfuncs, blast)
+    also have "... = add2 \<circ>\<^sub>c \<langle>a, mult2 \<circ>\<^sub>c \<langle>a, n\<rangle>\<rangle>"
+      by (simp add: IH)
+    also have "... = a +\<^sub>\<nat> (a \<cdot>\<^sub>\<nat> n)"
+      by (simp add: add_def mult_def)
+    also have "... = a \<cdot>\<^sub>\<nat> (successor \<circ>\<^sub>c n)"
+      using mult_respects_succ_right[OF a_type n_type] by simp
+    also have "... = mult2 \<circ>\<^sub>c \<langle>a, successor \<circ>\<^sub>c n\<rangle>"
+      by (simp add: mult_def)
+    finally show "(autogenerated_mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n
+        = (mult2 \<circ>\<^sub>c \<langle>a \<circ>\<^sub>c \<beta>\<^bsub>\<nat>\<^sub>c\<^esub>,id\<^sub>c \<nat>\<^sub>c\<rangle>) \<circ>\<^sub>c successor \<circ>\<^sub>c n"
+      by (typecheck_cfuncs, smt cart_prod_extract_right comp_associative2)
+  qed
+  then show "autogenerated_mult2 \<circ>\<^sub>c x = mult2 \<circ>\<^sub>c x"
+    by (typecheck_cfuncs_prems, smt cart_prod_extract_right comp_associative2 x_def)
+qed
 
 end
