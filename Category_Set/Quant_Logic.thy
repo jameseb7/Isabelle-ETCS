@@ -7,16 +7,16 @@ begin
 subsection \<open>Universal Quantification\<close>
 
 definition FORALL :: "cset \<Rightarrow> cfunc" where
-  "FORALL X = (THE \<chi>. is_pullback \<one> \<one> (\<Omega>\<^bsup>X\<^esup>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>)\<^sup>\<sharp>) \<chi>)"
+  "FORALL X = (THE \<chi>. is_pullback \<one> \<one> (\<Omega>\<^sup>X) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>)\<^sup>\<sharp>) \<chi>)"
 
 lemma FORALL_is_pullback:
-  "is_pullback \<one> \<one> (\<Omega>\<^bsup>X\<^esup>) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>)\<^sup>\<sharp>) (FORALL X)"
+  "is_pullback \<one> \<one> (\<Omega>\<^sup>X) \<Omega> (\<beta>\<^bsub>\<one>\<^esub>) \<t> ((\<t> \<circ>\<^sub>c \<beta>\<^bsub>X \<times>\<^sub>c \<one>\<^esub>)\<^sup>\<sharp>) (FORALL X)"
   unfolding FORALL_def
   using characteristic_function_exists element_monomorphism
   by (typecheck_cfuncs, simp add: the1I2)
 
 lemma FORALL_type[type_rule]:
-  "FORALL X : \<Omega>\<^bsup>X\<^esup> \<rightarrow> \<Omega>"
+  "FORALL X : \<Omega>\<^sup>X \<rightarrow> \<Omega>"
   using FORALL_is_pullback unfolding is_pullback_def  by auto
 
 lemma all_true_implies_FORALL_true:
@@ -178,7 +178,7 @@ definition EXISTS :: "cset \<Rightarrow> cfunc" where
   "EXISTS X = NOT \<circ>\<^sub>c FORALL X \<circ>\<^sub>c NOT\<^bsup>X\<^esup>\<^sub>f"
 
 lemma EXISTS_type[type_rule]:
-  "EXISTS X : \<Omega>\<^bsup>X\<^esup> \<rightarrow> \<Omega>"
+  "EXISTS X : \<Omega>\<^sup>X \<rightarrow> \<Omega>"
   unfolding EXISTS_def by typecheck_cfuncs
 
 lemma EXISTS_true_implies_exists_true:

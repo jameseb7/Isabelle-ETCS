@@ -514,15 +514,15 @@ qed
 
 lemma prod_leq_exp:
   assumes "\<not> terminal_object Y"
-  shows "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+  shows "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^sup>X"
 proof(cases "initial_object Y")
-  show "initial_object Y \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+  show "initial_object Y \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^sup>X"
     by (metis X_prod_empty initial_iso_empty initial_maps_mono initial_object_def is_smaller_than_def iso_empty_initial isomorphic_is_reflexive isomorphic_is_transitive prod_pres_iso)
 next
   assume "\<not> initial_object Y"
   then obtain y1 y2 where y1_type[type_rule]: "y1 \<in>\<^sub>c Y" and y2_type[type_rule]: "y2 \<in>\<^sub>c Y" and y1_not_y2: "y1 \<noteq> y2"
     using assms not_init_not_term by blast
-  show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+  show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^sup>X"
   proof(cases "X \<cong> \<Omega>")
       assume "X \<cong> \<Omega>"
       have "\<Omega>  \<le>\<^sub>c  Y"
@@ -533,13 +533,13 @@ next
         by typecheck_cfuncs
       have m_id_mono: "monomorphism (m \<times>\<^sub>f id(Y))"
         by (typecheck_cfuncs, simp add: cfunc_cross_prod_mono id_isomorphism iso_imp_epi_and_monic m_mono)  
-      obtain n where n_type[type_rule]: "n : Y \<times>\<^sub>c Y  \<rightarrow>  Y\<^bsup>\<Omega>\<^esup>" and n_mono: "monomorphism n"
+      obtain n where n_type[type_rule]: "n : Y \<times>\<^sub>c Y  \<rightarrow>  Y\<^sup>\<Omega>" and n_mono: "monomorphism n"
         using is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric sets_squared by blast
-      obtain r where r_type[type_rule]: "r : Y\<^bsup>\<Omega>\<^esup>  \<rightarrow>  Y\<^bsup>X\<^esup>" and r_mono: "monomorphism r"
+      obtain r where r_type[type_rule]: "r : Y\<^sup>\<Omega>  \<rightarrow>  Y\<^sup>X" and r_mono: "monomorphism r"
         by (meson \<open>X \<cong> \<Omega>\<close> exp_pres_iso_right is_isomorphic_def iso_imp_epi_and_monic isomorphic_is_symmetric)
       obtain q where q_type[type_rule]: "q : X \<times>\<^sub>c Y  \<rightarrow>  \<Omega> \<times>\<^sub>c Y" and q_mono: "monomorphism q"
         by (meson \<open>X \<cong> \<Omega>\<close> id_isomorphism id_type is_isomorphic_def iso_imp_epi_and_monic prod_pres_iso) 
-      have rnmq_type[type_rule]: "r \<circ>\<^sub>c n \<circ>\<^sub>c (m \<times>\<^sub>f id(Y)) \<circ>\<^sub>c q : X \<times>\<^sub>c Y \<rightarrow> Y\<^bsup>X\<^esup>"
+      have rnmq_type[type_rule]: "r \<circ>\<^sub>c n \<circ>\<^sub>c (m \<times>\<^sub>f id(Y)) \<circ>\<^sub>c q : X \<times>\<^sub>c Y \<rightarrow> Y\<^sup>X"
         by typecheck_cfuncs
       have "monomorphism(r \<circ>\<^sub>c n \<circ>\<^sub>c (m \<times>\<^sub>f id(Y)) \<circ>\<^sub>c q)"
         by (typecheck_cfuncs, simp add: cfunc_type_def composition_of_monic_pair_is_monic m_id_mono n_mono q_mono r_mono)
@@ -547,23 +547,23 @@ next
         by (meson is_smaller_than_def rnmq_type)
     next
       assume "\<not> X \<cong> \<Omega>"
-      show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+      show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^sup>X"
       proof(cases "initial_object X")
-        show "initial_object X \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+        show "initial_object X \<Longrightarrow> X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^sup>X"
           by (metis is_empty_def initial_iso_empty initial_maps_mono initial_object_def 
               is_smaller_than_def isomorphic_is_transitive no_el_iff_iso_empty
               not_init_not_term prod_with_empty_is_empty2 product_commutes terminal_object_def)
       next
       assume "\<not> initial_object X"
-      show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+      show "X \<times>\<^sub>c Y \<le>\<^sub>c Y\<^sup>X"
       proof(cases "terminal_object X")
         assume "terminal_object X"
         then have "X \<cong> \<one>"
           by (simp add: one_terminal_object terminal_objects_isomorphic)
         have "X \<times>\<^sub>c Y \<cong> Y"
           by (simp add: \<open>terminal_object X\<close> prod_with_term_obj1)
-        then have "X \<times>\<^sub>c Y \<cong> Y\<^bsup>X\<^esup>"
-          by (meson \<open>X \<cong> \<one>\<close> exp_pres_iso_right exp_set_inj isomorphic_is_symmetric isomorphic_is_transitive exp_one)
+        then have "X \<times>\<^sub>c Y \<cong> Y\<^sup>X"
+          by (meson \<open>X \<cong> \<one>\<close> exp_pres_iso_right isomorphic_is_symmetric isomorphic_is_transitive exp_one)
         then show ?thesis
           using is_isomorphic_def is_smaller_than_def iso_imp_epi_and_monic by blast
       next
@@ -579,32 +579,32 @@ next
         obtain \<Theta> where \<Theta>_def: "\<Theta> = (into \<circ>\<^sub>c associate_right Y X X \<circ>\<^sub>c swap X (Y \<times>\<^sub>c X))\<^sup>\<sharp> \<circ>\<^sub>c swap X Y"
           by auto
   
-        have \<Theta>_type[type_rule]: "\<Theta> : X \<times>\<^sub>c Y \<rightarrow> Y\<^bsup>X\<^esup>"
+        have \<Theta>_type[type_rule]: "\<Theta> : X \<times>\<^sub>c Y \<rightarrow> Y\<^sup>X"
           unfolding \<Theta>_def by typecheck_cfuncs
 
-        have f0: "\<And>x. \<And> y. \<And> z. x \<in>\<^sub>c X \<and> y \<in>\<^sub>c Y \<and> z \<in>\<^sub>c X \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
+        have f0: "\<And>x. \<And> y. \<And> z. x \<in>\<^sub>c X \<and> y \<in>\<^sub>c Y \<and> z \<in>\<^sub>c X \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
         proof(clarify)
           fix x y z
           assume x_type[type_rule]: "x \<in>\<^sub>c X"
           assume y_type[type_rule]: "y \<in>\<^sub>c Y"
           assume z_type[type_rule]: "z \<in>\<^sub>c X"
-          show "(\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id\<^sub>c X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c \<langle>y,\<langle>x,z\<rangle>\<rangle>"
+          show "(\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id\<^sub>c X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c \<langle>y,\<langle>x,z\<rangle>\<rangle>"
           proof - 
-            have "(\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id\<^sub>c X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = (\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id\<^sub>c X \<circ>\<^sub>c z,\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c z\<rangle>"
+            have "(\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id\<^sub>c X,\<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = (\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id\<^sub>c X \<circ>\<^sub>c z,\<beta>\<^bsub>X\<^esub> \<circ>\<^sub>c z\<rangle>"
               by (typecheck_cfuncs, simp add: cfunc_prod_comp)
-            also have "... = (\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
+            also have "... = (\<Theta> \<circ>\<^sub>c \<langle>x,y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
               by (typecheck_cfuncs, metis id_left_unit2 one_unique_element)
-            also have "... = (\<Theta>\<^sup>\<flat> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<langle>x,y\<rangle>)) \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
+            also have "... = (\<Theta>\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<langle>x,y\<rangle>)) \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
               using inv_transpose_of_composition by (typecheck_cfuncs, presburger)
-            also have "... = \<Theta>\<^sup>\<flat> \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<langle>x,y\<rangle>) \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
+            also have "... = \<Theta>\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c (id(X) \<times>\<^sub>f \<langle>x,y\<rangle>) \<circ>\<^sub>c \<langle>z,id \<one>\<rangle>"
               using comp_associative2 by (typecheck_cfuncs, auto)
-            also have "... = \<Theta>\<^sup>\<flat> \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c  z, \<langle>x,y\<rangle> \<circ>\<^sub>c  id \<one>\<rangle>"
+            also have "... = \<Theta>\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id(X) \<circ>\<^sub>c  z, \<langle>x,y\<rangle> \<circ>\<^sub>c  id \<one>\<rangle>"
               by (typecheck_cfuncs, simp add: cfunc_cross_prod_comp_cfunc_prod)
-            also have "... = \<Theta>\<^sup>\<flat> \<circ>\<^sub>c \<langle>z,\<langle>x,y\<rangle>\<rangle>"
+            also have "... = \<Theta>\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>z,\<langle>x,y\<rangle>\<rangle>"
               by (typecheck_cfuncs, simp add: id_left_unit2 id_right_unit2)
-            also have "... = ((into \<circ>\<^sub>c associate_right Y X X \<circ>\<^sub>c swap X (Y \<times>\<^sub>c X))\<^sup>\<sharp> \<circ>\<^sub>c swap X Y)\<^sup>\<flat> \<circ>\<^sub>c \<langle>z,\<langle>x,y\<rangle>\<rangle>"
+            also have "... = ((into \<circ>\<^sub>c associate_right Y X X \<circ>\<^sub>c swap X (Y \<times>\<^sub>c X))\<^sup>\<sharp> \<circ>\<^sub>c swap X Y)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>z,\<langle>x,y\<rangle>\<rangle>"
               by (simp add: \<Theta>_def)
-            also have "... = ((into \<circ>\<^sub>c associate_right Y X X \<circ>\<^sub>c swap X (Y \<times>\<^sub>c X))\<^sup>\<sharp>\<^sup>\<flat> \<circ>\<^sub>c (id X \<times>\<^sub>f swap X Y)) \<circ>\<^sub>c \<langle>z,\<langle>x,y\<rangle>\<rangle>"
+            also have "... = ((into \<circ>\<^sub>c associate_right Y X X \<circ>\<^sub>c swap X (Y \<times>\<^sub>c X))\<^sup>\<sharp>\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c (id X \<times>\<^sub>f swap X Y)) \<circ>\<^sub>c \<langle>z,\<langle>x,y\<rangle>\<rangle>"
               using inv_transpose_of_composition by (typecheck_cfuncs, presburger)
             also have "... = (into \<circ>\<^sub>c associate_right Y X X \<circ>\<^sub>c swap X (Y \<times>\<^sub>c X)) \<circ>\<^sub>c  (id X \<times>\<^sub>f swap X Y) \<circ>\<^sub>c \<langle>z,\<langle>x,y\<rangle>\<rangle>"
               by (typecheck_cfuncs, simp add: comp_associative2 inv_transpose_func_def3 transpose_func_def)
@@ -622,12 +622,12 @@ next
           qed
         qed
   
-        have f1: "\<And>x y. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y  \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = y"
+        have f1: "\<And>x y. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y  \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = y"
         proof - 
           fix x y 
           assume x_type[type_rule]: "x \<in>\<^sub>c X"
           assume y_type[type_rule]: "y \<in>\<^sub>c Y"
-          have "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = into \<circ>\<^sub>c   \<langle>y, \<langle>x, x\<rangle>\<rangle>"
+          have "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = into \<circ>\<^sub>c   \<langle>y, \<langle>x, x\<rangle>\<rangle>"
             by (simp add: f0 x_type y_type)
           also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
                                  \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y, \<langle>x, x\<rangle>\<rangle>"
@@ -654,10 +654,10 @@ next
             using left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
           also have "... = y"
             by (typecheck_cfuncs, simp add: left_cart_proj_cfunc_prod)
-          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = y".
+          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c x = y".
         qed
   
-        have f2: "\<And>x y z. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y  \<Longrightarrow>  z \<in>\<^sub>c X \<Longrightarrow> z \<noteq> x \<Longrightarrow> y \<noteq> y1 \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1"
+        have f2: "\<And>x y z. x \<in>\<^sub>c X \<Longrightarrow> y \<in>\<^sub>c Y  \<Longrightarrow>  z \<in>\<^sub>c X \<Longrightarrow> z \<noteq> x \<Longrightarrow> y \<noteq> y1 \<Longrightarrow> (\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1"
         proof - 
           fix x y z
           assume x_type[type_rule]: "x \<in>\<^sub>c X"
@@ -665,7 +665,7 @@ next
           assume z_type[type_rule]: "z \<in>\<^sub>c X"
           assume "z \<noteq> x"
           assume "y \<noteq> y1"
-          have "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
+          have "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
             by (simp add: f0 x_type y_type z_type)
           also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
                                  \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y, \<langle>x, z\<rangle>\<rangle>"
@@ -698,16 +698,16 @@ next
             by (typecheck_cfuncs, metis \<open>y \<noteq> y1\<close> eq_pred_iff_eq_conv)
           also have "... = y1"
             using case_bool_false right_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
-          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1".
+          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1".
         qed
         
-        have f3: "\<And>x z. x \<in>\<^sub>c X \<Longrightarrow>  z \<in>\<^sub>c X \<Longrightarrow> z \<noteq> x \<Longrightarrow>  (\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2"
+        have f3: "\<And>x z. x \<in>\<^sub>c X \<Longrightarrow>  z \<in>\<^sub>c X \<Longrightarrow> z \<noteq> x \<Longrightarrow>  (\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2"
         proof - 
           fix x y z
           assume x_type[type_rule]: "x \<in>\<^sub>c X"
           assume z_type[type_rule]: "z \<in>\<^sub>c X"
           assume "z \<noteq> x"
-          have "(\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y1, \<langle>x, z\<rangle>\<rangle>"
+          have "(\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = into \<circ>\<^sub>c   \<langle>y1, \<langle>x, z\<rangle>\<rangle>"
             by (simp add: f0 x_type y1_type z_type)
           also have "... = (left_cart_proj Y \<one> \<amalg> ((y2 \<amalg> y1) \<circ>\<^sub>c case_bool \<circ>\<^sub>c eq_pred Y \<circ>\<^sub>c (id Y \<times>\<^sub>f y1)))
                                  \<circ>\<^sub>c dist_prod_coprod_left Y \<one> \<one> \<circ>\<^sub>c (id Y \<times>\<^sub>f case_bool) \<circ>\<^sub>c (id Y \<times>\<^sub>f eq_pred X) \<circ>\<^sub>c   \<langle>y1, \<langle>x, z\<rangle>\<rangle>"
@@ -740,7 +740,7 @@ next
             by (typecheck_cfuncs, metis eq_pred_iff_eq)
           also have "... = y2"
             using case_bool_true left_coproj_cfunc_coprod by (typecheck_cfuncs, presburger)
-          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2".
+          finally show "(\<Theta> \<circ>\<^sub>c \<langle>x, y1\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2".
         qed
   
      have \<Theta>_injective: "injective(\<Theta>)"
@@ -773,9 +773,9 @@ next
              assume "s \<noteq> x"  (*This step, in particular, is why we require X to not be isomorphic to Omega*)
              obtain z where z_type[type_rule]: "z \<in>\<^sub>c X" and z_not_x: "z \<noteq> x" and z_not_s: "z \<noteq> s"
                by (metis \<open>\<not> X \<cong> \<Omega>\<close> \<open>\<not> initial_object X\<close> \<open>\<not> terminal_object X\<close> sets_size_3_plus)
-             have t_sz: "(\<Theta> \<circ>\<^sub>c \<langle>s, t\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1"
+             have t_sz: "(\<Theta> \<circ>\<^sub>c \<langle>s, t\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y1"
                by (simp add: \<open>t \<noteq> y1\<close> f2 s_type t_type z_not_s z_type)
-             have y_xz: "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat> \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2"
+             have y_xz: "(\<Theta> \<circ>\<^sub>c \<langle>x, y\<rangle>)\<^sup>\<flat>\<^sup>(\<^sup>Y\<^sup>,\<^sup>X\<^sup>) \<circ>\<^sub>c \<langle>id X, \<beta>\<^bsub>X\<^esub>\<rangle> \<circ>\<^sub>c z = y2"
                by (simp add: \<open>y = y1\<close> f3 x_type z_not_x z_type)    
              then have "y1 = y2"
                using equals2 t_sz by auto
@@ -836,11 +836,11 @@ qed
 
 lemma Y_nonempty_then_X_le_XtoY:
   assumes "nonempty Y"
-  shows "X \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+  shows "X \<le>\<^sub>c X\<^sup>Y"
 proof - 
   obtain f where f_def: "f = (right_cart_proj Y X)\<^sup>\<sharp>"
     by blast
-  then have f_type: "f : X \<rightarrow> X\<^bsup>Y\<^esup>"
+  then have f_type: "f : X \<rightarrow> X\<^sup>Y"
     by (simp add: right_cart_proj_type transpose_func_type)
   have mono_f: "injective(f)"
     unfolding injective_def
@@ -874,7 +874,7 @@ proof -
     ultimately show "x = y"
       using assms epimorphism_def3 nonempty_left_imp_right_proj_epimorphism right_cart_proj_type x_type2 y_type2 by fastforce
   qed
-  then show "X \<le>\<^sub>c X\<^bsup>Y\<^esup>"
+  then show "X \<le>\<^sub>c X\<^sup>Y"
     using f_type injective_imp_monomorphism is_smaller_than_def by blast
 qed
 
@@ -945,35 +945,35 @@ qed
 lemma exp_preserves_card1:
   assumes "A \<le>\<^sub>c B"
   assumes "nonempty X"   
-  shows "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
+  shows "X\<^sup>A \<le>\<^sub>c X\<^sup>B"
   unfolding is_smaller_than_def
 proof -
   obtain x where x_type[type_rule]: "x \<in>\<^sub>c X"
     using assms(2) unfolding nonempty_def by auto
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
     using assms(1) unfolding is_smaller_than_def by auto
-  show "\<exists>m. m : X\<^bsup>A\<^esup> \<rightarrow> X\<^bsup>B\<^esup> \<and> monomorphism m"
-  proof (intro exI[where x="(((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>))
-    \<circ>\<^sub>c dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) 
-    \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id (X\<^bsup>A\<^esup>)))\<^sup>\<sharp>"], safe)
+  show "\<exists>m. m : X\<^sup>A \<rightarrow> X\<^sup>B \<and> monomorphism m"
+  proof (intro exI[where x="(((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>))
+    \<circ>\<^sub>c dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) 
+    \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id (X\<^sup>A)))\<^sup>\<sharp>"], safe)
 
-    show "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> : X\<^bsup>A\<^esup> \<rightarrow> X\<^bsup>B\<^esup>"
+    show "((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp> : X\<^sup>A \<rightarrow> X\<^sup>B"
       by  typecheck_cfuncs
     then show "monomorphism
-      (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-        dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-        swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp>)"
+      (((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+        dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+        swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp>)"
     proof (unfold monomorphism_def3, clarify)
       fix g h Z
-      assume g_type[type_rule]: "g : Z \<rightarrow> X\<^bsup>A\<^esup>"
-      assume h_type[type_rule]: "h : Z \<rightarrow> X\<^bsup>A\<^esup>"
-      assume eq: "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-          dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-          swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c g
+      assume g_type[type_rule]: "g : Z \<rightarrow> X\<^sup>A"
+      assume h_type[type_rule]: "h : Z \<rightarrow> X\<^sup>A"
+      assume eq: "((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+          dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+          swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp> \<circ>\<^sub>c g
         =
-          ((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-          dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-          swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h"
+          ((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+          dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+          swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp> \<circ>\<^sub>c h"
 
       show "g = h"
       proof (typecheck_cfuncs, rule same_evals_equal[where Z=Z, where A=A, where X=X], clarify)
@@ -985,103 +985,103 @@ proof -
           obtain a z where az_types[type_rule]: "a \<in>\<^sub>c A" "z \<in>\<^sub>c Z" and az_def: "az = \<langle>a,z\<rangle>"
             using cart_prod_decomp az_type by blast
 
-          have "(eval_func X B) \<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c g)) = 
-          (eval_func X B) \<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp> \<circ>\<^sub>c h))"
+          have "(eval_func X B) \<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp> \<circ>\<^sub>c g)) = 
+          (eval_func X B) \<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp> \<circ>\<^sub>c h))"
             using eq by simp
-          then have "(eval_func X B)\<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  g) = 
-          (eval_func X B)\<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  h)"
+          then have "(eval_func X B)\<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  g) = 
+          (eval_func X B)\<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  h)"
             using identity_distributes_across_composition by (typecheck_cfuncs, auto)
-          then have "((eval_func X B)\<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp>))) \<circ>\<^sub>c (id B \<times>\<^sub>f  g) = 
-          ((eval_func X B)\<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>))\<^sup>\<sharp>))) \<circ>\<^sub>c (id B \<times>\<^sub>f  h)"
+          then have "((eval_func X B)\<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp>))) \<circ>\<^sub>c (id B \<times>\<^sub>f  g) = 
+          ((eval_func X B)\<circ>\<^sub>c (id B \<times>\<^sub>f (((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A))\<^sup>\<sharp>))) \<circ>\<^sub>c (id B \<times>\<^sub>f  h)"
             by (typecheck_cfuncs, smt eq inv_transpose_func_def3 inv_transpose_of_composition)
-          then have "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  g)
-          = ((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  h)"
+          then have "((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c (id B \<times>\<^sub>f  g)
+          = ((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c (id B \<times>\<^sub>f  h)"
             using   transpose_func_def by (typecheck_cfuncs,auto)
-          then have "(((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  g)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, z\<rangle>
-          = (((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  h)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, z\<rangle>"
+          then have "(((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c (id B \<times>\<^sub>f  g)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, z\<rangle>
+          = (((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c (id B \<times>\<^sub>f  h)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, z\<rangle>"
             by auto
-          then have "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  g) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, z\<rangle>
-          = ((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c (id B \<times>\<^sub>f  h) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, z\<rangle>"
+          then have "((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c (id B \<times>\<^sub>f  g) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, z\<rangle>
+          = ((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c (id B \<times>\<^sub>f  h) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, z\<rangle>"
             by (typecheck_cfuncs, auto simp add: comp_associative2)
-          then have "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
-          = ((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
+          then have "((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
+          = ((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
             by (typecheck_cfuncs, smt cfunc_cross_prod_comp_cfunc_prod id_left_unit2 id_type)
-          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
-          = (eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id\<^sub>c (X\<^bsup>A\<^esup>)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
+          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
+          = (eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c (try_cast m \<times>\<^sub>f id\<^sub>c (X\<^sup>A)) \<circ>\<^sub>c \<langle>m \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
             by (typecheck_cfuncs_prems, smt comp_associative2)
-          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c \<langle>try_cast m \<circ>\<^sub>c m \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
-          = (eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c \<langle>try_cast m \<circ>\<^sub>c m \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
+          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c \<langle>try_cast m \<circ>\<^sub>c m \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
+          = (eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c \<langle>try_cast m \<circ>\<^sub>c m \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
             using cfunc_cross_prod_comp_cfunc_prod id_left_unit2 by (typecheck_cfuncs_prems, smt)
-          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c \<langle>(try_cast m \<circ>\<^sub>c m) \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
-          = (eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c \<langle>(try_cast m \<circ>\<^sub>c m) \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
+          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c \<langle>(try_cast m \<circ>\<^sub>c m) \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
+          = (eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c \<langle>(try_cast m \<circ>\<^sub>c m) \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
             by (typecheck_cfuncs, auto simp add: comp_associative2)
-          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c \<langle>left_coproj A (B \<setminus> (A,m)) \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
-          = (eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c
-            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^bsup>A\<^esup>) \<circ>\<^sub>c \<langle>left_coproj A (B \<setminus> (A,m)) \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
+          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c \<langle>left_coproj A (B \<setminus> (A,m)) \<circ>\<^sub>c a, g \<circ>\<^sub>c z\<rangle>
+          = (eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c
+            swap (A \<Coprod> (B \<setminus> (A, m))) (X\<^sup>A) \<circ>\<^sub>c \<langle>left_coproj A (B \<setminus> (A,m)) \<circ>\<^sub>c a, h \<circ>\<^sub>c z\<rangle>"
             using m_def(2) try_cast_m_m by (typecheck_cfuncs, auto)
-          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, left_coproj A (B \<setminus> (A,m)) \<circ>\<^sub>c a\<rangle>
-          = (eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            dist_prod_coprod_left (X\<^bsup>A\<^esup>) A (B \<setminus> (A, m)) \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z, left_coproj A (B \<setminus> (A,m)) \<circ>\<^sub>c a\<rangle>"
+          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, left_coproj A (B \<setminus> (A,m)) \<circ>\<^sub>c a\<rangle>
+          = (eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            dist_prod_coprod_left (X\<^sup>A) A (B \<setminus> (A, m)) \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z, left_coproj A (B \<setminus> (A,m)) \<circ>\<^sub>c a\<rangle>"
             using swap_ap by (typecheck_cfuncs, auto)
-          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            left_coproj (X\<^bsup>A\<^esup>\<times>\<^sub>cA) (X\<^bsup>A\<^esup>\<times>\<^sub>c(B \<setminus> (A,m))) \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, a\<rangle>
-          = (eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            left_coproj (X\<^bsup>A\<^esup>\<times>\<^sub>cA) (X\<^bsup>A\<^esup>\<times>\<^sub>c(B \<setminus> (A,m))) \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z,a\<rangle>"
+          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            left_coproj (X\<^sup>A\<times>\<^sub>cA) (X\<^sup>A\<times>\<^sub>c(B \<setminus> (A,m))) \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, a\<rangle>
+          = (eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            left_coproj (X\<^sup>A\<times>\<^sub>cA) (X\<^sup>A\<times>\<^sub>c(B \<setminus> (A,m))) \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z,a\<rangle>"
             using dist_prod_coprod_left_ap_left by (typecheck_cfuncs, auto)
-          then have "((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            left_coproj (X\<^bsup>A\<^esup>\<times>\<^sub>cA) (X\<^bsup>A\<^esup>\<times>\<^sub>c(B \<setminus> (A,m)))) \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, a\<rangle>
-          = ((eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^bsup>A\<^esup> \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
-            left_coproj (X\<^bsup>A\<^esup>\<times>\<^sub>cA) (X\<^bsup>A\<^esup>\<times>\<^sub>c(B \<setminus> (A,m)))) \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z,a\<rangle>"
+          then have "((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            left_coproj (X\<^sup>A\<times>\<^sub>cA) (X\<^sup>A\<times>\<^sub>c(B \<setminus> (A,m)))) \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, a\<rangle>
+          = ((eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<amalg> (x \<circ>\<^sub>c \<beta>\<^bsub>X\<^sup>A \<times>\<^sub>c (B \<setminus> (A, m))\<^esub>) \<circ>\<^sub>c
+            left_coproj (X\<^sup>A\<times>\<^sub>cA) (X\<^sup>A\<times>\<^sub>c(B \<setminus> (A,m)))) \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z,a\<rangle>"
             by (typecheck_cfuncs_prems, auto simp add: comp_associative2)
-          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, a\<rangle>
-            = (eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A) \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z,a\<rangle>"
+          then have "(eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, a\<rangle>
+            = (eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A) \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z,a\<rangle>"
             by (typecheck_cfuncs_prems, auto simp add: left_coproj_cfunc_coprod)
-          then have "eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, a\<rangle>
-            = eval_func X A \<circ>\<^sub>c swap (X\<^bsup>A\<^esup>) A \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z,a\<rangle>"
+          then have "eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A \<circ>\<^sub>c \<langle>g \<circ>\<^sub>c z, a\<rangle>
+            = eval_func X A \<circ>\<^sub>c swap (X\<^sup>A) A \<circ>\<^sub>c \<langle>h \<circ>\<^sub>c z,a\<rangle>"
             by (typecheck_cfuncs_prems, auto simp add: comp_associative2)
           then have "eval_func X A \<circ>\<^sub>c \<langle>a, g \<circ>\<^sub>c z\<rangle> = eval_func X A \<circ>\<^sub>c \<langle>a, h \<circ>\<^sub>c z\<rangle>"
             by (typecheck_cfuncs_prems, auto simp add: swap_ap)
@@ -1097,20 +1097,20 @@ qed
 
 lemma exp_preserves_card2:
   assumes "A \<le>\<^sub>c B"
-  shows "A\<^bsup>X\<^esup> \<le>\<^sub>c B\<^bsup>X\<^esup>"
+  shows "A\<^sup>X \<le>\<^sub>c B\<^sup>X"
   unfolding is_smaller_than_def
 proof -
   obtain m where m_def[type_rule]: "m : A \<rightarrow> B" "monomorphism m"
         using assms unfolding is_smaller_than_def by auto
-  show "\<exists>m. m : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup> \<and> monomorphism m"
+  show "\<exists>m. m : A\<^sup>X \<rightarrow> B\<^sup>X \<and> monomorphism m"
   proof (intro exI[where x="(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>"], safe)
-    show "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> : A\<^bsup>X\<^esup> \<rightarrow> B\<^bsup>X\<^esup>"
+    show "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> : A\<^sup>X \<rightarrow> B\<^sup>X"
       by typecheck_cfuncs
     then show "monomorphism((m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp>)"
     proof (unfold monomorphism_def3, clarify)
       fix g h Z
-      assume g_type[type_rule]: "g : Z \<rightarrow> A\<^bsup>X\<^esup>"
-      assume h_type[type_rule]: "h : Z \<rightarrow> A\<^bsup>X\<^esup>"
+      assume g_type[type_rule]: "g : Z \<rightarrow> A\<^sup>X"
+      assume h_type[type_rule]: "h : Z \<rightarrow> A\<^sup>X"
 
       assume eq: "(m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c g = (m \<circ>\<^sub>c eval_func A X)\<^sup>\<sharp> \<circ>\<^sub>c h"
       show "g = h"
@@ -1135,13 +1135,13 @@ lemma exp_preserves_card3:
   assumes "A \<le>\<^sub>c B"
   assumes "X \<le>\<^sub>c Y"
   assumes "nonempty(X)"
-  shows "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
+  shows "X\<^sup>A \<le>\<^sub>c Y\<^sup>B"
 proof - 
-  have leq1: "X\<^bsup>A\<^esup> \<le>\<^sub>c X\<^bsup>B\<^esup>"
+  have leq1: "X\<^sup>A \<le>\<^sub>c X\<^sup>B"
     by (simp add: assms(1,3) exp_preserves_card1)    
-  have leq2: "X\<^bsup>B\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
+  have leq2: "X\<^sup>B \<le>\<^sub>c Y\<^sup>B"
     by (simp add: assms(2) exp_preserves_card2)
-  show "X\<^bsup>A\<^esup> \<le>\<^sub>c Y\<^bsup>B\<^esup>"
+  show "X\<^sup>A \<le>\<^sub>c Y\<^sup>B"
     using leq1 leq2 set_card_transitive by blast
 qed
 

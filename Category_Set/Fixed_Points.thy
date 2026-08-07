@@ -19,14 +19,14 @@ lemma fixed_point_def2:
 
 text \<open>The lemma below corresponds to Theorem 2.6.13 in Halvorson.\<close>
 lemma Lawveres_fixed_point_theorem:
-  assumes p_type[type_rule]: "p : X \<rightarrow> A\<^bsup>X\<^esup>"
+  assumes p_type[type_rule]: "p : X \<rightarrow> A\<^sup>X"
   assumes p_surj: "surjective p"
   shows "fixed_point_property A"
   unfolding fixed_point_property_def has_fixed_point_def
 proof(clarify) 
   fix g 
   assume g_type[type_rule]: "g : A \<rightarrow> A"
-  obtain \<phi> where \<phi>_def: "\<phi> = p\<^sup>\<flat>"
+  obtain \<phi> where \<phi>_def: "\<phi> = p\<^sup>\<flat>\<^sup>(\<^sup>A\<^sup>,\<^sup>X\<^sup>)"
     by auto
   then have \<phi>_type[type_rule]: "\<phi> : X \<times>\<^sub>c X \<rightarrow> A"
     by (simp add: flat_type p_type)
@@ -36,11 +36,11 @@ proof(clarify)
     using \<phi>_type comp_type diagonal_type f_def g_type by blast
   obtain x_f where x_f: "metafunc f = p \<circ>\<^sub>c x_f" and x_f_type[type_rule]: "x_f \<in>\<^sub>c X"
     using assms by (typecheck_cfuncs, metis p_surj surjective_def2)
-  have "\<phi>\<^bsub>[-,x_f]\<^esub> = f"
+  have "\<phi>\<^bsub>[-,x_f]\<^esub>\<^bsub>X\<^esub> = f"
   proof(etcs_rule one_separator)
-    fix x 
+    fix x
     assume x_type[type_rule]: "x \<in>\<^sub>c X"
-    have "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
+    have "\<phi>\<^bsub>[-,x_f]\<^esub>\<^bsub>X\<^esub> \<circ>\<^sub>c x = \<phi> \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
       by (typecheck_cfuncs, meson right_param_on_el x_f)
     also have "... = ((eval_func A X) \<circ>\<^sub>c (id X \<times>\<^sub>f p)) \<circ>\<^sub>c \<langle>x, x_f\<rangle>"
       using assms \<phi>_def inv_transpose_func_def3 by auto
@@ -52,9 +52,9 @@ proof(clarify)
       using id_left_unit2 x_f by (typecheck_cfuncs, auto)
     also have "... = f \<circ>\<^sub>c x"
       by (simp add: eval_lemma f_type x_type)
-    finally show "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x".
+    finally show "\<phi>\<^bsub>[-,x_f]\<^esub>\<^bsub>X\<^esub> \<circ>\<^sub>c x = f \<circ>\<^sub>c x".
   qed
-  then have "\<phi>\<^bsub>[-,x_f]\<^esub> \<circ>\<^sub>c x_f = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c diagonal(X) \<circ>\<^sub>c x_f"
+  then have "\<phi>\<^bsub>[-,x_f]\<^esub>\<^bsub>X\<^esub> \<circ>\<^sub>c x_f = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c diagonal(X) \<circ>\<^sub>c x_f"
     by (typecheck_cfuncs, smt (z3) cfunc_type_def comp_associative domain_comp f_def x_f)
   then have "\<phi> \<circ>\<^sub>c \<langle>x_f, x_f\<rangle> = g \<circ>\<^sub>c \<phi> \<circ>\<^sub>c \<langle>x_f, x_f\<rangle>"
     using  diag_on_elements right_param_on_el x_f by (typecheck_cfuncs, auto)
@@ -90,9 +90,9 @@ qed
 
 text \<open>The theorem below corresponds to Exercise 2.6.15 in Halvorson.\<close>
 theorem Cantors_Positive_Theorem:
-  "\<exists>m. m : X \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> injective m"
+  "\<exists>m. m : X \<rightarrow> \<Omega>\<^sup>X \<and> injective m"
 proof - 
-  have eq_pred_sharp_type[type_rule]: "eq_pred X\<^sup>\<sharp> : X \<rightarrow>  \<Omega>\<^bsup>X\<^esup>"
+  have eq_pred_sharp_type[type_rule]: "eq_pred X\<^sup>\<sharp> : X \<rightarrow>  \<Omega>\<^sup>X"
     by typecheck_cfuncs
   have "injective(eq_pred X\<^sup>\<sharp>)"
     unfolding injective_def
@@ -124,7 +124,7 @@ proof -
     then show "x = y"
       by (metis eq_pred_iff_eq x_type y_type)
   qed
-  then show "\<exists>m. m : X \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> injective m"
+  then show "\<exists>m. m : X \<rightarrow> \<Omega>\<^sup>X \<and> injective m"
     using eq_pred_sharp_type injective_imp_monomorphism by blast
 qed
 
@@ -138,13 +138,13 @@ corollary
 corollary Generalized_Cantors_Positive_Theorem:
   assumes "\<not> terminal_object Y"
   assumes "\<not> initial_object Y"
-  shows "X  \<le>\<^sub>c Y\<^bsup>X\<^esup>"
+  shows "X  \<le>\<^sub>c Y\<^sup>X"
 proof - 
   have "\<Omega> \<le>\<^sub>c Y"
     by (simp add: assms non_init_non_ter_sets)
-  then have fact: "\<Omega>\<^bsup>X\<^esup> \<le>\<^sub>c  Y\<^bsup>X\<^esup>"
+  then have fact: "\<Omega>\<^sup>X \<le>\<^sub>c  Y\<^sup>X"
     by (simp add: exp_preserves_card2)
-  have "X \<le>\<^sub>c \<Omega>\<^bsup>X\<^esup>"
+  have "X \<le>\<^sub>c \<Omega>\<^sup>X"
     by (meson Cantors_Positive_Theorem CollectI injective_imp_monomorphism is_smaller_than_def)
   then show ?thesis
     using fact set_card_transitive by blast
@@ -153,22 +153,22 @@ qed
 corollary Generalized_Cantors_Negative_Theorem:
   assumes "\<not> initial_object X"
   assumes "\<not> terminal_object Y"
-  shows "\<nexists> s. s : X \<rightarrow> Y\<^bsup>X\<^esup> \<and> surjective s"
+  shows "\<nexists> s. s : X \<rightarrow> Y\<^sup>X \<and> surjective s"
 proof(rule ccontr, clarify) 
   fix s 
-  assume s_type: "s : X \<rightarrow> Y\<^bsup>X\<^esup>"
+  assume s_type: "s : X \<rightarrow> Y\<^sup>X"
   assume s_surj: "surjective s"
-  obtain m where m_type: "m : Y\<^bsup>X\<^esup> \<rightarrow> X" and m_mono: "monomorphism(m)"
+  obtain m where m_type: "m : Y\<^sup>X \<rightarrow> X" and m_mono: "monomorphism(m)"
     by (meson epis_give_monos s_surj s_type surjective_is_epimorphism)
   have "nonempty X"
     using is_empty_def assms(1) iso_empty_initial no_el_iff_iso_empty nonempty_def by blast
 
-  then have nonempty: "nonempty (\<Omega>\<^bsup>X\<^esup>)"
+  then have nonempty: "nonempty (\<Omega>\<^sup>X)"
     using nonempty_def nonempty_to_nonempty true_func_type by blast
   show False
   proof(cases "initial_object Y")
     assume "initial_object Y"
-    then have "Y\<^bsup>X\<^esup> \<cong> \<emptyset>"
+    then have "Y\<^sup>X \<cong> \<emptyset>"
       by (simp add: \<open>nonempty X\<close> empty_to_nonempty initial_iso_empty no_el_iff_iso_empty)      
     then show False
       by (meson is_empty_def assms(1) comp_type iso_empty_initial no_el_iff_iso_empty s_type) 
@@ -176,13 +176,13 @@ proof(rule ccontr, clarify)
     assume "\<not> initial_object Y"
     then have "\<Omega> \<le>\<^sub>c Y"
       by (simp add: assms(2) non_init_non_ter_sets)
-    then obtain n where n_type: "n : \<Omega>\<^bsup>X\<^esup> \<rightarrow> Y\<^bsup>X\<^esup>" and n_mono: "monomorphism(n)"
+    then obtain n where n_type: "n : \<Omega>\<^sup>X \<rightarrow> Y\<^sup>X" and n_mono: "monomorphism(n)"
       by (meson exp_preserves_card2 is_smaller_than_def)
-    then have mn_type: "m \<circ>\<^sub>c n :  \<Omega>\<^bsup>X\<^esup> \<rightarrow> X"
+    then have mn_type: "m \<circ>\<^sub>c n :  \<Omega>\<^sup>X \<rightarrow> X"
       by (meson comp_type m_type)
     have mn_mono: "monomorphism(m \<circ>\<^sub>c n)"
       using cfunc_type_def composition_of_monic_pair_is_monic m_mono m_type n_mono n_type by presburger
-    then have "\<exists>g. g: X  \<rightarrow> \<Omega>\<^bsup>X\<^esup> \<and> epimorphism(g) \<and> g \<circ>\<^sub>c (m \<circ>\<^sub>c n) = id (\<Omega>\<^bsup>X\<^esup>)"
+    then have "\<exists>g. g: X  \<rightarrow> \<Omega>\<^sup>X \<and> epimorphism(g) \<and> g \<circ>\<^sub>c (m \<circ>\<^sub>c n) = id (\<Omega>\<^sup>X)"
       by (simp add: mn_type monos_give_epis nonempty)
     then show False
       by (metis Cantors_Negative_Theorem epi_is_surj powerset_def)

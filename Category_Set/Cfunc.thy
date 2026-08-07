@@ -333,8 +333,10 @@ lemma isomorphism_comp':
   shows "isomorphism f \<Longrightarrow> isomorphism g \<Longrightarrow> isomorphism (f \<circ>\<^sub>c g)"
   using assms cfunc_type_def isomorphism_comp by auto
 
-lemma isomorphic_is_transitive: "(X \<cong> Y \<and> Y \<cong> Z) \<longrightarrow> X \<cong> Z"
-  unfolding is_isomorphic_def by (auto, metis cfunc_type_def comp_type isomorphism_comp)
+lemma isomorphic_is_transitive[trans]:
+  assumes "X \<cong> Y" and "Y \<cong> Z"
+  shows "X \<cong> Z"
+  using assms unfolding is_isomorphic_def by (auto, metis cfunc_type_def comp_type isomorphism_comp)
 
 lemma is_isomorphic_equiv:
   "equiv UNIV {(X, Y). X \<cong> Y}"
