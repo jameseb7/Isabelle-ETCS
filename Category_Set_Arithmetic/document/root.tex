@@ -1,0 +1,43 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb}
+\usepackage{isabelle,isabellesym}
+
+% this should be the last package used
+\usepackage{pdfsetup}
+
+% urls in roman style, theory text in math-similar italics
+\urlstyle{rm}
+\isabellestyle{it}
+
+\begin{document}
+
+\title{Arithmetic and Primitive Recursion in the Category of Sets}
+\author{Dustin Bryant}
+\maketitle
+
+\begin{abstract}
+  Building on the entry \emph{Category\_Set}, which formalises the
+  Elementary Theory of the Category of Sets (ETCS), we develop
+  elementary arithmetic on the natural numbers object. Starting from
+  the successor function, we construct addition, a truncated
+  subtraction (monus), the usual linear order, multiplication, and
+  exponentiation, together with their standard algebraic and
+  order-theoretic properties. We also construct the integers as a
+  quotient of pairs of naturals equipped with addition and
+  multiplication, and define finite (Sigma) summation. Finally, we
+  provide a general scheme for primitive recursion and iteration on
+  the natural numbers object, along with tooling for defining new
+  recursively specified functions from it, which is used extensively
+  by the companion entry on finite and countable sets.
+\end{abstract}
+
+\tableofcontents
+
+% include generated text of all theories
+\input{session}
+
+\bibliographystyle{abbrv}
+\bibliography{root}
+
+\end{document}

@@ -1,0 +1,24 @@
+(* All sessions must be in chapter AFP *)
+chapter AFP
+
+(* Session name, list base session: *)
+session "Category_Set_Arithmetic" = "Category_Set" +
+
+(* Timeout (in sec) in case of non-termination problems *)
+  options [timeout = 600]
+
+(* The top-level theories of the submission: *)
+  theories
+    Add
+    Inequality
+    Monus
+    Mult
+    Exp
+    Int
+    Summation
+    Primitive_Recursive
+
+(* Dependencies on document source files: *)
+  document_files
+    "root.bib"
+    "root.tex"

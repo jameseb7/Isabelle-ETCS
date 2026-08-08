@@ -3,17 +3,17 @@ theory Monus
 begin
 
 definition monus1 :: "cfunc" 
-  where "monus1 = (THE u. u : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and> 
+  where "monus1 = (THE u. u : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^sup>(\<nat>\<^sub>c) \<and> 
   u \<circ>\<^sub>c zero = (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> \<and> 
   u \<circ>\<^sub>c successor = predecessor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c u)"
 
-lemma monus1_property: "monus1 : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup> \<and> 
+lemma monus1_property: "monus1 : \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^sup>(\<nat>\<^sub>c) \<and> 
   monus1 \<circ>\<^sub>c zero = (left_cart_proj \<nat>\<^sub>c \<one>)\<^sup>\<sharp> \<and> 
   monus1 \<circ>\<^sub>c successor = predecessor\<^bsup>\<nat>\<^sub>c\<^esup>\<^sub>f \<circ>\<^sub>c monus1"
   unfolding monus1_def
   by (rule theI', typecheck_cfuncs, smt (verit, best) natural_number_object_property2)
   
-lemma monus1_type[type_rule]: "monus1: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^bsup>\<nat>\<^sub>c\<^esup>"
+lemma monus1_type[type_rule]: "monus1: \<nat>\<^sub>c \<rightarrow> \<nat>\<^sub>c\<^sup>(\<nat>\<^sub>c)"
   by (simp add: monus1_property)
 
 lemma monus1_0_eq: "monus1 \<circ>\<^sub>c zero = left_cart_proj \<nat>\<^sub>c \<one>\<^sup>\<sharp>"
